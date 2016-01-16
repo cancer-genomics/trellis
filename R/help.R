@@ -5,8 +5,8 @@
 #' @docType package
 #' @name svclasses
 #' @import methods
-#' @importFrom Rsamtools bamPaths bamRanges bamSamples
-#' @importMethodsFrom Rsamtools BamViews
+#' @importFrom Rsamtools bamPaths bamRanges bamSamples 
+#' @importMethodsFrom Rsamtools BamViews 
 #' @importClassesFrom Rsamtools BamViews
 #' @importMethodsFrom GenomicRanges assays rowRanges rowRanges<-
 NULL

@@ -18,5 +18,6 @@ VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 5.0.1
 Collate:
+    'Paths-class.R'
     'help.R'
     'Preprocess-class.R'

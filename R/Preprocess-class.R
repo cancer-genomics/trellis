@@ -144,3 +144,4 @@ setReplaceMethod("rowRanges", "PreprocessViews2", function(x, value){
 setMethod("rowRanges", "PreprocessViews2", function(x, ...) bamRanges(x))
 
 
+
