@@ -1,0 +1,143 @@
+#' @include help.R
+
+
+setGeneric("setScale<-", function(x,value) standardGeneric("setScale<-"))
+setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
+setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
+
+#' Accessor for file paths
+#'
+#' File path to intermediate data saved to disk
+#' 
+#' @export
+#' @param object a \code{PreprocessViews2} object
+#' @rdname paths
+#' @aliases paths paths<-
+setGeneric("paths", function(object) standardGeneric("paths"))
+
+#' @param value a character-vector of file paths to intermediate data
+#' @rdname paths
+#' @aliases paths,PreprocessViews2-method  paths<-,PreprocessViews2-method
+setGeneric("paths<-", function(object,value) standardGeneric("paths<-"))
+
+
+#' A container for storing views of preprocessed data
+#'
+#' This class directly extends the \code{BamViews} class and provides
+#' views to intermediate data (saved to disk) from the analysis of one
+#' or more bam files.
+#'
+#' @seealso See \code{\link{paths}} for the character-vector of file
+#'   paths to the intermediate data.
+#' 
+#' @slot scale a length-one numeric vector.  We scale numeric data by
+#'   the value of \code{scale}, round to the nearest integer, and then
+#'   save as an integer.  This slot is for internal use only.
+#'
+#' @examples
+#' PreprocessViews2()
+#' paths(PreprocessViews2())
+#' paths(PreprocessViews2()) <- character()
+#'
+#' @export
+setClass("PreprocessViews2", representation(scale="numeric"),
+         contains="BamViews")
+
+setValidity("PreprocessViews2", function(object){
+  msg <- TRUE
+  if(!"range_index" %in% colnames(mcols(rowRanges(object)))){
+    msg <- "mcols of the rowRanges is missing a required column 'range_index'"
+    return(msg)
+  }
+  if(!identical(length(indexRanges(object)), length(rowRanges(object)))){
+    msg <- "length of indexRanges and rowRanges must be the same"
+    return(msg)
+  }
+  msg
+})
+
+#' Constructor for PreprocessViews2
+#'
+#' @return A \code{PreprocessViews2} object
+#'
+#' @export
+#' @param object can be \code{missing} or an existing \code{BamViews} object
+#' @rdname PreprocessViews2-class
+PreprocessViews2 <- function(object){ ## A BamViews object
+  if(missing(object)){
+    object <- BamViews()
+  }
+  object <- as(object, "PreprocessViews2")
+  indexRanges(object) <- seq_len(nrow(object))
+  setScale(object) <- 1 ## by default
+  object
+}
+
+##
+##  Accessors / methods for PreprocessViews2
+##
+
+#' Accessor for reading assay data saved to disk
+#'
+#' We have adapted the assays method to read assay data from disk
+#' using a \code{PreprocessViews2} object.
+#'
+#' 
+#' REFACTOR: both ... and withDimnames are ignored.  we should just
+#' provide a different generic/method.
+#'
+#' 
+#' @return a R x C matrix, where R is the length of
+#'   \code{rowRanges(x)} and C is the number of samples given by
+#'   \code{ncol(x)}
+#' 
+#' @export
+#' 
+#' @param x a \code{PreprocessViews2} object
+#' @param ... ignored
+#' @param withDimnames ignored
+setMethod("assays", "PreprocessViews2", function(x, ..., withDimnames=FALSE){
+  result <- matrix(NA, nrow(x), ncol(x))
+  for(j in seq_len(ncol(x))){
+    result[, j] <- readRDS(paths(x)[j])[indexRanges(x)]
+  }
+  colnames(result) <- colnames(x)
+  if(getScale(x) != 1){
+    result <- result/getScale(x)
+  }
+  result
+})
+
+
+getScale <- function(x) x@scale
+
+setReplaceMethod("setScale", "PreprocessViews2", function(x, value){
+  x@scale <- value
+  x
+})
+
+setMethod("indexRanges", "PreprocessViews2", function(object) {
+  rowRanges(object)$range_index
+})
+
+setReplaceMethod("indexRanges", "PreprocessViews2", function(object, value) {
+  rowRanges(object)$range_index <- value
+  object
+})
+
+setMethod("paths", "PreprocessViews2", function(object) object@bamPaths)
+
+setReplaceMethod("paths", "PreprocessViews2", function(object, value){
+  object@bamPaths <- value
+  object
+})
+
+
+setReplaceMethod("rowRanges", "PreprocessViews2", function(x, value){
+  x@bamRanges <- value
+  x
+})
+
+setMethod("rowRanges", "PreprocessViews2", function(x, ...) bamRanges(x))
+
+
