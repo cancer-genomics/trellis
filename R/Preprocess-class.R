@@ -1,7 +1,19 @@
 #' @include help.R
+NULL
 
+#' Set numeric scale for \code{PreprocessViews2} object
+#'
+#' Exported only for internal use by other packages.
+#' 
+#' @return numeric
+#' 
+#' @export
+#' @docType methods
+#' @param x A \code{PreprocessViews2} object
+#' @param value a length-one numeric vector
+#' @rdname setScale-method
+setGeneric("setScale<-", function(x, value) standardGeneric("setScale<-"))
 
-setGeneric("setScale<-", function(x,value) standardGeneric("setScale<-"))
 setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
 setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
 
@@ -114,6 +126,8 @@ setMethod("assays", "PreprocessViews2", function(x, ..., withDimnames=FALSE){
 
 getScale <- function(x) x@scale
 
+#' @aliases setScale,PreprocessViews2-method
+#' @rdname setScale-method
 setReplaceMethod("setScale", "PreprocessViews2", function(x, value){
   x@scale <- value
   x
@@ -143,5 +157,23 @@ setReplaceMethod("rowRanges", "PreprocessViews2", function(x, value){
 
 setMethod("rowRanges", "PreprocessViews2", function(x, ...) bamRanges(x))
 
-
+#' Helper for creating filenames with .rds extension
+#'
+#' Intermediate files are stored in directories given by
+#' \code{DataPaths}.  The names of the intermediate files are formed
+#' by concatenating the \code{colnames} of the \code{BamViews}-derived
+#' object with the extension \code{.rds}.
+#'
+#'
+#' @examples
+#'   library(Rsamtools)
+#'   extdir <- system.file("extdata", package="Rsamtools", mustWork=TRUE)
+#'   bamfile <- list.files(extdir, pattern="ex1.bam$", full.names=TRUE)
+#'   bview <- BamViews(bamPaths=bamfile)
+#'   rdsId(bview)
+#'
+#' 
+#' @export
+#' @param x a \code{BamViews}-derived object
+rdsId <- function(x) paste0(colnames(x), ".rds")
 

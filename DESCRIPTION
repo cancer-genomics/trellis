@@ -9,7 +9,8 @@ Depends:
 Imports:
     methods,
     Rsamtools,
-    GenomicRanges
+    GenomicRanges,
+    GenomeInfoDb
 Suggests:
     knitr
 License: Artistic-2.0
@@ -21,3 +22,4 @@ Collate:
     'DataPaths-class.R'
     'help.R'
     'Preprocess-class.R'
+    'seqinfo-utils.R'

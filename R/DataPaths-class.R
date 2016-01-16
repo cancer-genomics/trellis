@@ -58,7 +58,7 @@ dataTypes <- function(object) object[["data"]]
 dirCreate <- function(x){
   xx <- x[!file.exists(x)]
   if(length(xx) == 0) return(x)
-  sapply(xx, dir.create, recursive=TRUE)
+  suppressWarnings(sapply(xx, dir.create, recursive=TRUE))
   x
 }
 
