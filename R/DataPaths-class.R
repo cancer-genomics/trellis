@@ -1,3 +1,5 @@
+#' A class for storing file paths to intermediate data types
+#'
 #' @export
 setClass("DataPaths", contains="character")
 
@@ -11,17 +13,17 @@ setClass("DataPaths", contains="character")
 #' ## by default, file directories are not created
 #' DataPaths()
 #' ## Create directories for intermediate data types
-#' all_paths <- Paths(dryrun=FALSE)
+#' all_paths <- DataPaths(dryrun=FALSE)
 #' all_paths
 #' ## Just list the 'data' subdirectories
-#' dataDirs(all_paths)
+#' dataTypes(all_paths)
 #'
 #' @export
 #' @param path A length-one character vector specifying where the top-level directory should reside
 #' @param rootname A length-one character vector providing the name of the directory to create under \code{path}
 #' @param dryrun logical.  If \code{FALSE}, all directories are
 #'   created. Otherwise, only the character-vector is returned.
-#' @rdname Paths-class
+#' @rdname DataPaths-class
 DataPaths <- function(path=tempdir(), rootname="sv_data", dryrun=TRUE){
   obj <- projectTree(path, rootname, dryrun)
   as(obj, "DataPaths")
