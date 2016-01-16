@@ -18,6 +18,7 @@ setGeneric("paths", function(object) standardGeneric("paths"))
 #' @param value a character-vector of file paths to intermediate data
 #' @rdname paths
 #' @aliases paths,PreprocessViews2-method  paths<-,PreprocessViews2-method
+#' @export
 setGeneric("paths<-", function(object,value) standardGeneric("paths<-"))
 
 
@@ -37,7 +38,9 @@ setGeneric("paths<-", function(object,value) standardGeneric("paths<-"))
 #' @examples
 #' PreprocessViews2()
 #' paths(PreprocessViews2())
-#' paths(PreprocessViews2()) <- character()
+#' pviews <- PreprocessViews2()
+#' paths(pviews) <- character()
+#' paths(pviews)
 #'
 #' @export
 setClass("PreprocessViews2", representation(scale="numeric"),

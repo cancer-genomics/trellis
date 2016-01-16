@@ -7,6 +7,7 @@ Description: This package contains classes and methods used for structural
 Depends:
     R (>= 3.2.3)
 Imports:
+    methods,
     Rsamtools,
     GenomicRanges
 Suggests:

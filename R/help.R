@@ -4,7 +4,8 @@
 #'
 #' @docType package
 #' @name svclasses
-#' @importFrom Rsamtools bamPaths
+#' @import methods
+#' @importFrom Rsamtools bamPaths bamRanges bamSamples
 #' @importMethodsFrom Rsamtools BamViews
 #' @importClassesFrom Rsamtools BamViews
 #' @importMethodsFrom GenomicRanges assays rowRanges rowRanges<-
