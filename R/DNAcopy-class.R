@@ -30,7 +30,6 @@ setOldClass("DNAcopy")
 #' as(test1, "GRanges")
 #' @rdname DNAcopy-methods
 #' @docType methods
-#' @export
 setAs("DNAcopy", "GRanges", function(from, to){
   gr <- GRanges(as.character(from$output$chrom),
                 IRanges(from$output$loc.start, from$output$loc.end),

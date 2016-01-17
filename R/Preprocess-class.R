@@ -196,6 +196,8 @@ rdsId <- function(x) paste0(colnames(x), ".rds")
 ##
 ##--------------------------------------------------
 
+## setAs is exported in methods, so we do not export here
+
 #' Coerce a \code{PreprocessViews2} object to a \code{RangedSummarizedExperiment}
 #'
 #' This method pulls the assay data from disk through the views object
@@ -207,7 +209,6 @@ rdsId <- function(x) paste0(colnames(x), ".rds")
 #' as(pviews, "RangedSummarizedExperiment")
 #'
 #' @return a \code{RangedSummarizedExperiment}
-#' @export
 #' @param from character string ('PreprocessViews2')
 #' @param to  character string  ('RangedSummarizedExperiment')
 #' @rdname PreprocessViews2-coercion
