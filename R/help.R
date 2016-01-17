@@ -9,5 +9,10 @@
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels
 #' @importMethodsFrom Rsamtools BamViews [ 
 #' @importClassesFrom Rsamtools BamViews
-#' @importMethodsFrom GenomicRanges assays rowRanges rowRanges<-
+#' @importFrom IRanges IRanges
+#' @importFrom GenomicRanges GRanges
+#' @importMethodsFrom GenomicRanges assays assays<- rowRanges rowRanges<-
+#' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
+#' @importMethodsFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom S4Vectors SimpleList
 NULL

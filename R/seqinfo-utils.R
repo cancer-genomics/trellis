@@ -17,6 +17,12 @@ setGeneric("chromosome", function(object) standardGeneric("chromosome"))
 #' @rdname chromosome-methods
 setMethod(chromosome, "GRanges", function(object) as.character(seqnames(object)))
 
+#' @aliases chromosome,RangedSummarizedExperiment-method
+#' @rdname chromosome-methods
+setMethod(chromosome, "RangedSummarizedExperiment", function(object){
+  chromosome(rowRanges(object))
+})
+
 #' @aliases autosomeNames,BamViews-method
 #' @rdname chromosome-methods
 setMethod(autosomeNames, "BamViews", function(object){

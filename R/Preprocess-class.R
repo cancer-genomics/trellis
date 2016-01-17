@@ -14,7 +14,16 @@ NULL
 #' @rdname setScale-method
 setGeneric("setScale<-", function(x, value) standardGeneric("setScale<-"))
 
+#' Indexes the GRanges of a BamViews-derived class
+#'
+#' @docType methods
+#' @rdname indexRanges-method
+#' @param object a \code{BamViews}-derived object
+#' @export 
 setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
+
+#' @param value an integer-vector 
+#' @rdname indexRanges-method
 setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
 
 #' Accessor for file paths
@@ -133,10 +142,14 @@ setReplaceMethod("setScale", "PreprocessViews2", function(x, value){
   x
 })
 
+#' @aliases indexRanges,PreprocessViews2-method
+#' @rdname indexRanges-method
 setMethod("indexRanges", "PreprocessViews2", function(object) {
   rowRanges(object)$range_index
 })
 
+#' @rdname indexRanges-method
+#' @aliases indexRanges<-,PreprocessViews2-method
 setReplaceMethod("indexRanges", "PreprocessViews2", function(object, value) {
   rowRanges(object)$range_index <- value
   object
@@ -176,4 +189,37 @@ setMethod("rowRanges", "PreprocessViews2", function(x, ...) bamRanges(x))
 #' @export
 #' @param x a \code{BamViews}-derived object
 rdsId <- function(x) paste0(colnames(x), ".rds")
+
+##--------------------------------------------------
+##
+## Coercion
+##
+##--------------------------------------------------
+
+#' Coerce a \code{PreprocessViews2} object to a \code{RangedSummarizedExperiment}
+#'
+#' This method pulls the assay data from disk through the views object
+#' interface, and then creates a \code{SummarizedExperiment} object
+#' with an assay named 'copy'.
+#'
+#' @examples
+#' pviews <- PreprocessViews2()
+#' as(pviews, "RangedSummarizedExperiment")
+#'
+#' @return a \code{RangedSummarizedExperiment}
+#' @export
+#' @param from character string ('PreprocessViews2')
+#' @param to  character string  ('RangedSummarizedExperiment')
+#' @rdname PreprocessViews2-coercion
+#' @docType methods
+#' @name setAs
+#' @aliases coerce,PreprocessViews2,RangedSummarizedExperiment-method
+setAs("PreprocessViews2", "RangedSummarizedExperiment", function(from, to){
+  x <- assays(from)
+  rr <- rowRanges(from)
+  coldat <- bamSamples(from)
+  SummarizedExperiment(assays=SimpleList(copy=x),
+                       rowRanges=rr,
+                       colData=coldat)
+})
 

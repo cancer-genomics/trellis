@@ -10,8 +10,12 @@ Imports:
     methods,
     Rsamtools,
     GenomicRanges,
-    GenomeInfoDb
+    IRanges,
+    GenomeInfoDb,
+    SummarizedExperiment,
+    S4Vectors
 Suggests:
+    DNAcopy,
     knitr
 License: Artistic-2.0
 LazyData: true
@@ -19,7 +23,9 @@ VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 5.0.1
 Collate:
+    'DNAcopy-class.R'
     'DataPaths-class.R'
     'help.R'
     'Preprocess-class.R'
+    'copynumber-methods.R'
     'seqinfo-utils.R'
