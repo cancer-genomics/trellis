@@ -35,3 +35,20 @@ setMethod(autosomeNames, "GRanges", function(object){
     sl <- seqlevels(object)
     sl[!sl %in% c("chrX", "chrY", "chrM", "X", "Y", "M")]
 })
+
+##--------------------------------------------------
+##
+## PreprocessViews2 methods
+##
+##--------------------------------------------------
+
+setMethod("seqlevels", "PreprocessViews2", function(x) seqlevels(rowRanges(x)))
+
+setMethod("seqinfo", "PreprocessViews2", function(x) seqinfo(rowRanges(x)))
+
+setReplaceMethod("seqinfo", "PreprocessViews2",
+                 function(x, value){
+                   seqlevels(rowRanges(x), force=TRUE) <- seqlevels(value)
+                   seqinfo(rowRanges(x)) <- value
+                   x
+                 })
