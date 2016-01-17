@@ -5,14 +5,14 @@
 #' @docType package
 #' @name svclasses
 #' @import methods
-#' @importFrom Rsamtools bamPaths bamRanges bamSamples
-#' @importMethodsFrom GenomeInfoDb seqnames seqlevels
 #' @importMethodsFrom Rsamtools BamViews [ 
 #' @importClassesFrom Rsamtools BamViews
+#' @importFrom Rsamtools bamPaths bamRanges bamSamples
+#' @importFrom S4Vectors SimpleList
+#' @importMethodsFrom GenomeInfoDb seqnames seqlevels
 #' @importFrom IRanges IRanges
 #' @importFrom GenomicRanges GRanges
 #' @importMethodsFrom GenomicRanges assays assays<- rowRanges rowRanges<-
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment
-#' @importFrom S4Vectors SimpleList
 NULL

@@ -222,4 +222,3 @@ setAs("PreprocessViews2", "RangedSummarizedExperiment", function(from, to){
                        rowRanges=rr,
                        colData=coldat)
 })
-

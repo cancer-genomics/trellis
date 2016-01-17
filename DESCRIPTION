@@ -4,9 +4,9 @@ Version: 0.0.1
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: This package contains classes and methods used for structural
     variant analyses.
-Depends:
+Depends: 
     R (>= 3.2.3)
-Imports:
+Imports: 
     methods,
     Rsamtools,
     GenomicRanges,
@@ -14,15 +14,16 @@ Imports:
     GenomeInfoDb,
     SummarizedExperiment,
     S4Vectors
-Suggests:
+Suggests: 
     DNAcopy,
-    knitr
+    knitr,
+    testthat
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 5.0.1
-Collate:
+Collate: 
     'DNAcopy-class.R'
     'DataPaths-class.R'
     'help.R'

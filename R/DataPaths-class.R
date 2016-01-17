@@ -24,7 +24,7 @@ setClass("DataPaths", contains="character")
 #' @param dryrun logical.  If \code{FALSE}, all directories are
 #'   created. Otherwise, only the character-vector is returned.
 #' @rdname DataPaths-class
-DataPaths <- function(path=tempdir(), rootname="sv_data", dryrun=TRUE){
+DataPaths <- function(path=tempdir(), rootname="sv_data", dryrun=FALSE){
   obj <- projectTree(path, rootname, dryrun)
   as(obj, "DataPaths")
 }
