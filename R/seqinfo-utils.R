@@ -42,13 +42,22 @@ setMethod(autosomeNames, "GRanges", function(object){
 ##
 ##--------------------------------------------------
 
+#' @param x a \code{PreprocessViews2} object
+#' @aliases seqlevels,PreprocessViews2-method
+#' @rdname PreprocessViews2-class
 setMethod("seqlevels", "PreprocessViews2", function(x) seqlevels(rowRanges(x)))
 
+#' @aliases seqinfo,PreprocessViews2-method
+#' @rdname PreprocessViews2-class
 setMethod("seqinfo", "PreprocessViews2", function(x) seqinfo(rowRanges(x)))
 
+#' @param value an object of class \code{seqinfo}
+#' @aliases seqinfo<-,PreprocessViews2,seqinfo-method
+#' @rdname PreprocessViews2-class
 setReplaceMethod("seqinfo", "PreprocessViews2",
                  function(x, value){
-                   seqlevels(rowRanges(x), force=TRUE) <- seqlevels(value)
+                   rowRanges(x) <- keepSeqlevels(rowRanges(x), seqlevels(value))
+                   ##seqlevels(rowRanges(x), force=TRUE) <- seqlevels(value)
                    seqinfo(rowRanges(x)) <- value
                    x
                  })
