@@ -12,7 +12,7 @@ test_that("PreprocessViews", {
   ##
   colnames(bview) <- "ex1"
   tree <- DataPaths(tempdir(), "Test", dryrun=FALSE)
-  expect_true(file.exists(tree[["top"]]))
+  all(file.exists(tree))
 ##
 ##  pview <- countExperiment2(bview, tree)
 ##  expect_identical(indexRanges(pview), 1:3)

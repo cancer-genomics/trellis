@@ -18,6 +18,12 @@ setClass("DataPaths", contains="character")
 #' ## Just list the 'data' subdirectories
 #' dataTypes(all_paths)
 #'
+#' ## Subsetting by character-string uses grep
+#' all_paths[["count"]]
+#' all_paths["count"]
+#' all_paths["data"] ## many paths have 'data' as part of string
+#' all_paths["gc"]
+#'
 #' @export
 #' @param path A length-one character vector specifying where the top-level directory should reside
 #' @param rootname A length-one character vector providing the name of the directory to create under \code{path}
@@ -37,23 +43,77 @@ setValidity("DataPaths", function(object){
   }
 })
 
+#' List folders at a particular level in the directory tree
+#'
+#' @examples
+#' dp <- DataPaths(tempdir(), "Test")
+#' listDir("preprocess", dp)
+#'
+#' @seealso See \code{\linkS4class{DataPaths}}.  See
+#'   \code{\link{dataTypes}} for a listing of the major headings.
+#' 
+#'@export
+#' @param folder length-one character string
+#' @param object an object of class \code{DataPaths}
+listDir <- function(folder, object){
+  ##ix <- grep(pattern, object)
+  ix <- grep(folder, basename(object))[1]
+  if(length(ix) == 0){
+    ix <- grep(folder, basename(dirname(object)))[1]
+    paths <- list(path=object[ix],
+                  folders=list.files(dirname(object)[ix]))
+    return(paths)
+  }
+  if(length(ix) == 0){
+    stop("pattern does not match basenames")
+  }
+  list(path=object[ix],
+       folders=list.files(object[ix]))
+}
+
+#' Accessor for data directory
+#'
+#' @examples
+#' dp <- DataPaths(rootname="test")
+#' dataDir(dp)
+#' @export
+#' @param object a \code{DataPaths} object
+dataDir <- function(object){
+  listDir("data", object)[["path"]]
+}
+
 setMethod("show", "DataPaths", function(object){
   cat("An object of class 'DataPaths'\n")
-  cat("  Top-level directory:", object[["top"]], "\n")
-  cat("  see dataTypes()\n")
+  cat(" Top level directory:\n")
+  top <- dirname(object[1])
+  cat(" ", top, "\n")
+  cat("\n")
+  cat("    /data/preprocess: \n")
+  preprocess_dirs <- listDir("preprocess", object)[["folders"]]
+  preprocess_dirs <- paste(preprocess_dirs, collapse=" | ")  
+  cat("      ", preprocess_dirs, "\n")
+  cat("\n")
+  cat("  see ?listDir\n")
 })
 
-#' List directories of intermediate data types
+top <- function(object){
+  dirname(object[1])
+}
+
+#' List directories of intermediate data pipelines
 #'
 #' @seealso \code{\link{DataPaths}}
 #' @return a \code{character}-vector
 #' @examples
-#' dirs <- DataPaths()
-#' basename(dataTypes(dirs))
+#' dp <- DataPaths()
+#' dataTypes(dp)
 #' 
 #' @param object a \code{DataPaths} object
 #' @export
-dataTypes <- function(object) object[["data"]]
+dataTypes <- function(object) {
+  d <- listDir("data", object)
+  d[["folders"]]
+}
 
 dirCreate <- function(x){
   xx <- x[!file.exists(x)]
@@ -62,75 +122,55 @@ dirCreate <- function(x){
   x
 }
 
-projectTree <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("top", "data", "figures", "extdata", "versions",
-                 "unit_test", "segments", "counts", "normalized_counts",
-                 "gc_adjust",
-                 "M",
-                 "filters",
-                 "fig:genome",
-                 "improper",
-                 "rear:improper",
-                 "proper",
-                 "deletions",
-                 "rear:candidates",
-                 "rear:filter",
-                 "rear:seq",
-                 "fasta",
-                 "fasta:unmapped",
-                 "blat:unmapped",
-                 "blat:parsed",
-                 "fusions",
-                 "fig:ambiguous",
-                 "fig:unambiguous",
-                 "export",
-                 "blat:alignment",
-                 "amp:graphs",
-                 "fig:circos",
-                 "fig:rear",
-                 "rearrangements",
-                 "rear_stats",
-                 "rearranged_reads")
-  dirnames <- topic_nms
-  dirnames[1] <- file.path(path, rootname)
-  ## subfolders
-  index <- 4:length(topic_nms)
-  dirnames[index] <- c("inst/extdata", "versions", "data/unit_tests",
-                       "data/segments", "data/counts",
-                       "data/normalized_counts",
-                       "data/gc_adjust",
-                       "data/M",
-                       "inst/extdata/filters",
-                       "figures/genome",
-                       "data/improper",
-                       "data/improper_rearrangement",
-                       "data/proper",
-                       "data/deletions",
-                       "data/rear_candidates",
-                       "data/rear_filtered",
-                       "data/rear_sequences",
-                       "data/fasta",
-                       "data/fasta-unmapped",
-                       "data/blat_alignment-unmapped",
-                       "data/blat_parsed",
-                       "data/fusions",
-                       "figures/ambiguous",
-                       "figures/unambiguous",
-                       "data/export",
-                       "data/blat_alignment",
-                       "data/amplicon_graphs",
-                       "figures/circos",
-                       "figures/rear",
-                       "data/rearrangements",
-                       "data/rearrangement_stats",
-                       "data/rearranged_reads")
-  dirnames[-1] <- file.path(dirnames[1], dirnames[-1])
-  dirnames <- setNames(dirnames, topic_nms)
-  ix <- order(names(dirnames))
-  dirnames <- dirnames[ix]
-  if(dryrun){
-    return(dirnames)
+createPreprocessDirs <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0counts", "1transformed_centered", "2gc_adj",
+                 "3background_adj")
+  paths <- file.path(path, file.path("data", file.path("preprocess", topic_nms)))
+  if(!dryrun){
+    dirCreate(paths)
   }
-  dirCreate(dirnames)
+  paths
 }
 
+## top-level folders
+createTopLevelDirs <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("data", "figures", "extdata", "versions",
+                 "unit_test")
+  paths <- file.path(path, topic_nms)
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths
+}
+
+projectTree <- function(path, rootname, dryrun=TRUE){
+  path <- file.path(path, rootname)
+  top_dirs <- createTopLevelDirs(path, rootname, dryrun)
+  preprocess_dirs <- createPreprocessDirs(path, rootname, dryrun)
+  c(top_dirs, preprocess_dirs)
+}
+
+unitTestDir <- function(object) {
+  object[["top"]][grep("unit_test", object[["top"]])]
+}
+
+figureDir <- function(object){
+  object[["top"]][grep("unit_test", object[["figures"]])]
+}
+
+#' @param x a \code{DataPaths} object
+#' @param i a length-one character vector
+#' @rdname DataPaths-class
+setMethod("[[", c("DataPaths", "character"), function(x, i){
+  i <- grep(i, x)[1]
+  x[[i]]
+})
+
+#' @param j ignored
+#' @param ... ignored
+#' @param drop ignored
+#' @rdname DataPaths-class
+setMethod("[", c("DataPaths", "character"), function(x, i, j, ..., drop=FALSE){
+  i <- grep(i, x)
+  x[i]
+})
