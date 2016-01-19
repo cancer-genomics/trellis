@@ -8,7 +8,7 @@
 #' @importMethodsFrom Rsamtools BamViews [ 
 #' @importClassesFrom Rsamtools BamViews
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples
-#' @importFrom S4Vectors SimpleList
+#' @importFrom S4Vectors SimpleList mcols mcols<-
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<-
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importFrom IRanges IRanges

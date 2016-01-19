@@ -1,3 +1,6 @@
+#' @include help.R
+NULL
+
 #' A class for storing file paths to intermediate data types
 #'
 #' @export
@@ -58,13 +61,13 @@ setValidity("DataPaths", function(object){
 listDir <- function(folder, object){
   ##ix <- grep(pattern, object)
   ix <- grep(folder, basename(object))[1]
-  if(length(ix) == 0){
+  if(is.na(ix)){
     ix <- grep(folder, basename(dirname(object)))[1]
     paths <- list(path=object[ix],
                   folders=list.files(dirname(object)[ix]))
     return(paths)
   }
-  if(length(ix) == 0){
+  if(is.na(ix)){
     stop("pattern does not match basenames")
   }
   list(path=object[ix],
@@ -92,7 +95,16 @@ setMethod("show", "DataPaths", function(object){
   preprocess_dirs <- listDir("preprocess", object)[["folders"]]
   preprocess_dirs <- paste(preprocess_dirs, collapse=" | ")  
   cat("      ", preprocess_dirs, "\n")
-  cat("\n")
+  ## CNVs
+  cat("    /data/segments: \n")  
+  cnv_dirs <- listDir("segment", object)[["folders"]]
+  cnv_dirs <- paste(cnv_dirs, collapse=" | ")  
+  cat("      ", cnv_dirs, "\n")
+  ## alignments
+  cat("    /data/alignments: \n")  
+  aln_dirs <- listDir("alignments", object)[["folders"]]
+  aln_dirs <- paste(aln_dirs, collapse=" | ")  
+  cat("      ", aln_dirs, "\n")    
   cat("  see ?listDir\n")
 })
 
@@ -122,18 +134,8 @@ dirCreate <- function(x){
   x
 }
 
-createPreprocessDirs <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0counts", "1transformed_centered", "2gc_adj",
-                 "3background_adj")
-  paths <- file.path(path, file.path("data", file.path("preprocess", topic_nms)))
-  if(!dryrun){
-    dirCreate(paths)
-  }
-  paths
-}
-
 ## top-level folders
-createTopLevelDirs <- function(path, rootname, dryrun=TRUE){
+create_top_dirs <- function(path, rootname, dryrun=TRUE){
   topic_nms <- c("data", "figures", "extdata", "versions",
                  "unit_test")
   paths <- file.path(path, topic_nms)
@@ -143,11 +145,41 @@ createTopLevelDirs <- function(path, rootname, dryrun=TRUE){
   paths
 }
 
+create_preprocess_dirs <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0counts", "1transformed_centered", "2gc_adj",
+                 "3background_adj")
+  paths <- file.path(path, file.path("data", file.path("preprocess", topic_nms)))
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths
+}
+
+create_cnv_dirs <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0cbs", "1deletions", "2amplicons")
+  paths <- file.path(path, file.path("data", file.path("segment", topic_nms)))
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths  
+}
+
+create_alignments <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0improper")
+  paths <- file.path(path, file.path("data", file.path("alignments", topic_nms)))
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths    
+}
+
 projectTree <- function(path, rootname, dryrun=TRUE){
   path <- file.path(path, rootname)
-  top_dirs <- createTopLevelDirs(path, rootname, dryrun)
-  preprocess_dirs <- createPreprocessDirs(path, rootname, dryrun)
-  c(top_dirs, preprocess_dirs)
+  top_dirs <- create_top_dirs(path, rootname, dryrun)
+  preprocess_dirs <- create_preprocess_dirs(path, rootname, dryrun)
+  cnv_dirs <- create_cnv_dirs(path, rootname, dryrun)
+  aln_dirs <- create_alignments(path, rootname, dryrun)
+  c(top_dirs, preprocess_dirs, cnv_dirs, aln_dirs)
 }
 
 unitTestDir <- function(object) {
