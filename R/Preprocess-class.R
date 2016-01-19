@@ -243,9 +243,8 @@ setAs("PreprocessViews2", "RangedSummarizedExperiment", function(from, to){
 #' @param gr  a \code{GRanges} object
 granges_copynumber <- function(gr, pviews){
   pviews <- pviews[, 1]
-  hits <- findOverlaps(gr, queryRanges(pviews))
+  hits <- findOverlaps(gr, rowRanges(pviews))
   if(!any(duplicated(names(gr))) && !is.null(names(gr))){
-    ##indices <- split(subjectHits(hits), queryHits(hits))
     split_by <- factor(names(gr)[queryHits(hits)], levels=names(gr))
   } else {
     split_by <- queryHits(hits)

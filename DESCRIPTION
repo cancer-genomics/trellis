@@ -30,6 +30,7 @@ Collate:
     'Preprocess-class.R'
     'AlignmentViews-class.R'
     'DNAcopy-class.R'
+    'RearrangmentParams-class.R'
     'SegmentParam-class.R'
     'copynumber-methods.R'
     'seqinfo-utils.R'
