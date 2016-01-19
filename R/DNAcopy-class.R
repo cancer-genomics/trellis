@@ -36,3 +36,17 @@ setAs("DNAcopy", "GRanges", function(from, to){
                 seg.mean=from$output$seg.mean)
   gr
 })
+
+#' Coerce a DNAcopy object to GRanges
+#'
+#' @return a \code{GRanges} object
+#' 
+#' @export
+#' @param x a \code{DNAcopy} object
+#' @param seq_info a \code{Seqinfo} object
+cbs2granges <- function(x, seq_info){
+  gr <- as(x, "GRanges")
+  gr <- keepSeqlevels(gr, seqlevels(seq_info))
+  seqinfo(gr) <- seq_info
+  gr
+}
