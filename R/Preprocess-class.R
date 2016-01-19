@@ -1,4 +1,4 @@
-#' @include help.R
+#' @include DataPaths-class.R
 NULL
 
 #' Set numeric scale for \code{PreprocessViews2} object
@@ -223,3 +223,33 @@ setAs("PreprocessViews2", "RangedSummarizedExperiment", function(from, to){
                        rowRanges=rr,
                        colData=coldat)
 })
+
+
+##--------------------------------------------------
+##
+## Descriptive stats 
+##
+##--------------------------------------------------
+
+#' Compute the mean normalized read-depth for a set of intervals
+#'
+#' Calculates the mean normalized read-depth for a set of genomic
+#' intervals in a \code{GRanges} object.
+#'
+#' @keywords internal
+#' 
+#' @export
+#' @param pviews a \code{PreprocessViews2} object
+#' @param gr  a \code{GRanges} object
+granges_copynumber <- function(gr, pviews){
+  pviews <- pviews[, 1]
+  hits <- findOverlaps(gr, queryRanges(pviews))
+  if(!any(duplicated(names(gr))) && !is.null(names(gr))){
+    ##indices <- split(subjectHits(hits), queryHits(hits))
+    split_by <- factor(names(gr)[queryHits(hits)], levels=names(gr))
+  } else {
+    split_by <- queryHits(hits)
+  }
+  fc_context <- sapply(split(assays(pviews[subjectHits(hits), 1]), split_by), median)
+  fc_context
+}
