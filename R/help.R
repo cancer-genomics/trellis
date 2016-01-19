@@ -13,6 +13,7 @@
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importFrom IRanges IRanges
 #' @importMethodsFrom IRanges findOverlaps
+#' @importClassesFrom GenomicAlignments GAlignmentPairs
 #' @importFrom GenomicRanges GRanges
 #' @importMethodsFrom GenomicRanges assays assays<- rowRanges rowRanges<-
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment

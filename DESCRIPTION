@@ -12,6 +12,7 @@ Imports:
     GenomicRanges,
     IRanges,
     GenomeInfoDb,
+    GenomicAlignments,
     SummarizedExperiment,
     S4Vectors
 Suggests:
@@ -30,6 +31,7 @@ Collate:
     'Preprocess-class.R'
     'AlignmentViews-class.R'
     'DNAcopy-class.R'
+    'Rearrangement-class.R'
     'RearrangmentParams-class.R'
     'SegmentParam-class.R'
     'copynumber-methods.R'
