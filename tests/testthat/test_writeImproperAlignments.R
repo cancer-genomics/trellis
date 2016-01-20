@@ -1,0 +1,28 @@
+context("Write improper alignments")
+test_that("writeImproperAlignments", {
+  library(svovarian)
+  dirs <- projectOvarian()
+  bv <- readRDS(file.path(dirs[["data"]], "bviews_hg19.rds"))
+  test_views <- AlignmentViews2(bv, dirs)
+  expect_is(test_views, "AlignmentViews2")
+  expect_is(test_views[, 1], "AlignmentViews2")
+  writeImproperAlignments2(test_views, mapq_thr=30)
+  expect_true(all(file.exists(improperPaths(test_views))))
+  ## this just reads from disk
+  timing <- system.time(writeImproperAlignments2(test_views))
+  expect_less_than(timing[["sys.self"]], 3)
+})
+
+test_that("improper alignment parameters", {
+  library(Rsamtools)
+  params <- improperAlignmentParams()
+  expect_true(bamFlag(params)[["isPaired"]])
+  expect_true(!bamFlag(params)[["isProperPair"]])
+  expect_true(!bamFlag(params)[["isUnmappedQuery"]])
+  expect_true(!bamFlag(params)[["hasUnmappedMate"]])
+  expect_true(!bamFlag(params)[["isDuplicate"]])
+  expect_true(is.na(bamFlag(params)[["isNotPassingQualityControls"]]))
+  flags <- improperAlignmentFlags()
+  params2 <- improperAlignmentParams(flag=flags)
+  expect_identical(params, params2)
+})
