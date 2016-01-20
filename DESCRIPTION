@@ -5,21 +5,22 @@ Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", 
 Description: This package contains classes and methods used for structural
     variant analyses.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.2.2), GenomicRanges
 Imports:
     methods,
+    BiocGenerics,
+    S4Vectors,
     Rsamtools,
-    GenomicRanges,
-    IRanges,
     GenomeInfoDb,
     GenomicAlignments,
-    SummarizedExperiment,
-    S4Vectors
+    IRanges,
+    SummarizedExperiment
 Suggests:
     DNAcopy,
     knitr,
     testthat,
-    TestBams
+    TestBams,
+    BSgenome.Hsapiens.UCSC.hg19
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
@@ -32,7 +33,14 @@ Collate:
     'AlignmentViews-class.R'
     'DNAcopy-class.R'
     'Rearrangement-class.R'
+    'Deletion-class.R'
+    'DeletionList-class.R'
+    'DeletionParam-class.R'
+    'GAlignmentPairs-utils.R'
+    'GRanges-utils.R'
+    'RearrangementList-class.R'
     'RearrangmentParams-class.R'
     'SegmentParam-class.R'
     'copynumber-methods.R'
+    'improper-methods.R'
     'seqinfo-utils.R'

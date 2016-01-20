@@ -47,6 +47,36 @@ setClass("Rearrangement", representation(linkedBins="GRanges",
                                          fraction_linking_tags="numeric"))
 
 
+conciseGRangeSummary <- function(g, type){
+  g <- g[1]
+  g2 <- g$linked.to
+  chr1 <- chromosome(g)
+  chr2 <- chromosome(g2)
+  #s1 <- prettyNum(start(g), big.mark=",")
+  s2 <- prettyNum(start(g2), big.mark=",")
+  e1 <- prettyNum(end(g), big.mark=",")
+  #e2 <- prettyNum(end(g2), big.mark=",")
+  txt1 <- paste0(chr1, ":", e1, "-", chr2, ":", s2)
+  ##txt2 <- paste0("chr2:", s2, "-", e2)
+  paste0(substr(type, 1, 1), "||", txt1)
+}
+
+setMethod("show", "Rearrangement", function(object){
+  cat(paste0("Object of class '", class(object), "'"), "\n")
+  cat("  number of rearrangements: ", length(linkedBins(object)), "\n")
+  cat("  number of linking RPs: ", length(improper(object)), "\n")
+  cat("  number of tags : ", length(tags(object)), "\n")
+  if(length(object)==1){
+    r <- modalRearrangement(object)
+    txt <- conciseGRangeSummary(linkedBins(object), r)
+    cat("  ", txt, "\n")
+    cat("  modal type   :", r, "\n")
+    cat("  %tags for mode :", round(percentRearrangement(object), 0), "\n")
+  }
+  cat("  see linkedBins(), improper(), and tags() \n")
+})
+
+
 
 ##--------------------------------------------------
 ##
@@ -54,21 +84,23 @@ setClass("Rearrangement", representation(linkedBins="GRanges",
 ##
 ##--------------------------------------------------
 
-#' Accessor for improper read pairs
+#' The fraction of improper read pairs that link two clusters of improper reads
 #'
-#' Extract the improperly paired reads.  Reads are flagged as improper
-#' by the alignment algorithm.  Typically, this indicates that the
-#' separation between a read and its mate is larger than expected, the
-#' orientation of the read and its mate is different from that
-#' anticipated in the reference genome, or the reads align to
-#' different chromosomes.
+#' For bona fide deletions, inversions, and translocations, we would
+#' expect that the fraction of improper read pairs that link two
+#' clusters of improper reads to be high.  For amplicons, the fraction
+#' of reads linking two clusters may be small.
 #' 
-#' 
+#' @return numeric
 #' @export
-#' @rdname improper-methods
-#' @seealso \code{\linkS4class{Rearrangement}}
-#' @param object a \code{Rearrangement} or \code{StructuralVariant} object
-setGeneric("improper", function(object) standardGeneric("improper"))
+#' @param object a \code{Rearrangement} object
+setGeneric("fractionLinkingTags", function(object) standardGeneric("fractionLinkingTags"))
+
+#' @rdname fractionLinkingTags
+#' @param value length-one numeric vector
+#' @export
+setGeneric("fractionLinkingTags<-", function(object,value)
+  standardGeneric("fractionLinkingTags<-"))
 
 #' Accessor for clusters of reads belonging to improper read pairs that are linked.
 #'
@@ -92,10 +124,45 @@ setGeneric("linkedBins", function(object) standardGeneric("linkedBins"))
 #'   in the element metadata.
 setGeneric("linkedBins<-", function(object,value) standardGeneric("linkedBins<-"))
 
+#' Accessor for the modal rearrangement of a linked tag cluster
+#'
+#' For a two clusters of improper reads that are linked by the pairing
+#' information, we classify the type of rearrangement supported by
+#' each improper read pair.  Once each read pair is typed, we store
+#' the modal type in the \code{Rearrangement} object.
+#'
+#' 
+#' @return a character string
+#' @export
+#' @param object a \code{Rearrangement} object
+setGeneric("modalRearrangement", function(object) standardGeneric("modalRearrangement"))
+#' @export
+
+#' @rdname modalRearrangement
+#' @param value a character-string indicating the modal rearrangement type
+#' @export
+setGeneric("modalRearrangement<-", function(object, value) standardGeneric("modalRearrangement<-"))
+
 #' @export
 #' @rdname Rearrangement-class
 #' @keywords internal
 setGeneric("partitioning", function(object) standardGeneric("partitioning"))
+
+#' The fraction of improper read pairs supporting the modal rearrangement type
+#'
+#' @seealso \code{\link{modalRearrangement}}
+#' @export
+#' @param object a \code{Rearrangement} object
+setGeneric("percentRearrangement", function(object) standardGeneric("percentRearrangement"))
+
+#' @rdname percentRearrangement
+#' 
+#' @param value a numeric vector with range [0,1] indicating the
+#'   fraction of improper read pairs that support the modal
+#'   rearrangement
+#' @export
+setGeneric("percentRearrangement<-",
+           function(object, value) standardGeneric("percentRearrangement<-"))
 
 #' Accessor for all the improper reads
 #'
@@ -115,27 +182,68 @@ setGeneric("tags", function(object) standardGeneric("tags"))
 
 setGeneric("tagMapping", function(object) standardGeneric("tagMapping"))
 
+## Methods
 
-link1id <- function(object) object@link1id
-link2id <- function(object) object@link2id
+#' @rdname fractionLinkingTags
+#' @aliases fractionLinkingTags,Rearrangement-method
+setMethod("fractionLinkingTags", "Rearrangement", function(object)
+  object@fraction_linking_tags)
 
-#' @aliases improper,Rearrangement-method
-#' @rdname improper-methods
-setMethod("improper", "Rearrangement", function(object) object@improper)
+#' @rdname fractionLinkingTags
+#' @aliases fractionLinkingTags,Rearrangement,ANY-method
+setReplaceMethod("fractionLinkingTags", "Rearrangement", function(object, value){
+  object@fraction_linking_tags <- value
+  object
+})
+
 
 #' @aliases linkedBins,Rearrangement-method
 #' @rdname linkedBins-methods
 setMethod("linkedBins", "Rearrangement", function(object) object@linkedBins)
 
+#' @rdname modalRearrangement
+#' @aliases modalRearrangement,Rearrangement-method
+setMethod("modalRearrangement", "Rearrangement", function(object) object@modal_rearrangement)
+
+#' @rdname modalRearrangement
+#' @aliases modalRearrangement,Rearrangement,ANY-method
+setReplaceMethod("modalRearrangement", "Rearrangement", function(object,value){
+  object@modal_rearrangement <- value
+  object
+})
+
+link1id <- function(object) object@link1id
+link2id <- function(object) object@link2id
+
 #' @aliases partitioning,Rearrangement-method
 #' @rdname Rearrangement-class
 setMethod("partitioning", "Rearrangement", function(object) object@partitioning)
+
+#' @rdname percentRearrangement
+#' @aliases percentRearrangement,Rearrangement-method
+setMethod("percentRearrangement", "Rearrangement", function(object) object@percent_rearrangement)
+
+#' @rdname percentRearrangement
+#' @aliases percentRearrangement,Rearrangement,ANY-method
+setReplaceMethod("percentRearrangement", "Rearrangement", function(object,value){
+  object@percent_rearrangement <- value
+  object
+})
+
 
 #' @aliases tags,Rearrangement-method
 #' @rdname tags-methods
 setMethod("tags", "Rearrangement", function(object) object@tags)
 
 setMethod("tagMapping", "Rearrangement", function(object) object@tag_map_to_linked_bin)
+
+#' @rdname Rearrangement-class
+#' @aliases length,Rearrangement-method
+setMethod("length", "Rearrangement", function(x) length(linkedBins(x)))
+
+#' @rdname Rearrangement-class
+#' @aliases names,Rearrangement-method
+setMethod("names", "Rearrangement", function(x) names(linkedBins(x)))
 
 ##--------------------------------------------------
 ##

@@ -24,6 +24,7 @@ setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
 
 #' @param value an integer-vector 
 #' @rdname indexRanges-method
+#' @export
 setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
 
 #' Accessor for file paths

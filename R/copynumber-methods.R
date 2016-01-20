@@ -1,3 +1,6 @@
+#' @include Deletion-class.R
+NULL
+
 #' Accessor for 'copy' assays
 #'
 #' Extract matrix of log2-transformed estimates of copy number
@@ -28,3 +31,16 @@ setReplaceMethod("copynumber", signature(object="RangedSummarizedExperiment", va
             assays(object)$copy <- value
             object
           })
+
+#' @rdname copynumber-methods
+#' @export
+#' @aliases copynumber,StructuralVariant-method
+setMethod("copynumber", "StructuralVariant", function(object) object@copynumber)
+
+#' @rdname copynumber-methods
+#' @export
+#' @aliases copynumber<-,StructuralVariant,ANY-method
+setReplaceMethod("copynumber", "StructuralVariant", function(object, value){
+  object@copynumber <- value
+  object
+})

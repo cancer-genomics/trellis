@@ -104,7 +104,12 @@ setMethod("show", "DataPaths", function(object){
   cat("    /data/alignments: \n")  
   aln_dirs <- listDir("alignments", object)[["folders"]]
   aln_dirs <- paste(aln_dirs, collapse=" | ")  
-  cat("      ", aln_dirs, "\n")    
+  cat("      ", aln_dirs, "\n")
+  ## rearrangements
+  cat("    /data/rearrangements: \n")  
+  rear_dirs <- listDir("rearrangements", object)[["folders"]]
+  rear_dirs <- paste(rear_dirs, collapse=" | ")  
+  cat("      ", rear_dirs, "\n")      
   cat("  see ?listDir\n")
 })
 
@@ -173,13 +178,23 @@ create_alignments <- function(path, rootname, dryrun=TRUE){
   paths    
 }
 
+create_rearrangements <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0linked", "1somatic", "2blat")
+  paths <- file.path(path, file.path("data", file.path("rearrangements", topic_nms)))
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths      
+}
+
 projectTree <- function(path, rootname, dryrun=TRUE){
   path <- file.path(path, rootname)
   top_dirs <- create_top_dirs(path, rootname, dryrun)
   preprocess_dirs <- create_preprocess_dirs(path, rootname, dryrun)
   cnv_dirs <- create_cnv_dirs(path, rootname, dryrun)
   aln_dirs <- create_alignments(path, rootname, dryrun)
-  c(top_dirs, preprocess_dirs, cnv_dirs, aln_dirs)
+  rear_dirs <- create_rearrangements(path, rootname, dryrun)
+  c(top_dirs, preprocess_dirs, cnv_dirs, aln_dirs, rear_dirs)
 }
 
 unitTestDir <- function(object) {
