@@ -1,0 +1,10 @@
+context("StructuralVariant")
+test_that("StructuralVariant", {
+  data(deletions)
+  deletions <- sort(deletions)
+  expect_identical(variant(deletions), sort(variant(deletions)))
+  expect_identical(length(deletions[1]), 1L)
+  expect_is(deletions[1], "StructuralVariant")
+  expect_is(calls(deletions), "character")
+  expect_is(variant(deletions), "GRanges")
+})
