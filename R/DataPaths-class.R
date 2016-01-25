@@ -19,7 +19,7 @@ setClass("DataPaths", contains="character")
 #' all_paths <- DataPaths(dryrun=FALSE)
 #' all_paths
 #' ## Just list the 'data' subdirectories
-#' dataTypes(all_paths)
+#' topics(all_paths)
 #'
 #' ## Subsetting by character-string uses grep
 #' all_paths[["count"]]
@@ -27,6 +27,7 @@ setClass("DataPaths", contains="character")
 #' all_paths["data"] ## many paths have 'data' as part of string
 #' all_paths["gc"]
 #'
+#' @seealso \code{\link{topics}}
 #' @export
 #' @param path A length-one character vector specifying where the top-level directory should reside
 #' @param rootname A length-one character vector providing the name of the directory to create under \code{path}
@@ -46,43 +47,43 @@ setValidity("DataPaths", function(object){
   }
 })
 
-#' List folders at a particular level in the directory tree
+#' Lists folders for a given topic
 #'
+#' Lists folders for major topics, together with the path to the major
+#' topic.
+#'
+#' TODO: add topics()
+#' 
 #' @examples
 #' dp <- DataPaths(tempdir(), "Test")
 #' listDir("preprocess", dp)
 #'
 #' @seealso See \code{\linkS4class{DataPaths}}.  See
-#'   \code{\link{dataTypes}} for a listing of the major headings.
+#'   \code{\link{topics}} for a listing of the major headings.
 #' 
 #'@export
 #' @param folder length-one character string
 #' @param object an object of class \code{DataPaths}
 listDir <- function(folder, object){
-  ##ix <- grep(pattern, object)
-  ix <- grep(folder, basename(object))[1]
-  if(is.na(ix)){
-    ix <- grep(folder, basename(dirname(object)))[1]
-    paths <- list(path=object[ix],
-                  folders=list.files(dirname(object)[ix]))
-    return(paths)
-  }
-  if(is.na(ix)){
-    stop("pattern does not match basenames")
-  }
-  list(path=object[ix],
-       folders=list.files(object[ix]))
+  folders <- list.files(object[folder])
+  path <- object[folder]
+  list(path=path, folders=folders)
 }
 
-#' Accessor for data directory
-#'
-#' @examples
-#' dp <- DataPaths(rootname="test")
-#' dataDir(dp)
-#' @export
-#' @param object a \code{DataPaths} object
-dataDir <- function(object){
-  listDir("data", object)[["path"]]
+preprocessDir <- function(object){
+  file.path(dataDir(object), "preprocess")
+}
+
+segmentDir <- function(object){
+  file.path(dataDir(object), "segment")
+}
+
+alignDir <- function(object){
+  file.path(dataDir(object), "alignments")
+}
+
+rearDir <- function(object){
+  file.path(dataDir(object), "rearrangements")
 }
 
 setMethod("show", "DataPaths", function(object){
@@ -92,22 +93,23 @@ setMethod("show", "DataPaths", function(object){
   cat(" ", top, "\n")
   cat("\n")
   cat("    /data/preprocess: \n")
-  preprocess_dirs <- listDir("preprocess", object)[["folders"]]
+  preprocess_dirs <- list.files(preprocessDir(object))
+  ##preprocess_dirs <- listDir("preprocess", object)[["folders"]]
   preprocess_dirs <- paste(preprocess_dirs, collapse=" | ")  
   cat("      ", preprocess_dirs, "\n")
   ## CNVs
   cat("    /data/segments: \n")  
-  cnv_dirs <- listDir("segment", object)[["folders"]]
+  cnv_dirs <- list.files(segmentDir(object))
   cnv_dirs <- paste(cnv_dirs, collapse=" | ")  
   cat("      ", cnv_dirs, "\n")
   ## alignments
   cat("    /data/alignments: \n")  
-  aln_dirs <- listDir("alignments", object)[["folders"]]
+  aln_dirs <- list.files(alignDir(object))
   aln_dirs <- paste(aln_dirs, collapse=" | ")  
   cat("      ", aln_dirs, "\n")
   ## rearrangements
   cat("    /data/rearrangements: \n")  
-  rear_dirs <- listDir("rearrangements", object)[["folders"]]
+  rear_dirs <- list.files(rearDir(object))
   rear_dirs <- paste(rear_dirs, collapse=" | ")  
   cat("      ", rear_dirs, "\n")      
   cat("  see ?listDir\n")
@@ -123,14 +125,15 @@ top <- function(object){
 #' @return a \code{character}-vector
 #' @examples
 #' dp <- DataPaths()
-#' dataTypes(dp)
+#' topics(dp)
 #' 
 #' @param object a \code{DataPaths} object
 #' @export
-dataTypes <- function(object) {
-  d <- listDir("data", object)
-  d[["folders"]]
+topics <- function(object){
+  list.files(dataDir(object))
 }
+
+dataDir <- function(object) object[1]
 
 dirCreate <- function(x){
   xx <- x[!file.exists(x)]
@@ -152,7 +155,7 @@ create_top_dirs <- function(path, rootname, dryrun=TRUE){
 
 create_preprocess_dirs <- function(path, rootname, dryrun=TRUE){
   topic_nms <- c("0counts", "1transformed_centered", "2gc_adj",
-                 "3background_adj")
+                 "3background_adj", "final_preprocess")
   paths <- file.path(path, file.path("data", file.path("preprocess", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
@@ -161,7 +164,7 @@ create_preprocess_dirs <- function(path, rootname, dryrun=TRUE){
 }
 
 create_cnv_dirs <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0cbs", "1deletions", "2amplicons")
+  topic_nms <- c("0cbs", "1deletions", "2amplicons", "final_segment")
   paths <- file.path(path, file.path("data", file.path("segment", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
@@ -179,7 +182,7 @@ create_alignments <- function(path, rootname, dryrun=TRUE){
 }
 
 create_rearrangements <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0linked", "1somatic", "2blat")
+  topic_nms <- c("0linked", "1somatic", "2blat", "final_rearrangement")
   paths <- file.path(path, file.path("data", file.path("rearrangements", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
@@ -209,8 +212,15 @@ figureDir <- function(object){
 #' @param i a length-one character vector
 #' @rdname DataPaths-class
 setMethod("[[", c("DataPaths", "character"), function(x, i){
-  i <- grep(i, x)[1]
-  x[[i]]
+  i <- grep(i, x)
+  if(length(i) > 1){
+    ## return the parent directory
+    i <- i[1]
+    x <- dirname(x[[i]])
+  } else {
+    x <- x[[i]]
+  }
+  x
 })
 
 #' @param j ignored
@@ -219,5 +229,12 @@ setMethod("[[", c("DataPaths", "character"), function(x, i){
 #' @rdname DataPaths-class
 setMethod("[", c("DataPaths", "character"), function(x, i, j, ..., drop=FALSE){
   i <- grep(i, x)
-  x[i]
+  if(length(i) > 1){
+    ## return the parent directory
+    i <- i[1]
+    x <- dirname(x[[i]])
+  } else {
+    x <- x[[i]]
+  }  
+  x
 })

@@ -140,14 +140,6 @@ setGeneric("variant<-", function(object,value) standardGeneric("variant<-"))
 #' @examples
 #' StructuralVariant()
 #'
-#' library(svovarian)
-#' dirs <- projectOvarian()
-#' ut_path <- file.path(dirs[["unit_test"]], "deletion_pipeline")
-#' sv_result <- readRDS(file=file.path(ut_path, "sv7.rds"))
-#' ## number of improper read pairs supporting each deletion
-#' elementLengths(sapply(sv_result, improper))
-#' improper(sv_result[1])
-#' variant(sv_result)
 #' 
 #' @export
 setClass("StructuralVariant",
@@ -216,6 +208,20 @@ setValidity("StructuralVariant", function(object){
     }
   }
   msg
+})
+
+#' @aliases [,StructuralVariant,ANY,ANY-method
+#' @rdname StructuralVariant-class
+setMethod("[", "StructuralVariant", function(x, i, j, ..., drop=FALSE){
+  if(!missing(i)){
+    x@variant <- variant(x)[i]
+    x@calls <- calls(x)[i]
+    x@copynumber <- copynumber(x)[i]
+    x@index_improper <- indexImproper(x)[i]
+    x@index_proper <- indexProper(x)[i]
+    x@grouped_variant <- x@grouped_variant[i]
+  }
+  x
 })
 
 setMethod("show", "StructuralVariant", function(object){
@@ -291,7 +297,16 @@ StructuralVariant <- function(variant=GRanges(),
 
 #' @rdname calls-method
 #' @aliases calls,StructuralVariant-method
+#' @export
 setMethod("calls", "StructuralVariant", function(object) object@calls)
+
+#' @rdname calls-method
+#' @aliases calls,StructuralVariant,ANY-method
+#' @export
+setReplaceMethod("calls", "StructuralVariant", function(object, value){
+  object@calls <- value
+  object
+})
 
 initializeImproperIndex2 <- function(gr, improper_rp, param=DeletionParam()){
   hits <- findOverlaps(gr, improper_rp, minimumGapWidth(param))
@@ -408,6 +423,25 @@ setReplaceMethod("proper", c("StructuralVariant","GAlignmentPairs"),
                    object
                  })
 
+#' @rdname StructuralVariant-class
+#' @export
+#' @aliases sort,StructuralVariant-method
+#' @param decreasing logical
+#' @param ... ignored
+setMethod("sort", "StructuralVariant", function(x, decreasing=FALSE, ...){
+  v <- variant(x)
+  i <- order(v)
+  x <- StructuralVariant(variant=v[i],
+                         calls=calls(x)[i],
+                         copynumber=copynumber(x)[i],
+                         proper=x@proper,
+                         improper=x@improper,
+                         index_proper=indexProper(x)[i],
+                         index_improper=indexImproper(x)[i],
+                         grouped_variant=groupedVariant(x)[i])
+  x
+})
+
 
 #' @rdname StructuralVariant-class
 #' @export
@@ -462,6 +496,18 @@ setMethod("[[", "StructuralVariant", function(x, i){
 ## Vector like operations
 ##
 
+#' @rdname sapply-methods
+#' @aliases lapply,StructuralVariant-method
+#' @export
+setMethod("lapply", "StructuralVariant", function(X, FUN, ...){
+  FUN <- match.fun(FUN)
+  result <- vector("list", length(X))
+  for(i in seq_along(X)){
+    result[[i]] <- FUN(X[i], ...)
+  }
+  result
+})
+
 #' Functionals for structural variant classes
 #'
 #' @keywords internal 
@@ -472,6 +518,7 @@ setMethod("[[", "StructuralVariant", function(x, i){
 #' @param ... additional arguments to \code{FUN}
 #' @param simplify logical
 #' @param USE.NAMES logical
+#' @export
 setMethod("sapply", "StructuralVariant", function(X, FUN, ..., simplify=TRUE, USE.NAMES=TRUE){
   FUN <- match.fun(FUN)
   answer <- lapply(X = X, FUN = FUN, ...)
@@ -484,13 +531,6 @@ setMethod("sapply", "StructuralVariant", function(X, FUN, ..., simplify=TRUE, US
 })
 
 
-#' @rdname sapply-methods
-#' @aliases lapply,StructuralVariant-method
-setMethod("lapply", "StructuralVariant", function(X, FUN, ...){
-  FUN <- match.fun(FUN)
-  result <- vector("list", length(X))
-  for(i in seq_along(X)){
-    result[[i]] <- FUN(X[i], ...)
-  }
-  result
-})
+
+
+
