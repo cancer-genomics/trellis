@@ -13,21 +13,6 @@ test_that("PreprocessViews", {
   colnames(bview) <- "ex1"
   tree <- DataPaths(tempdir(), "Test", dryrun=FALSE)
   all(file.exists(tree))
-##
-##  pview <- countExperiment2(bview, tree)
-##  expect_identical(indexRanges(pview), 1:3)
-##  pview2 <- pview[1, ]
-##  expect_identical(nrow(pview2), 1L)
-##  expect_identical(indexRanges(pview2), 1L)
-##  pview2 <- pview[2:3, ]
-##  expect_identical(nrow(pview2), 2L)
-##  expect_identical(indexRanges(pview2), 2:3)
-##  expect_identical(getScale(pview2), 1)
-##  cnts <- assays(pview)
-##
-##  expect_is(seqinfo(pview), "Seqinfo")
-##  expect_is(seqlevels(pview), "character")
-##  test5 <- keepSeqlevels(pview, "seq1")
-##  expect_identical(seqlevels(test5), "seq1")
-##  expect_identical(indexRanges(test5), 1L)
+
+  pv <- PreprocessViews2(bview)
 })

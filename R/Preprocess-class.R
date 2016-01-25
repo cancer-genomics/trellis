@@ -12,6 +12,7 @@ NULL
 #' @param x A \code{PreprocessViews2} object
 #' @param value a length-one numeric vector
 #' @rdname setScale-method
+#' @keywords internal
 setGeneric("setScale<-", function(x, value) standardGeneric("setScale<-"))
 
 #' Indexes the GRanges of a BamViews-derived class
@@ -19,12 +20,14 @@ setGeneric("setScale<-", function(x, value) standardGeneric("setScale<-"))
 #' @docType methods
 #' @rdname indexRanges-method
 #' @param object a \code{BamViews}-derived object
-#' @export 
+#' @export
+#' @keywords internal
 setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
 
 #' @param value an integer-vector 
 #' @rdname indexRanges-method
 #' @export
+#' @keywords internal
 setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
 
 #' Accessor for file paths
@@ -133,7 +136,9 @@ setMethod("assays", "PreprocessViews2", function(x, ..., withDimnames=FALSE){
   result
 })
 
-
+#' @rdname setScale-method
+#' @export
+#' @keywords internal
 getScale <- function(x) x@scale
 
 #' @aliases setScale,PreprocessViews2-method
@@ -163,12 +168,16 @@ setReplaceMethod("paths", "PreprocessViews2", function(object, value){
   object
 })
 
-
+#' @aliases rowRanges,PreprocessViews2,ANY-method
+#' @rdname PreprocessViews2-class
 setReplaceMethod("rowRanges", "PreprocessViews2", function(x, value){
   x@bamRanges <- value
   x
 })
 
+#' @aliases rowRanges,PreprocessViews2-method
+#' @rdname PreprocessViews2-class
+#' @param ... ignored
 setMethod("rowRanges", "PreprocessViews2", function(x, ...) bamRanges(x))
 
 #' Helper for creating filenames with .rds extension

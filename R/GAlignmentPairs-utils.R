@@ -14,9 +14,13 @@ NULL
 #' @export
 #' @param first a \code{GAlignments}
 #' @param last a \code{GAlignments}
-#' 
 #' @param isProperPair logical for whether to require that the reads
 #'   be in a proper pair
-.GAlignmentPairs <- function() GAlignmentPairs(first=GAlignments(),
-                                               last=GAlignments(),
-                                               isProperPair=logical())
+.GAlignmentPairs <- function() {
+  GAlignmentPairs(first=GAlignments(),
+                  last=GAlignments(),
+                  isProperPair=logical())
+}
+
+
+

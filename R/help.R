@@ -5,7 +5,6 @@
 #' @docType package
 #' @name svclasses
 #' @import methods
-#' @import GenomicRanges
 #' @import BiocGenerics
 #' @importMethodsFrom Rsamtools BamViews [ 
 #' @importClassesFrom Rsamtools BamViews
@@ -18,6 +17,7 @@
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce
 #' @importFrom GenomicAlignments GAlignmentPairs GAlignments
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
+#' @import GenomicRanges
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment
 NULL

@@ -23,6 +23,12 @@ setMethod(chromosome, "RangedSummarizedExperiment", function(object){
   chromosome(rowRanges(object))
 })
 
+#' @aliases chromosome,GAlignments-method
+#' @rdname chromosome-methods
+setMethod(chromosome, "GAlignments", function(object){
+  as.character(seqnames(object))
+})
+
 #' @aliases autosomeNames,BamViews-method
 #' @rdname chromosome-methods
 setMethod(autosomeNames, "BamViews", function(object){
