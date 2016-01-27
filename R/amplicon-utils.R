@@ -503,7 +503,7 @@ edgeStats <- function(edges, param){
   ##i <- NULL
   results <- vector("list", length(index))
   for(j in seq_along(index)){
-    i <- index[j]
+    i <- index[[j]]
     results[[j]] <- start(first(e2))[i]
   }
   maxdist <- sapply(lapply(results, range), diff)
@@ -912,10 +912,8 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ## stopifnot(nodes(ag) %in% names(tmp)), and so
   ## setAmpliconGroups fails
   ranges(ag) <- tmp
-
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
-
   LOW_THR <- af[["LOW_THR"]]
   ##
   ## REFACTOR: could this step use the saved improper read pairs
