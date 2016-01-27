@@ -299,6 +299,8 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
     stop("currently this method does not preserve edges")
   }
   rg <- ranges(object)
+  sl <- seqlevels(rg)
+  si <- seqinfo(rg)
   spanned_by_gap <- unique(queryHits(findOverlaps(rg, centromeres, type="within")))
   if(length(spanned_by_gap) > 0){
     rg <- rg[-spanned_by_gap]
@@ -323,6 +325,8 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
     rg <- filterBy(rg, rgs)
     rg <- sort(c(rg, trimmed))
     names(rg) <- ampliconNames(rg)
+    rg <- keepSeqlevels(rg, sl)
+    seqinfo(rg) <- si
     ranges(object) <- rg
   }
   ag <- graphNEL(nodes=names(ampliconRanges(object)))
@@ -896,11 +900,11 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
                       germline_cnv=af[["germline_cnv"]],
                       outliers=af[["outliers"]],
                       overhang=af[["overhang"]])
-  stopifnot(all(nodes(ag) %in% names(ranges(ag))))
+  ##stopifnot(all(nodes(ag) %in% names(ranges(ag))))
   if (numNodes (ag) == 0) return (ag)
 
   centromeres <- af[["centromeres"]]
-  ag <- trimRangesOverlappingCentromere (ag, centromeres)
+  ag2 <- trimRangesOverlappingCentromere (ag, centromeres)
   stopifnot(all(nodes(ag) %in% names(ranges(ag))))
   tmp <- joinNearGRanges(ranges(ag), thr=0.05)
   names(tmp) <- ampliconNames(tmp)
