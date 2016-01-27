@@ -10,6 +10,7 @@ Depends:
     svclasses
 Imports:
     methods,
+    BiocGenerics,
     S4Vectors,
     Rsamtools,
     GenomeInfoDb,
@@ -17,7 +18,9 @@ Imports:
     IRanges,
     GenomicRanges,
     DNAcopy,
-    svalignments
+    svalignments,
+    graph,
+    RBGL
 Suggests:
     svpreprocess,
     testthat,
@@ -27,5 +30,6 @@ LazyData: true
 RoxygenNote: 5.0.1
 Collate:
     'help.R'
+    'amplicon-utils.R'
     'deletion-utils.R'
     'segment.R'

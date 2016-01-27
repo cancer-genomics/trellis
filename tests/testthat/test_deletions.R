@@ -14,8 +14,9 @@ test_that("deletions", {
   germline_filters <- reduce(unlist(GRangesList(lapply(gfilters, granges))))
   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
   del_file <- file.path(dp["1deletions"], rdsId(bviews[, id]))
+  file2 <- gsub(".rds", "_copy.rds", del_file)
   if(file.exists(del_file)){
-    file2 <- gsub(".rds", "_copy.rds", del_file)
+    unlink(file2)
     file.copy(del_file, file2)
     unlink(del_file)
   }
@@ -29,6 +30,8 @@ test_that("deletions", {
   expect_is(sv_dels[[1]], "StructuralVariant")
   expect_true(file.exists(del_file))
   unlink(del_file)
+  file.copy(file2, del_file)
+  unlink(file2)
 })
 
 

@@ -395,8 +395,9 @@ isHemizygousDeletion <- function(object, param, pview){
 #' ut_path <- file.path(dirs[["unit_test"]], "deletion_pipeline")
 #' sv <- readRDS(file=file.path(ut_path, "sv7.rds"))
 #' del_list <- readRDS(file.path(ut_path, "del_list.rds"))
-#' bviews <- readRDS(file.path(dirs[["data"]], "bviews_hg19.rds"))
-#' index <- match(gsub(".bam", "", names(del_list)[12]), bamSamples(bviews)$Flow.Cell.ID)
+#' bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
+#' index <- match(gsub(".bam", "", names(del_list)[12]),
+#'                Rsamtools::bamSamples(bviews)$Flow.Cell.ID)
 #' bview <- bviews[, index]
 #' pview <- sv_preprocess(bview, dirs)
 #' ## number of improper read pairs supporting each deletion
@@ -444,19 +445,6 @@ reviseDeletionBorders <- function(object){
   gr
 }
 
-readPairsAsSegments <- function(object){
-  intrachrom <- chromosome(first(object)) == chromosome(last(object))
-  firstIsLeft <- start(first(object)) < start(last(object))
-  rp2 <- object
-  starts <- start(first(object))
-  starts[!firstIsLeft] <- start(last(object))[!firstIsLeft]
-  ends <- end(last(object))
-  ends[!firstIsLeft] <- end(first(object))[!firstIsLeft]
-  all(starts < ends)
-  rpsegs <- GRanges(chromosome(first(object))[intrachrom],
-                    IRanges(starts[intrachrom],
-                            ends[intrachrom]))
-}
 
 .homozygousBorders <- function(object, svs){
   v <- variant(object)
@@ -583,7 +571,7 @@ improperReadPairs <- function(aview, gr, param=DeletionParam()){
 }
 
 .reviseEachJunction <- function(object, param=DeletionParam(), pview, aview){
-o  svs <- reviseDeletionBorders(object)
+  svs <- reviseDeletionBorders(object)
   ##
   ## for the duplicated ranges, revert back to the original
   ##
@@ -1044,8 +1032,6 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 #' deletion based on the preprocessed estimates of read depth and the
 #' improper read pair alignments.
 #'
-#' @examples
-#' 
 #' 
 #' @param gr a \code{GRanges} object
 #' @param aview a \code{AlignmentViews2} object
@@ -1113,6 +1099,8 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
 #' \code{sv_deletion_exp} creates an object of class
 #' \code{StructuralVariant} for each element of a \code{GRangesList}.
 #'
+#' REFACTORING: should we remove need to access bam file to allow
+#' local testing?
 #'
 #' @seealso See \linkS4class{StructuralVariant} for methods defined
 #'   for this class. See
@@ -1122,13 +1110,10 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
 #' @examples
 #'   library(svovarian)
 #'   dirs <- projectOvarian()
-#'   bviews <- readRDS(file.path(dirs[["data"]], "bviews_hg19.rds"))
-#'  
+#'   bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
 #'   saved_gr <- readDeletions(dirs, seq_info=seqinfo(bamRanges(bviews)))
-#'  
 #'   del_list <- readRDS(file.path(dirs[["unit_test"]], "deletion_list.rds"))
 #'   bviews <- bviews[, unique(saved_gr$id)]
-#'
 #'   ## verify improper read pair alignment file
 #'   sv_dels <- sv_deletion_exp(dirs=dirs, bviews=bviews)
 #' 
@@ -1170,6 +1155,10 @@ sv_deletion_exp <- function(dirs,
     paths(pview) <- file.path(dirs[["background_adj"]], paste0(id, ".rds"))    
     gr <- grl[[id]]
     bam_exists <- file.exists(bamPaths(bviews[, id]))
+    ##
+    ##  BAM files are needed to extract 'proper' read pairs near
+    ##  deletions
+    ##
     if(!bam_exists) stop("bamPaths is invalid -- no bam file available")
     sv <- sv_deletions(gr,
                        aview,
