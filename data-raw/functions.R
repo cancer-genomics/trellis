@@ -27,7 +27,28 @@ create_deletions_data <- function(){
                              gr_filters=germline_filters)
   deletions <- sv_dels[[1]]
   save(deletions, file="/dcl01/scharpf/data/svpackages/svclasses/data/deletions.rda")
-  expect_is(sv_dels[[1]], "StructuralVariant")
-  expect_true(file.exists(del_file))
+  ##expect_is(sv_dels[[1]], "StructuralVariant")
+  ##expect_true(file.exists(del_file))
   unlink(del_file)
 }
+
+
+
+amplicons_data <- function(){
+  library(svfilters)
+  library(svcnvs)
+  library(svovarian)
+  id <- "CGOV2T"
+  dp <- projectOvarian(rootname="OvarianData2")
+  gfilters <- listGenomeFilters("hg19")
+  afilters <- ampliconFilters(gfilters)
+  bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
+  grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
+  ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], afilters)
+  amplicons <- ag[[1]]
+  save(amplicons, file="/dcl01/scharpf/data/svpackages/svclasses/data/amplicons.rda")
+}
+  
+  
+
+
