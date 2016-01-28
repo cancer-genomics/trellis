@@ -17,7 +17,10 @@
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce
 #' @importFrom GenomicAlignments GAlignmentPairs GAlignments
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
+#' @importMethodsFrom GenomicAlignments first last 
 #' @import GenomicRanges
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom graph graphNEL 
+#' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames
 NULL
