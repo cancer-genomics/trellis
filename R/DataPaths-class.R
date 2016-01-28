@@ -190,6 +190,15 @@ create_rearrangements <- function(path, rootname, dryrun=TRUE){
   paths      
 }
 
+create_figures <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0preprocess", "1dels", "2amps", "3rear")
+  paths <- file.path(path, "figures", topic_nms)
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths      
+}
+
 projectTree <- function(path, rootname, dryrun=TRUE){
   path <- file.path(path, rootname)
   top_dirs <- create_top_dirs(path, rootname, dryrun)
@@ -197,7 +206,9 @@ projectTree <- function(path, rootname, dryrun=TRUE){
   cnv_dirs <- create_cnv_dirs(path, rootname, dryrun)
   aln_dirs <- create_alignments(path, rootname, dryrun)
   rear_dirs <- create_rearrangements(path, rootname, dryrun)
-  c(top_dirs, preprocess_dirs, cnv_dirs, aln_dirs, rear_dirs)
+  fig_dirs <- create_figures(path, rootname, dryrun)
+  c(top_dirs, preprocess_dirs, cnv_dirs, aln_dirs, rear_dirs,
+    fig_dirs)
 }
 
 unitTestDir <- function(object) {
