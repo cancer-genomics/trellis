@@ -795,7 +795,7 @@ setAmpliconGroups <- function(object){
   groups <- groupAmplicons(graph(object))
   groups <- setNames(paste0("gr", groups), names(groups))
   ar <- ampliconRanges(object)
-  ## assumes that groups is the same length as ar
+  groups <- groups[names(ar)]
   ar$groups <- groups
   object <- updateRangesMetadata(object, ar)
   object
@@ -804,7 +804,8 @@ setAmpliconGroups <- function(object){
 getGenes <- function(object, transcripts){
   .hgnc <- setNames(rep(NA, length(object)), names(object))
   hits <- findOverlaps(transcripts, object, type="within")
-  genes <- hgnc(transcripts)[queryHits(hits)]
+  ##genes <- hgnc(transcripts)[queryHits(hits)]
+  genes <- transcripts$gene_name[queryHits(hits)]
   amp <- names(object)[subjectHits(hits)]
   geneL <- lapply(split(genes, amp), function(x) paste(unique(x), collapse=", "))
   genes <- unlist(geneL)
@@ -819,8 +820,14 @@ setGenes <- function(object, transcripts){
   object
 }
 
+
+
+driver_genes <- function(tx){
+  tx$gene_name[tx$cancer_connection]
+}
+
 getDrivers <- function(object, transcripts){
-  known_drivers <- unique(driver(transcripts))
+  known_drivers <- unique(driver_genes(transcripts))
   genes <- object$hgnc
   gene_list <- split(genes, object$groups)
   gene_list <- lapply(gene_list, function(x){
