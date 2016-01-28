@@ -1,4 +1,5 @@
-## TODO Need examples and tests for constructor
+#' @include GAlignmentPairs-utils.R
+NULL
 
 #' A class for storing rearrangement data
 #'

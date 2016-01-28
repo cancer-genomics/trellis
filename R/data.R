@@ -20,3 +20,18 @@
 #' improper(deletions[1])
 #' calls(deletions)
 NULL
+
+#' An amplicons object of class AmpliconGraph
+#'
+#' An \code{AmpliconGraph} of amplicons in sample CGOV2T.
+#'
+#' @seealso \code{\link[svplots]{plot_amplicons}}
+#' @docType data
+#' @keywords datasets
+#' @name amplicons-data
+#' @usage data(amplicons)
+#' @format a \code{AmpliconGraph} object.
+#' @examples
+#' data(amplicons)
+#' ampliconRanges(amplicons)
+NULL
