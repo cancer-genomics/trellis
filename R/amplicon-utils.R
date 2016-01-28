@@ -335,6 +335,7 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
 }
 
 joinNearGRanges <- function(object, thr=0.05){
+  browser()
   k <- which(!is.na(object$seg.mean) & width(object) > 2e3)
   if(length(k) == 0) return(object)
   g <- object[k]
@@ -344,18 +345,27 @@ joinNearGRanges <- function(object, thr=0.05){
   regions <- paste0("region", cumsum(c(0, abs(d) > thr)))
   regions <- factor(regions, levels=unique(regions))
   indexlist <- split(seq_along(regions), regions)
-  ## slow
+  ##
+  ## list of regions.  Each element is a vector of regions that can be
+  ## joined
+  ##
   glist <- vector("list", length(indexlist))
   for(i in seq_along(indexlist)){
     j <- indexlist[[i]]
     glist[[i]] <- g[j]
   }
-  ##glist <- foreach(i = indexlist) %do% g[i]
   index <- which(elementLengths(glist) > 1)
-  if(length(index) == 0) return(object)
+  if(length(index) == 0){
+    ## none of the regions can be joined. Return the original object.
+    return(object)
+  }
+  ##
+  ## Join regions within 3kb
+  ##
+  ## - Compute a weighted average for the regions that are joined
+  ## 
   for(i in seq_along(index)){
     j <- index[i]
-    ##foreach(j = index) %do% {
     gr <- glist[[j]]
     ng <- reduce(gr, min.gapwidth=3e3)
     df <- mcols(gr)
@@ -364,8 +374,13 @@ joinNearGRanges <- function(object, thr=0.05){
     mcols(ng) <- ndf
     glist[[i]] <- ng
   }
+  ## the joined GRanges
   gnew <- unlist(GRangesList(glist))
-  object2 <- filterBy(object, g)
+  ##  Remove regions in the original object that overlap with the
+  ## joined regions (g contains all the original intervals that were
+  ## subsequently joined)
+  object2 <- filterBy(object, gnew)
+  ##object2 <- filterBy(object, g)
   object3 <- c(object2, gnew)
   sort(object3)
 }
@@ -911,7 +926,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   if (numNodes (ag) == 0) return (ag)
 
   centromeres <- af[["centromeres"]]
-  ag2 <- trimRangesOverlappingCentromere (ag, centromeres)
+  ag <- trimRangesOverlappingCentromere (ag, centromeres)
   stopifnot(all(nodes(ag) %in% names(ranges(ag))))
   tmp <- joinNearGRanges(ranges(ag), thr=0.05)
   names(tmp) <- ampliconNames(tmp)
@@ -919,6 +934,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ## stopifnot(nodes(ag) %in% names(tmp)), and so
   ## setAmpliconGroups fails
   ranges(ag) <- tmp
+  stopifnot(validObject(ag))
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
   LOW_THR <- af[["LOW_THR"]]
