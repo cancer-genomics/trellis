@@ -78,6 +78,11 @@ setGeneric("proper", function(object) standardGeneric("proper"))
 #' @export
 setGeneric("proper<-", function(object, value) standardGeneric("proper<-"))
 
+#' @rdname StructuralVariant-class
+#' @keywords internal
+#' @export
+setGeneric("readPairs", function(object) standardGeneric("readPairs"))
+
 #' Extract deletion regions from a StructuralVariant object
 #'
 #' @return a \code{GRanges} object for the genomic intervals of the deletions
@@ -422,6 +427,24 @@ setReplaceMethod("proper", c("StructuralVariant","GAlignmentPairs"),
                    object@proper <- value
                    object
                  })
+
+#' @rdname StructuralVariant-class
+#' @aliases readPairs,StructuralVariant-method
+setMethod("readPairs", "StructuralVariant", function(object){
+  prp <- proper(object)
+  irp <- improper(object)
+  if(!identical(colnames(mcols(first(prp))),
+                colnames(mcols(first(irp))))){
+    mcols(first(prp)) <- NULL
+    mcols(first(irp)) <- NULL
+    mcols(last(prp)) <- NULL
+    mcols(last(irp)) <- NULL    
+  }
+  rp <- c(prp, irp)
+  i <- order(start(first(rp)))
+  rp <- rp[i]
+  rp
+})
 
 #' @rdname StructuralVariant-class
 #' @export

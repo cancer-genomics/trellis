@@ -15,7 +15,8 @@ Imports:
     GenomeInfoDb,
     GenomicAlignments,
     IRanges,
-    SummarizedExperiment
+    SummarizedExperiment,
+    graph
 Suggests:
     DNAcopy,
     knitr,
@@ -32,12 +33,13 @@ Collate:
     'DataPaths-class.R'
     'Preprocess-class.R'
     'AlignmentViews-class.R'
+    'Amplicon-class.R'
     'DNAcopy-class.R'
+    'GAlignmentPairs-utils.R'
     'Rearrangement-class.R'
     'Deletion-class.R'
     'DeletionList-class.R'
     'DeletionParam-class.R'
-    'GAlignmentPairs-utils.R'
     'GRanges-utils.R'
     'RearrangementList-class.R'
     'RearrangmentParams-class.R'

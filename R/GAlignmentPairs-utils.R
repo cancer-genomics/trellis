@@ -1,6 +1,10 @@
 #' @include Deletion-class.R
 NULL
 
+setGeneric("first<-", function(x, value) standardGeneric("first<-"))
+
+setGeneric("last<-", function(x, value) standardGeneric("last<-"))
+
 
 ##--------------------------------------------------
 ##
@@ -23,4 +27,40 @@ NULL
 }
 
 
+#' Represent read pairs as segments
+#'
+#' When both reads of a pair are aligned to the same chromosome, this
+#' function makes a \code{GRanges} object of the interval (DNA
+#' fragment).
+#'
+#' 
+#' @return a \code{GRanges} object
+#' @export
+#' @param object a \code{GAlignmentPairs} object
+readPairsAsSegments <- function(object){
+  intrachrom <- chromosome(first(object)) == chromosome(last(object))
+  firstIsLeft <- start(first(object)) < start(last(object))
+  rp2 <- object
+  starts <- start(first(object))
+  starts[!firstIsLeft] <- start(last(object))[!firstIsLeft]
+  ends <- end(last(object))
+  ends[!firstIsLeft] <- end(first(object))[!firstIsLeft]
+  all(starts < ends)
+  rpsegs <- GRanges(chromosome(first(object))[intrachrom],
+                    IRanges(starts[intrachrom],
+                            ends[intrachrom]))
+}
 
+
+
+
+
+setReplaceMethod("first", "GAlignmentPairs", function(x, value){
+  x@first <- value
+  x
+})
+
+setReplaceMethod("last", "GAlignmentPairs", function(x, value){
+  x@last <- value
+  x
+})
