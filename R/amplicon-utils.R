@@ -999,7 +999,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
 #'   bviews <- bviews[, id]
 #'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
 #'   ## Requires bam file
-#'   if(file.exists(bamPaths(bviews))){
+#'   if(file.exists(Rsamtools::bamPaths(bviews))){
 #'     ag <- sv_amplicons(bviews[, id], grl[[id]], afilters)
 #'     ## or
 #'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], afilters)

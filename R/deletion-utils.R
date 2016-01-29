@@ -1109,14 +1109,27 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
 #' 
 #' @examples
 #'   library(svovarian)
-#'   dirs <- projectOvarian()
-#'   bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-#'   saved_gr <- readDeletions(dirs, seq_info=seqinfo(bamRanges(bviews)))
-#'   del_list <- readRDS(file.path(dirs[["unit_test"]], "deletion_list.rds"))
-#'   bviews <- bviews[, unique(saved_gr$id)]
-#'   ## verify improper read pair alignment file
-#'   sv_dels <- sv_deletion_exp(dirs=dirs, bviews=bviews)
-#' 
+#'   library(svfilters)
+#'   library(Rsamtools)
+#'   id <- "CGOV2T"
+#'   dp <- projectOvarian(rootname="OvarianData2")
+#'   data(lymphoblast_filters_hg19)
+#'   data(lowMappabilityBins_hg19)
+#'   data(binAssemblyGaps_hg19)
+#'   gfilters <- as(lymphoblast_filters_hg19, "list")
+#'   gfilters$map <- lowMappabilityBins_hg19
+#'   gfilters$gc <- binAssemblyGaps_hg19
+#'   germline_filters <- reduce(unlist(GRangesList(lapply(gfilters, granges))))
+#'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
+#'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
+#'   gr <- grl[[id]]
+#'   gr <- gr[gr$seg.mean < log2(0.75)]
+#'   grl_del <- setNames(GRangesList(gr), id)
+#'   if(FALSE){
+#'     sv_dels <- sv_deletion_exp(dirs=dp, grl=grl_del[id],
+#'                                bviews=bviews[, id],
+#'                                gr_filters=germline_filters)
+#'   }
 #' @return a list. Each element of the list is a \code{StructuralVariant} object.
 #' @export
 #' @param dirs a character vector of file paths as provided by \code{projectTree}
