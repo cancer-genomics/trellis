@@ -86,6 +86,10 @@ rearDir <- function(object){
   file.path(dataDir(object), "rearrangements")
 }
 
+figDir <- function(object){
+  file.path(dirname(object[1]), "figures")
+}
+
 setMethod("show", "DataPaths", function(object){
   cat("An object of class 'DataPaths'\n")
   cat(" Top level directory:\n")
@@ -111,7 +115,12 @@ setMethod("show", "DataPaths", function(object){
   cat("    /data/rearrangements: \n")  
   rear_dirs <- list.files(rearDir(object))
   rear_dirs <- paste(rear_dirs, collapse=" | ")  
-  cat("      ", rear_dirs, "\n")      
+  cat("      ", rear_dirs, "\n")
+  ## figures
+  cat("    /figures: \n")  
+  fig_dirs <- list.files(figDir(object))
+  fig_dirs <- paste(fig_dirs, collapse=" | ")  
+  cat("      ", fig_dirs, "\n")        
   cat("  see ?listDir\n")
 })
 
