@@ -334,9 +334,25 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
   object
 }
 
-joinNearGRanges <- function(object, thr=0.05){
-  browser()
-  k <- which(!is.na(object$seg.mean) & width(object) > 2e3)
+#' Merge adjacent amplicons that have a similar segment mean
+#'
+#' Merges adjacent amplicons (<= 3kb separation) that have similar
+#' segment means.
+#' 
+#' @keywords internal
+#' @export
+#' @return a \code{GRanges} object of the merged segments
+#' 
+#' @param object a \code{GRanges} object
+#' 
+#' @param thr a length-one numeric vector.  If the difference of the
+#'   average log ratio for two segments is less than this number,
+#'   combine the segments.
+#'
+#' @param MIN_WIDTH minimum size of amplicon (default 2000)
+#' 
+joinNearGRanges <- function(object, thr=0.05, MIN_WIDTH=2e3){
+  k <- which(!is.na(object$seg.mean) & width(object) > MIN_WIDTH)
   if(length(k) == 0) return(object)
   g <- object[k]
   means <- g$seg.mean
@@ -352,36 +368,23 @@ joinNearGRanges <- function(object, thr=0.05){
   glist <- vector("list", length(indexlist))
   for(i in seq_along(indexlist)){
     j <- indexlist[[i]]
-    glist[[i]] <- g[j]
-  }
-  index <- which(elementLengths(glist) > 1)
-  if(length(index) == 0){
-    ## none of the regions can be joined. Return the original object.
-    return(object)
-  }
-  ##
-  ## Join regions within 3kb
-  ##
-  ## - Compute a weighted average for the regions that are joined
-  ## 
-  for(i in seq_along(index)){
-    j <- index[i]
-    gr <- glist[[j]]
-    ng <- reduce(gr, min.gapwidth=3e3)
-    df <- mcols(gr)
-    ndf <- df[1, ]
-    ndf$seg.mean <- sum(width(gr)*gr$seg.mean)/sum(width(gr))
-    mcols(ng) <- ndf
+    if(length(j)==1) next()
+    ng <- reduce(g[j], min.gapwidth=3e3)
+    ##
+    ## TODO: combining the metadata.  Here, we're just taking the first row
+    ##
+    mc <- mcols(g)[j[1], ]
+    mc$seg.mean <- sum(width(g[j])*g$seg.mean[j])/sum(width(g[j]))
+    mcols(ng) <- mc
     glist[[i]] <- ng
   }
-  ## the joined GRanges
-  gnew <- unlist(GRangesList(glist))
+  gnew <- unlist(GRangesList(unlist(glist)))
   ##  Remove regions in the original object that overlap with the
   ## joined regions (g contains all the original intervals that were
   ## subsequently joined)
   object2 <- filterBy(object, gnew)
-  ##object2 <- filterBy(object, g)
   object3 <- c(object2, gnew)
+  object3$seg.mean <- round(object3$seg.mean, 2)
   sort(object3)
 }
 
@@ -934,7 +937,6 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ## stopifnot(nodes(ag) %in% names(tmp)), and so
   ## setAmpliconGroups fails
   ranges(ag) <- tmp
-  stopifnot(validObject(ag))
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
   LOW_THR <- af[["LOW_THR"]]
@@ -961,6 +963,25 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ag <- setGenes (ag, transcripts)
   ag <- setDrivers (ag, transcripts)
   ag
+}
+
+get_improper_readpairs2 <- function(dp, object){
+  g <- reduce(queryRanges(object))
+  if(totalWidth(g)==0) {
+    galp <- GAlignmentPairs(first=GAlignments(), last=GAlignments(), isProperPair=logical())
+    return(galp)
+  }
+  ## expand the query regions by 2kb on each side
+  g2 <- reduce(expandGRanges(g, 2e3L))
+  p <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE, isProperPair=FALSE),
+                    what=c("flag", "mrnm", "mpos"), which=g)
+  ##x <- readGAlignmentsFromBam(bam.file, param=p, use.names=TRUE)
+  x <- readGAlignments(bam.file, param=p, use.names=TRUE)
+  galp <- makeGAlignmentPairs2(x, use.mcols="flag")
+  validR1 <- overlapsAny(first(galp), g)
+  validR2 <- overlapsAny(last(galp), g)
+  galp <- galp[validR1 & validR2]
+  galp
 }
 
 
