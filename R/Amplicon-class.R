@@ -137,7 +137,6 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @rdname AmpliconGraph-class
 #' @aliases addNode,character,AmpliconGraph-method
 #' @param node name of amplicon 
-#' @param object a \code{AmpliconGraph}
 #' @param edges name of edge (e.g., concatenate two amplicon names)
 setMethod("addNode", c("character", "AmpliconGraph"),
           function(node, object, edges){
@@ -206,7 +205,8 @@ setMethod(driver, "AmpliconGraph", function(object){
 
 #' @rdname AmpliconGraph-class
 #' @aliases edges,AmpliconGraph-method
-setMethod("edges", "AmpliconGraph", function(object, ...){
+ #' @param which ignored
+setMethod("edges", "AmpliconGraph", function(object, which, ...){
   edges(graph(object))
 })
 
