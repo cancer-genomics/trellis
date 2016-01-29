@@ -80,7 +80,7 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @examples
 #' library(svfilters)
 #' library(svcnvs)
-#' gfilters <- listGermlineFilters("hg19")
+#' gfilters <- listGenomeFilters("hg19")
 #' afilters <- ampliconFilters(gfilters)
 #' 
 #' @param germline_filters a list of germline filters
@@ -965,26 +965,6 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ag
 }
 
-get_improper_readpairs2 <- function(dp, object){
-  g <- reduce(queryRanges(object))
-  if(totalWidth(g)==0) {
-    galp <- GAlignmentPairs(first=GAlignments(), last=GAlignments(), isProperPair=logical())
-    return(galp)
-  }
-  ## expand the query regions by 2kb on each side
-  g2 <- reduce(expandGRanges(g, 2e3L))
-  p <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE, isProperPair=FALSE),
-                    what=c("flag", "mrnm", "mpos"), which=g)
-  ##x <- readGAlignmentsFromBam(bam.file, param=p, use.names=TRUE)
-  x <- readGAlignments(bam.file, param=p, use.names=TRUE)
-  galp <- makeGAlignmentPairs2(x, use.mcols="flag")
-  validR1 <- overlapsAny(first(galp), g)
-  validR2 <- overlapsAny(last(galp), g)
-  galp <- galp[validR1 & validR2]
-  galp
-}
-
-
 #' Identify somatic amplicons and grouped amplicons
 #'
 #' This function identifies focal, somatic amplifications.  As
@@ -1009,26 +989,21 @@ get_improper_readpairs2 <- function(dp, object){
 #'
 #' @examples
 #'   library(svovarian)
+#'   library(svfilters)
+#'   id <- "CGOV2T"
 #'   data(lymph_ids)
-#'   dirs <- projectOvarian()
-#'   bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-#'   bviews <- bviews[, c("CGOV1T", lymph_ids)]
-#'   pviews <- bin_copynumber(bviews, dirs)
-#'   grl <- segmentExperiment(pviews, dirs)
-#'   tracks <- germlineTracks(grl[lymph_ids], pviews[, lymph_ids])
-#'   afilters <- ampliconFilters(tracks, dirs)
-#'   ag_test <- sv_amplicon_exp(dirs, bviews[, "CGOV1T"], afilters)
-#'   expect_is(ag_test[[1]], "AmpliconGraph")
-#' 
-#'   ##  Subsequent calls to sv_amplicon_exp will read the saved
-#'   ##  graphs from disk
-#'   ##
-#'   ## To force generating the graph de novo, the intermediate files must be deleted
-#'   \dontrun{
-#'     unlink(file.path(dirs[["amp"]], "CGOV1T.rds"))
-#'     ag_test <- sv_amplicon_exp(dirs, bviews[, "CGOV1T"], afilters)
+#'   dp <- projectOvarian(rootname="OvarianData2")
+#'   gfilters <- listGenomeFilters("hg19")
+#'   afilters <- ampliconFilters(gfilters)
+#'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
+#'   bviews <- bviews[, id]
+#'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
+#'   ## Requires bam file
+#'   if(file.exists(bamPaths(bviews))){
+#'     ag <- sv_amplicons(bviews[, id], grl[[id]], afilters)
+#'     ## or
+#'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], afilters)
 #'   }
-#' 
 #' @param dirs character-vector of file paths for storing intermediate
 #'   files
 #' @param bviews A \code{BamViews} object
