@@ -13,8 +13,6 @@ test_that("deletions", {
   gfilters$gc <- binAssemblyGaps_hg19
   germline_filters <- reduce(unlist(GRangesList(lapply(gfilters, granges))))
   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
-  del_file <- file.path(dp["1deletions"], rdsId(bviews[, id]))
-  file2 <- gsub(".rds", "_copy.rds", del_file)
   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
   gr <- grl[[id]]
   gr <- gr[gr$seg.mean < log2(0.75)]
@@ -23,9 +21,5 @@ test_that("deletions", {
                              bviews=bviews[, id],
                              gr_filters=germline_filters)
   expect_is(sv_dels[[1]], "StructuralVariant")
-  expect_true(file.exists(del_file))
-  unlink(del_file)
-  file.copy(file2, del_file)
-  unlink(file2)
 })
 

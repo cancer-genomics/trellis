@@ -373,7 +373,7 @@ joinNearGRanges <- function(object, thr=0.05, MIN_WIDTH=2e3){
     ##
     ## TODO: combining the metadata.  Here, we're just taking the first row
     ##
-    mc <- mcols(g)[j[1], ]
+    mc <- mcols(g)[j[1], , drop=FALSE]
     mc$seg.mean <- sum(width(g[j])*g$seg.mean[j])/sum(width(g[j]))
     mcols(ng) <- mc
     glist[[i]] <- ng
