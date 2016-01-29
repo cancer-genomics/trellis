@@ -21,11 +21,10 @@
 #' calls(deletions)
 NULL
 
-#' An amplicons object of class AmpliconGraph
+#' An example AmpliconGraph
 #'
-#' An \code{AmpliconGraph} of amplicons in sample CGOV2T.
+#' An \code{AmpliconGraph} for sample CGOV2T.
 #'
-#' @seealso \code{\link[svplots]{plot_amplicons}}
 #' @docType data
 #' @keywords datasets
 #' @name amplicons-data

@@ -24,8 +24,10 @@ NULL
 #' @slot tags a \code{GRanges} object of single tags
 #' 
 #' @slot tag_map_to_linked_bin an integer vector keeping track of
-#'   which tags belong to which linked bin @slot modal_rearrangement
-#'   charactering string of the modal rearrangemnt type
+#'   which tags belong to a linked bin
+#'
+#' @slot modal_rearrangement charactering string of the modal
+#'   rearrangemnt type
 #' 
 #' @slot percent_rearrangement length-one numeric vector indicating
 #'   the percentage of improper read pairs for a linked bin that
