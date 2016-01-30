@@ -153,8 +153,7 @@ dirCreate <- function(x){
 
 ## top-level folders
 create_top_dirs <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("data", "figures", "extdata", "versions",
-                 "unit_test")
+  topic_nms <- c("data", "figures",  "unit_test", "fasta")
   paths <- file.path(path, topic_nms)
   if(!dryrun){
     dirCreate(paths)
