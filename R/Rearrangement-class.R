@@ -146,6 +146,22 @@ setGeneric("modalRearrangement", function(object) standardGeneric("modalRearrang
 #' @export
 setGeneric("modalRearrangement<-", function(object, value) standardGeneric("modalRearrangement<-"))
 
+#' Calculate the number of read pairs that link two clusters of improper reads
+#'
+#' Clusters of improper read pairs can be linked by the mates of the
+#' improper reads that belong to these clusters.  This function
+#' computes the number of improperly paired reads that link two
+#' clusters. The number of read pairs that would link two clusters in
+#' a bona fide somatic rearrangement depends on the depth of
+#' sequencing.  For 30x coverage, we require at least 5 linking read
+#' pairs.
+#' 
+#' @rdname numberLinkingRP-methods
+#' @keywords internal
+#' @return a numeric vector
+#' @export
+setGeneric("numberLinkingRP", function(object) standardGeneric("numberLinkingRP"))
+
 #' @export
 #' @rdname Rearrangement-class
 #' @keywords internal
@@ -183,9 +199,21 @@ setGeneric("percentRearrangement<-",
 #' @rdname tags-methods
 setGeneric("tags", function(object) standardGeneric("tags"))
 
+#' @rdname tags-methods
+#' @export
+setGeneric("tags<-", function(object, value) standardGeneric("tags<-"))
+
 setGeneric("tagMapping", function(object) standardGeneric("tagMapping"))
 
+##--------------------------------------------------
+##
+##
+##
 ## Methods
+##
+##
+##
+##--------------------------------------------------
 
 #' @rdname fractionLinkingTags
 #' @aliases fractionLinkingTags,Rearrangement-method
@@ -199,10 +227,26 @@ setReplaceMethod("fractionLinkingTags", "Rearrangement", function(object, value)
   object
 })
 
+link1id <- function(object) object@link1id
+link2id <- function(object) object@link2id
 
 #' @aliases linkedBins,Rearrangement-method
 #' @rdname linkedBins-methods
 setMethod("linkedBins", "Rearrangement", function(object) object@linkedBins)
+
+#' @aliases, linkedBins,Rearrangement,ANY-method
+#' @rdname linkedBins-methods
+#' @param value a \code{GRanges} object
+setReplaceMethod("linkedBins", "Rearrangement", function(object, value){
+  object@linkedBins <- value
+  ##
+  ## list only the improper tags that are within the redefined bin
+  ##
+  all_tags <- tags(object)
+  keep <- overlapsAny(all_tags, value) | overlapsAny(all_tags, value$linked.to)
+  tags(object) <- all_tags[keep]
+  object
+})
 
 #' @rdname modalRearrangement
 #' @aliases modalRearrangement,Rearrangement-method
@@ -215,8 +259,14 @@ setReplaceMethod("modalRearrangement", "Rearrangement", function(object,value){
   object
 })
 
-link1id <- function(object) object@link1id
-link2id <- function(object) object@link2id
+#' @rdname numberLinkingRP-methods
+#' @aliases numberLinkingRP,Rearrangement-method
+#' @export
+setMethod("numberLinkingRP", "Rearrangement", function(object){
+  nsupportingReads <- table(names(improper(object)))
+  nsupportingReads <- nsupportingReads[names(object)]
+  as.integer(nsupportingReads)
+})
 
 #' @aliases partitioning,Rearrangement-method
 #' @rdname Rearrangement-class
@@ -237,6 +287,26 @@ setReplaceMethod("percentRearrangement", "Rearrangement", function(object,value)
 #' @aliases tags,Rearrangement-method
 #' @rdname tags-methods
 setMethod("tags", "Rearrangement", function(object) object@tags)
+
+#' @aliases tags,Rearrangement,ANY-method
+#' @rdname tags-methods
+setReplaceMethod("tags", "Rearrangement", function(object, value){
+  object@tags <- value
+  lb <- linkedBins(object)
+  ## update the tag mapping to the rearrangement bin
+  linked.ids <- strsplit(names(lb), "-")
+  linked1id <- sapply(linked.ids, "[", 1)
+  linked2id <- sapply(linked.ids, "[", 2)
+  hits1 <- findOverlaps(value, lb, select="first")
+  hits2 <- findOverlaps(value, lb$linked.to, select="first")
+  i1 <- linked1id[hits1]
+  i2 <- linked2id[hits2]
+  mapping <- rep(NA, length(tags))
+  mapping[!is.na(i1)] <- i1[!is.na(i1)]
+  mapping[is.na(i1)] <- i2[is.na(i1)]
+  object@tag_map_to_linked_bin <- mapping
+  object
+})
 
 setMethod("tagMapping", "Rearrangement", function(object) object@tag_map_to_linked_bin)
 

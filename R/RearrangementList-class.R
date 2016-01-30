@@ -1,5 +1,29 @@
-#' @include help.R
+#' @include Rearrangement-class.R
 NULL
+
+#' Constructor for \code{RearrangementList} class
+#'
+#' @return a \code{RearrangementList} object
+#' @rdname RearrangementList-class
+#' @export
+#' @keywords internal
+#' @param object a list of \code{Rearrangement} objects
+#' 
+#' @param modal_rearrangement a character vector of the modal
+#'   rearrangement corresponding to each element in \code{object}.
+#'   Must be the same length as \code{object}.
+#' 
+#' @param percent_rearrangement a numeric vector indicating the
+#'   fraction of improper read pairs supporting the modal
+#'   rearrangement type.  Must be the same length as \code{object}.
+#' 
+#' @param colData a \code{DataFrame} containing metadata on the
+#'   \code{Rearrangement} objects.
+#' 
+setGeneric("RearrangementList", function(object,
+                                         modal_rearrangement,
+                                         percent_rearrangement,
+                                         colData) standardGeneric("RearrangementList"))
 
 #' A container for a list of Rearrangement objects
 #'
@@ -7,6 +31,9 @@ NULL
 #' to encapsulate the data supporting each rearrangement in a
 #' \code{Rearrangement} object, and to list all of these
 #' rearrangements in a \code{RearrangementList}.
+#'
+#' @examples
+#' RearrangementList()
 #' 
 #' @export
 #' @slot data a list of \code{Rearrangement} objects
@@ -40,29 +67,7 @@ setMethod("show", "RearrangementList", function(object){
 })
 
 
-#' Constructor for \code{RearrangementList} class
-#'
-#' @return a \code{RearrangementList} object
-#' @rdname RearrangementList-class
-#' @export
-#' @keywords internal
-#' @param object a list of \code{Rearrangement} objects
-#' 
-#' @param modal_rearrangement a character vector of the modal
-#'   rearrangement corresponding to each element in \code{object}.
-#'   Must be the same length as \code{object}.
-#' 
-#' @param percent_rearrangement a numeric vector indicating the
-#'   fraction of improper read pairs supporting the modal
-#'   rearrangement type.  Must be the same length as \code{object}.
-#' 
-#' @param colData a \code{DataFrame} containing metadata on the
-#'   \code{Rearrangement} objects.
-#' 
-setGeneric("RearrangementList", function(object,
-                                         modal_rearrangement,
-                                         percent_rearrangement,
-                                         colData) standardGeneric("RearrangementList"))
+
 
 #' @rdname RearrangementList-class
 #' @aliases RearrangementList,missing-method
@@ -119,19 +124,110 @@ setReplaceMethod("colData", "RearrangementList", function(x, value){
 #' @keywords internal
 setMethod("elementType", "RearrangementList", function(x, ...) x@elementType)
 
+#' @rdname fractionLinkingTags
+#' @aliases fractionLinkingTags,RearrangementList-method
+setMethod("fractionLinkingTags", "RearrangementList", function(object){
+  sapply(object, fractionLinkingTags)
+})
+
 #' @aliases length,RearrangementList-method
 #' @rdname RearrangementList-class
 setMethod("length", "RearrangementList", function(x) length(x@data))
 
+#' @aliases linkedBins,RearrangementList-method
+#' @rdname linkedBins-methods
+setMethod("linkedBins", "RearrangementList", function(object){
+  dat <- object@data
+  lblist <- lapply(dat, linkedBins)
+  nms <- sapply(lblist, names)
+  grl <- GRangesList(lblist)
+  g <- unlist(grl)
+  names(g) <- nms
+  g
+})
+
+#' @aliases linkedBins,RearrangementList,ANY-method
+#' @rdname linkedBins-methods
+setReplaceMethod("linkedBins", "RearrangementList", function(object, value){
+  dat <- object@data
+  for(i in seq_along(dat)){
+    linkedBins(dat[[i]]) <- value[i]
+  }
+  object@data <- dat
+  object
+})
+
+#' @rdname modalRearrangement
+#' @aliases modalRearrangement,RearrangementList-method
+setMethod("modalRearrangement", "RearrangementList", function(object){
+  sapply(object, modalRearrangement)
+})
+
+
 #' @aliases names,RearrangementList-method
 #' @rdname RearrangementList-class
 setMethod("names", "RearrangementList", function(x) x@names)
+
+#' @aliases numberLinkingRP,RearrangementList-method
+#' @rdname numberLinkingRP-methods
+#' @export
+setMethod("numberLinkingRP", "RearrangementList", function(object){
+  sapply(object, numberLinkingRP)
+})
+
+#' @rdname RearrangementList-class
+#' @aliases overlapsAny,RearrangementList,GRanges-method
+#' 
+#' @param query a \code{RearrangementList}
+#' @param subject a \code{GRanges} object
+#' @param ... additional arguments ignored
+setMethod("overlapsAny", c("RearrangementList", "GRanges"), function(query, subject, ...){
+  lb <- linkedBins(query)
+  overlaps_firstbin <- overlapsAny(lb, subject)
+  overlaps_secondbin <- overlapsAny(lb$linked.to, subject)
+  overlaps_firstbin | overlaps_secondbin
+})
+
+#' @rdname percentRearrangement
+#' @aliases percentRearrangement,RearrangementList-method
+setMethod("percentRearrangement", "RearrangementList", function(object){
+  sapply(object, percentRearrangement)
+})
+
+#' @aliases sapply,RearrangementList-method
+#' @rdname sapply-methods
+setMethod("sapply", "RearrangementList", function(X, FUN, ..., simplify=TRUE, USE.NAMES=TRUE){
+  results <- setNames(rep(NA, length(X)), names(X))
+  for(i in seq_along(X)){
+    results[i] <- FUN(X[[i]], ...)
+  }
+  results
+})
+
+#' @aliases lapply,RearrangementList-method
+#' @rdname sapply-methods
+setMethod("lapply", "RearrangementList", function(X, FUN, ...){
+  ##results <- setNames(rep(NA, length(X)), names(X))
+  results <- vector("list", length(X))
+  setNames(results, names(X))
+  for(i in seq_along(X)){
+    results[[i]] <- FUN(X[[i]], ...)
+  }
+  results
+})
 
 ##--------------------------------------------------
 ##
 ## Subsetting
 ##
 ##--------------------------------------------------
+
+#' @rdname RearrangementList-class
+#' @aliases $,RearrangementList,ANY-method
+setReplaceMethod("$", "RearrangementList", function(x, name, value){
+  x@colData[[name]] <- value
+  x
+})
 
 #' @rdname RearrangementList-class
 #' @aliases $,RearrangementList-method
