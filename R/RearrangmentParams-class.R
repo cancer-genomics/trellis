@@ -54,7 +54,8 @@ setClass("RearrangementParams", representation(rp_separation="numeric",
 #'   separation of the first and last read of a pair
 #' 
 #' @param min_number_tags_per_cluster length-one numeric vector
-#'   indicating the minimum number of reads in a cluster
+#'   indicating the minimum number of reads in a cluster and the
+#'   minimum number of reads required to link two clusters
 #' 
 #' @param min_cluster_size length-one numeric vector; the minimum size
 #'   of a cluster of reads

@@ -536,7 +536,7 @@ setMethod("lapply", "StructuralVariant", function(X, FUN, ...){
 #' @keywords internal 
 #' @rdname sapply-methods
 #' @aliases sapply,StructuralVariant-method
-#' @param X a \code{StructuralVariant} object
+#' @param X see \code{showMethods("sapply")}
 #' @param FUN a function
 #' @param ... additional arguments to \code{FUN}
 #' @param simplify logical

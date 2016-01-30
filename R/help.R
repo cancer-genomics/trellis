@@ -14,7 +14,7 @@
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importFrom IRanges IRanges
-#' @importMethodsFrom IRanges findOverlaps pintersect reduce
+#' @importMethodsFrom IRanges findOverlaps pintersect reduce overlapsAny
 #' @importFrom GenomicAlignments GAlignmentPairs GAlignments
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
 #' @importMethodsFrom GenomicAlignments first last 
