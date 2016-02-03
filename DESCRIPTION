@@ -4,7 +4,7 @@ Version: 0.0.1
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: Methods for extracting and viewing improper alignments.
 Depends:
-    R (>= 3.2.2),
+    R (>= 3.2.0),
     svclasses
 Imports: methods,
          GenomicAlignments,
@@ -12,7 +12,8 @@ Imports: methods,
          S4Vectors,
          GenomeInfoDb,
          IRanges,
-         GenomicRanges
+         GenomicRanges,
+         dplyr
 License: Artistic-2.0
 LazyData: true
 Suggests:

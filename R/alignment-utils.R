@@ -1,3 +1,15 @@
+#' Find total width of a \code{GRanges} object
+#'
+#' Adds the width of the intervals in a \code{GRanges} object. 
+#'
+#' @examples
+#' gr <- GRanges(c("chr1", "chr2"), IRanges(c(11, 11), c(1000, 1000)))
+#' totalWidth(gr)
+#' @return numeric
+#' @export
+#' @param object a \code{GRanges} object
+totalWidth <- function(object) sum(as.numeric(width(object)))
+
 ## Adapted from makeGAlignmentPairs in GenomicAlignments
 makeGAlignmentPairs2 <- function(x, use.names=FALSE, use.mcols=FALSE, strandMode=1){
   if (!isTRUEorFALSE(use.names))
@@ -114,6 +126,23 @@ improperAlignmentParams <- function(flags=improperAlignmentFlags()){
   ScanBamParam(flag=improperAlignmentFlags(), what=c("flag", "mrnm", "mpos", "mapq"))
 }
 
+
+#' Function used by rearrangement analysis to extract the sequence of
+#' read pairs near a rearrangement
+#'
+#' @return a \code{GAlignmentPairs} object
+#' @keywords internal
+#' @export
+#' @param object a \code{AlignmentViews2} object
+#' @param param a \code{ScanBamParam} object.
+#' @param mapq_thr the minimum mapq score (numeric)
+#' @param use.mcols logical
+#' 
+#' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
+#'   for details regarding \code{use.mcols} argument.  See
+#'   \code{\link{improperAlignmentParams}} for creating a
+#'   \code{ScanBamParam} object with the appropriate flags for
+#'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(object,
                                       param,
                                       mapq_thr=-Inf,
@@ -151,6 +180,7 @@ getImproperAlignmentPairs <- function(object,
 #'   aviews <- AlignmentViews2(bv, dp)
 #'   \dontrun{
 #'     writeImproperAlignments2(aviews)
+#'     gps <- readRDS(file.path(dp["improper"], rdsId(aviews)[1]))
 #'   }
 #' 
 #' @rdname AlignmentViews2
@@ -219,8 +249,14 @@ thinReadPairQuery <- function(g, zoom.out=1){
 }
 
 R1isFirst <- function(galp) start(first(galp)) < end(last(galp))
-validFirstR1 <- function(galp)  strand(first(galp)) == "+" & strand(last(galp)) == "-" & R1isFirst(galp)
-validLastR1 <- function(galp)  strand(first(galp)) == "-" & strand(last(galp)) == "+" & !R1isFirst(galp)
+
+validFirstR1 <- function(galp){
+  strand(first(galp)) == "+" & strand(last(galp)) == "-" & R1isFirst(galp)
+}
+
+validLastR1 <- function(galp){
+  strand(first(galp)) == "-" & strand(last(galp)) == "+" & !R1isFirst(galp)
+}
 
 validPairForDeletion <- function(galp){
   ## for deletions:
@@ -265,7 +301,6 @@ properReadPairs <- function(bam_path, gr, param=DeletionParam()){
 #' @return a \code{GAlignmentPairs} object
 #' @param object a \code{GRanges} object
 #' @param bam.file a character string providing complete path to bam file
-#' @param param a \code{ScanBamParam} object
 readPairsNearVariant <- function(object, bam.file){
   flags <- .mappedReadPairFlags()
   ##granges <- thinReadPairQuery(object, thin)
@@ -273,4 +308,66 @@ readPairsNearVariant <- function(object, bam.file){
   seqlevelsStyle(galp) <- seqlevelsStyle(object)
   is_valid <- validPairForDeletion(galp)
   galp[is_valid]
+}
+
+
+
+
+#' Parse BAM file for improper read pairs near a set of GRanges
+#'
+#' All reads aligned to the intervals given by
+#' \code{queryRanges(object)} are identified by the low-level function
+#' \code{.scan_all_readpairs}.  This function reads alignments by
+#' \code{readGAlignments} and then makes pairs of the alignments by
+#' \code{makeGAlignmentPairs2}.  The latter function is an adaption of
+#' the function \code{makeGAlignmentPairs} implemented in the
+#' \code{GenomeAlignments} package but allows for the read pairs to be
+#' improper.
+#'
+#' @param object Typically an \code{AmpliconGraph}, though the only
+#'   requirement is that the method \code{queryRanges} is defined
+#' @param bam.file character-vector providing valid complete path to a
+#'   bam file
+#' @param flags length-two integer vector as given by \code{scanBamFlags}
+#' @export
+get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
+  g <- queryRanges(object)
+  galp <- .scan_all_readpairs(g, bam.file, flags)
+  validR1 <- overlapsAny(first(galp), g)
+  validR2 <- overlapsAny(last(galp), g)
+  galp <- galp[validR1 & validR2]
+  galp
+}
+
+#' Extract all improperly paired reads from an object with queryRanges defined
+#'
+#' This function is a wrapper for readGAlignments followed by
+#' makeGAlignmentPairs2.  Only read pairs in which both the first read
+#' and the last read in a pair overlap with the queryRanges are
+#' returned.  Note, a given read pair need not overlap the same
+#' queryRange.  To allow fuzzy matching of alignments to the
+#' queryRanges, the queryRanges are expanded by 2kb in each direction.
+#'
+#' 
+#' @export
+#' 
+#' @param object An object for which \code{queryRanges} method is defined
+#' @param bam.file The complete file path to a bam file.
+get_improper_readpairs <- function(object, bam.file){
+  g <- reduce(queryRanges(object))
+  if(totalWidth(g)==0) {
+    galp <- GAlignmentPairs(first=GAlignments(), last=GAlignments(), isProperPair=logical())
+    return(galp)
+  }
+  ## expand the query regions by 2kb on each side
+  g2 <- reduce(expandGRanges(g, 2e3L))
+  p <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE, isProperPair=FALSE),
+                    what=c("flag", "mrnm", "mpos"), which=g)
+  ##x <- readGAlignmentsFromBam(bam.file, param=p, use.names=TRUE)
+  x <- readGAlignments(bam.file, param=p, use.names=TRUE)
+  galp <- makeGAlignmentPairs2(x, use.mcols="flag")
+  validR1 <- overlapsAny(first(galp), g)
+  validR2 <- overlapsAny(last(galp), g)
+  galp <- galp[validR1 & validR2]
+  galp
 }

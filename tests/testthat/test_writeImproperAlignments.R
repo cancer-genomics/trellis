@@ -2,7 +2,7 @@ context("Write improper alignments")
 test_that("writeImproperAlignments", {
   library(svovarian)
   dirs <- projectOvarian()
-  bv <- readRDS(file.path(dirs[["data"]], "bviews_hg19.rds"))
+  bv <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
   test_views <- AlignmentViews2(bv, dirs)
   expect_is(test_views, "AlignmentViews2")
   expect_is(test_views[, 1], "AlignmentViews2")
@@ -11,6 +11,9 @@ test_that("writeImproperAlignments", {
   ## this just reads from disk
   timing <- system.time(writeImproperAlignments2(test_views))
   expect_less_than(timing[["sys.self"]], 3)
+
+  gps <- readRDS(file.path(dirs["improper"], rdsId(test_views)[1]))
+  expect_is(gps, "GAlignmentPairs")
 })
 
 test_that("improper alignment parameters", {
