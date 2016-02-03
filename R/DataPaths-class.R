@@ -153,7 +153,7 @@ dirCreate <- function(x){
 
 ## top-level folders
 create_top_dirs <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("data", "figures",  "unit_test", "fasta")
+  topic_nms <- c("data", "figures",  "unit_test", "fasta", "fasta_unmapped")
   paths <- file.path(path, topic_nms)
   if(!dryrun){
     dirCreate(paths)
@@ -181,7 +181,8 @@ create_cnv_dirs <- function(path, rootname, dryrun=TRUE){
 }
 
 create_alignments <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0improper")
+  topic_nms <- c("0improper", "1blat_mapped", "2blat_unmapped", "3reads", "4parsed_mapped",
+                 "5parsed_unmapped")
   paths <- file.path(path, file.path("data", file.path("alignments", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
@@ -190,7 +191,7 @@ create_alignments <- function(path, rootname, dryrun=TRUE){
 }
 
 create_rearrangements <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0linked", "1somatic", "2blat", "final_rearrangement")
+  topic_nms <- c("0linked", "1somatic", "2blat_mapped", "3blat_unmapped", "final_rearrangement")
   paths <- file.path(path, file.path("data", file.path("rearrangements", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
@@ -198,8 +199,9 @@ create_rearrangements <- function(path, rootname, dryrun=TRUE){
   paths      
 }
 
+
 create_figures <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0preprocess", "1dels", "2amps", "3rear")
+  topic_nms <- c("0preprocess", "1dels", "2amps", "3rear", "intrachrom", "interchrom")
   paths <- file.path(path, "figures", topic_nms)
   if(!dryrun){
     dirCreate(paths)
