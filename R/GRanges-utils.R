@@ -81,3 +81,41 @@ intOverWidth <- function(query, subject){
   p[as.integer(names(numer))] <- numer/denom
   p
 }
+
+
+#' Uncouple linked bins
+#'
+#' Two genomic intervals that are linked are represented by a
+#' \code{GRanges} object where a single elemnt provides the genomic
+#' interval of a bin and a genomic interval of a bin that it is linked
+#' to.  The latter is included in the metadata (mcols) variable
+#' 'linked.to'.  This function represents every genomic interval as a
+#' single element.  Hence, a \code{GRanges} of linked intervals with
+#' length one would have length-two after uncoupling the bins.
+#'
+#' @examples
+#' linked <- GRanges("chr1", IRanges(1,5))
+#' linked$linked.to <- setNames(GRanges("chr1", IRanges(10, 20)), "b")
+#' names(linked) <- "a"
+#' uncouple(linked)
+#'
+#' @return a \code{GRanges} object
+#' @export
+#' 
+#' @param linked_bins a \code{GRanges} representation of two genomic
+#'   intervals that are linked. 
+uncouple <- function(linked_bins){
+  gr <- c(granges(linked_bins), linked_bins$linked.to)
+  ## order by rearrangement
+  L <- seq(1, length(linked_bins)*2, 2)
+  R <- seq(2, length(linked_bins)*2, 2)
+  gr <- gr[c(L, R)]
+  if(!is.null(names(linked_bins))){
+    names(gr)[L] <- names(linked_bins)
+  } 
+  if(!is.null(names(linked_bins$linked.to))){
+    names(gr)[R] <- names(linked_bins$linked.to)
+  }
+  gr <- gr[!duplicated(gr)]
+  gr
+}
