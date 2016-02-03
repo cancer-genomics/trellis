@@ -4,3 +4,4 @@
 /.Rbuildignore
 man/
 /svalignments.Rproj
+data/*
