@@ -9,6 +9,7 @@
 #' @import methods
 #' @import svclasses
 #' @import S4Vectors
+#' @importFrom svfilters listGenomeFilters
 #' @importFrom BiocGenerics combine
 #' @importFrom Rsamtools bamPaths
 #' @importFrom DNAcopy CNA segment

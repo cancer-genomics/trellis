@@ -1112,14 +1112,8 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
 #'   library(svfilters)
 #'   library(Rsamtools)
 #'   id <- "CGOV2T"
-#'   dp <- projectOvarian(rootname="OvarianData2")
-#'   data(lymphoblast_filters_hg19)
-#'   data(lowMappabilityBins_hg19)
-#'   data(binAssemblyGaps_hg19)
-#'   gfilters <- as(lymphoblast_filters_hg19, "list")
-#'   gfilters$map <- lowMappabilityBins_hg19
-#'   gfilters$gc <- binAssemblyGaps_hg19
-#'   germline_filters <- reduce(unlist(GRangesList(lapply(gfilters, granges))))
+#'   dp <- projectOvarian()
+#'   germline_filters <- reduceGenomeFilters("hg19")
 #'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
 #'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
 #'   gr <- grl[[id]]
@@ -1135,11 +1129,13 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
 #' @param dirs a character vector of file paths as provided by \code{projectTree}
 #' @param grl a \code{GRangesList} of deletions. Each element is a sample.
 #' @param bviews a \code{BamViews} object
+#' @param aviews a \code{AlignmentViews} object (optional)
 #' @param gr_filters a \code{GRanges} object of germline filter tracks
 #' @param param a \code{DeletionParam} object
 sv_deletion_exp <- function(dirs,
                             grl,
                             bviews,
+                            aview,
                             gr_filters=NULL,
                             param=DeletionParam()){
   if(!missing(grl)){
@@ -1157,7 +1153,9 @@ sv_deletion_exp <- function(dirs,
       result_list[[i]] <- results
       next()
     }
-    aview <- AlignmentViews2(bviews[, id], dirs)
+    if(missing(aview)){
+      aview <- AlignmentViews2(bviews[, id], dirs)
+    }
     if(!file.exists(file.path(dirs["0improper"], rdsId(bviews[, id])))){
       stop("File of improper read pairs is not available.")
     }

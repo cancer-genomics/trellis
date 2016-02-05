@@ -1,6 +1,6 @@
 Package: svcnvs
 Title: Identify somatic copy number variants
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: Segments bin-level estimates of copy number.  Use both read
     pairs and read depth to identify focal deletions and amplicons. For
@@ -22,7 +22,7 @@ Imports:
     graph,
     RBGL
 Suggests:
-    testthat,   
+    testthat,
     svpreprocess,
     svfilters,
     svovarian
@@ -33,4 +33,5 @@ Collate:
     'help.R'
     'amplicon-utils.R'
     'deletion-utils.R'
+    'listCNVs.R'
     'segment.R'

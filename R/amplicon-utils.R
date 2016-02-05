@@ -78,19 +78,41 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @export
 #'
 #' @examples
-#' library(svfilters)
 #' library(svcnvs)
-#' gfilters <- listGenomeFilters("hg19")
-#' afilters <- ampliconFilters(gfilters)
+#' params <- ampliconParams("hg19")
+#'
+#' @return Returns a list of germline filters and some of the hard
+#'   thresholds used in the amplicon analysis.
 #' 
-#' @param germline_filters a list of germline filters
+#' @param build character string providing UCSC genome build
+#'   (currently, must be hg19)
+#' 
+#' @param AMP_THR numeric threshold for high copy amplicon
+#' 
+#' @param LOW_THR numeric a lower threshold used when considering
+#'   amplicons that are bridged by improper read pairs to a high copy
+#'   amplicon
+#' 
+#' @param border_size used to construct a query (GRanges object) for
+#'   additional amplicons neighboring a focal amplicon. TODO: more
+#'   detail needed.
+#' 
+#' @param overhang An integer indicating how much to expand the
+#'   germline filter on each size.  Using \code{overlapsAny}, a
+#'   determination is made whether an amplicon is part-germline (any
+#'   overlap) or no-germline (no overlap).  If the amplicon is
+#'   completely within the extended germline filter, the amplicon is
+#'   considered fully-germline.
+#' 
 #' @seealso \code{\link[svfilters]{listGenomeFilters}}
-ampliconFilters <- function(germline_filters){
-  AMP_THR <- log2(2.75)
-  LOW_THR <- log2(1.75)
-  filters <- germline_filters
-  filters$border_size <- 10e3
-  filters$overhang <- 25e3
+ampliconParams <- function(build="hg19",
+                           AMP_THR=log2(2.75),
+                           LOW_THR=log2(1.75),
+                           border_size=10e3,
+                           overhang=25e3){
+  filters <- listGenomeFilters(build)
+  filters$border_size <- border_size
+  filters$overhang <- overhang
   filters$AMP_THR <- AMP_THR
   filters$LOW_THR <- LOW_THR
   filters
@@ -241,8 +263,8 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
 #'
 #' @param ranges a \code{GRanges} of the amplicons
 #' 
-#' @param border_size length-one numeric vector indicating size of
-#'   region around border
+#' @param border_size used to construct a query for additional
+#'   amplicons neighboring a focal amplicon. TODO: more detail needed.
 #' 
 #' @param assembly_gaps a \code{GRanges} object of the assembly gaps
 #' 
@@ -882,7 +904,7 @@ setDrivers <- function(object, transcripts){
 #' \code{BamViews} object for a single sample.  By default, the seeds
 #' of the graph are focal amplicons with fold-change of nearly 3
 #' relative to the diploid genome (log2(2.75)).  The threshold of
-#' seeding amplicons can be adjusted by the \code{ampliconFilters}
+#' seeding amplicons can be adjusted by the \code{ampliconParams}
 #' function. After seeding the graph with high-copy focal amplicons,
 #' both neighboring (flanking) and distant low-copy focal amplicons
 #' are added to the graph object.  Next, improperly paired reads in
@@ -902,7 +924,7 @@ setDrivers <- function(object, transcripts){
 #' sv_deletions should be exported to more fully document this
 #' procedure.
 #'
-#' @seealso See \code{ampliconFilters} for default parameters. The
+#' @seealso See \code{ampliconParams} for default parameters. The
 #'   wrapper \code{\link{sv_amplicon_exp}} constructs and saves an
 #'   \code{\linkS4class{AmpliconGraph}} for each sample in an
 #'   experiment.
@@ -994,15 +1016,15 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
 #'   data(lymph_ids)
 #'   dp <- projectOvarian(rootname="OvarianData2")
 #'   gfilters <- listGenomeFilters("hg19")
-#'   afilters <- ampliconFilters(gfilters)
+#'   params <- ampliconParams(gfilters)
 #'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
 #'   bviews <- bviews[, id]
 #'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
 #'   ## Requires bam file
 #'   if(file.exists(Rsamtools::bamPaths(bviews))){
-#'     ag <- sv_amplicons(bviews[, id], grl[[id]], afilters)
+#'     ag <- sv_amplicons(bviews[, id], grl[[id]], params)
 #'     ## or
-#'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], afilters)
+#'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], params)
 #'   }
 #' @param dirs character-vector of file paths for storing intermediate
 #'   files
