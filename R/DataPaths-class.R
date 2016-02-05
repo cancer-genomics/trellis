@@ -191,7 +191,8 @@ create_alignments <- function(path, rootname, dryrun=TRUE){
 }
 
 create_rearrangements <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0linked", "1somatic", "2blat_mapped", "3blat_unmapped", "final_rearrangement")
+  topic_nms <- c("0linked", "germline", "1somatic", "2blat_mapped",
+                 "3blat_unmapped", "final_rearrangement")
   paths <- file.path(path, file.path("data", file.path("rearrangements", topic_nms)))
   if(!dryrun){
     dirCreate(paths)

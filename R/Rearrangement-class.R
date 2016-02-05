@@ -200,6 +200,8 @@ setGeneric("percentRearrangement<-",
 setGeneric("tags", function(object) standardGeneric("tags"))
 
 #' @rdname tags-methods
+#' @param value a \code{GRanges} object of read alignments
+#' @keywords internal
 #' @export
 setGeneric("tags<-", function(object, value) standardGeneric("tags<-"))
 
@@ -236,7 +238,6 @@ setMethod("linkedBins", "Rearrangement", function(object) object@linkedBins)
 
 #' @aliases, linkedBins,Rearrangement,ANY-method
 #' @rdname linkedBins-methods
-#' @param value a \code{GRanges} object
 setReplaceMethod("linkedBins", "Rearrangement", function(object, value){
   object@linkedBins <- value
   ##
