@@ -568,7 +568,9 @@ improperReadPairs <- function(aview, gr, param=DeletionParam()){
   irp <- irp[chromosome(first(irp)) == chromosome(last(irp))]
   hits <- findOverlaps(gr, irp, minimumGapWidth(param))
   irp <- irp[unique(subjectHits(hits))]
-  names(irp) <- paste0("i", seq_along(irp))
+  if(length(irp) > 0){
+    names(irp) <- paste0("i", seq_along(irp))
+  }
   irp
 }
 
