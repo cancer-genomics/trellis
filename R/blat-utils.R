@@ -359,7 +359,7 @@ rearrangedReads <- function(r, blat, maxgap=500){
     blat <- blat[!is_na, ]
   }
   lb <- linkedBins(r)
-  blat <- blat[blat$Tname %in% seqlevels(lb)]
+  blat <- blat[blat$Tname %in% seqlevels(lb), ]
   blat_gr <- GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
                      match=blat$match, qname=blat$Qname,
                      qstart=blat$Qstart, qend=blat$Qend,
