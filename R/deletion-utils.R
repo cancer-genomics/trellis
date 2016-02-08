@@ -1167,6 +1167,7 @@ sv_deletion_exp <- function(dirs,
     ## re-assign paths
     ##
     pview <- PreprocessViews2(bviews[, id])
+    setScale(pview) <- 1000
     paths(pview) <- file.path(dirs[["background_adj"]], paste0(id, ".rds"))    
     gr <- grl[[id]]
     bam_exists <- file.exists(bamPaths(bviews[, id]))

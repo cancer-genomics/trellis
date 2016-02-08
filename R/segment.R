@@ -42,6 +42,7 @@ segmentCoverage <- function(object, param=SegmentParam(), ...){
   for(i in seq_along(chroms)){
     chr <- chroms[i]
     obj <- keepSeqlevels(object, chr)
+    if(nrow(obj) < 2) next()
     results[[i]] <- .segment(obj, param=param, ...)
   }
   g <- unlist(GRangesList(results))
