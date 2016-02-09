@@ -1187,3 +1187,72 @@ sv_deletion_exp <- function(dirs,
   }
   result_list
 }
+
+
+#' Create a StructuralVariants object
+#'
+#' Improperly paired reads provide additional evidence for candidate
+#' deletions identified from the segmentation. The
+#' \code{StructuralVariant} class is used to link both proper and
+#' improper read pairs to \code{GRanges} intervals representing
+#' candidate hemizygous deletions.  We assume a file containing all
+#' the improper read pairs has already been created (see
+#' \code{writeImproperAlignments2}). The function
+#' \code{sv_deletion_exp} creates an object of class
+#' \code{StructuralVariant} for each element of a \code{GRangesList}.
+#'
+#' REFACTORING: should we remove need to access bam file to allow
+#' local testing?
+#'
+#' @seealso See \linkS4class{StructuralVariant} for methods defined
+#'   for this class. See
+#'   \code{\link[svalignments]{writeImproperAlignments2}} for
+#'   extracting improper read pairs from a bam file.
+#' 
+#' @return  a \code{StructuralVariant} object
+#' @export
+#' @param dirs a character vector of file paths as provided by \code{projectTree}
+#' @param gr a \code{GRanges} of possible deletions. Each element is a sample.
+#' @param bview a \code{BamViews} object
+#' @param aview a \code{AlignmentViews} object (optional)
+#' @param gr_filters a \code{GRanges} object of germline filters
+#' @param param a \code{DeletionParam} object
+sv_deletion_exp2 <- function(dirs,
+                             gr,
+                             bview,
+                             aview,
+                             gr_filters=NULL,
+                             param=DeletionParam()){
+  id <- colnames(bview)
+  file <- file.path(dirs[["deletions"]], paste0(id, ".rds"))
+  if(file.exists(file)) {
+    results <- readRDS(file)
+    return(results)
+  }
+  if(missing(aview)){
+    aview <- AlignmentViews2(bview, dirs)
+  }
+  if(!file.exists(file.path(dirs["0improper"], rdsId(bview)))){
+    stop("File of improper read pairs is not available.")
+  }
+  ##
+  ## re-assign paths
+  ##
+  pview <- PreprocessViews2(bview)
+  setScale(pview) <- 1000
+  paths(pview) <- file.path(dirs[["background_adj"]], paste0(id, ".rds"))    
+  bam_exists <- file.exists(bamPaths(bview))
+  ##
+  ##  BAM files are needed to extract 'proper' read pairs near
+  ##  deletions
+  ##
+  if(!bam_exists) stop("bamPaths is invalid -- no bam file available")
+  sv <- sv_deletions(gr,
+                     aview,
+                     bview,
+                     pview,
+                     gr_filters,
+                     param=param)
+  saveRDS(sv, file=file)
+  sv
+}
