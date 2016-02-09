@@ -47,7 +47,7 @@ setValidity("AlignmentViews2", function(object){
 #' @param dirs A \code{DataPaths} object
 #' @rdname AlignmentViews2-class
 AlignmentViews2 <- function(bviews, dirs){
-  path <- dirs[["improper"]]
+  path <- dirs[["alignments/0improper"]]
   improper_paths <- file.path(path, rdsId(bviews))
   aviews <- as(bviews, "AlignmentViews2")
   indexRanges(aviews) <- seq_len(nrow(aviews))
