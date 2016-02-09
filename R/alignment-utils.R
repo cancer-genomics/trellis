@@ -185,28 +185,20 @@ getImproperAlignmentPairs <- function(object,
 #' 
 #' @rdname AlignmentViews2
 #' @export
-#' @param aviews a \code{AlignmentViews2} object
+#' @param aview a \code{AlignmentViews2} object
 #' @param param a \code{ScanBamParam} object
 #' @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
 #' @param use.mcols length-one logical vector
-writeImproperAlignments2 <- function(aviews,
+writeImproperAlignments2 <- function(aview,
                                      param=improperAlignmentParams(),
                                      mapq_thr=-Inf, use.mcols=TRUE){
-  if(all(file.exists(improperPaths(aviews)))){
+  if(file.exists(improperPaths(aview))){
     return(invisible())
   }
-  aviews <- aviews[, !file.exists(improperPaths(aviews))]
-  if(ncol(aviews)==0) return(invisible())
-  aln_paths <- improperPaths(aviews)
-  J <- seq_along(aln_paths)[!file.exists(aln_paths)]
-  for(j in J){
-    getImproperAlignmentPairs(aviews[, j], param,
-                              mapq_thr=mapq_thr,
-                              use.mcols=use.mcols)
-  }
-  if(!all(file.exists(improperPaths(aviews)))){
-    stop("Improper read pairs were not written to disk for one or more samples")
-  }
+  aln_path <- improperPaths(aview)
+  getImproperAlignmentPairs(aview, param,
+                            mapq_thr=mapq_thr,
+                            use.mcols=use.mcols)
   invisible()
 }
 
