@@ -148,7 +148,6 @@ getImproperAlignmentPairs <- function(object,
                                       mapq_thr=-Inf,
                                       use.mcols=TRUE){
   bam.file <- bamPaths(object)
-  out.file <- improperPaths(object)
   flags <- improperAlignmentFlags()
   if(missing(param)){
     param <- ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
@@ -159,7 +158,6 @@ getImproperAlignmentPairs <- function(object,
     irp <- irp[ mcols(irp)$mapq >= mapq_thr ]
   }
   irp2 <- makeGAlignmentPairs2(irp, use.mcols=use.mcols, use.names=TRUE)
-  saveRDS(irp2, file=out.file)
   irp2
 }
 
@@ -180,7 +178,7 @@ getImproperAlignmentPairs <- function(object,
 #'   aviews <- AlignmentViews2(bv, dp)
 #'   \dontrun{
 #'     writeImproperAlignments2(aviews)
-#'     gps <- readRDS(file.path(dp["improper"], rdsId(aviews)[1]))
+#'     gps <- readRDS(file.path(dp["alignments/0improper"], rdsId(aviews)[1]))
 #'   }
 #' 
 #' @rdname AlignmentViews2
@@ -196,9 +194,11 @@ writeImproperAlignments2 <- function(aview,
     return(invisible())
   }
   aln_path <- improperPaths(aview)
-  getImproperAlignmentPairs(aview, param,
-                            mapq_thr=mapq_thr,
-                            use.mcols=use.mcols)
+  irp <- getImproperAlignmentPairs(aview, param,
+                                   mapq_thr=mapq_thr,
+                                   use.mcols=use.mcols)
+  out.file <- improperPaths(aview)
+  saveRDS(irp, file=out.file)
   invisible()
 }
 
