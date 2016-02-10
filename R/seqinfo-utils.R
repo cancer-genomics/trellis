@@ -29,6 +29,10 @@ setMethod(chromosome, "GAlignments", function(object){
   as.character(seqnames(object))
 })
 
+#' @aliases chromosome,StructuralVariant-method
+#' @rdname chromosome-methods
+setMethod("chromosome", "StructuralVariant", function(object) chromosome(variant(object)))
+
 #' @aliases autosomeNames,BamViews-method
 #' @rdname chromosome-methods
 setMethod(autosomeNames, "BamViews", function(object){
@@ -67,3 +71,11 @@ setReplaceMethod("seqinfo", "PreprocessViews2",
                    seqinfo(rowRanges(x)) <- value
                    x
                  })
+
+#' @aliases seqlengths,StructuralVariant-method
+#' @rdname StructuralVariant-class
+setMethod("seqlengths", "StructuralVariant", function(x) seqlengths(variant(x)))
+
+#' @aliases seqinfo,StructuralVariant-method
+#' @rdname StructuralVariant-class
+setMethod("seqinfo", "StructuralVariant", function(x) seqinfo(variant(x)))
