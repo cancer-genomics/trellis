@@ -202,7 +202,7 @@ create_rearrangements <- function(path, rootname, dryrun=TRUE){
 
 
 create_figures <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0preprocess", "1dels", "2amps", "3rear", "intrachrom", "interchrom")
+  topic_nms <- c("fig_preprocess", "fig_deletions", "fig_amplicons", "fig_intrachrom", "fig_interchrom")
   paths <- file.path(path, "figures", topic_nms)
   if(!dryrun){
     dirCreate(paths)
