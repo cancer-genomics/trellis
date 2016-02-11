@@ -1033,7 +1033,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
 #'   element is the \code{GRanges} for a sample)
 #' @param amplicon_filters A list of germline filters and parameters
 sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters){
-  ag_files <- file.path(dirs["amplicons"],
+  ag_files <- file.path(dirs["2amplicons"],
                         paste0(colnames(bviews), ".rds"))
   result_list <- setNames(vector("list",
                                  length(ag_files)),

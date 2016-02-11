@@ -1151,7 +1151,7 @@ sv_deletion_exp <- function(dirs,
   }
   for(i in seq_along(result_list)){
     id <- names(result_list)[i]
-    file <- file.path(dirs[["deletions"]], paste0(id, ".rds"))
+    file <- file.path(dirs[["1deletions"]], paste0(id, ".rds"))
     if(file.exists(file)) {
       results <- readRDS(file)
       result_list[[i]] <- results
@@ -1224,7 +1224,7 @@ sv_deletion_exp2 <- function(dirs,
                              gr_filters=NULL,
                              param=DeletionParam()){
   id <- colnames(bview)
-  file <- file.path(dirs[["deletions"]], paste0(id, ".rds"))
+  file <- file.path(dirs[["1deletions"]], paste0(id, ".rds"))
   if(file.exists(file)) {
     results <- readRDS(file)
     return(results)
