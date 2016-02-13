@@ -410,26 +410,34 @@ joinNearGRanges <- function(object, thr=0.05, MIN_WIDTH=2e3){
   sort(object3)
 }
 
-flankingRanges <- function(object, ranges, shift){
-  index <- match(names(ranges), names(ranges(object)))
+flankingRanges <- function(object, shift=2){
+  rgs <- ranges(object)
+  amplicons <- ampliconRanges(object)
+  index <- match(names(amplicons), names(rgs))
   index2 <- index - shift  
   index2 <- index2[index2 > 0]
   index3 <- index + shift
-  index3 <- index3[index3 < length(ranges(object))]
-  left_flank <- ranges(object)[index2]
-  right_flank <- ranges(object)[index3]
-  left <- list(first=left_flank, last=ranges)
-  right <- list(first=ranges, last=right_flank)
+  is_right_flank <- index3 < length(rgs)
+  if(any(!is_right_flank)){
+    ## REFACTOR.  No right flank exists.  If we exclude, linkedDuplicatedRanges will fail
+    ## assign the amplicon index
+    index3[!is_right_flank] <- index[!is_right_flank]
+  }  
+  left_flank <- rgs[index2]
+  right_flank <- rgs[index3]
+  left <- list(first=left_flank, last=amplicons)
+  right <- list(first=amplicons, last=right_flank)
   list(left=left, right=right)
 }
 
-flankingDuplications <- function(object, ranges, minimum_foldchange=1){
-  ##flanks <- flankingSegments(object, ranges=ranges)
-  flanks <- flankingRanges(object, ranges=ranges, shift=2)
+flankingDuplications <- function(object, minimum_foldchange=1){
+  flanks <- flankingRanges(object,  shift=2)
   is_dupL <- isDuplication(flanks$left[[1]], minimum_foldchange)
   is_dupR <- isDuplication(flanks$right[[2]], minimum_foldchange)
   flanks$left <- lapply(flanks$left, "[", is_dupL)
   flanks$right <- lapply(flanks$right, "[", is_dupR)
+  lengths <- unlist(lapply(flanks, elementLengths))
+  if(any(lengths > 1)) browser()
   flanks
 }
 
@@ -448,6 +456,8 @@ linkedDuplicatedRanges <- function(object, rpsegs,
                                    ##flanking_gaps,
                                    minimum_count=5){
   flank <- flanking_duplications
+  lengths <- unlist(lapply(flank, elementLengths))
+  if(any(lengths != 1)) stop("Flanking regions must be length-one GRanges")
   gapsLeft <- GRanges(seqnames(flank[["left"]]$first),
                       IRanges(end(flank[["left"]]$first)+1,
                               start(flank[["left"]]$last)))
@@ -511,8 +521,9 @@ addFlanks <- function(object, dup_granges){
 #' 
 addFocalDupsFlankingAmplicon <- function(object, rp, LOW_THR){
   if(totalWidth(queryRanges(object))==0) return(object)
+  ##flanks <- flankingDuplications(object, ampliconRanges(object), minimum_foldchange=LOW_THR)
+  flanks <- flankingDuplications(object, minimum_foldchange=LOW_THR)
   rpsegs <- readPairsAsSegments(rp)
-  flanks <- flankingDuplications(object, ampliconRanges(object), minimum_foldchange=LOW_THR)
   dup_gr <- linkedDuplicatedRanges(object, rpsegs, flanks)
   L <- max(length(dup_gr$left[[1]]), length(dup_gr$right[[2]]))
   object <- addFlanks(object, dup_gr)
