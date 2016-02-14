@@ -134,6 +134,7 @@ overlapsGermline <- function(object, germline, overhang=5e3){
 }
 
 standardizeGRangesMetadata <- function(granges){
+  if(length(granges) == 0) return(granges)
   mns <- granges$seg.mean
   is_amplicon <- granges$is_amplicon
   granges <- reduce(granges)
@@ -277,14 +278,18 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
 #' @param overhang a length-one numeric vector
 #' @rdname AmpliconGraph-constructor
 #' @export
-AmpliconGraph <- function(ranges,
+AmpliconGraph <- function(ranges=GRanges(),
                           border_size=150e3,
                           assembly_gaps=GRanges(),
                           centromeres=GRanges(),
                           germline_cnv=GRanges(),
                           outliers=GRanges(),
                           overhang=5e3){
-  if(missing(ranges)) return(new("AmpliconGraph"))
+  if(missing(ranges)) {
+    ag <- new("AmpliconGraph")
+    names(ranges(ag)) <- character()
+    return(ag)
+  }
   ranges <- standardizeGRangesMetadata(ranges)
   assembly_gaps <- reduce(sort(combine(assembly_gaps, centromeres)))
   ##
@@ -293,12 +298,14 @@ AmpliconGraph <- function(ranges,
   ##  gaps
   ##
   g <- gaps0(ranges)
-  g$seg.mean <- NA
-  g$is_amplicon <- FALSE
-  g$hgnc <- as.character(NA)
-  g$driver <- as.character(NA)
-  g$groups <- as.factor(NA)
-  ranges <- sort(c(ranges, g))
+  if(length(g) > 0){
+    g$seg.mean <- NA
+    g$is_amplicon <- FALSE
+    g$hgnc <- as.character(NA)
+    g$driver <- as.character(NA)
+    g$groups <- as.factor(NA)
+    ranges <- sort(c(ranges, g))
+  }
   ##
   germ <- reduce(c(germline_cnv, outliers))
   ranges$overlaps_germline <- overlapsGermline(ranges, germ,
@@ -436,8 +443,6 @@ flankingDuplications <- function(object, minimum_foldchange=1){
   is_dupR <- isDuplication(flanks$right[[2]], minimum_foldchange)
   flanks$left <- lapply(flanks$left, "[", is_dupL)
   flanks$right <- lapply(flanks$right, "[", is_dupR)
-  lengths <- unlist(lapply(flanks, elementLengths))
-  if(any(lengths > 1)) browser()
   flanks
 }
 
