@@ -198,7 +198,10 @@ setMethod("rowRanges", "PreprocessViews2", function(x, ...) bamRanges(x))
 #' 
 #' @export
 #' @param x a \code{BamViews}-derived object
-rdsId <- function(x) paste0(colnames(x), ".rds")
+rdsId <- function(x) {
+  if(ncol(x) == 0) return(character())
+  paste0(colnames(x), ".rds")
+}
 
 ##--------------------------------------------------
 ##

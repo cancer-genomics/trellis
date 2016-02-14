@@ -1,5 +1,9 @@
 context("AlignmentViews")
 test_that("AlignmentViews", {
+  av <-  AlignmentViews2()
+  expect_true(validObject(av))
+  expect_identical(rdsId(av), character())
+  
   library(Rsamtools)
   require(TestBams)
   extdata <- system.file("extdata", package="TestBams")

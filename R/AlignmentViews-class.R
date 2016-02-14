@@ -46,7 +46,7 @@ setValidity("AlignmentViews2", function(object){
 #' @param bviews A \code{BamViews} object
 #' @param dirs A \code{DataPaths} object
 #' @rdname AlignmentViews2-class
-AlignmentViews2 <- function(bviews, dirs){
+AlignmentViews2 <- function(bviews=BamViews(), dirs=DataPaths()){
   path <- dirs[["alignments/0improper"]]
   improper_paths <- file.path(path, rdsId(bviews))
   aviews <- as(bviews, "AlignmentViews2")
