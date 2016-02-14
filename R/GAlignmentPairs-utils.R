@@ -40,7 +40,6 @@ setGeneric("last<-", function(x, value) standardGeneric("last<-"))
 readPairsAsSegments <- function(object){
   intrachrom <- chromosome(first(object)) == chromosome(last(object))
   firstIsLeft <- start(first(object)) < start(last(object))
-  rp2 <- object
   starts <- start(first(object))
   starts[!firstIsLeft] <- start(last(object))[!firstIsLeft]
   ends <- end(last(object))
@@ -49,11 +48,8 @@ readPairsAsSegments <- function(object){
   rpsegs <- GRanges(chromosome(first(object))[intrachrom],
                     IRanges(starts[intrachrom],
                             ends[intrachrom]))
+  rpsegs
 }
-
-
-
-
 
 setReplaceMethod("first", "GAlignmentPairs", function(x, value){
   x@first <- value

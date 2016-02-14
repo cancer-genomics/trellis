@@ -225,11 +225,17 @@ setMethod("isAmplicon", "AmpliconGraph", function(object) {
 
 #' @rdname AmpliconGraph-class
 #' @aliases isAmplicon,GRanges-method
-setMethod("isAmplicon", "GRanges", function(object) object$is_amplicon)
+setMethod("isAmplicon", "GRanges", function(object){
+  if(length(object)==0) return(logical())
+  object$is_amplicon
+})
 
 #' @rdname AmpliconGraph-class
 #' @aliases isSomatic,GRanges-method
-setMethod("isSomatic", "GRanges", function(object) object$overlaps_germline != "fully_germline")
+setMethod("isSomatic", "GRanges", function(object){
+  if(length(object)==0) return(logical())
+  object$overlaps_germline != "fully_germline"
+})
 
 
 #' @export
