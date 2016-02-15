@@ -57,6 +57,13 @@ setMethod(autosomeNames, "GRanges", function(object){
 #' @rdname PreprocessViews2-class
 setMethod("seqlevels", "PreprocessViews2", function(x) seqlevels(rowRanges(x)))
 
+#' @rdname RearrangementList-class
+#' @aliases seqlevels,RearrangementList-method
+setMethod("seqlevels", "RearrangementList", function(x){
+  seqlevels(linkedBins(x[[1]]))
+})
+
+
 #' @aliases seqinfo,PreprocessViews2-method
 #' @rdname PreprocessViews2-class
 setMethod("seqinfo", "PreprocessViews2", function(x) seqinfo(rowRanges(x)))

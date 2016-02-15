@@ -13,11 +13,11 @@
 #' @importMethodsFrom S4Vectors elementType queryHits subjectHits elementLengths
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths
 #' @importFrom GenomeInfoDb keepSeqlevels
-#' @importFrom IRanges IRanges
+#' @importFrom IRanges IRanges LogicalList
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce overlapsAny
 #' @importFrom GenomicAlignments GAlignmentPairs GAlignments
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
-#' @importMethodsFrom GenomicAlignments first last 
+#' @importMethodsFrom GenomicAlignments first last left right
 #' @import GenomicRanges
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment

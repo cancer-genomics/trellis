@@ -20,6 +20,7 @@ setGeneric("last<-", function(x, value) standardGeneric("last<-"))
 #' @param last a \code{GAlignments}
 #' @param isProperPair logical for whether to require that the reads
 #'   be in a proper pair
+#' @rdname GAlignmentPairs
 .GAlignmentPairs <- function() {
   GAlignmentPairs(first=GAlignments(),
                   last=GAlignments(),

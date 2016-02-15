@@ -34,3 +34,27 @@ NULL
 #' data(amplicons)
 #' ampliconRanges(amplicons)
 NULL
+
+#' An example RearrangementList
+#'
+#' A \code{RearrangementList} object.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name rear_list-data
+#' @usage data(rear_list)
+#' @format a \code{RearrangementList}
+#' @examples
+#' data(rear_list)
+#' modalRearrangement(rear_list)
+#' linkedBins(rear_list)
+
+#' An example Transcripts object
+#'
+#' @docType data
+#' @keywords datasets
+#' @name transcripts-data
+#' @usage data(transcripts)
+#' @format a \code{Transcripts} object
+#' @examples
+#' data(transcripts)

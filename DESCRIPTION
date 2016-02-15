@@ -22,7 +22,8 @@ Suggests:
     knitr,
     testthat,
     TestBams,
-    BSgenome.Hsapiens.UCSC.hg19
+    BSgenome.Hsapiens.UCSC.hg19,
+    TxDb.Hsapiens.UCSC.hg19.refGene
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
@@ -40,10 +41,12 @@ Collate:
     'Deletion-class.R'
     'DeletionList-class.R'
     'DeletionParam-class.R'
+    'ExonSubset-class.R'
     'GRanges-utils.R'
     'RearrangementList-class.R'
     'RearrangmentParams-class.R'
     'SegmentParam-class.R'
+    'Transcripts-class.R'
     'copynumber-methods.R'
     'data.R'
     'improper-methods.R'

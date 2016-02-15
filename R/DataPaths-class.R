@@ -86,6 +86,10 @@ rearDir <- function(object){
   file.path(dataDir(object), "rearrangements")
 }
 
+fusionDir <- function(object){
+  file.path(dataDir(object), "fusions")
+}
+
 figDir <- function(object){
   file.path(dirname(object[1]), "figures")
 }
@@ -116,6 +120,11 @@ setMethod("show", "DataPaths", function(object){
   rear_dirs <- list.files(rearDir(object))
   rear_dirs <- paste(rear_dirs, collapse=" | ")  
   cat("      ", rear_dirs, "\n")
+  ## fusions"
+  cat("    /data/fusions: \n")  
+  rear_dirs <- list.files(fusionDir(object))
+  rear_dirs <- paste(rear_dirs, collapse=" | ")  
+  cat("      ", rear_dirs, "\n")  
   ## figures
   cat("    /figures: \n")  
   fig_dirs <- list.files(figDir(object))
@@ -153,7 +162,8 @@ dirCreate <- function(x){
 
 ## top-level folders
 create_top_dirs <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("data", "figures",  "unit_test", "fasta", "fasta_unmapped")
+  topic_nms <- c("data", "figures",  "unit_test",
+                 "fasta", "fasta_unmapped")
   paths <- file.path(path, topic_nms)
   if(!dryrun){
     dirCreate(paths)
@@ -164,7 +174,8 @@ create_top_dirs <- function(path, rootname, dryrun=TRUE){
 create_preprocess_dirs <- function(path, rootname, dryrun=TRUE){
   topic_nms <- c("0counts", "1transformed_centered", "2gc_adj",
                  "3background_adj", "final_preprocess")
-  paths <- file.path(path, file.path("data", file.path("preprocess", topic_nms)))
+  paths <- file.path(path, file.path("data",
+                                     file.path("preprocess", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
   }
@@ -173,7 +184,8 @@ create_preprocess_dirs <- function(path, rootname, dryrun=TRUE){
 
 create_cnv_dirs <- function(path, rootname, dryrun=TRUE){
   topic_nms <- c("0cbs", "1deletions", "2amplicons", "final_segment")
-  paths <- file.path(path, file.path("data", file.path("segment", topic_nms)))
+  paths <- file.path(path, file.path("data",
+                                     file.path("segment", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
   }
@@ -181,9 +193,11 @@ create_cnv_dirs <- function(path, rootname, dryrun=TRUE){
 }
 
 create_alignments <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("0improper", "1blat_mapped", "2blat_unmapped", "3reads", "4parsed_mapped",
+  topic_nms <- c("0improper", "1blat_mapped", "2blat_unmapped",
+                 "3reads", "4parsed_mapped",
                  "5parsed_unmapped")
-  paths <- file.path(path, file.path("data", file.path("alignments", topic_nms)))
+  paths <- file.path(path, file.path("data",
+                                     file.path("alignments", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
   }
@@ -193,7 +207,18 @@ create_alignments <- function(path, rootname, dryrun=TRUE){
 create_rearrangements <- function(path, rootname, dryrun=TRUE){
   topic_nms <- c("0linked", "germline", "1somatic", "2blat_mapped",
                  "3blat_unmapped", "final_rearrangement")
-  paths <- file.path(path, file.path("data", file.path("rearrangements", topic_nms)))
+  paths <- file.path(path, file.path("data",
+                                     file.path("rearrangements", topic_nms)))
+  if(!dryrun){
+    dirCreate(paths)
+  }
+  paths      
+}
+
+create_fusions <- function(path, rootname, dryrun=TRUE){
+  topic_nms <- c("0fusions")
+  paths <- file.path(path, file.path("data",
+                                     file.path("fusions", topic_nms)))
   if(!dryrun){
     dirCreate(paths)
   }
@@ -202,7 +227,8 @@ create_rearrangements <- function(path, rootname, dryrun=TRUE){
 
 
 create_figures <- function(path, rootname, dryrun=TRUE){
-  topic_nms <- c("fig_preprocess", "fig_deletions", "fig_amplicons", "fig_intrachrom", "fig_interchrom")
+  topic_nms <- c("fig_preprocess", "fig_deletions", "fig_amplicons",
+                 "fig_intrachrom", "fig_interchrom")
   paths <- file.path(path, "figures", topic_nms)
   if(!dryrun){
     dirCreate(paths)
@@ -217,9 +243,10 @@ projectTree <- function(path, rootname, dryrun=TRUE){
   cnv_dirs <- create_cnv_dirs(path, rootname, dryrun)
   aln_dirs <- create_alignments(path, rootname, dryrun)
   rear_dirs <- create_rearrangements(path, rootname, dryrun)
+  fusion_dirs <- create_fusions(path, rootname, dryrun)
   fig_dirs <- create_figures(path, rootname, dryrun)
   c(top_dirs, preprocess_dirs, cnv_dirs, aln_dirs, rear_dirs,
-    fig_dirs)
+    fusion_dirs, fig_dirs)
 }
 
 unitTestDir <- function(object) {
