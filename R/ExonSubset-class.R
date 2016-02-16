@@ -122,3 +122,11 @@ setValidity("ExonSubset", function(object){
   }
   msg
 })
+
+setMethod("show", "ExonSubset", function(object){
+  cat("Object of class 'ExonSubset'\n")
+  cat("Logical subsetting of left transcript in fusion:\n")
+  show(inRearrangement.left(object))
+  cat("\nLogical subsetting of right transcript in fusion:\n")
+  show(inRearrangement.right(object))
+})
