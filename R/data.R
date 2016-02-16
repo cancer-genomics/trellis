@@ -44,17 +44,21 @@ NULL
 #' @name rear_list-data
 #' @usage data(rear_list)
 #' @format a \code{RearrangementList}
+#' @aliases rear_list
 #' @examples
 #' data(rear_list)
 #' modalRearrangement(rear_list)
 #' linkedBins(rear_list)
+NULL
 
 #' An example Transcripts object
 #'
 #' @docType data
 #' @keywords datasets
-#' @name transcripts-data
-#' @usage data(transcripts)
+#' @name rear_cds-data
+#' @usage data(rear_cds)
+#' @aliases rear_cds
 #' @format a \code{Transcripts} object
 #' @examples
-#' data(transcripts)
+#' data(rear_cds)
+NULL

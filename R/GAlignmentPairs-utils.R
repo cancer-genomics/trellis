@@ -16,11 +16,8 @@ setGeneric("last<-", function(x, value) standardGeneric("last<-"))
 #' 
 #' @return an empty \code{GAlignmentPairs} object
 #' @export
-#' @param first a \code{GAlignments}
-#' @param last a \code{GAlignments}
-#' @param isProperPair logical for whether to require that the reads
-#'   be in a proper pair
 #' @rdname GAlignmentPairs
+#' @keywords internal
 .GAlignmentPairs <- function() {
   GAlignmentPairs(first=GAlignments(),
                   last=GAlignments(),

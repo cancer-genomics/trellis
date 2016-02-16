@@ -4,6 +4,7 @@ NULL
 #' @export
 #' @keywords-internal
 #' @rdname ExonSubset-class
+#' @param object a \code{ExonSubset} object
 #' @return a \code{LogicalList}
 setGeneric("inRearrangement.left", function(object) standardGeneric("inRearrangement.left"))
 
@@ -39,6 +40,10 @@ setClass("ExonSubset", representation(name.left="character", ##e.g, "A"
 
 #' @rdname ExonSubset-class
 #' @export
+#' @param name.left name of left transcript
+#' @param inRearrangement.left \code{LogicalList} subsetting the left transcripts
+#' @param name.right name of right transcript
+#' @param inRearrangement.right \code{LogicalList} subsetting the right transcripts
 ExonSubset <- function(name.left=character(),
                        inRearrangement.left=LogicalList(),
                        name.right=character(),
@@ -50,18 +55,24 @@ ExonSubset <- function(name.left=character(),
 }
 
 #' @aliases name.left,ExonSubset-method
+#' @rdname ExonSubset-class
 setMethod("name.left", "ExonSubset", function(object) object@name.left)
 
 #' @aliases name.right, ExonSubset-method
+#' @rdname ExonSubset-class
 setMethod("name.right", "ExonSubset", function(object) object@name.right)
 
 #' @aliases names,ExonSubset-method
+#' @param x an \code{ExonSubset} object
+#' @rdname ExonSubset-class
 setMethod("names", "ExonSubset", function(x) paste0(name.left(x), name.right(x)))
 
 #' @aliases inRearrangement.left,ExonSubset-method
+#' @rdname ExonSubset-class
 setMethod("inRearrangement.left", "ExonSubset", function(object) object@inRearrangement.left)
 
 #' @aliases inRearrangement.right,ExonSubset-method
+#' @rdname ExonSubset-class
 setMethod("inRearrangement.right", "ExonSubset", function(object) object@inRearrangement.right)
 
 setMethod("isEmpty", "ExonSubset", function(x){

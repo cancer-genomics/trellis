@@ -2,6 +2,11 @@
 NULL
 
 #' @aliases ClippedTranscripts
+#' @param transcripts a \code{Transcripts} object
+#' @param i an integer vector
+#' @param left a \code{GRangesList} for the transcripts to the left of the junction
+#' @param right a \code{GRangesList} for the transcripts to the right of the junction
+#' @rdname ClippedTranscripts-class
 #' @export
 setGeneric("ClippedTranscripts", function(transcripts, i, left=GRangesList(),
                                           right=GRangesList())
@@ -9,6 +14,7 @@ setGeneric("ClippedTranscripts", function(transcripts, i, left=GRangesList(),
 
 #' @export
 #' @rdname fuse-methods
+#' @aliases fuse
 #' @param object a \code{Transcripts}-derived class
 #' @param nms name of transcript (character-string)
 setGeneric("fuse", function(object, nms) standardGeneric("fuse"))
@@ -49,6 +55,7 @@ setGeneric("numberFusions", function(object) standardGeneric("numberFusions"))
 #' txB(rear_cds)
 #' txC(rear_cds)
 #' txD(rear_cds)
+#' @aliases txA txB txC txD
 #' @rdname transcript-accessors
 #' @export
 #' @param object a \code{Transcripts}-derived object
@@ -86,9 +93,6 @@ setGeneric("txD<-", function(object,value) standardGeneric("txD<-"))
 
 #' Container for storing CDS near a sequence junction
 #'
-#' @examples
-#' Transcripts()
-#' 
 #' @slot tA a \code{GRangesList}
 #' @slot tB a \code{GRangesList}
 #' @slot tC a \code{GRangesList}
@@ -121,9 +125,12 @@ setClass("TranscriptsFusion", representation(fusions="list"),
 #' ClippedTranscripts()
 #' @slot left a \code{GRangesList}
 #' @slot right a \code{GRangesList}
+#' @rdname ClippedTranscripts-class
 #' @export
 setClass("ClippedTranscripts", representation(left="GRangesList", right="GRangesList"))
 
+#' @examples
+#' Transcripts()
 #' @export
 #' @keywords-internal
 #' @rdname Transcripts-class
@@ -132,13 +139,15 @@ Transcripts <- function(tA=GRangesList(),
                         tC=GRangesList(),
                         tD=GRangesList(),
                         id=character()){
-  ##fusions=list()){
-  new("Transcripts", tA=tA, tB=tB, tC=tC, tD=tD, id=id)##, fusions=fusions)
+  new("Transcripts", tA=tA, tB=tB, tC=tC, tD=tD, id=id)
 }
 
 #' @rdname TranscriptsFusion-class
 #' @export
 TranscriptsFusion <- function(object, fusions=list()){
+  if(missing(object)){
+    object <- Transcripts()
+  }
   new("TranscriptsFusion",
       tA=txA(object),
       tB=txB(object),
@@ -218,7 +227,12 @@ clip <- function(transcripts, i) {
   stop("Chimeric proteins on both strands. Didn't expect to see this.")
 }
 
+setMethod("elementLengths", "Transcripts", function(x){
+  c(length(txA(x)), length(txB(x)), length(txC(x)), length(txD(x)))
+})
+
 #' @aliases fuse,TranscriptsFusion-method
+#' @rdname fuse-methods
 #' @export
 setMethod("fuse", "TranscriptsFusion", function(object, nms){
   fuse(clip(object, nms))
@@ -278,13 +292,13 @@ setReplaceMethod("fusions", c("TranscriptsFusion", "list"), function(object, val
 #'   fused <- fuse(clipped)
 #' @rdname fuse-methods
 #' @export
-#' @param object A \code{ClippedTranscripts} object
-#' @param nms  ignored
 setMethod("fuse", "ClippedTranscripts", function(object, nms){
   joined <- .getFusedTx(object)
   joined
 })
 
+#' @rdname TranscriptsFusion-class 
+#' @aliases fusionNames,TranscriptsFusion-method
 #' @export
 setMethod("fusionNames", "TranscriptsFusion", function(object) names(fusions(object)))
 
@@ -331,56 +345,69 @@ setReplaceMethod("identifier", "Transcripts", function(object, value){
 })
 
 #' @aliases left,ClippedTranscripts-method
+#' @param x a \code{ClippedTranscripts} object
+#' @param ... ignored
+#' @rdname ClippedTranscripts-class
 #' @export
 setMethod("left", "ClippedTranscripts", function(x, ...) x@left)
 
-#' @aliases numberFusions,TransriptsFusion-method
+#' @aliases numberFusions,TranscriptsFusion-method
+#' @rdname TranscriptsFusion-class
 #' @export
 setMethod("numberFusions", "TranscriptsFusion", function(object) length(fusions(object)))
 
+#' @rdname ClippedTranscripts-class
 #' @aliases right,ClippedTranscripts-method
 #'@export
 setMethod("right", "ClippedTranscripts", function(x, ...) x@right)
 
+#' @rdname transcript-accessors
 #' @aliases txA,Transcripts-method
 #' @export
 setMethod("txA", "Transcripts", function(object) object@tA)
 
+#' @rdname transcript-accessors
 #' @aliases txB,Transcripts-method
 #' @export
 setMethod("txB", "Transcripts", function(object) object@tB)
 
+#' @rdname transcript-accessors
 #' @export
 #' @aliases txC,Transcripts-method
 setMethod("txC", "Transcripts", function(object) object@tC)
 
+#' @rdname transcript-accessors
 #' @export
 #' @aliases txD,Transcripts-method
 setMethod("txD", "Transcripts", function(object) object@tD)
 
+#' @rdname transcript-accessors
 #' @export
-#' @aliases txA,Transcripts,ANY-method
+#' @aliases txA<-,Transcripts,ANY-method
 setReplaceMethod("txA", "Transcripts", function(object, value){
   object@tA <- value
   object
 })
 
+#' @rdname transcript-accessors
 #' @export
-#' @aliases txB,Transcripts,ANY-method
+#' @aliases txB<-,Transcripts,ANY-method
 setReplaceMethod("txB", "Transcripts", function(object, value){
   object@tB <- value
   object
 })
 
+#' @rdname transcript-accessors
 #' @export
-#' @aliases txC,Transcripts,ANY-method
+#' @aliases txC<-,Transcripts,ANY-method
 setReplaceMethod("txC", "Transcripts", function(object, value){
   object@tC <- value
   object
 })
 
+#' @rdname transcript-accessors
 #' @export
-#' @aliases txD,Transcripts,ANY-method
+#' @aliases txD<-,Transcripts,ANY-method
 setReplaceMethod("txD", "Transcripts", function(object, value){
   object@tD <- value
   object
@@ -402,6 +429,8 @@ setMethod("[[", "Transcripts", function(x, i, j, ..., drop=FALSE){
   if(i==4) return(txD(x))
 })
 
+#' @rdname Transcripts-class
+#' @aliases [[<-,Transcripts,ANY,ANY,GRangesList-method
 setReplaceMethod("[[", c("Transcripts", "ANY", "ANY", "GRangesList"),
                  function(x, i, j, value){
                    if(is.character(i)){
@@ -423,6 +452,13 @@ setReplaceMethod("[[", c("Transcripts", "ANY", "ANY", "GRangesList"),
                  })
 
 ## subsetting by one of the fusions produces a ClippedTranscripts object
+#' @rdname TranscriptsFusion-class
+#' @param x a \code{TranscriptsFusion} object
+#' @param i an integer-vector
+#' @param j ignored
+#' @param ... ignored
+#' @param drop ignored
+#' @return a \code{ClippedTranscripts} object
 setMethod("[", c("TranscriptsFusion", "ExonSubset"), function(x, i, j, ..., drop=FALSE){
   grl1 <- x[[name.left(i)]] ## GRangesList
   ##gr1 <- grl1[[tx1(i)]]  ## GRanges
