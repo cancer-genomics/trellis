@@ -153,6 +153,12 @@ topics <- function(object){
 
 dataDir <- function(object) object[1]
 
+#' Recursively create directories from supplied file paths
+#'
+#' @seealso \code{\link{dir.create}}
+#' @export
+#' @keywords internal
+#' @return character-vector of file paths
 dirCreate <- function(x){
   xx <- x[!file.exists(x)]
   if(length(xx) == 0) return(x)
