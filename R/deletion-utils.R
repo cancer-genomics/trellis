@@ -1269,5 +1269,46 @@ listDeletions <- function(dp, ids){
   dels <- lapply(files, readRDS)
   names(dels) <- ids
   g <- lapply(dels, function(x) granges(variant(x)))
-  GRangesList(g)
+  g <- unlist(GRangesList(g))
+  g$id <- sapply(strsplit(names(g), "\\."), "[", 1)
+  names(g) <- NULL
+  g$log_ratio <- unlist(lapply(dels, copynumber))
+  g$call <- unlist(lapply(dels, calls))
+  grl <- split(g, g$id)
+  grl
+}
+
+#' Tabulate the frequency a gene has a deletion
+#'
+#' Multiple hit genes. Deletions do not necessarily have to overlap so long as
+#' the two deletions both hit the same gene.
+#'
+#' 1. list transcripts by gene
+#' 2. reduce the deletion granges for each subject to avoid over-counting
+#' overlapping hemizygous deletions as 2 hits
+#' 3. count overlaps
+#' @return a \code{data.frame} of gene names with frequencies
+#' @param tx a \code{transcript} object as provided by the \code{svfilters} package
+#' @param grl a \code{GRangesList} of deletions
+#'
+recurrentDeletions <- function(tx, grl){
+  g <- unlist(grl)
+  hits <- findOverlaps(g, tx, maxgap=5e3)
+  g$gene <- NA
+  g$gene[queryHits(hits)] <- tx$gene_name[subjectHits(hits)]
+  g_table <- as.data.frame(g)
+  gene_list <- split(tx, tx$gene_name)
+  ## remove any element that has multiple chromosomes
+  nchroms <- sapply(gene_list, function(g) length(unique(chromosome(g))))
+  gene_list <- gene_list[nchroms == 1]
+  g2 <- lapply(dels, function(x) reduce(variant(x)))
+  g2 <- unlist(GRangesList(g2))
+  names(g2) <- NULL
+  cnts <- countOverlaps(gene_list, g2)
+  gene_list <- gene_list[cnts > 1]
+  cnts <- cnts[ cnts > 1 ]
+  recurrent_deletions <- data.frame(gene=names(gene_list), freq=cnts)
+  recurrent_deletions <- recurrent_deletions[order(recurrent_deletions$freq,
+                                                   decreasing=TRUE), ]
+  recurrent_deletions
 }
