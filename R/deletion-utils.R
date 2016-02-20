@@ -1256,3 +1256,18 @@ sv_deletion_exp2 <- function(dirs,
   saveRDS(sv, file=file)
   sv
 }
+
+#' Extract a GRangesList of all identified deletions in a project
+#'
+#' @param dp a \code{DataPathss} object
+#' @param ids a character vector of sample identifiers
+#' @return a \code{GRangesList} of deletions
+#' @export
+listDeletions <- function(dp, ids){
+  ids <- paste0(ids, ".bam.rds")
+  files <- file.path(dp["1deletions"], ids)
+  dels <- lapply(files, readRDS)
+  names(dels) <- ids
+  g <- lapply(dels, function(x) granges(variant(x)))
+  GRangesList(g)
+}
