@@ -1264,7 +1264,6 @@ sv_deletion_exp2 <- function(dirs,
 #' @return a \code{GRangesList} of deletions
 #' @export
 listDeletions <- function(dp, ids){
-  ids <- paste0(ids, ".bam.rds")
   files <- file.path(dp["1deletions"], ids)
   dels <- lapply(files, readRDS)
   names(dels) <- ids
