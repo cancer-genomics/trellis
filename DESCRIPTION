@@ -1,13 +1,13 @@
 Package: svcnvs
 Title: Identify somatic copy number variants
-Version: 0.0.14
+Version: 0.0.16
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: Segments bin-level estimates of copy number.  Use both read
     pairs and read depth to identify focal deletions and amplicons. For
     amplicons, we use read pairs to identify grouped amplicons.
 Depends:
     R (>= 3.2.0),
-    svclasses
+    svclasses (>= 0.0.11)
 Imports:
     methods,
     BiocGenerics,

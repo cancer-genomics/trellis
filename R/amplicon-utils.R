@@ -1067,3 +1067,44 @@ sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters){
   }
   result_list
 }
+
+#' @export
+listAmplicons <- function(dp, ids){
+  files <- file.path(dp["2amplicons"], paste0(ids, ".rds"))
+  amp_grl <- lapply(files, readRDS)
+  amp_grl <- GRangesList(lapply(amp_grl, amplicons))
+  nms <- rep(ovarian_ids, elementLengths(amp_grl))
+  amps <- unlist(amp_grl)
+  amps$id <- nms
+  names(amps) <- NULL
+  split(amps, factor(amps$id, levels=ids))
+}
+
+#' @export
+recurrentAmplicons <- function(tx, grl, maxgap=5e3){
+  ## tx is big.  Make this smaller as a first step
+  tx <- subsetByOverlaps(tx, reduce(unlist(grl), min.gapwidth=maxgap))
+  gene_list <- split(tx, tx$gene_name)
+  ## remove any element that has multiple chromosomes
+  nchroms <- sapply(gene_list, function(g) length(unique(chromosome(g))))
+  gene_list <- gene_list[nchroms == 1]
+  ## A gene can have multiple entries.  Try reduce
+  gene_list <- GRangesList(lapply(gene_list, reduce, min.gapwidth=maxgap))
+  ##
+  ## Add back the gene name
+  ##
+  el <- elementLengths(gene_list)
+  tx <- unlist(gene_list)
+  tx$gene_name <- rep(names(gene_list), el)
+  ## ensure that 2 amplicons for a subject hitting a gene are only counted once
+  is_overlap_list <- lapply(grl, function(gr, tx, maxgap) {
+    overlapsAny(tx, gr, maxgap=maxgap)
+  }, maxgap=maxgap, tx=tx)
+  is_overlap <- do.call(cbind, is_overlap_list)
+  cnts <- rowSums(is_overlap)
+  tx <- tx[cnts > 1, ]
+  cnts <- cnts[ cnts > 1 ]
+  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts))
+  rownames(result) <- make.unique(result$gene)
+  result[order(result$freq, decreasing=TRUE), ]
+}

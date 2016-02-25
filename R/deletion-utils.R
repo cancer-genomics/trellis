@@ -161,6 +161,10 @@ initializeImproperIndex2 <- function(gr, improper_rp, param=DeletionParam()){
   result
 }
 
+initializeImproperIndex3 <- function(sv, param){
+  initializeImproperIndex2(variant(sv), sv@improper, param)
+}
+
 updateImproperIndex <- function(sv, maxgap=2e3){
   left_boundary <- resize(variant(sv), width=2)
   right_boundary <- resize(variant(sv), width=2, fix="end")
@@ -255,13 +259,13 @@ updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   index_irp
 }
 
-initializeProperIndex <- function(sv, zoom.out=1){
-  proper_rp <- sv@proper
-  g <- expandGRanges(variant(sv), zoom.out*width(variant(sv)))
-  hits <- findOverlaps(g, proper_rp)
-  index_proper <- split(subjectHits(hits), names(variant(sv))[queryHits(hits)])
-  index_proper
-}
+## initializeProperIndex <- function(sv, zoom.out=1){
+##   proper_rp <- sv@proper
+##   g <- expandGRanges(variant(sv), zoom.out*width(variant(sv)))
+##   hits <- findOverlaps(g, proper_rp)
+##   index_proper <- split(subjectHits(hits), names(variant(sv))[queryHits(hits)])
+##   index_proper
+## }
 
 initializeProperIndex2 <- function(gr, proper_rp, zoom.out=1){
   g <- expandGRanges(gr, zoom.out*width(gr))
@@ -270,6 +274,10 @@ initializeProperIndex2 <- function(gr, proper_rp, zoom.out=1){
   result <- setNames(vector("list", length(gr)), names(gr))
   result[names(index_proper)] <- index_proper
   result
+}
+
+initializeProperIndex3 <- function(sv, zoom.out=1){
+  initializeProperIndex2(variant(sv), sv@proper, zoom.out=zoom.out)
 }
 
 addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
@@ -496,8 +504,8 @@ addVariant <- function(v, object, cn, cncall, param){
                              proper=object@proper,
                              copynumber=cn,
                              calls=cncall)
-  indexImproper(svtmp) <- initializeImproperIndex(svtmp, param)
-  indexProper(svtmp) <- initializeProperIndex(svtmp, zoom.out=1)
+  indexImproper(svtmp) <- initializeImproperIndex3(svtmp, param)
+  indexProper(svtmp) <- initializeProperIndex3(svtmp, zoom.out=1)
   indexImproper(svtmp) <- updateImproperIndex(svtmp, maxgap=1e3)
 
   cnvs <- c(v, granges(variant(object)))
@@ -697,7 +705,7 @@ adjudicateHomozygousOverlap <- function(g, object){
     variant(object) <- v
     obj <- object[i]
     indexImproper(obj) <- updateImproperIndex(obj, maxgap=1e3)
-    indexProper(obj) <- initializeProperIndex(obj, zoom.out=1)
+    indexProper(obj) <- initializeProperIndex3(obj, zoom.out=1)
     copynumber(obj) <- cn2
     calls(obj) <- "homozygous"
 
@@ -738,7 +746,7 @@ removeSameStateOverlapping <- function(sv){
 reviseEachJunction <- function(object, pview, aview, param=DeletionParam()){
   message("Revising junctions...")
   object <- .reviseEachJunction(object, param, pview, aview)
-  indexProper(object) <- initializeProperIndex(object, zoom.out=1)
+  indexProper(object) <- initializeProperIndex3(object, zoom.out=1)
   copynumber(object) <- granges_copynumber(variant(object), pview)
   calls(object) <- rpSupportedDeletions(object, param, pview)
   object <- object[calls(object) != "hemizygous"]
@@ -1024,7 +1032,7 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
   query <- reduce(disjoin(g))
   proper_rp <- readPairsNearVariant(query, bfile)
   sv@proper <- proper_rp
-  indexProper(sv) <- initializeProperIndex(sv, zoom.out=zoom.out)
+  indexProper(sv) <- initializeProperIndex3(sv, zoom.out=zoom.out)
   sv
 }
 
@@ -1085,7 +1093,7 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
   sv9 <- allProperReadPairs(sv9, param, bfile=bamPaths(bview), zoom.out=1)
   if(length(sv9@proper) > 25e3){
     proper(sv9) <- sv9@proper[sample(seq_along(sv9@proper), 25e3)]
-    indexProper(sv9) <- initializeProperIndex(sv9, zoom.out=1)
+    indexProper(sv9) <- initializeProperIndex3(sv9, zoom.out=1)
   }
   sv9
 }
@@ -1318,3 +1326,5 @@ recurrentDeletions <- function(tx, grl, maxgap=5e3){
   rownames(result) <- make.unique(result$gene)
   result[order(result$freq, decreasing=TRUE), ]
 }
+
+
