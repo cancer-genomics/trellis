@@ -1083,12 +1083,14 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
   sv9 <- groupSVs(sv8)
   id <- names(aview)
   sv9 <- allProperReadPairs(sv9, param, bfile=bamPaths(bview), zoom.out=1)
-  if(length(proper(sv9)) > 25e3){
-    proper(sv9) <- proper(sv9)[sample(seq_along(proper(sv9)), 25e3)]
+  if(length(sv9@proper) > 25e3){
+    proper(sv9) <- sv9@proper[sample(seq_along(sv9@proper), 25e3)]
     indexProper(sv9) <- initializeProperIndex(sv9, zoom.out=1)
   }
   sv9
 }
+
+
 
 
 #' Create a list of StructuralVariants
@@ -1264,7 +1266,7 @@ sv_deletion_exp2 <- function(dirs,
 #' @return a \code{GRangesList} of deletions
 #' @export
 listDeletions <- function(dp, ids){
-  files <- file.path(dp["1deletions"], ids)
+  files <- file.path(dp["1deletions"], paste0(ids, ".rds"))
   dels <- lapply(files, readRDS)
   names(dels) <- ids
   g <- lapply(dels, function(x) granges(variant(x)))
@@ -1289,25 +1291,19 @@ listDeletions <- function(dp, ids){
 #' @return a \code{data.frame} of gene names with frequencies
 #' @param tx a \code{transcript} object as provided by the \code{svfilters} package
 #' @param grl a \code{GRangesList} of deletions
-#'
-recurrentDeletions <- function(tx, grl){
-  g <- unlist(grl)
-  hits <- findOverlaps(g, tx, maxgap=5e3)
-  g$gene <- NA
-  g$gene[queryHits(hits)] <- tx$gene_name[subjectHits(hits)]
-  g_table <- as.data.frame(g)
+#' @param maxgap a length-one numeric vector indicating the amount of space between a deletion and a transcript allowed to consider overlapping.  This argument is passed to \code{overlapsAny}.
+#' @seealso \code{\link[IRanges]{overlapsAny}}
+recurrentDeletions <- function(tx, grl, maxgap=5e3){
   gene_list <- split(tx, tx$gene_name)
   ## remove any element that has multiple chromosomes
   nchroms <- sapply(gene_list, function(g) length(unique(chromosome(g))))
   gene_list <- gene_list[nchroms == 1]
-  g2 <- lapply(dels, function(x) reduce(variant(x)))
-  g2 <- unlist(GRangesList(g2))
-  names(g2) <- NULL
-  cnts <- countOverlaps(gene_list, g2)
-  gene_list <- gene_list[cnts > 1]
+  ## ensure that 2 deletions for a subject hitting a gene are only counted once
+  is_overlap_list <- lapply(grl, function(gr, tx, maxgap) overlapsAny(tx, gr, maxgap=maxgap), maxgap=maxgap, tx=tx)
+  is_overlap <- do.call(cbind, is_overlap_list)
+  cnts <- rowSums(is_overlap)
+  tx <- tx[cnts > 1, ]
   cnts <- cnts[ cnts > 1 ]
-  recurrent_deletions <- data.frame(gene=names(gene_list), freq=cnts)
-  recurrent_deletions <- recurrent_deletions[order(recurrent_deletions$freq,
-                                                   decreasing=TRUE), ]
-  recurrent_deletions
+  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts))
+  result[order(result$freq, decreasing=TRUE), ]
 }
