@@ -159,6 +159,24 @@ setClass("StructuralVariant",
                         length_improper="integer",
                         length_proper="integer"))
 
+is_valid_proper_index <- function(object){
+  msg <- TRUE
+  if(sum(elementLengths(indexProper(object))) == 0){
+    return(msg)
+  }
+  ##i <- as.integer(unlist(indexProper(object)))
+  i <- sapply(indexProper(object), function(x) {
+    is_null <- is.null(x)
+    if(is_null) return(0)
+    max(x)
+  })
+  maxi <- max(i)
+  if(maxi > length(object@proper)){
+    msg <- "Out of bounds indexing for proper read pairs"
+  }
+  msg
+}
+
 setValidity("StructuralVariant", function(object){
   msg <- TRUE
   if(length(variant(object))==0){
@@ -199,19 +217,7 @@ setValidity("StructuralVariant", function(object){
       return(msg)
     }
   }
-  if(sum(elementLengths(indexProper(object))) > 0){
-    ##i <- as.integer(unlist(indexProper(object)))
-    i <- sapply(indexProper(object), function(x) {
-      is_null <- is.null(x)
-      if(is_null) return(0)
-      max(x)
-    })
-    maxi <- max(i)
-    if(maxi > object@length_proper){
-      msg <- "Out of bounds indexing for proper read pairs"
-      return(msg)
-    }
-  }
+  msg <- is_valid_proper_index(object)
   msg
 })
 
