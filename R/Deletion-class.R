@@ -159,17 +159,21 @@ setClass("StructuralVariant",
                         length_improper="integer",
                         length_proper="integer"))
 
-is_valid_proper_index <- function(object){
-  msg <- TRUE
-  if(sum(elementLengths(indexProper(object))) == 0){
-    return(msg)
-  }
-  ##i <- as.integer(unlist(indexProper(object)))
+max_proper_read_index <- function(object){
   i <- sapply(indexProper(object), function(x) {
     is_null <- is.null(x)
     if(is_null) return(0)
     max(x)
   })
+  i
+}
+
+is_valid_proper_index <- function(object){
+  msg <- TRUE
+  if(sum(elementLengths(indexProper(object))) == 0){
+    return(msg)
+  }
+  i <- max_proper_read_index(object)
   maxi <- max(i)
   if(maxi > length(object@proper)){
     msg <- "Out of bounds indexing for proper read pairs"
@@ -351,10 +355,16 @@ setReplaceMethod("groupedVariant", "StructuralVariant", function(object, value) 
 #' @export
 setReplaceMethod("indexProper", c("StructuralVariant","list"),
                  function(object, value){
-                   ## only update the SV indices for which proper pairs are available
-                   index <- match(names(value), names(variant(object)))
-                   object@index_proper[index] <- value
+                   object@index_proper <- value
                    object
+##
+##                   ## only update the SV indices for which proper pairs are available
+##                   index <- match(names(value), names(variant(object)))
+##                   object@index_proper[index] <- value
+##                   ## indices without any matches assign null
+##                   index < which(! names(value) %in% names(variant(object)))
+##                   object@index <- NULL
+##                   object
                  })
 
 #' @aliases indexImproper,StructuralVariant,list-method
@@ -362,10 +372,11 @@ setReplaceMethod("indexProper", c("StructuralVariant","list"),
 #'@export
 setReplaceMethod("indexImproper", c("StructuralVariant","list"),
                  function(object, value){
-                   index_improper <- .match_index_variant(indexImproper(object),
-                                                          variant(object),
-                                                          value)
-                   object@index_improper <- index_improper
+                   ##                    index_improper <- .match_index_variant(indexImproper(object),
+                   ##                                                           variant(object),
+                   ##                                                           value)
+                   ##                    object@index_improper <- index_improper
+                   object@index_improper <- value
                    object
                  })
 
