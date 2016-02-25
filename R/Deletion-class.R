@@ -215,9 +215,10 @@ setValidity("StructuralVariant", function(object){
   msg
 })
 
-#' @aliases [,StructuralVariant,ANY,ANY-method
+#' @aliases [,StructuralVariant,numeric,ANY-method
 #' @rdname StructuralVariant-class
-setMethod("[", "StructuralVariant", function(x, i, j, ..., drop=FALSE){
+setMethod("[", signature(x="StructuralVariant", i="numeric"),
+          function(x, i, j, ..., drop=FALSE){
   if(!missing(i)){
     x@variant <- variant(x)[i]
     x@calls <- calls(x)[i]
