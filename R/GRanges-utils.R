@@ -48,10 +48,9 @@ expandGRanges <- function(granges, size) .expand(granges, size)
 #' genomic interval.
 #'
 #' 
-#' Computing the fraction of a query genomic interval overlapping with
-#' another set of genomic interval amounts to finding the intersection
-#' of the query with the other intervals (subject) and then dividing
-#' by the width of the query.
+#' Compute the fraction of a query genomic interval that overlaps with another
+#' set of genomic intervals. We divide the total width of the intersection with
+#' the width of the query.
 #'
 #' @examples
 #'  library(GenomicRanges)
