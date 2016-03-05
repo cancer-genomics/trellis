@@ -144,6 +144,7 @@ standardizeGRangesMetadata <- function(granges){
 
   granges$hgnc <- as.character(NA)
   granges$driver <- as.character(NA)
+  granges$biol_sign <- as.character(NA)
   granges$groups <- as.factor(NA)
   granges
 }
@@ -303,6 +304,7 @@ AmpliconGraph <- function(ranges=GRanges(),
     g$is_amplicon <- FALSE
     g$hgnc <- as.character(NA)
     g$driver <- as.character(NA)
+    g$biol_sign <- as.character(NA)
     g$groups <- as.factor(NA)
     ranges <- sort(c(ranges, g))
   }
@@ -347,6 +349,7 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
     trimmed$is_amplicon <- rgs$is_amplicon[j]
     trimmed$hgnc <- rgs$hgnc
     trimmed$driver <- rgs$driver
+    trimmed$biol_sign <- rgs$biol_sign
     trimmed$groups <- rgs$groups
     trimmed$overlaps_germline <- rgs$overlaps_germline
     ## drop regions that were gaps to begin with
@@ -462,7 +465,7 @@ linkedDuplicatedRanges <- function(object, rpsegs,
                                    minimum_count=5){
   flank <- flanking_duplications
   lengths <- unlist(lapply(flank, elementLengths))
-  if(any(lengths != 1)) stop("Flanking regions must be length-one GRanges")
+  ##if(any(lengths != 1)) stop("Flanking regions must be length-one GRanges")
   gapsLeft <- GRanges(seqnames(flank[["left"]]$first),
                       IRanges(end(flank[["left"]]$first)+1,
                               start(flank[["left"]]$last)))
@@ -876,14 +879,21 @@ setGenes <- function(object, transcripts){
   object
 }
 
-
-
-driver_genes <- function(tx){
-  tx$gene_name[tx$cancer_connection]
+## Two levels of significance for genes:
+##    - clinical significance (synonymous with driver)
+##
+##    - biologically significant: perhaps biologically significant but unkown
+##      clinical significance. This set of all clinically significant
+##      genes is a subset
+driver_genes <- function(tx, clin_sign=FALSE){
+  if(clin_sign){
+    return(tx$gene_name[tx$cancer_connection])
+  }
+  tx$gene_name [ tx$biol_sign ]
 }
 
-getDrivers <- function(object, transcripts){
-  known_drivers <- unique(driver_genes(transcripts))
+getDrivers <- function(object, transcripts, clin_sign=TRUE){
+  known_drivers <- unique(driver_genes(transcripts, clin_sign=clin_sign))
   genes <- object$hgnc
   gene_list <- split(genes, object$groups)
   gene_list <- lapply(gene_list, function(x){
@@ -901,15 +911,23 @@ getDrivers <- function(object, transcripts){
   drv <- driver_in_grouped_amplicon[!is.na(driver_in_grouped_amplicon)]
   for(i in seq_along(drv)){
     driver_group <- names(drv)[i]
-    object$driver[object$groups == driver_group] <- drv[i]
+    if(clin_sign){
+      object$driver[object$groups == driver_group] <- drv[i]
+    } else {
+      object$biol_sign[ object$groups == driver_group ] <- drv[i]
+    }
   }
-  object$driver <- as.character(object$driver)
+  if(clin_sign){
+    object$driver <- as.character(object$driver)
+  } else {
+    object$biol_sign <- as.character(object$biol_sign)
+  }
   object
 }
 
-setDrivers <- function(object, transcripts){
+setDrivers <- function(object, transcripts, clin_sign=TRUE){
   ar <- ampliconRanges(object)
-  ar <- getDrivers(ar, transcripts)
+  ar <- getDrivers(ar, transcripts, clin_sign=clin_sign)
   object <- updateRangesMetadata(object, ar)
   object
 }
@@ -999,7 +1017,8 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ag <- setAmpliconGroups (ag)
   transcripts <- af[["transcripts"]]
   ag <- setGenes (ag, transcripts)
-  ag <- setDrivers (ag, transcripts)
+  ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
+  ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
   ag
 }
 
@@ -1103,8 +1122,25 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   is_overlap <- do.call(cbind, is_overlap_list)
   cnts <- rowSums(is_overlap)
   tx <- tx[cnts > 1, ]
+  is_overlap <- is_overlap[ cnts > 1, ]
   cnts <- cnts[ cnts > 1 ]
-  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts))
-  rownames(result) <- make.unique(result$gene)
+
+  ids <- apply(is_overlap, 1, function(is_amplicon, id) {
+    paste(id[is_amplicon], collapse=",")
+  }, id=gsub(".bam", "", colnames(is_overlap)))
+  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts), id=ids)
+  ##
+  ## Gene coordinates
+  ##
+  tx2 <- tx[tx$gene_name %in% result$gene]
+  tx2.list <- GRangesList(sapply(split(tx2, tx2$gene_name), reduce))
+  tx2 <- unlist(tx2.list)
+  tx2 <- tx2[result$gene]
+  stopifnot(identical(names(tx2), result$gene))
+  result$chr <- chromosome(tx2)
+  result$start <- start(tx2)
+  result$end <- end(tx2)
+  result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
+  rownames(result) <- NULL
   result[order(result$freq, decreasing=TRUE), ]
 }
