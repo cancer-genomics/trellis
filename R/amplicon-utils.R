@@ -1092,7 +1092,7 @@ listAmplicons <- function(dp, ids){
   files <- file.path(dp["2amplicons"], paste0(ids, ".rds"))
   amp_grl <- lapply(files, readRDS)
   amp_grl <- GRangesList(lapply(amp_grl, amplicons))
-  nms <- rep(ovarian_ids, elementLengths(amp_grl))
+  nms <- rep(ids, elementLengths(amp_grl))
   amps <- unlist(amp_grl)
   amps$id <- nms
   names(amps) <- NULL
