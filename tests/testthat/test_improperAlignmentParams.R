@@ -1,0 +1,15 @@
+context("improper alignment parameters")
+
+test_that("improper alignment parameters", {
+  library(Rsamtools)
+  params <- improperAlignmentParams()
+  expect_true(bamFlag(params)[["isPaired"]])
+  expect_true(!bamFlag(params)[["isProperPair"]])
+  expect_true(!bamFlag(params)[["isUnmappedQuery"]])
+  expect_true(!bamFlag(params)[["hasUnmappedMate"]])
+  expect_true(!bamFlag(params)[["isDuplicate"]])
+  expect_true(is.na(bamFlag(params)[["isNotPassingQualityControls"]]))
+  flags <- improperAlignmentFlags()
+  params2 <- improperAlignmentParams(flag=flags)
+  expect_identical(params, params2)
+})
