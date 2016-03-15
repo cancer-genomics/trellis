@@ -105,12 +105,11 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #'   considered fully-germline.
 #' 
 #' @seealso \code{\link[svfilters]{listGenomeFilters}}
-ampliconParams <- function(build="hg19",
-                           AMP_THR=log2(2.75),
+ampliconParams <- function(AMP_THR=log2(2.75),
                            LOW_THR=log2(1.75),
                            border_size=10e3,
                            overhang=25e3){
-  filters <- listGenomeFilters(build)
+  filters <- listGenomeFilters()
   filters$border_size <- border_size
   filters$overhang <- overhang
   filters$AMP_THR <- AMP_THR
@@ -1143,4 +1142,38 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
   rownames(result) <- NULL
   result[order(result$freq, decreasing=TRUE), ]
+}
+
+#' Table of recurrent driver amplicons
+#'
+#' @param amp_grl a \code{GRangesList} of amplicons. Each list element contains
+#'   the set of amplicons for one sample.
+#' @param transcripts a \code{GRanges} object of transcripts as provided by the
+#'   \code{svfilters.<ucsc_build>} packages
+#' @return a \code{data.frame} of recurrent driver amplicons
+#' @export
+recurrentDriverAmplicons <- function(amp_grl, transcripts){
+  driver_list <- sapply(amp_grl, function(g){
+    dr <- g$driver
+    if(length(dr) == 0) return(NULL)
+    dr <- dr[!is.na(dr)]
+    dr <- unlist(strsplit(dr, ", "))
+    unique(dr)
+  })
+  driver_list2 <- driver_list[ elementLengths(driver_list) > 0 ]
+  df <- data.frame(id=rep(names(driver_list2), elementLengths(driver_list2)),
+                   gene=unlist(driver_list2))
+  dflist <- split(df, df$gene)
+  ids <- sapply(sapply(dflist, "[[", "id"), paste, collapse=",")
+  df <- data.frame(gene=names(dflist),
+                   id=ids,
+                   freq=elementLengths(dflist))
+  tx <- transcripts[transcripts$gene_name %in% df$gene]
+  txlist <- split(tx, tx$gene_name)
+  tx <- unlist(reduce(txlist, min.gapwidth=2e3))
+  df$chr <- chromosome(tx)
+  df$start <- start(tx)
+  df$end <- end(tx)
+  df <- df[order(df$freq, decreasing=TRUE), ]
+  df
 }
