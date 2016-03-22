@@ -1339,7 +1339,7 @@ recurrentDeletions <- function(tx, grl, maxgap=5e3){
   tx2.list <- GRangesList(sapply(split(tx2, tx2$gene_name), reduce))
   tx2 <- unlist(tx2.list)
   tx2 <- tx2[result$gene]
-  stopifnot(identical(names(tx2), result$gene))
+  stopifnot(identical(names(tx2), as.character(result$gene)))
   result$chr <- chromosome(tx2)
   result$start <- start(tx2)
   result$end <- end(tx2)

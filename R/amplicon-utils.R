@@ -1144,20 +1144,25 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   result[order(result$freq, decreasing=TRUE), ]
 }
 
-#' Table of recurrent driver amplicons
+#' Table of recurrent drivers
 #'
-#' @param amp_grl a \code{GRangesList} of amplicons. Each list element contains
-#'   the set of amplicons for one sample.
+#' Given a GRangesList of amplicons or deletions (each element of list is a
+#' sample), tabulate the frequency of driver deletions or amplifications.
+#' 
+#' @param grl a \code{GRangesList} organized by sample
 #' @param transcripts a \code{GRanges} object of transcripts as provided by the
 #'   \code{svfilters.<ucsc_build>} packages
-#' @return a \code{data.frame} of recurrent driver amplicons
+#' @param split A character string indicating the string used to separate
+#'   drivers. By default, we assume the drivers associated with a given deletion
+#'   or amplicon are separated by a comma followed by a space.
+#' @return a \code{data.frame} of recurrent drivers
 #' @export
-recurrentDriverAmplicons <- function(amp_grl, transcripts){
-  driver_list <- sapply(amp_grl, function(g){
-    dr <- g$driver
+recurrentDrivers <- function(grl, transcripts, split=", "){
+  driver_list <- sapply(grl, function(g){
+    dr <- as.character(g$driver)
     if(length(dr) == 0) return(NULL)
     dr <- dr[!is.na(dr)]
-    dr <- unlist(strsplit(dr, ", "))
+    dr <- unlist(strsplit(dr, split))
     unique(dr)
   })
   driver_list2 <- driver_list[ elementLengths(driver_list) > 0 ]
@@ -1176,4 +1181,69 @@ recurrentDriverAmplicons <- function(amp_grl, transcripts){
   df$end <- end(tx)
   df <- df[order(df$freq, decreasing=TRUE), ]
   df
+}
+
+#' Annotate table of amplified genes with linked drivers and the number of
+#' samples for which a driver is linked
+#'
+#' @param ramps a table of recurrent amplicons
+#' @param amp_grl a \code{GRangesList} of amplicons (each element is a sample)
+#' 
+#' @seealso See \code{\link{recurrentDrivers}} for making a table of recurrent amplicons
+#' @export
+annotateRecurrent <- function(rcnvs, grl){
+  df_ext <- data.frame(gene=rep(rcnvs$gene, rcnvs$freq),
+                       chr=rep(rcnvs$chr, rcnvs$freq),
+                       start=rep(rcnvs$start, rcnvs$freq),
+                       end=rep(rcnvs$end, rcnvs$freq),
+                       id=unlist(strsplit(as.character(rcnvs$id), ",")))
+  df_ext$driver <- NA
+  names(grl) <- gsub(".bam", "", names(grl))
+  dflist <- split(df_ext, df_ext$id)
+  grl <- grl[names(dflist)]
+
+  for(k in seq_along(dflist)){
+    amps <- grl[[k]]
+    dat <- dflist[[k]]
+    dat_gr <- GRanges(dat$chr, IRanges(dat$start, dat$end))
+    hits <- findOverlaps(dat_gr, amps)
+    i <- queryHits(hits)
+    j <- subjectHits(hits)
+    j <- j[!duplicated(i)]
+    i <- i[!duplicated(i)]
+    dat$log2_ratio <- NA
+    dat$log2_ratio[i] <- amps$seg.mean[j]
+    dat$linked_driver <- NA
+    dat$linked_driver[i] <- amps$driver[j]
+    dflist[[k]] <- dat
+  }
+  df_ext2 <- do.call(rbind, dflist)
+  ld <- df_ext2$linked_driver
+  ld[ ld == "" ] <- NA
+  df_ext2$linked_driver <- ld
+  df_ext2 <- df_ext2[order(df_ext2$gene), ]
+  rownames(df_ext2) <- NULL
+
+  dflist2 <- split(df_ext2, df_ext2$gene)
+  df.gene <- vector("list", length(df_ext2))
+  for(i in seq_along(dflist2)){
+    dat <- dflist2[[i]]
+    x <- as.character(dat$linked_driver)
+    x <- unique(unlist(strsplit(x, ", ")))
+    if(!all(is.na(x))){
+      x <- x[ !is.na(x) ]
+      xx <- paste(unique(unlist(x)), collapse=",")
+    } else xx <- NA
+    nlinked <- sum(!is.na(dat$linked_driver))
+    dat2 <- data.frame(gene=names(dflist2)[i],
+                       log2_ratio=mean(dat$log2_ratio, na.rm=TRUE),
+                       id=paste(dat$id, collapse=","),
+                       linked_drivers=xx,
+                       nlinked=nlinked,
+                       freq=nrow(dat))
+    df.gene[[i]] <- dat2
+  }
+  df.gene <- do.call(rbind, df.gene)
+  df.gene <- df.gene[order(df.gene$freq, decreasing=TRUE), ]
+  df.gene
 }
