@@ -109,7 +109,8 @@ ampliconParams <- function(AMP_THR=log2(2.75),
                            LOW_THR=log2(1.75),
                            border_size=10e3,
                            overhang=25e3){
-  filters <- listGenomeFilters()
+  ##filters <- listGenomeFilters()
+  filters <- list()
   filters$border_size <- border_size
   filters$overhang <- overhang
   filters$AMP_THR <- AMP_THR
@@ -969,10 +970,15 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 #'   fold-changes consistent with amplification
 #' 
 #' @param amplicon_filters a \code{list} of filters
-sv_amplicons <- function(bview, segs, amplicon_filters){
-  AMP_THR <- amplicon_filters[["AMP_THR"]]
-  segs$is_amplicon <- segs$seg.mean > AMP_THR
+#' @param params a list of parameters for the amplicon analysis
+#' @param transcripts a \code{GRanges} object of transcripts
+sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   af <- amplicon_filters
+  af$border_size <- params$border_size
+  af$overhang <- params$overhang
+  AMP_THR <- params$AMP_THR
+  ##AMP_THR <- amplicon_filters[["AMP_THR"]]
+  segs$is_amplicon <- segs$seg.mean > AMP_THR
   ag <- AmpliconGraph(ranges=segs,
                       border_size=af[["border_size"]],
                       assembly_gaps=af[["assembly_gaps"]],
@@ -980,9 +986,8 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
                       germline_cnv=af[["germline_cnv"]],
                       outliers=af[["outliers"]],
                       overhang=af[["overhang"]])
-  ##stopifnot(all(nodes(ag) %in% names(ranges(ag))))
+  stopifnot(all(nodes(ag) %in% names(ranges(ag))))
   if (numNodes (ag) == 0) return (ag)
-
   centromeres <- af[["centromeres"]]
   ag <- trimRangesOverlappingCentromere (ag, centromeres)
   stopifnot(all(nodes(ag) %in% names(ranges(ag))))
@@ -1014,7 +1019,6 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
   ag <- linkNearAmplicons(ag, maxgap=500e3)
   ag <- filterSmallAmplicons (ag)
   ag <- setAmpliconGroups (ag)
-  transcripts <- af[["transcripts"]]
   ag <- setGenes (ag, transcripts)
   ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
@@ -1045,12 +1049,14 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
 #'
 #' @examples
 #'   library(svovarian)
-#'   library(svfilters)
+#'   library(svfilters.hg19)
 #'   id <- "CGOV2T"
 #'   data(lymph_ids)
 #'   dp <- projectOvarian(rootname="OvarianData2")
-#'   gfilters <- listGenomeFilters("hg19")
-#'   params <- ampliconParams(gfilters)
+#'   ##gfilters <- listGenomeFilters("hg19")
+#'   data(germline_filters)
+#'   data(transcripts)
+#'   params <- ampliconParams()
 #'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
 #'   bviews <- bviews[, id]
 #'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
@@ -1058,7 +1064,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
 #'   if(file.exists(Rsamtools::bamPaths(bviews))){
 #'     ag <- sv_amplicons(bviews[, id], grl[[id]], params)
 #'     ## or
-#'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], params)
+#'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], filters, params, transcripts)
 #'   }
 #' @param dirs character-vector of file paths for storing intermediate
 #'   files
@@ -1066,7 +1072,11 @@ sv_amplicons <- function(bview, segs, amplicon_filters){
 #' @param grl A \code{GRangesList} of the segmented genomes (each
 #'   element is the \code{GRanges} for a sample)
 #' @param amplicon_filters A list of germline filters and parameters
-sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters){
+#' @param params  a list of parameters for the amplicon analysis
+#' @param transcripts a \code{GRanges} object
+sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters,
+                            params=ampliconParams(),
+                            transcripts){
   ag_files <- file.path(dirs["2amplicons"],
                         paste0(colnames(bviews), ".rds"))
   result_list <- setNames(vector("list",
@@ -1079,12 +1089,14 @@ sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters){
       next()
     }
     ag <- sv_amplicons(bviews[, i], segs=grl[[i]],
-                       amplicon_filters)
+                       amplicon_filters, params, transcripts)
     result_list[[i]] <- ag
     saveRDS(ag, file=ag_files[i])
   }
   result_list
 }
+
+
 
 #' @export
 listAmplicons <- function(dp, ids){
