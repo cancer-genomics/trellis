@@ -129,12 +129,13 @@ addXCoordinateForTag <- function(blat){
   x
 }
 
-blatStatsPerTag <- function(blat.records){
+blatStatsPerTag <- function(blat.records, tag_length){
   ## summary statistics for a single read
   is_90 <- blat.records$match > 90
   ## Tsize in blat.records is size of target sequence (chromosome)
   Tsize <- abs(blat.records$Tend-blat.records$Tstart)
-  is_size_near100 <- Tsize > 80 & Tsize < 120
+  is_size_near100 <- Tsize > (tag_length - 1/5*tag_length) &
+    Tsize < (tag_length + 1/5*tag_length)
   is_90 <- is_90 & is_size_near100
   is_overlap <- blat.records$is_overlap
   ## calculate number of near-perfect matches for each tag
@@ -143,12 +144,12 @@ blatStatsPerTag <- function(blat.records){
   n.matches==1 & n.eland.matches==1
 }
 
-.blatStatsRearrangement <- function(blat, thr=0.8){
+.blatStatsRearrangement <- function(blat, thr=0.8, tag_length){
   cols <- c("Qname", "match", "is_overlap", "Tstart", "Tend")
   blat <- blat[, cols]
   if(nrow(blat) == 0) return(NULL)
   blat$tag_index <- addXCoordinateForTag(blat)
-  stats <- blatStatsPerTag(blat)
+  stats <- blatStatsPerTag(blat, tag_length)
   proportion_pass <- mean(stats)
   qnames <- gsub("R[12]", "", blat$Qname)
   n_tags <- length(unique(qnames))
@@ -249,6 +250,8 @@ blatStatsPerTag <- function(blat.records){
 #' @param thr a length-one numeric vector indicating the fraction of
 #'   reads at a rearrangement that must pass the read-level QC.
 blatScores <- function(blat, tags, id, thr=0.8){
+  tag_length <- nchar(tags$seq[1])
+  blat$match <- blat$match/tag_length * 100
   rownames(tags) <- paste0(tags$qname, "_", tags$read)
   blat <- annotateBlatRecords(blat, tags)
   blat <- removeReadsWithoutMate(blat)
@@ -258,7 +261,7 @@ blatScores <- function(blat, tags, id, thr=0.8){
     tagnames <- tagnames.list[[j]]
     rid <- names(tagnames.list)[j]
     blat_rid <- blat[blat$Qname %in% tagnames, ]
-    result <- .blatStatsRearrangement(blat_rid, thr=thr)
+    result <- .blatStatsRearrangement(blat_rid, thr=thr, tag_length)
     if(!is.null(result)){
       result$rearrangement <- rep(rid, nrow(result))
     }
