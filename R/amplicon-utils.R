@@ -104,7 +104,7 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #'   completely within the extended germline filter, the amplicon is
 #'   considered fully-germline.
 #' 
-#' @seealso \code{\link[svfilters]{listGenomeFilters}}
+#' @seealso \code{\link{listGenomeFilters}}
 ampliconParams <- function(AMP_THR=log2(2.75),
                            LOW_THR=log2(1.75),
                            border_size=10e3,
