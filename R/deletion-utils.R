@@ -1287,6 +1287,27 @@ listDeletions <- function(dp, ids){
   grl
 }
 
+#' @export
+reduceTranscripts <- function(tx, grl, maxgap=5e3){
+  ## tx is big.  Make this smaller as a first step
+  if(!missing(grl)){
+    tx <- subsetByOverlaps(tx, reduce(unlist(grl), min.gapwidth=maxgap))
+  }
+  gene_list <- split(tx, tx$gene_name)
+  ## remove any element that has multiple chromosomes
+  nchroms <- sapply(gene_list, function(g) length(unique(chromosome(g))))
+  gene_list <- gene_list[nchroms == 1]
+  ## A gene can have multiple entries.  Try reduce
+  gene_list <- GRangesList(lapply(gene_list, reduce, min.gapwidth=maxgap))
+  ##
+  ## Add back the gene name
+  ##
+  el <- elementLengths(gene_list)
+  tx <- unlist(gene_list)
+  tx$gene_name <- rep(names(gene_list), el)
+  sort(tx)
+}
+
 #' Tabulate the frequency a gene has a deletion
 #'
 #' Multiple hit genes. Deletions do not necessarily have to overlap so long as
@@ -1305,45 +1326,53 @@ listDeletions <- function(dp, ids){
 #'   argument is passed to \code{overlapsAny}.
 #' 
 #' @seealso \code{\link[IRanges]{overlapsAny}}
+#' @return a \code{GRanges} object. **The coordinates are of the reduced transcript and not the observed deletion.**
+#' @export
+numberOverlappingDeletions <- function(tx, grl, maxgap=5e3){
+  ## ensure that 2 deletions for a subject hitting a gene are only counted once
+  is_overlap_list <- lapply(grl, function(gr, tx, maxgap) {
+    overlapsAny(tx, gr, maxgap=maxgap)
+  }, maxgap=maxgap, tx=tx)
+  is_overlap <- do.call(cbind, is_overlap_list)
+  frequency <- rowSums(is_overlap)
+  frequency
+}
+
+#' @export
+numberSpanningAmplicons <- function(tx, grl, maxgap=5e3){
+  ## ensure that 2 deletions for a subject hitting a gene are only counted once
+  is_overlap_list <- lapply(grl, function(gr, tx, maxgap) {
+    overlapsAny(tx, gr, type="within")
+  }, maxgap=maxgap, tx=tx)
+  is_overlap <- do.call(cbind, is_overlap_list)
+  frequency <- rowSums(is_overlap)
+  frequency
+}
+
 #' @export
 recurrentDeletions <- function(tx, grl, maxgap=5e3){
-  ## tx is big.  Make this smaller as a first step
-  tx <- subsetByOverlaps(tx, reduce(unlist(grl), min.gapwidth=maxgap))
-  gene_list <- split(tx, tx$gene_name)
-  ## remove any element that has multiple chromosomes
-  nchroms <- sapply(gene_list, function(g) length(unique(chromosome(g))))
-  gene_list <- gene_list[nchroms == 1]
-  ## A gene can have multiple entries.  Try reduce
-  gene_list <- GRangesList(lapply(gene_list, reduce, min.gapwidth=maxgap))
-  ##
-  ## Add back the gene name
-  ##
-  el <- elementLengths(gene_list)
-  tx <- unlist(gene_list)
-  tx$gene_name <- rep(names(gene_list), el)
-  ## ensure that 2 deletions for a subject hitting a gene are only counted once
-  is_overlap_list <- lapply(grl, function(gr, tx, maxgap) overlapsAny(tx, gr, maxgap=maxgap), maxgap=maxgap, tx=tx)
-  is_overlap <- do.call(cbind, is_overlap_list)
-  cnts <- rowSums(is_overlap)
-  tx <- tx[cnts > 1, ]
-  is_overlap <- is_overlap[ cnts > 1, ]
-  cnts <- cnts[ cnts > 1 ]
-  ids <- apply(is_overlap, 1, function(is_amplicon, id) {
-    paste(id[is_amplicon], collapse=",")
-  }, id=gsub(".bam", "", colnames(is_overlap)))
-  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts), id=ids)
-  ##
-  ## Gene coordinates
-  ##
-  tx2 <- tx[tx$gene_name %in% result$gene]
-  tx2.list <- GRangesList(sapply(split(tx2, tx2$gene_name), reduce))
-  tx2 <- unlist(tx2.list)
-  tx2 <- tx2[result$gene]
-  stopifnot(identical(names(tx2), as.character(result$gene)))
-  result$chr <- chromosome(tx2)
-  result$start <- start(tx2)
-  result$end <- end(tx2)
-  result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
-  rownames(result) <- NULL
-  result[order(result$freq, decreasing=TRUE), ]
+  stop("needs refactoring")
+##  gr <- unlist(grl)
+##  
+##
+##  is_overlap <- is_overlap[ cnts > 1, ] 
+##  cnts <- cnts[ cnts > 1 ]
+##  ids <- apply(is_overlap, 1, function(is_amplicon, id) {
+##    paste(id[is_amplicon], collapse=",")
+##  }, id=gsub(".bam", "", colnames(is_overlap)))
+##  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts), id=ids)
+##  ##
+##  ## Gene coordinates
+##  ##
+##  tx2 <- tx[tx$gene_name %in% result$gene]
+##  tx2.list <- GRangesList(sapply(split(tx2, tx2$gene_name), reduce))
+##  tx2 <- unlist(tx2.list)
+##  tx2 <- tx2[result$gene]
+##  stopifnot(identical(names(tx2), as.character(result$gene)))
+##  result$chr <- chromosome(tx2)
+##  result$start <- start(tx2)
+##  result$end <- end(tx2)
+##  result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
+##  rownames(result) <- NULL
+##  result[order(result$freq, decreasing=TRUE), ]
 }
