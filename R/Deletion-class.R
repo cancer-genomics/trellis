@@ -170,7 +170,7 @@ max_proper_read_index <- function(object){
 
 is_valid_proper_index <- function(object){
   msg <- TRUE
-  if(sum(elementLengths(indexProper(object))) == 0){
+  if(sum(elementNROWS(indexProper(object))) == 0){
     return(msg)
   }
   i <- max_proper_read_index(object)
@@ -208,7 +208,7 @@ setValidity("StructuralVariant", function(object){
                  "must be the same as the names for the SVs")
     return(msg)
   }
-  if(sum(elementLengths(indexImproper(object))) > 0){
+  if(sum(elementNROWS(indexImproper(object))) > 0){
     ##i <- as.integer(unlist(indexImproper(object)))
     i <- sapply(indexImproper(object), function(x) {
       is_null <- is.null(x)
@@ -243,8 +243,8 @@ setMethod("[", signature(x="StructuralVariant", i="numeric"),
 setMethod("show", "StructuralVariant", function(object){
   cat("StructuralVariant class\n")
   cat("    #SVs         :", length(object), "\n")
-  cat("    proper RPs   :", sum(elementLengths(indexProper(object))), "\n")
-  cat("    improper RPs :", sum(elementLengths(indexImproper(object))), "\n")
+  cat("    proper RPs   :", sum(elementNROWS(indexProper(object))), "\n")
+  cat("    improper RPs :", sum(elementNROWS(indexImproper(object))), "\n")
   ##cat("    proper RPs   :", object@length_proper, "\n")
   ##cat("    improper RPs :", object@length_improper, "\n")
 })

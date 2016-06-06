@@ -10,7 +10,8 @@
 #' @importClassesFrom Rsamtools BamViews
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples
 #' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame
-#' @importMethodsFrom S4Vectors elementType queryHits subjectHits elementLengths
+#' @importFrom S4Vectors queryHits subjectHits
+#' @importMethodsFrom S4Vectors elementType elementNROWS
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importFrom IRanges IRanges LogicalList
@@ -20,7 +21,8 @@
 #' @importMethodsFrom GenomicAlignments first last left right
 #' @import GenomicRanges
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
-#' @importMethodsFrom SummarizedExperiment SummarizedExperiment
+#' @importMethodsFrom SummarizedExperiment SummarizedExperiment assays rowRanges 
+#' @importMethodsFrom SummarizedExperiment rowRanges<- colData colData<-
 #' @importFrom graph graphNEL 
 #' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames
 NULL

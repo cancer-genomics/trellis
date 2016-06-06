@@ -183,7 +183,7 @@ logicalList <- function(x) x@fusions
 #'   ## One of the possible fused transcripts is gene B and gene C, or "BC"
 #'   ## There are four possible refseq transcripts associated with gene 'B'
 #'   full_refseqs <- txB(rear_cds)
-#'   elementLengths(full_refseqs)
+#'   elementNROWS(full_refseqs)
 #' 
 #'   ## We exclude CDS from the four refseq transcripts that are not
 #'   ## involved in the fusion using the clip function:
@@ -191,7 +191,7 @@ logicalList <- function(x) x@fusions
 #'   ## The clipped refseq transcripts for gene B are give by
 #'   names(left(clipped_tx))
 #'   clipped_refseqs <- left(clipped_tx)
-#'   elementLengths(clipped_refseqs)
+#'   elementNROWS(clipped_refseqs)
 #'   ##
 #'   ## One transcript on the "right" side
 #'   ##
@@ -227,7 +227,7 @@ clip <- function(transcripts, i) {
   stop("Chimeric proteins on both strands. Didn't expect to see this.")
 }
 
-setMethod("elementLengths", "Transcripts", function(x){
+setMethod("elementNROWS", "Transcripts", function(x){
   c(length(txA(x)), length(txB(x)), length(txC(x)), length(txD(x)))
 })
 
@@ -463,11 +463,11 @@ setMethod("[", c("TranscriptsFusion", "ExonSubset"), function(x, i, j, ..., drop
   grl1 <- x[[name.left(i)]] ## GRangesList
   ##gr1 <- grl1[[tx1(i)]]  ## GRanges
   grl1 <- grl1[inRearrangement.left(i)]
-  grl1 <- grl1[elementLengths(grl1) > 0]
+  grl1 <- grl1[elementNROWS(grl1) > 0]
 
   grl2 <-x[[name.right(i)]] ## GRangesList
   grl2 <- grl2[inRearrangement.right(i)]  ## GRanges
-  grl2 <- grl2[elementLengths(grl2) > 0]
+  grl2 <- grl2[elementNROWS(grl2) > 0]
 
   x[[name.left(i)]] <- grl1
   x[[name.right(i)]] <- grl2
@@ -477,7 +477,7 @@ setMethod("[", c("TranscriptsFusion", "ExonSubset"), function(x, i, j, ..., drop
 
 setMethod("show", "Transcripts", function(object){
   cat("An object of class 'Transcripts'\n")
-  el <- elementLengths(object)
+  el <- elementNROWS(object)
   cat("   txA: ", el[1], "elements\n")
   cat("   txB: ", el[2], "elements\n")
   cat("   txC: ", el[3], "elements\n")
@@ -486,7 +486,7 @@ setMethod("show", "Transcripts", function(object){
 
 setMethod("show", "TranscriptsFusion", function(object){
   cat("An object of class 'Transcripts'\n")
-  el <- elementLengths(object)
+  el <- elementNROWS(object)
   cat("   txA: ", el[1], "elements\n")
   cat("   txB: ", el[2], "elements\n")
   cat("   txC: ", el[3], "elements\n")
