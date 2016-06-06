@@ -1,0 +1,14 @@
+---
+title: "Classes and methods for structural variant analyses"
+author: "Robert Scharpf"
+date: \today
+output: BiocStyle::pdf_document
+bibliography:
+vignette: >
+  %\VignetteIndexEntry{Classes and methods for structural variant analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc} 
+---
+```{r lib}
+library(svclasses)
+```
