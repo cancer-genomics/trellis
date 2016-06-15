@@ -1,11 +1,21 @@
-constructCNAObject <- function(x, view){
-  qr <- rowRanges(view)
-  CNA(as.matrix(x),
-      chrom=as.character(seqnames(qr)),
-      maploc=start(qr),
-      sampleid=colnames(view),
+setGeneric("CNAObject", function(object) standardGeneric("CNAObject"))
+
+setMethod("CNAObject", "PreprocessViews2", function(object){
+  bins <- rowRanges(object)
+  x <- assays(object)[, 1, drop=FALSE]
+  CNA(x,
+      chrom=as.character(seqnames(bins)),
+      maploc=start(bins),
+      sampleid=colnames(object),
       presorted=TRUE)
-}
+})
+
+##setMethod("CNAObject", "PreprocessViews2", function(object, x){
+##  CNA(as.matrix(x),
+##      chrom=as.character(seqnames(object)),
+##      maploc=start(object),
+##      presorted=TRUE)
+##})
 
 not_in_filters <- function(x, filters){
   not_filtered <- rep(TRUE, length(x))
@@ -18,13 +28,14 @@ not_in_filters <- function(x, filters){
   not_filtered
 }
 
+
 .segment <- function(object, param=SegmentParam(), ...){
     filterList <- list(x=expression(is.na(x)))
     x <- assays(object)[, 1]
     ##files <- file.path(tree[["cbs"]], rdsId(object))
     select <- not_in_filters(x, filterList[["x"]])
-    x <- x[select]
-    dat <- constructCNAObject(x, object)
+    ##x <- x[select]
+    dat <- CNAObject(object[select, ])
     seg <- segment(dat,
                    alpha=cbs_alpha(param),
                    undo.splits=undo.splits(param),
