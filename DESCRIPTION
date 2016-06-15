@@ -20,7 +20,8 @@ Imports:
     DNAcopy,
     svalignments,
     graph,
-    RBGL
+    RBGL,
+    SummarizedExperiment
 Suggests:
     testthat,
     svpreprocess,

@@ -23,5 +23,6 @@
 #' @importFrom svalignments properReadPairs readPairsNearVariant get_readpairs get_improper_readpairs totalWidth
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges edges addEdge addNode nodes
+#' @importMethodsFrom SummarizedExperiment rowRanges
 #' @importFrom RBGL kCliques
 NULL
