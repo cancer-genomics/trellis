@@ -361,7 +361,7 @@ checkHemizygousSpanningHomozygous <- function(object, hits, param, pview){
   means <- granges_copynumber(portion_notspanning, pview)
   means <- sum(means*width(portion_notspanning))/sum(width(portion_notspanning))
   if(means > log2(homozygousThr(param))){
-    lirp <- elementLengths(indexImproper(object))
+    lirp <- elementNROWS(indexImproper(object))
     L <- lirp[subjectHits(hits)]
     tmp <- ifelse(L <= 4, "hemizygous", "hemizygous+")
     cncall[names(spanning_variant)] <- tmp
@@ -423,7 +423,7 @@ rpSupportedDeletions <- function(object, param, pview){
   ## NA means that there were no queryRanges in the view -- i.e., all bins were masked
   is_hemizygous <- isHemizygousDeletion(object, param, pview)
   cncalls <- ifelse(is_hemizygous, "hemizygous", "homozygous")
-  number_improper <- elementLengths(sapply(object, improper))
+  number_improper <- elementNROWS(sapply(object, improper))
   MIN <- param@nflanking_hemizygous
   cncalls[number_improper >= MIN] <- paste0(cncalls[number_improper >= MIN], "+")
   as.character(cncalls)
@@ -637,7 +637,7 @@ adjudicateHemizygousOverlap <- function(g, object){
   ##
   k <- match(names(g), names(variant(object)))
   indices <- indexImproper(object[k])
-  drop <- which.min(elementLengths(indices))
+  drop <- which.min(elementNROWS(indices))
   if(length(drop) > 0){
     dropid <- names(g)[drop]
     dropindex <- match(dropid, names(variant(object)))
@@ -685,7 +685,7 @@ adjudicateHomozygousOverlap <- function(g, object){
   if(identical(length(r), length(g)))    return(object)
   hits <- findOverlaps(g, r)
   indices <- split(queryHits(hits), subjectHits(hits))
-  indices <- indices[elementLengths(indices) > 1]
+  indices <- indices[elementNROWS(indices) > 1]
   for(k in seq_along(indices)){
     m <- indices[[k]]
     rr <- r[k]
@@ -729,7 +729,7 @@ removeSameStateOverlapping <- function(sv){
   if(length(r) == length(v)) return(sv)
   hits <- findOverlaps(variant(sv), r)
   hitlist <- split(queryHits(hits), subjectHits(hits))
-  hitlist <- hitlist[elementLengths(hitlist) > 1]
+  hitlist <- hitlist[elementNROWS(hitlist) > 1]
   if(length(hitlist) == 0) return(sv)
   sv2 <- sv
   for(j in seq_along(hitlist)){
@@ -971,7 +971,7 @@ removeSameStateOverlapping <- function(sv){
   if(length(r) == length(v)) return(sv)
   hits <- findOverlaps(variant(sv), r)
   hitlist <- split(queryHits(hits), subjectHits(hits))
-  hitlist <- hitlist[elementLengths(hitlist) > 1]
+  hitlist <- hitlist[elementNROWS(hitlist) > 1]
   if(length(hitlist) == 0) return(sv)
   sv2 <- sv
   for(j in seq_along(hitlist)){
@@ -1302,7 +1302,7 @@ reduceTranscripts <- function(tx, grl, maxgap=5e3){
   ##
   ## Add back the gene name
   ##
-  el <- elementLengths(gene_list)
+  el <- elementNROWS(gene_list)
   tx <- unlist(gene_list)
   tx$gene_name <- rep(names(gene_list), el)
   sort(tx)

@@ -464,7 +464,7 @@ linkedDuplicatedRanges <- function(object, rpsegs,
                                    ##flanking_gaps,
                                    minimum_count=5){
   flank <- flanking_duplications
-  lengths <- unlist(lapply(flank, elementLengths))
+  lengths <- unlist(lapply(flank, elementNROWS))
   ##if(any(lengths != 1)) stop("Flanking regions must be length-one GRanges")
   gapsLeft <- GRanges(seqnames(flank[["left"]]$first),
                       IRanges(end(flank[["left"]]$first)+1,
@@ -1103,7 +1103,7 @@ listAmplicons <- function(dp, ids){
   files <- file.path(dp["2amplicons"], paste0(ids, ".rds"))
   amp_grl <- lapply(files, readRDS)
   amp_grl <- GRangesList(lapply(amp_grl, amplicons))
-  nms <- rep(ids, elementLengths(amp_grl))
+  nms <- rep(ids, elementNROWS(amp_grl))
   amps <- unlist(amp_grl)
   amps$id <- nms
   names(amps) <- NULL
@@ -1123,7 +1123,7 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   ##
   ## Add back the gene name
   ##
-  el <- elementLengths(gene_list)
+  el <- elementNROWS(gene_list)
   tx <- unlist(gene_list)
   tx$gene_name <- rep(names(gene_list), el)
   ## ensure that 2 amplicons for a subject hitting a gene are only counted once
@@ -1177,14 +1177,14 @@ recurrentDrivers <- function(grl, transcripts, split=", "){
     dr <- unlist(strsplit(dr, split))
     unique(dr)
   })
-  driver_list2 <- driver_list[ elementLengths(driver_list) > 0 ]
-  df <- data.frame(id=rep(names(driver_list2), elementLengths(driver_list2)),
+  driver_list2 <- driver_list[ elementNROWS(driver_list) > 0 ]
+  df <- data.frame(id=rep(names(driver_list2), elementNROWS(driver_list2)),
                    gene=unlist(driver_list2))
   dflist <- split(df, df$gene)
   ids <- sapply(sapply(dflist, "[[", "id"), paste, collapse=",")
   df <- data.frame(gene=names(dflist),
                    id=ids,
-                   freq=elementLengths(dflist))
+                   freq=elementNROWS(dflist))
   tx <- transcripts[transcripts$gene_name %in% df$gene]
   txlist <- split(tx, tx$gene_name)
   tx <- unlist(reduce(txlist, min.gapwidth=2e3))
