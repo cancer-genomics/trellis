@@ -1,6 +1,6 @@
-setGeneric("CNAObject", function(object) standardGeneric("CNAObject"))
+setGeneric("CNAObject", function(object, valuename) standardGeneric("CNAObject"))
 
-setMethod("CNAObject", "PreprocessViews2", function(object){
+setMethod("CNAObject", c("PreprocessViews2", "missing"), function(object, valuename){
   bins <- rowRanges(object)
   x <- assays(object)[, 1, drop=FALSE]
   CNA(x,
@@ -10,12 +10,14 @@ setMethod("CNAObject", "PreprocessViews2", function(object){
       presorted=TRUE)
 })
 
-##setMethod("CNAObject", "PreprocessViews2", function(object, x){
-##  CNA(as.matrix(x),
-##      chrom=as.character(seqnames(object)),
-##      maploc=start(object),
-##      presorted=TRUE)
-##})
+setMethod("CNAObject", c("GenomicRanges", "character"), function(object, valuename){
+  x <- mcols(object)[[valuename]]
+  CNA(as.matrix(x),
+      chrom=as.character(seqnames(object)),
+      maploc=start(object),
+      sampleid=object$id[1],
+      presorted=TRUE)
+})
 
 not_in_filters <- function(x, filters){
   not_filtered <- rep(TRUE, length(x))

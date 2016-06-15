@@ -25,8 +25,8 @@ Imports:
 Suggests:
     testthat,
     svpreprocess,
-    svfilters,
-    svovarian
+    svfilters.hg19,
+    svbams
 License: Artistic-2.0
 LazyData: true
 RoxygenNote: 5.0.1

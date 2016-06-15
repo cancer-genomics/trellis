@@ -19,10 +19,12 @@
 #' @importMethodsFrom GenomicAlignments first last
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
 #' @importFrom IRanges IRanges
+#' @importMethodsFrom IRanges overlapsAny subsetByOverlaps
 #' @import GenomicRanges
 #' @importFrom svalignments properReadPairs readPairsNearVariant get_readpairs get_improper_readpairs totalWidth
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges edges addEdge addNode nodes
 #' @importMethodsFrom SummarizedExperiment rowRanges
+#' @importFrom stats setNames
 #' @importFrom RBGL kCliques
 NULL

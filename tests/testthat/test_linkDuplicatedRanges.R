@@ -1,14 +1,4 @@
 test_that("linkDuplicatedRanges", {
-  
-  ag <- AmpliconGraph <- function(ranges,
-                                  border_size=150e3,
-                                  assembly_gaps=GRanges(),
-                                  centromeres=GRanges(),
-                                  germline_cnv=GRanges(),
-                                  outliers=GRanges(),
-                                  overhang=5e3){
-
-  
   left_first <- GRanges("chrY", IRanges(58967001, 59000001), seg.mean=1.07, overlaps_germline="no_germline")
   left_last <- GRanges("chrY", IRanges(59001001, 59032001), seg.mean=2.82, overlaps_germline="no_germline")
   right_first <- GRanges(rep("chrY", 2),
