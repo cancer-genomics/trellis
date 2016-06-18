@@ -16,7 +16,8 @@ Imports:
     GenomicAlignments,
     IRanges,
     SummarizedExperiment,
-    graph
+    graph,
+    stats
 Suggests:
     DNAcopy,
     knitr,

@@ -46,7 +46,6 @@ setGeneric("paths", function(object) standardGeneric("paths"))
 #' @export
 setGeneric("paths<-", function(object,value) standardGeneric("paths<-"))
 
-
 #' A container for storing views of preprocessed data
 #'
 #' This class directly extends the \code{BamViews} class and provides

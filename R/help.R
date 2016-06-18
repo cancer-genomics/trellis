@@ -22,7 +22,8 @@
 #' @import GenomicRanges
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment assays rowRanges 
-#' @importMethodsFrom SummarizedExperiment rowRanges<- colData colData<-
+#' @importMethodsFrom SummarizedExperiment rowRanges<- colData colData<- assays<-
 #' @importFrom graph graphNEL 
 #' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames
+#' @importFrom stats median setNames
 NULL
