@@ -1052,7 +1052,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
 #'   library(svfilters.hg19)
 #'   id <- "CGOV2T"
 #'   data(lymph_ids)
-#'   dp <- projectOvarian(rootname="OvarianData2")
+#'   dp <- projectOvarian(rootname="data")
 #'   ##gfilters <- listGenomeFilters("hg19")
 #'   data(germline_filters)
 #'   data(transcripts)

@@ -48,6 +48,7 @@ not_in_filters <- function(x, filters){
     g
 }
 
+#' @export
 segmentCoverage <- function(object, param=SegmentParam(), ...){
   object <- object[, 1]
   chroms <- seqlevels(object)
