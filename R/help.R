@@ -25,6 +25,7 @@
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges edges addEdge addNode nodes
 #' @importMethodsFrom SummarizedExperiment rowRanges
-#' @importFrom stats setNames
+#' @importFrom stats setNames mad
 #' @importFrom RBGL kCliques
+#' @importFrom utils data
 NULL

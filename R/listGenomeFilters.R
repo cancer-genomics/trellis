@@ -23,11 +23,15 @@
 listGenomeFilters <- function(){
   ##if(ucsc_build != "hg19") stop("Only available for build hg19")
   data(transcripts, envir=environment())
+  transcripts <- get("transcripts")
   data(assembly_gaps, envir=environment())
+  assembly_gaps <- get("assembly_gaps")
   data(gaps, envir=environment())
+  gaps <- get("gaps")
   centromeres <- gaps[gaps$type=="centromere"]
   seqinfo(centromeres) <- seqinfo(assembly_gaps)
   data(coverage_filters, envir=environment())
+  coverage_filters <- get("coverage_filters")
   cnv <- reduce(c(coverage_filters[["amplicon"]],
                   coverage_filters[["deletion"]]))
   out <- reduce(coverage_filters[["outlier"]])
@@ -74,6 +78,7 @@ reduceGenomeFilters <- function(filters, seqlev){
 #' @export
 listRearFilters <- function(){
   data(lymphoblast_rear, envir=environment())
+  lymphoblast_rear <- get("lymphoblast_rear")
   ##data(normalblood_rear_hg19, envir=environment())
   ##GRangesList(lymphoblast=lymphoblast_rear_hg19,
   ##normalblood=normalblood_rear_hg19)
