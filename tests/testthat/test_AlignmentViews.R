@@ -9,7 +9,7 @@ test_that("AlignmentViews", {
   extdata <- system.file("extdata", package="TestBams")
   bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
   bv <- BamViews(bam.file)
-  dp <- DataPaths(tempdir())
+  dp <- tempdir()
   aviews <- AlignmentViews2(bv, dp)
   expect_identical(length(improperPaths(aviews)),
                    ncol(bv))
