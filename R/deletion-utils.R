@@ -1051,6 +1051,7 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 #' @param pview a \code{PreprocessViews2} object
 #' @param gr_filters a \code{GRanges} object of germline filters
 #' @param param a \code{DeletionParam} object
+#' @export
 sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
                          param=DeletionParam()){
   ##gr <- germlineFilters(gr, gr_filters, pview)
@@ -1139,7 +1140,6 @@ sv_deletions <- function(gr, aview, bview, pview,  gr_filters,
 #'                                gr_filters=germline_filters)
 #'   }
 #' @return a list. Each element of the list is a \code{StructuralVariant} object.
-#' @export
 #' @param dirs a character vector of file paths as provided by \code{projectTree}
 #' @param grl a \code{GRangesList} of deletions. Each element is a sample.
 #' @param bviews a \code{BamViews} object
