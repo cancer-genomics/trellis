@@ -5,7 +5,7 @@
 #' @name svalignments
 #' @import methods
 #' @import svclasses
-#' @importMethodsFrom S4Vectors mcols mcols<- elementLengths 
+#' @importMethodsFrom S4Vectors mcols mcols<- elementNROWS 
 #' @importFrom S4Vectors isTRUEorFALSE
 #' @importFrom S4Vectors queryHits subjectHits
 #' @importMethodsFrom GenomicAlignments readGAlignments first last 

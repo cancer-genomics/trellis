@@ -64,7 +64,7 @@ annotateBlatRecords <- function(blat, tag.sequences){
   ## T is for target (reference genome)
   ## Q is for query (tag sequence)
   sampleids <- tag.sequences$id
-  ##sampleids <- rep(sampleids, elementLengths(tag.sequences))
+  ##sampleids <- rep(sampleids, elementNROWS(tag.sequences))
   eland.starts <- tag.sequences$start
   eland.ends <- tag.sequences$end
   eland.chr <- tag.sequences$seqnames
@@ -105,7 +105,7 @@ removeReadsWithoutMate <- function(blat){
   rpid <- gsub("_R[12]$", "", rid)
   rpid <- factor(rpid, levels=unique(rpid))
   rplist <- lapply(split(rid, rpid), function(x) unique(x))
-  el <- elementLengths(rplist)
+  el <- elementNROWS(rplist)
   ## there are 36 reads with no mate listed
   rps.without.mate <- names(rplist)[el != 2]
   blat <- blat[!rpid %in% rps.without.mate, ]
@@ -338,7 +338,7 @@ sequenceRanges <- function(blat){
 multipleAlignmentRecords <- function(records){
   records <- records[ records$match < 95]
   recordlist <- split(records, records$qname)
-  n.alignments <- elementLengths(recordlist)
+  n.alignments <- elementNROWS(recordlist)
   recordlist <- recordlist[n.alignments >= 2]
   unlist(recordlist)
 }
@@ -412,7 +412,7 @@ rearrangedReads <- function(r, blat, maxgap=500){
   ##
   ## And the number of records for a given rearrangement should be 2
   ##
-  records_qname <- records_qname [ elementLengths(records_qname) == 2 ]
+  records_qname <- records_qname [ elementNROWS(records_qname) == 2 ]
   ##
   ## The split should involve nearly non-overlapping subsequences of
   ## the read, and the total match score should be high (near 100)
