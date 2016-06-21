@@ -50,6 +50,5 @@ Collate:
     'Transcripts-class.R'
     'copynumber-methods.R'
     'data.R'
-    'functions.R'
     'improper-methods.R'
     'seqinfo-utils.R'
