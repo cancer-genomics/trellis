@@ -37,21 +37,23 @@ setValidity("AlignmentViews2", function(object){
 #'   extdata <- system.file("extdata", package="TestBams")
 #'   bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
 #'   bv <- BamViews(bam.file)
-#'   dp <- DataPaths(tempdir())
-#'   aviews <- AlignmentViews2(bv, dp)
+#'   fname <- tempfile()
+#'   aviews <- AlignmentViews2(bv, fname)
 #'   validObject(aviews[, 1])
 #'   aviews
 #'   improperPaths(aviews)
 #' @export
 #' @param bviews A \code{BamViews} object
-#' @param dirs A \code{DataPaths} object
+#' @param dirs file path for storing alignments
 #' @rdname AlignmentViews2-class
-AlignmentViews2 <- function(bviews=BamViews(), dirs=DataPaths()){
-  path <- dirs[["alignments/0improper"]]
-  improper_paths <- file.path(path, rdsId(bviews))
+AlignmentViews2 <- function(bviews=BamViews(), path){
+  if(missing(path)) path <- tempfile()
+  ##improper_paths <- file.path(path, rdsId(bviews))
   aviews <- as(bviews, "AlignmentViews2")
   indexRanges(aviews) <- seq_len(nrow(aviews))
-  improperPaths(aviews) <- improper_paths
+  if(ncol(bviews) > 0){
+    improperPaths(aviews) <- path
+  }
   aviews
 }
 
