@@ -297,7 +297,6 @@ blatScores <- function(blat, tags, id, thr=0.8){
 #'
 #' @return a list of \code{tbl_df} objects
 #' 
-#' @export
 #' @param id sample id
 #'
 #' @param blat data.frame of blat records from the command-line blat tool
