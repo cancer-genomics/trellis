@@ -963,6 +963,20 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 #'   \code{\linkS4class{AmpliconGraph}} for each sample in an
 #'   experiment.
 #'
+#' @examples
+#'   library(svovarian)
+#'   library(svfilters.hg19)
+#'   id <- "CGOV2T"
+#'   data(lymph_ids)
+#'   data(germline_filters)
+#'   data(transcripts)
+#'   params <- ampliconParams()
+#'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
+#'   bviews <- bviews[, id]
+#'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
+#'   ## Requires bam file
+#'   ag <- sv_amplicons(bviews[, id], grl[[id]], germline_filters, params)
+#'
 #' @export
 #' @param bview a \code{BamViews} object
 #' 
@@ -1045,21 +1059,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
 #'   associated with the class and \code{\link{sv_amplicons}} for
 #'   construction of an \code{AmpliconGraph} for a single sample.
 #' 
-#' @export
 #'
-#' @examples
-#'   library(svovarian)
-#'   library(svfilters.hg19)
-#'   id <- "CGOV2T"
-#'   data(lymph_ids)
-#'   data(germline_filters)
-#'   data(transcripts)
-#'   params <- ampliconParams()
-#'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
-#'   bviews <- bviews[, id]
-#'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
-#'   ## Requires bam file
-#'   ag <- sv_amplicons(bviews[, id], grl[[id]], germline_filters, params)
 #' @param dirs character-vector of file paths for storing intermediate
 #'   files
 #' @param bviews A \code{BamViews} object
