@@ -141,6 +141,8 @@ blatStatsPerTag <- function(blat.records, tag_length){
   ## calculate number of near-perfect matches for each tag
   n.matches <- sapply(split(is_90, blat.records$Qname), sum)
   n.eland.matches <- sapply(split(is_overlap & is_90, blat.records$Qname), sum)
+  ## there should only be one eland alignment with high quality (n.matches == 1)
+  ## AND this read should overlap the eland alignment
   n.matches==1 & n.eland.matches==1
 }
 

@@ -1,4 +1,4 @@
-#' Find total width of a \code{GRanges} object
+ #' Find total width of a \code{GRanges} object
 #'
 #' Adds the width of the intervals in a \code{GRanges} object. 
 #'

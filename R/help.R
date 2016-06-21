@@ -5,8 +5,9 @@
 #' @name svalignments
 #' @import methods
 #' @import svclasses
-#' @importMethodsFrom S4Vectors mcols mcols<- elementLengths queryHits subjectHits
+#' @importMethodsFrom S4Vectors mcols mcols<- elementLengths 
 #' @importFrom S4Vectors isTRUEorFALSE
+#' @importFrom S4Vectors queryHits subjectHits
 #' @importMethodsFrom GenomicAlignments readGAlignments first last 
 #' @importFrom GenomicAlignments makeGAlignmentPairs findMateAlignment GAlignmentPairs GAlignments
 #' @importFrom Rsamtools scanBamFlag bamPaths bamFlagAsBitMatrix 
@@ -17,6 +18,7 @@
 #' @importFrom IRanges IRanges
 #' @importMethodsFrom IRanges reduce width disjoin overlapsAny pintersect subsetByOverlaps unlist findOverlaps
 #' @importFrom GenomicRanges GRanges GRangesList
-#' @importMethodsFrom GenomicRanges granges strand rowRanges strand<- width intersect split 
+#' @importMethodsFrom GenomicRanges granges strand strand<- width intersect 
+#' @importMethodsFrom SummarizedExperiment rowRanges rowRanges<- 
 #' @importFrom dplyr tbl_df
 NULL
