@@ -339,7 +339,7 @@ multipleAlignmentRecords <- function(records){
   recordlist <- split(records, records$qname)
   n.alignments <- elementNROWS(recordlist)
   recordlist <- recordlist[n.alignments >= 2]
-  unlist(recordlist)
+  unlist(GRangesList(recordlist))
 }
 
 #' Identify rearranged reads -- initiallly unmapped reads that can be
@@ -428,11 +428,13 @@ rearrangedReads <- function(r, blat, maxgap=500){
   splitread_match <- as.integer(sapply(splitread_ranges, function(x) sum(x$match)))
   is_splitread <- splitread_int < 10 & splitread_match > 90
   records_qname <- records_qname[ splitread_int < 10 & splitread_match > 90 ]
+  records_qname <- GRangesList(records_qname)
   records <- unlist(records_qname)
   records$qname <- names(records)
   names(records) <- NULL
   ## list the split reads by rearrangement
   records_rear <- split(records, records$rear.id)
+  GRangesList(records_rear)
 }
 
 
