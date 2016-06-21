@@ -2,6 +2,5 @@
 .Rhistory
 .RData
 /.Rbuildignore
-man/*
 /svclasses.Rproj
 /#DESCRIPTION#

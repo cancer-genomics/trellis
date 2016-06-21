@@ -44,11 +44,10 @@ setValidity("AlignmentViews2", function(object){
 #'   improperPaths(aviews)
 #' @export
 #' @param bviews A \code{BamViews} object
-#' @param dirs file path for storing alignments
+#' @param path file path for storing alignment data
 #' @rdname AlignmentViews2-class
 AlignmentViews2 <- function(bviews=BamViews(), path){
   if(missing(path)) path <- tempfile()
-  ##improper_paths <- file.path(path, rdsId(bviews))
   aviews <- as(bviews, "AlignmentViews2")
   indexRanges(aviews) <- seq_len(nrow(aviews))
   if(ncol(bviews) > 0){
