@@ -1052,8 +1052,6 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
 #'   library(svfilters.hg19)
 #'   id <- "CGOV2T"
 #'   data(lymph_ids)
-#'   dp <- projectOvarian(rootname="data")
-#'   ##gfilters <- listGenomeFilters("hg19")
 #'   data(germline_filters)
 #'   data(transcripts)
 #'   params <- ampliconParams()
@@ -1061,19 +1059,15 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
 #'   bviews <- bviews[, id]
 #'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
 #'   ## Requires bam file
-#'   if(file.exists(Rsamtools::bamPaths(bviews))){
-#'     ag <- sv_amplicons(bviews[, id], grl[[id]], params)
-#'     ## or
-#'     ag <- sv_amplicon_exp(dp, bviews[, id], grl[id], filters, params, transcripts)
-#'   }
+#'   ag <- sv_amplicons(bviews[, id], grl[[id]], germline_filters, params)
 #' @param dirs character-vector of file paths for storing intermediate
 #'   files
 #' @param bviews A \code{BamViews} object
 #' @param grl A \code{GRangesList} of the segmented genomes (each
 #'   element is the \code{GRanges} for a sample)
-#' @param amplicon_filters A list of germline filters and parameters
+#' @param amplicon_filters A list of germline filters and parameters. See the \code{germline_filters} object in the package \code{svfilters.<build>}.
 #' @param params  a list of parameters for the amplicon analysis
-#' @param transcripts a \code{GRanges} object
+#' @param transcripts a \code{GRanges} object of the transcripts.  
 sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters,
                             params=ampliconParams(),
                             transcripts){
