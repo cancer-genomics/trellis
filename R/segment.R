@@ -48,6 +48,52 @@ not_in_filters <- function(x, filters){
     g
 }
 
+.segmentBins <- function(bins, param, ...){
+  bins <- bins[!is.na(bins$adjusted)]
+  adjusted <- bins$adjusted
+  cnaobj <- CNA(as.matrix(adjusted),
+                chrom=as.character(seqnames(bins)),
+                maploc=start(bins),
+                ##sampleid=object$id[1],
+                presorted=TRUE)
+  seg <- segment(cnaobj,
+                 alpha=cbs_alpha(param),
+                 undo.splits=undo.splits(param),
+                 undo.SD=undo.SD(param),
+                 verbose=param@verbose, ...)
+  g <- cbs2granges(seg, seqinfo(bins))
+  g
+}
+
+#' Circular binary segmentation of log2-transformed and GC-adjusted counts.
+#'
+#' Segmentation of the transformed counts is performed by the circular
+#' binary segmentation algorithm implemented in the \code{DNAcopy}
+#' package.
+#' 
+#' @param param a \code{SegmentParam} object
+#' @param bins a \code{GRanges} object containing adjusted counts.  Note, the adjusted counts must be stored in a column named \code{adjusted}.
+#' @param ... additional arguments to \code{segment} in the \code{DNAcopy} package
+#' @seealso \code{\link[DNAcopy]{segment}} for description of circular
+#'   binary segmentation and references therein; see
+#'   \code{\link[svclasses]{SegmentParam-class}} for a description of the default
+#'   parameters settings passed to the \code{segment} function. See \code{\link[svpreprocess]{sv_preprocess}} for obtaining normalized counts for segmentation.
+#' @export
+segmentBins <- function(bins, param=SegmentParam(), ...){
+  chroms <- seqlevels(bins)
+  results <- vector("list", length(chroms))
+  for(i in seq_along(chroms)){
+    chr <- chroms[i]
+    chrbins <- keepSeqlevels(bins, chr)
+    if(length(chrbins) < 2) next()
+    results[[i]] <- .segmentBins(chrbins, param=param, ...)
+  }
+  g <- unlist(GRangesList(results))
+  seqlevels(g, force=TRUE) <- seqlevels(bins)
+  seqinfo(g) <- seqinfo(bins)
+  g
+}
+
 #' @export
 segmentCoverage <- function(object, param=SegmentParam(), ...){
   object <- object[, 1]
@@ -131,7 +177,6 @@ checkMcols <- function(x, id){
 #'   to the \code{segment} function are passed by an instance of the
 #'   \code{SegmentParam} class.
 #' 
-#' @export
 #' @param object A \code{PreprocessViews2} object
 #' @param tree A directory tree for storing intermediate files. See
 #'   \code{\link[svclasses]{DataPaths-class}}.
