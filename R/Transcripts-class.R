@@ -344,6 +344,10 @@ setReplaceMethod("identifier", "Transcripts", function(object, value){
   object
 })
 
+
+setGeneric("left", function(x, ...) standardGeneric("left"))
+setGeneric("right", function(x, ...) standardGeneric("right"))
+
 #' @aliases left,ClippedTranscripts-method
 #' @param x a \code{ClippedTranscripts} object
 #' @param ... ignored

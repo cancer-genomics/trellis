@@ -18,7 +18,7 @@
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce overlapsAny
 #' @importFrom GenomicAlignments GAlignmentPairs GAlignments
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
-#' @importMethodsFrom GenomicAlignments first last left right
+#' @importMethodsFrom GenomicAlignments first last 
 #' @import GenomicRanges
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment assays rowRanges 

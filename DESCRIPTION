@@ -1,6 +1,6 @@
 Package: svclasses
 Title: Classes for somatic structural variation analyses
-Version: 0.0.12
+Version: 0.0.13
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: This package contains classes and methods used for structural
     variant analyses.
@@ -13,7 +13,7 @@ Imports:
     S4Vectors,
     Rsamtools,
     GenomeInfoDb,
-    GenomicAlignments,
+    GenomicAlignments (>= 1.10.0),
     IRanges,
     SummarizedExperiment,
     graph,
