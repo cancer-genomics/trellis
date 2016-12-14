@@ -4,7 +4,9 @@
 \name{readPairs}
 \alias{StructuralVariant}
 \alias{StructuralVariant-class}
+\alias{[,StructuralVariant,ANY,ANY,ANY-method}
 \alias{[,StructuralVariant,ANY,ANY-method}
+\alias{[,StructuralVariant,numeric,ANY,ANY-method}
 \alias{[,StructuralVariant,numeric,ANY-method}
 \alias{[[,StructuralVariant,ANY,ANY-method}
 \alias{improper,StructuralVariant-method}
@@ -22,7 +24,7 @@
 \usage{
 readPairs(object)
 
-\S4method{[}{StructuralVariant,numeric,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{StructuralVariant,numeric,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
 StructuralVariant(variant = GRanges(), proper = .GAlignmentPairs(),
   improper = .GAlignmentPairs(), copynumber, calls, index_proper,
@@ -40,7 +42,7 @@ StructuralVariant(variant = GRanges(), proper = .GAlignmentPairs(),
 
 \S4method{variant}{StructuralVariant}(object) <- value
 
-\S4method{[}{StructuralVariant,ANY,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{StructuralVariant,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
 \S4method{[[}{StructuralVariant,ANY,ANY}(x, i)
 

@@ -4,7 +4,7 @@
 \name{fusions}
 \alias{TranscriptsFusion}
 \alias{TranscriptsFusion-class}
-\alias{[,TranscriptsFusion,ExonSubset,ANY-method}
+\alias{[,TranscriptsFusion,ExonSubset,ANY,ANY-method}
 \alias{fusionNames}
 \alias{fusionNames,TranscriptsFusion-method}
 \alias{fusions}
@@ -37,7 +37,7 @@ TranscriptsFusion(object, fusions = list())
 
 \S4method{numberFusions}{TranscriptsFusion}(object)
 
-\S4method{[}{TranscriptsFusion,ExonSubset,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{TranscriptsFusion,ExonSubset,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{value}{}

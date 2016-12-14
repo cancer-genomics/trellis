@@ -4,7 +4,7 @@
 \name{DataPaths-class}
 \alias{DataPaths}
 \alias{DataPaths-class}
-\alias{[,DataPaths,character,ANY-method}
+\alias{[,DataPaths,character,ANY,ANY-method}
 \alias{[[,DataPaths,character,ANY-method}
 \title{A class for storing file paths to intermediate data types}
 \usage{
@@ -12,7 +12,7 @@ DataPaths(path = tempdir(), rootname = "sv_data", dryrun = FALSE)
 
 \S4method{[[}{DataPaths,character,ANY}(x, i)
 
-\S4method{[}{DataPaths,character,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{DataPaths,character,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{path}{A length-one character vector specifying where the top-level directory should reside}

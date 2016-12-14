@@ -270,6 +270,7 @@ setReplaceMethod("fusions", c("TranscriptsFusion", "list"), function(object, val
       names(joined)[it] <- paste("promoter", nm.rt, sep="::")
       it <- it+1
     }
+    joined <- GRangesList(joined)
     return(joined)
   }
   for(i in seq_along(lt)){

@@ -3,7 +3,7 @@
 \docType{class}
 \name{Rearrangement-class}
 \alias{Rearrangement-class}
-\alias{[,Rearrangement,ANY,ANY-method}
+\alias{[,Rearrangement,ANY,ANY,ANY-method}
 \alias{length,Rearrangement-method}
 \alias{names,Rearrangement-method}
 \alias{partitioning}
@@ -18,7 +18,7 @@ partitioning(object)
 
 \S4method{names}{Rearrangement}(x)
 
-\S4method{[}{Rearrangement,ANY,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{Rearrangement,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{x}{a \code{Rearrangement} object}

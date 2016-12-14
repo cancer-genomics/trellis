@@ -4,8 +4,11 @@
 \name{AlignmentViews2-class}
 \alias{AlignmentViews2}
 \alias{AlignmentViews2-class}
+\alias{[,AlignmentViews2,missing,character,ANY-method}
 \alias{[,AlignmentViews2,missing,character-method}
+\alias{[,AlignmentViews2,missing,logical,ANY-method}
 \alias{[,AlignmentViews2,missing,logical-method}
+\alias{[,AlignmentViews2,missing,numeric,ANY-method}
 \alias{[,AlignmentViews2,missing,numeric-method}
 \alias{improperPaths}
 \alias{improperPaths,AlignmentViews2-method}
@@ -17,11 +20,12 @@ improperPaths(object)
 
 \S4method{improperPaths}{AlignmentViews2}(object)
 
-\S4method{[}{AlignmentViews2,missing,numeric}(x, i, j, ..., drop = FALSE)
+\S4method{[}{AlignmentViews2,missing,numeric,ANY}(x, i, j, ..., drop = FALSE)
 
-\S4method{[}{AlignmentViews2,missing,logical}(x, i, j, ..., drop = FALSE)
+\S4method{[}{AlignmentViews2,missing,logical,ANY}(x, i, j, ..., drop = FALSE)
 
-\S4method{[}{AlignmentViews2,missing,character}(x, i, j, ..., drop = FALSE)
+\S4method{[}{AlignmentViews2,missing,character,ANY}(x, i, j, ...,
+  drop = FALSE)
 }
 \arguments{
 \item{bviews}{A \code{BamViews} object}

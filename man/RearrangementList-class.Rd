@@ -10,7 +10,7 @@
 \alias{RearrangementList,list-method}
 \alias{RearrangementList,missing-method}
 \alias{RearrangementList-class}
-\alias{[,RearrangementList,ANY,ANY-method}
+\alias{[,RearrangementList,ANY,ANY,ANY-method}
 \alias{[[,RearrangementList,ANY,ANY-method}
 \alias{[[<-,RearrangementList,ANY,ANY,ANY-method}
 \alias{colData,RearrangementList,ANY-method}
@@ -48,7 +48,7 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
 
 \S4method{$}{RearrangementList}(x, name)
 
-\S4method{[}{RearrangementList,ANY,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{RearrangementList,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
 \S4method{[[}{RearrangementList,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
