@@ -257,6 +257,21 @@ setReplaceMethod("fusions", c("TranscriptsFusion", "list"), function(object, val
   joined <- list()
   it <- 1
   ## if either lt or rt has length zero, joined is an empty list
+  ## RS: 12/13/2016  Why should joined be an empty list??
+  ## e.g., the promoter of the left transcript fused with the right transcript
+  if(length(lt) == 0){
+    for(j in seq_along(rt)){
+      R <- rt[[j]]
+      nm.rt <- names(rt)[j]
+      R$orientation <- "right"
+      ##J <- c(L, R)
+      J <- R
+      joined[[it]] <- J
+      names(joined)[it] <- paste("promoter", nm.rt, sep="::")
+      it <- it+1
+    }
+    return(joined)
+  }
   for(i in seq_along(lt)){
     L <- lt[[i]]
     nm.lt <- names(lt)[i]
