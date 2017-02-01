@@ -13,5 +13,89 @@ vignette: >
 
 # Workflow
 
+This vignette requires the *svpreprocess* package for loading a views for the
+bin-level preprocessed coverage estimates.
+
+```{r packages}
+library(svpreprocess)
+library(svcnvs)
+```
+
+```{r views}
+data(pview, package="svpreprocess")
+```
+
+Update the file path in the views object to file containing the preprocessed coverage.
+
+```{r views_filepath}
+ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
+cov.file <- file.path(ddir, "preprocessed_coverage.rds")
+pview@bamPaths <- cov.file
+```
+
+TODO: show how deletions are called from the views object above.
+
+Here, we are loading an object already created by the *sv_deletions* function
+for ovarian cancer cell line CGOV44T.
+
+```{r deletion}
+data(deletion, package="svcnvs")
+```
+
 # Plotting deletions
+
+In the following code chunk, we extract the genomic coordinates for the deletion
+stored in the *deletion* object. To view the deletion in the context of the
+surrounding region, we create a second *GRanges* object that includes 200kb of
+the flanking genome on each side of the deletion.
+
+```{r region_of_interest}
+library(SummarizedExperiment)
+##
+## region of interest (roi)
+##
+roi <- variant(deletion)
+expand <- 200e3
+roi2 <- GRanges(seqnames(roi), IRanges(start(roi)-expand,
+                                       end(roi) + expand))
+```
+
+Next, we subset the views object to contain only the genomic bins in the region
+of interest defined above:
+
+```{r logratios, eval=FALSE}
+pview2 <- pview[queryHits(findOverlaps(rowRanges(pview), roi2)), ]
+segs <- readRDS(file.path(path, "grl_hg19.rds"))
+segs <- segs[[id]]
+segs.df <- as(keepSeqlevels(segs, seqlevels(roi)), "data.frame")
+df <- data.frame(logr=assays(pview2)[, 1],
+                 start=start(rowRanges(pview2)))
+df$logr <- threshold(df$logr, ylim)
+brks <- pretty(df$start, n=8)
+region <- subsetByOverlaps(segs, roi)
+region <- region[region$seg.mean < -1]
+region <- as.data.frame(region)
+xlim <- c(start(roi2), end(roi2))
+ylim <- c(-9, 2)
+C <- ggplot(df, aes(start, logr)) +
+  geom_point(size=1, color="gray50") +
+  scale_x_continuous(expand=c(0,0), breaks=brks, labels=brks/1e6)+
+  scale_y_continuous(expand=c(0,0)) +
+  geom_segment(data=segs.df,
+               aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
+               size=1) +
+  coord_cartesian(xlim=xlim, ylim=ylim) +
+  ylab(expression(log[2]~ratio)) +
+  geom_rect(data=region,
+            aes(xmin=start, xmax=end, ymin=-Inf, ymax=+Inf),
+            fill="steelblue", color="transparent", alpha=0.3,
+            inherit.aes=FALSE) +
+  theme(axis.text=element_text(size=10),
+        axis.text.x=element_blank()) + xlab("") +
+  annotate("text", x=xlim[1] + 15e3, y=-8, label="chr15", size=3)
+C1 <- ggplotGrob(C)
+```
+
+
+
 
