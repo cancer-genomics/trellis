@@ -347,7 +347,10 @@ multipleAlignmentRecords <- function(records){
 #'
 #' @return a list of blat records that map to both sides of a sequence
 #'   junction.  Each list element corresponds to one read that is
-#'   aligned to two locations.  
+#'   aligned to two locations.
+#'
+#' @examples
+#' 
 #' 
 #' @export
 #' 
