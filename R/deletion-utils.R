@@ -1044,6 +1044,10 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 #' deletion based on the preprocessed estimates of read depth and the
 #' improper read pair alignments.
 #'
+#' Note: proper read pairs near a candidate deletion are randomly sampled to
+#' reduce the size of the object. For reproducibility, set a seed prior to
+#' running this function.
+#'
 #' 
 #' @param gr a \code{GRanges} object
 #' @param aview a \code{AlignmentViews2} object
@@ -1273,8 +1277,9 @@ sv_deletion_exp2 <- function(dirs,
 #' @param ids a character vector of sample identifiers
 #' @return a \code{GRangesList} of deletions
 #' @export
-listDeletions <- function(dp, ids){
-  files <- file.path(dp["1deletions"], paste0(ids, ".rds"))
+listDeletions <- function(path="data/segment/1deletions", ids){
+  ##files <- file.path(dp["1deletions"], paste0(ids, ".rds"))
+  files <- file.path(path, paste0(ids, ".rds"))
   dels <- lapply(files, readRDS)
   names(dels) <- ids
   g <- lapply(dels, function(x) granges(variant(x)))
@@ -1375,4 +1380,34 @@ recurrentDeletions <- function(tx, grl, maxgap=5e3){
 ##  result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
 ##  rownames(result) <- NULL
 ##  result[order(result$freq, decreasing=TRUE), ]
+}
+
+thinReadPairs <- function(object, max.out=25e3){
+  rp <- readPairs(object)
+  L <- length(rp)
+  if(L > max.out){
+    d <- start(last(rp)) - end(first(rp))
+    j <- which(d < 0)
+    d[j] <- end(first(rp))[j]-start(last(rp))[j]
+    big <- d > 3e3
+    thin <- seq(1, length(rp), length.out=max.out)
+    thin <- sort(unique(c(thin, which(big))))
+    rp <- rp[thin]
+  }
+  rp
+}
+
+meltReadPairs <- function(rps){
+  is.improper <- names(rps) != ""
+  names(rps) <- NULL
+  df <- as(rps, "data.frame")
+  df$readpair <- seq_len(nrow(df))
+  df1 <- df[, c("start.first", "end.first", "readpair")]
+  df2 <- df[, c("start.last", "end.last", "readpair")]
+  colnames(df1) <- colnames(df2) <- c("start", "end", "readpair")
+  df <- rbind(df1, df2)
+  df$read <- rep(c("first", "last"), c(nrow(df1), nrow(df2)))
+  df$read <- factor(df$read, levels=c("first", "last"))
+  df$is.improper <- rep(is.improper, 2)
+  df
 }
