@@ -132,13 +132,13 @@ checkMcols <- function(x, id){
 #' library(svpreprocess)
 #' extdir <- system.file("extdata", package="svclasses")
 #' bviews <- readRDS(file.path(extdir, "bamviews_example.rds"))
-#' 
+#'
 #' set.seed(123)
 #' gc <- round(runif(nrow(bviews), 30, 80), 0)
 #' mp <- as.integer(round(runif(nrow(bviews), 600, 1000), 0))
 #' bamRanges(bviews)$gc <- gc
 #' bamRanges(bviews)$map <- mp
-#' 
+#'
 #' unlink(DataPaths(tempdir(), "Test", dryrun=TRUE))
 #' tree <- DataPaths(tempdir(), "Test", dryrun=FALSE)
 #' views <- countExperiment2(bviews, tree)
