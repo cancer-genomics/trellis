@@ -35,14 +35,23 @@ pview@bamPaths <- cov.file
 
 TODO: show how deletions are called from the views object above.
 
-Here, we are loading an object already created by the *sv_deletions* function
-for ovarian cancer cell line CGOV44T.
+Here, we are loading results from segmentation of the preprocessed coverage as
+well as an object of called deletions from the *sv_deletions* function for the
+ovarian cancer cell line CGOV44T.
 
 ```{r deletion}
+data(segments, package="svcnvs")
 data(deletion, package="svcnvs")
 ```
 
 # Plotting deletions
+
+We will use the *ggplot2* and *gridExtra* packages for plotting the deletions.
+
+```{r plot_libraries}
+library(ggplot2)
+library(gridExtra)
+```
 
 In the following code chunk, we extract the genomic coordinates for the deletion
 stored in the *deletion* object. To view the deletion in the context of the
@@ -55,29 +64,41 @@ library(SummarizedExperiment)
 ## region of interest (roi)
 ##
 roi <- variant(deletion)
+roi <- keepSeqlevels(roi, as.character(seqnames(roi)))
 expand <- 200e3
 roi2 <- GRanges(seqnames(roi), IRanges(start(roi)-expand,
                                        end(roi) + expand))
 ```
 
 Next, we subset the views object to contain only the genomic bins in the region
-of interest defined above:
+of interest defined above. In addition, we create a data.frame containing all
+the segments for this particular chromosome and sample and a data.frame
+containing the preprocessed coverage.
 
-```{r logratios, eval=FALSE}
+```{r dataframes, eval=FALSE}
 pview2 <- pview[queryHits(findOverlaps(rowRanges(pview), roi2)), ]
-segs <- readRDS(file.path(path, "grl_hg19.rds"))
-segs <- segs[[id]]
-segs.df <- as(keepSeqlevels(segs, seqlevels(roi)), "data.frame")
+segs <- keepSeqlevels(segments, seqlevels(roi), pruning.mode="coarse")
+segs.df <- as(segs, "data.frame")
 df <- data.frame(logr=assays(pview2)[, 1],
                  start=start(rowRanges(pview2)))
+```
+
+We restrict the y-axis limits to a suitable range for visualizing the log
+ratios, thresholding log ratios that are extreme. We highlight the region
+identified by the segmentation in the ggplot graphic and use dashed lines to
+indicate the more precise deletion boundaries identified from the rearranged
+read pairs that were used in the *sv_deletion* function. 
+
+```{r plot_logratios}
+ylim <- c(-9, 2)
 df$logr <- threshold(df$logr, ylim)
 brks <- pretty(df$start, n=8)
 region <- subsetByOverlaps(segs, roi)
 region <- region[region$seg.mean < -1]
 region <- as.data.frame(region)
 xlim <- c(start(roi2), end(roi2))
-ylim <- c(-9, 2)
-C <- ggplot(df, aes(start, logr)) +
+
+A <- ggplot(df, aes(start, logr)) +
   geom_point(size=1, color="gray50") +
   scale_x_continuous(expand=c(0,0), breaks=brks, labels=brks/1e6)+
   scale_y_continuous(expand=c(0,0)) +
@@ -93,8 +114,12 @@ C <- ggplot(df, aes(start, logr)) +
   theme(axis.text=element_text(size=10),
         axis.text.x=element_blank()) + xlab("") +
   annotate("text", x=xlim[1] + 15e3, y=-8, label="chr15", size=3)
-C1 <- ggplotGrob(C)
+A1 <- ggplotGrob(A)
 ```
+
+We would like to visualize the log ratio
+
+
 
 
 
