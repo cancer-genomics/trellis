@@ -18,6 +18,5 @@ License: Artistic-2.0
 LazyData: true
 Suggests:
     testthat,
-    TestBams,
-    svovarian
+    TestBams
 RoxygenNote: 5.0.1
