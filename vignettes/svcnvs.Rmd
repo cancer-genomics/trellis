@@ -1,0 +1,17 @@
+---
+title: "Overview of svcnvs package"
+author: "Robert Scharpf"
+date: \today
+output: BiocStyle::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Overview of svcnvs package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc} 
+---
+
+# Introduction
+
+# Workflow
+
+# Plotting deletions
+
