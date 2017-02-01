@@ -51,6 +51,7 @@ We will use the *ggplot2* and *gridExtra* packages for plotting the deletions.
 ```{r plot_libraries}
 library(ggplot2)
 library(gridExtra)
+library(scales)
 ```
 
 In the following code chunk, we extract the genomic coordinates for the deletion
@@ -117,10 +118,47 @@ A <- ggplot(df, aes(start, logr)) +
 A1 <- ggplotGrob(A)
 ```
 
-We would like to visualize the log ratio
+In addition to the log ratios, we would like to visualize the rearranged read
+pairs (read pairs with aberrant spacing or orientation with respect to the
+reference genome) that support the deletion. The rearranged read pairs
+supporting the deletion are encapsulated in the *deletion* object that we
+already loaded. First, we pull read pairs flanking the candidate deletion that
+have normal spacing and orientation. Because there are typically a large number
+of the normal read pairs, we thin these using the function *thinReadPairs*.
+Next, we melt these reads into a *data.frame* useful for plotting.
+
+```{r rearranged_reads}
+rps <- thinReadPairs(deletion)
+rps <- meltReadPairs(rps)
+```
+
+We again use *ggplot* to plot the data:
+
+```{r plot_rearranged_reads}
+colors <- c("#0072B2", "#009E73")
+p <- ggplot(rps, aes(ymin=readpair-0.2, ymax=readpair+0.2,
+                xmin=start/1e6, xmax=end/1e6, color=read,
+                fill=read, group=readpair)) +
+  geom_rect() +
+  xlim(c(min(rps$start), max(rps$end))/1e6) +
+  geom_line(aes(x=start/1e6, y=readpair)) +
+  ylab("read pair index") +
+  scale_x_continuous(breaks=pretty_breaks(5)) +
+  geom_rect(data=region,
+            aes(xmin=start/1e6, xmax=end/1e6, ymin=-Inf, ymax=+Inf),
+            fill="steelblue", color="transparent", alpha=0.2,
+            inherit.aes=FALSE) +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors) + 
+  xlab("Mb") +
+  theme(axis.text.x=element_text(size=7)) +
+  guides(fill=FALSE, color=FALSE)
+B <- ggplotGrob(p)
+```
 
 
+Finally, we make a composite graphic of the log ratios and rearranged reads:
 
-
-
-
+```{r compoisite}
+grid.arrange(A1, B, ncol=1)
+```
