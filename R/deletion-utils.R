@@ -285,7 +285,7 @@ addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
   irp <- updateObject(irp)
   si <- seqinfo(aview)
   sl <- seqlevels(si)
-  irp <- keepSeqlevels(irp, sl)
+  irp <- keepSeqlevels(irp, sl, pruning.model="coarse")
   d <- abs(start(first(irp)) - start(last(irp)))
   irp <- irp[d < maximumWidth(param)]
   seqlevelsStyle(irp) <- seqlevelsStyle(si)
@@ -569,7 +569,7 @@ improperReadPairs <- function(aview, gr, param=DeletionParam()){
   irp <- updateObject(irp)
   si <- seqinfo(aview)
   sl <- seqlevels(si)
-  irp <- keepSeqlevels(irp, sl)
+  irp <- keepSeqlevels(irp, sl, pruning.mode="coarse")
   d <- abs(start(first(irp)) - start(last(irp)))
   irp <- irp[d < maximumWidth(param)]
   seqlevelsStyle(irp) <- seqlevelsStyle(si)
