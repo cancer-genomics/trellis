@@ -357,7 +357,7 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
     rg <- filterBy(rg, rgs)
     rg <- sort(c(rg, trimmed))
     names(rg) <- ampliconNames(rg)
-    rg <- keepSeqlevels(rg, sl)
+    rg <- keepSeqlevels(rg, sl, pruning.mode="coarse")
     seqinfo(rg) <- si
     ranges(object) <- rg
   }
