@@ -542,7 +542,7 @@ addVariant <- function(v, object, cn, cncall, param){
     j <- unique(queryHits(hits))
     newg <- g[j]
     ##if(length(newg) > 1) browser()
-    seqlevels(newg,force=TRUE) <- seqlevels(variant(object))
+    seqlevels(newg, pruning.mode="coarse") <- seqlevels(variant(object))
     seqinfo(newg) <- seqinfo(variant(object))
     epsilon <- rep(log2(1/50), length(newg))
     object2 <- addVariant(newg,
@@ -794,7 +794,7 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, par
     g <- g[overlapsAny(g, homdel)]
     g <- g[width(g) >= 2e3]
     g <- GRanges(seqnames(g)[1], IRanges(min(start(g)), max(end(g))))
-    seqlevels(g,force=TRUE) <- seqlevels(homdel)
+    seqlevels(g, pruning.mode="coarse") <- seqlevels(homdel)
     seqinfo(g) <- seqinfo(homdel)
     object2 <- addVariant(v=g,
                           object=object,
@@ -816,7 +816,7 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, par
     copynumber(object2)[K] <- means
     return(object2)
   }
-  seqlevels(hemdel,force=TRUE) <- seqlevels(homdel)
+  seqlevels(hemdel,pruning.mode="coarse") <- seqlevels(homdel)
   seqinfo(hemdel) <- seqinfo(homdel)
   portion_notspanning <- setdiff(hemdel, homdel)
   means <- granges_copynumber(portion_notspanning, pview)
