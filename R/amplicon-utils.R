@@ -1093,18 +1093,6 @@ sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters,
 
 
 #' @export
-listAmplicons <- function(dp, ids){
-  files <- file.path(dp["2amplicons"], paste0(ids, ".rds"))
-  amp_grl <- lapply(files, readRDS)
-  amp_grl <- GRangesList(lapply(amp_grl, amplicons))
-  nms <- rep(ids, elementNROWS(amp_grl))
-  amps <- unlist(amp_grl)
-  amps$id <- nms
-  names(amps) <- NULL
-  split(amps, factor(amps$id, levels=ids))
-}
-
-#' @export
 recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   ## tx is big.  Make this smaller as a first step
   tx <- subsetByOverlaps(tx, reduce(unlist(grl), min.gapwidth=maxgap))
