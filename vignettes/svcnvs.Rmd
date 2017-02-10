@@ -11,10 +11,19 @@ vignette: >
 
 # Introduction
 
+This package is used to segment normalized coverage by circular binary
+segmentation and to identify deletions and amplicons through a combination of
+changes in normalized coverage and read pairs with aberrant spacing or
+orientation. *Segmentation should probably be extracted into a separate
+package.*
+
 # Workflow
 
 This vignette requires the *svpreprocess* package for loading a views for the
-bin-level preprocessed coverage estimates.
+bin-level preprocessed coverage estimates. *TODO: Purpose of modular processing
+is not to depend on the preprocessing package. Read in normalized coverage from
+a GRanges object. Save to disk in the appropriate format and instantiate the
+Views object below from scratch*.
 
 ```{r packages}
 library(svpreprocess)
