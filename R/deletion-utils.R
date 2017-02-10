@@ -1382,6 +1382,14 @@ recurrentDeletions <- function(tx, grl, maxgap=5e3){
 ##  result[order(result$freq, decreasing=TRUE), ]
 }
 
+#' Extract read pairs from a \code{StructuralVariant} object
+#'
+#' This function extracts all read pairs from a StructuralVariant object and
+#' then performs a filtering step. The filtering step thins the number of read
+#' pairs with insert size less than 3kb. 
+#' 
+#' @param object  a \code{StructuralVariant} object
+#' @export
 thinReadPairs <- function(object, max.out=25e3){
   rp <- readPairs(object)
   L <- length(rp)
