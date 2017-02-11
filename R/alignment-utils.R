@@ -112,8 +112,7 @@ properAlignmentFlags <- function(){
 }
 
 
-#' Helper function for specifying flags for reading improperly
-#' paired reads
+#' Helper function for specifying flags for reading properly or improperly paired reads
 #'
 #' This is a wrapper to \code{ScanBamParam}
 #'
@@ -133,8 +132,15 @@ properAlignmentFlags <- function(){
 #' 
 #' @param flags A length-two integer vector as provided by \code{improperAlignmentFlags}
 #' @export
+#' @rdname alignment-flags
 improperAlignmentParams <- function(flags=improperAlignmentFlags()){
-  ScanBamParam(flag=improperAlignmentFlags(), what=c("flag", "mrnm", "mpos", "mapq"))
+  ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
+}
+
+#' @export
+#' @rdname alignment-flags
+properAlignmentParams <- function(flags=properAlignmentFlags()){
+  ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
 }
 
 
@@ -155,7 +161,7 @@ improperAlignmentParams <- function(flags=improperAlignmentFlags()){
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(object,
-                                      param,
+                                      param=improperAlignmentParams(),
                                       mapq_thr=-Inf,
                                       use.mcols=TRUE){
   bam.file <- bamPaths(object)
@@ -189,7 +195,7 @@ getImproperAlignmentPairs <- function(object,
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getProperAlignmentPairs <- function(object,
-                                    param,
+                                    param=properAlignmentParams(),
                                     mapq_thr=-Inf,
                                     use.mcols=TRUE){
   bam.file <- bamPaths(object)
