@@ -18,5 +18,6 @@ License: Artistic-2.0
 LazyData: true
 Suggests:
     testthat,
-    svbams
+    svbams,
+    TxDb.Hsapiens.UCSC.hg19.refGene
 RoxygenNote: 6.0.1

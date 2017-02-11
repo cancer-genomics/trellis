@@ -22,44 +22,32 @@ test_that("improper alignment parameters", {
   library(svalignments)
   path <- system.file("extdata", package="svbams")
 
+  library(TxDb.Hsapiens.UCSC.hg19.refGene)
+  region <- GRanges("chr15", IRanges(63201003, 63209243))
+  si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
+  seqinfo(region) <- si["chr15", ]
+
+  bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
+  bview <- BamViews(bamPaths=bampath)
+
+  iparams <- improperAlignmentParams()
+  pparams <- properAlignmentParams()
   irp <- getImproperAlignmentPairs(bview,
                                    iparams,
                                    mapq_thr=30,
                                    use.mcols=TRUE)
+  expect_identical(length(irp), 445L)
+  g.irp <- ga2gr(irp, is.improper=TRUE)
+  expect_identical(length(g.irp), 445L*2L)
+  expect_true(all(g.irp$is.improper))
+
   prp <- getProperAlignmentPairs(bview,
                                  pparams,
                                  mapq_thr=30,
                                  use.mcols=TRUE)
-  readPairs <- function(bview, mapq_thr=30){
-    irp <- getImproperAlignmentPairs(bview,
-                                     iparams,
-                                     mapq_thr=30,
-                                     use.mcols=TRUE)
-    prp <- getProperAlignmentPairs(bview,
-                                   pparams,
-                                   mapq_thr=30,
-                                   use.mcols=TRUE)
-    ##mcols(prp)$is.improper <- FALSE
-    ##mcols(irp)$is.improper <- TRUE
-  }
-
-  r1.irp <- granges(first(irp))
-  r2.irp <- granges(last(irp))
-  names(r1.irp) <- names(r2.irp) <- NULL
-  r1.irp$read <- "R1"
-  r2.irp$read <- "R2"
-  r1.irp$is.improper <- r2.irp$is.improper <- TRUE
-  r1.prp <- granges(first(prp))
-  r2.prp <- granges(last(prp))
-  names(r1.prp) <- names(r2.prp) <- NULL
-  r1.prp$read <- "R1"
-  r2.prp$read <- "R2"
-  r1.prp$is.improper <- r2.prp$is.improper <- FALSE
-  r1 <- c(r1.prp, r1.irp)
-  r2 <- c(r2.prp, r2.irp)
-  r1$pair.id <- seq_len(length(r1))
-  r2$pair.id <- seq_len(length(r2))
-  g <- c(r1, r2)
+  g.prp <- ga2gr(prp, is.improper=FALSE)
+  expect_identical(length(g.prp), length(prp) * 2L)
+  expect_true(!any(g.prp$is.improper))
 })
 
 

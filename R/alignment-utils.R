@@ -414,3 +414,19 @@ get_improper_readpairs <- function(object, bam.file){
   galp <- galp[validR1 & validR2]
   galp
 }
+
+#' Convert GAlignments to GRanges with is.improper and pair.index fields
+#' @param ga a \code{GAlignments} object
+#' @param is.improper length-one logical vector.  Are the reads improperly paired?
+#' @export
+#' @examples
+#' 
+ga2gr <- function(ga, is.improper=FALSE){
+  r1.ga <- granges(first(ga))
+  r2.ga <- granges(last(ga))
+  names(r1.ga) <- names(r2.ga) <- NULL
+  r1.ga$read <- "R1"
+  r2.ga$read <- "R2"
+  r1.ga$is.improper <- r2.ga$is.improper <- is.improper
+  c(r1.ga, r2.ga)
+}
