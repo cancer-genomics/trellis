@@ -90,7 +90,7 @@ makeGAlignmentPairs2 <- function(x, use.names=FALSE, use.mcols=FALSE, strandMode
 #' flags2 <- improperAlignmentFlags()
 #' identical(flags, flags2)
 #' print(flags)
-#' 
+#' @rdname alignment-flags
 #' @export
 improperAlignmentFlags <- function(){
   flags <- scanBamFlag(isDuplicate=FALSE,
@@ -98,6 +98,17 @@ improperAlignmentFlags <- function(){
                        isUnmappedQuery=FALSE,
                        hasUnmappedMate=FALSE,
                        isProperPair=FALSE)
+}
+
+
+#' @rdname alignment-flags
+#' @export
+properAlignmentFlags <- function(){
+  flags <- scanBamFlag(isDuplicate=FALSE,
+                       isPaired=TRUE,
+                       isUnmappedQuery=FALSE,
+                       hasUnmappedMate=FALSE,
+                       isProperPair=TRUE)
 }
 
 
