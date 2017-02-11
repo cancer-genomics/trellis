@@ -10,7 +10,7 @@ test_that("overlapsBoth", {
   ## number split reads
   n_splitreads <- length(split(rearranged_reads[[1]], rearranged_reads[[1]]$qname))
   expect_identical(n_splitreads, 32L)
-  
+
   ## this should exit gracefully with no rearranged reads identified
   rearranged_reads <- rearrangedReads(rearrangement_list, blat_unmapped[1:10, ], 500)
   expect_identical(length(rearranged_reads), 0L)

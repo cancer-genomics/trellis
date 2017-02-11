@@ -16,7 +16,12 @@ test_that("improper alignment parameters", {
 
 .test_that <- function(expr, ...) NULL
 
-.test_that("expr", {
+.test_that("read_pairs_from_bam", {
+  library(Rsamtools)
+  library(svbams)
+  library(svalignments)
+  path <- system.file("extdata", package="svbams")
+
   irp <- getImproperAlignmentPairs(bview,
                                    iparams,
                                    mapq_thr=30,
