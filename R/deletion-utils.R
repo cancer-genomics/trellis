@@ -1358,7 +1358,7 @@ numberSpanningAmplicons <- function(tx, grl, maxgap=5e3){
 recurrentDeletions <- function(tx, grl, maxgap=5e3){
   stop("needs refactoring")
 ##  gr <- unlist(grl)
-##  
+##
 ##
 ##  is_overlap <- is_overlap[ cnts > 1, ] 
 ##  cnts <- cnts[ cnts > 1 ]
@@ -1386,8 +1386,8 @@ recurrentDeletions <- function(tx, grl, maxgap=5e3){
 #'
 #' This function extracts all read pairs from a StructuralVariant object and
 #' then performs a filtering step. The filtering step thins the number of read
-#' pairs with insert size less than 3kb. 
-#' 
+#' pairs with insert size less than 3kb.
+#'
 #' @param object  a \code{StructuralVariant} object
 #' @export
 thinReadPairs <- function(object, max.out=25e3){
