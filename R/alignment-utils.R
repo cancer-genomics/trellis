@@ -172,6 +172,40 @@ getImproperAlignmentPairs <- function(object,
   irp2
 }
 
+#' Function used by rearrangement analysis to extract the sequence of
+#' properly paired reads
+#'
+#' @return a \code{GAlignmentPairs} object
+#' @keywords internal
+#' @export
+#' @param object a \code{BamViews} object
+#' @param param a \code{ScanBamParam} object.
+#' @param mapq_thr the minimum mapq score (numeric)
+#' @param use.mcols logical
+#' 
+#' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
+#'   for details regarding \code{use.mcols} argument.  See
+#'   \code{\link{improperAlignmentParams}} for creating a
+#'   \code{ScanBamParam} object with the appropriate flags for
+#'   extracting improper read pairs.
+getProperAlignmentPairs <- function(object,
+                                    param,
+                                    mapq_thr=-Inf,
+                                    use.mcols=TRUE){
+  bam.file <- bamPaths(object)
+  flags <- properAlignmentFlags()
+  if(missing(param)){
+    param <- ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
+  }
+  irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
+  irp <- .trimInvalidReadsGAlign(irp)
+  if(mapq_thr > -Inf){
+    irp <- irp[ mcols(irp)$mapq >= mapq_thr ]
+  }
+  irp2 <- makeGAlignmentPairs2(irp, use.mcols=use.mcols, use.names=TRUE)
+  irp2
+}
+
 #' Parse improper read pairs from a bam file
 #'
 #' Parses improper read pairs from a bam file and saves the result as
@@ -274,7 +308,7 @@ validPairForDeletion <- function(galp){
 
 #' Import properly paired reads from a bam file
 #'
-#' 
+#'
 #' @return a \code{GAlignmentPairs} object
 #' @export
 #' @param bam_path character string providing complete path to bam file
