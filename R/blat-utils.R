@@ -2,14 +2,14 @@
 #'
 #' The command-line version of blat can be downloaded from sourceforge:
 #' \url{http://sourceforge.net/projects/blat/files/}
-#' 
+#'
 #' @export
 #' @param filename character string providing full path to blat output
 #' @return a \code{data.frame} of alignment records from blat
-#' 
+#'
 #' @seealso See \code{\link{blatScores}} for evaluating whether the
 #'   blat alignments support a novel sequence junction
-#' 
+#'
 readBlat <- function(filename){
   blat <- read.delim(filename, skip=2, nrows=5, stringsAsFactors=FALSE, sep="\t", header=FALSE)
   nms <- paste0(as.character(blat[1, ]), as.character(blat[2, ]))
@@ -24,13 +24,13 @@ readBlat <- function(filename){
 blatGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
   g <- GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
                strand=factor(blat$strand, levels=c("+", "-", "*")))
-  seqlevels(g, force=TRUE) <- sl
+  seqlevels(g, pruning.mode="coarse") <- sl
   g
 }
 
 elandGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
   g <- GRanges(blat$eland.chr, IRanges(blat$eland.start, blat$eland.end))
-  seqlevels(g, force=TRUE) <- sl
+  seqlevels(g, pruning.mode="coarse") <- sl
   g
 }
 
