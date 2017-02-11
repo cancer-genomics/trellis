@@ -79,7 +79,7 @@ TODO: check whether BioC automatically handles this query
 
 ```
 
-For visualization, we combine the read pairs in a single object.
+For visualization, te combine the read pairs in a single object.
 
 ```{r combine}
 library(GenomicAlignments)

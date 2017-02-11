@@ -2,10 +2,13 @@
 
 export(blatScores)
 export(getImproperAlignmentPairs)
+export(getProperAlignmentPairs)
 export(get_improper_readpairs)
 export(get_readpairs)
 export(improperAlignmentFlags)
 export(improperAlignmentParams)
+export(properAlignmentFlags)
+export(properAlignmentParams)
 export(properReadPairs)
 export(readBlat)
 export(readPairsNearVariant)

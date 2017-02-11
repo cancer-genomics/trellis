@@ -14,9 +14,9 @@ test_that("improper alignment parameters", {
   expect_identical(params, params2)
 })
 
-.test_that <- function(expr) NULL
+.test_that <- function(expr, ...) NULL
 
-.test_that(){
+.test_that("expr", {
   irp <- getImproperAlignmentPairs(bview,
                                    iparams,
                                    mapq_thr=30,
@@ -55,7 +55,7 @@ test_that("improper alignment parameters", {
   r1$pair.id <- seq_len(length(r1))
   r2$pair.id <- seq_len(length(r2))
   g <- c(r1, r2)
-}
+})
 
 
 
