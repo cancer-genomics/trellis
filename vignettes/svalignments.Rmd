@@ -12,8 +12,11 @@ vignette: >
 # Introduction
 
 This package is used to extract properly paired reads and improperly paired
-reads from bam files. The main use-case is to identify rearranged read pairs
-that support structural variants. We assume that users have a BAM file. 
+reads from bam files. The main use-cases are (1) to identify rearranged read
+pairs that support structural variants, (2) assess BLAT realignment of selected
+reads for consistency with putative rearrangements and the whole-genome aligner.
+Most use-cases require a BAM file. For the puporse of illustrating examples in
+this vignette, we use BAM files in the `svbams` package.
 
 # Extract rearranged read pairs from a BAM file for a region of interest
 
@@ -50,7 +53,7 @@ bview <- BamViews(bamPaths=bampath)
 The following wrapper for `ScanBamParams` provides a default instance of the
 class with parameters for extracting improperly paired reads.
 
-```{r scanbamparams}
+i```{r scanbamparams}
 iparams <- improperAlignmentParams()
 pparams <- properAlignmentParams()
 ```
