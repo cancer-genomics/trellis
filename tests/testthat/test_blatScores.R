@@ -21,7 +21,7 @@ test_that("blatScores", {
                       strand=rep("+", 10),
                       start=Tstart,
                       end=Tend,
-                      seq=replicate(10, paste(sample(c("g","c"), 10, replace=TRUE), collapse="")),
+                      seq=replicate(10, paste(sample(c("g","c"), 100, replace=TRUE), collapse="")),
                       stringsAsFactors=FALSE)
   stags$id <- "CGOV32T"
   stags$rearrangement.id <- "1-3"
@@ -31,7 +31,14 @@ test_that("blatScores", {
   blat <- annotateBlatRecords(sblat, stags)
   expect_true(nrow(blat) == 20)
   s <- blatScores(sblat, stags, "SOME_ID")
+  ## none pass because the tag length is very small
   expect_true(all(s$passQC))
+
+  is.pass <- blatStatsPerTag(blat, tag_length=10)
+  expect_true(!any(is.pass))
+
+  is.pass <- blatStatsPerTag(blat, tag_length=100)
+  expect_true(all(is.pass))
 
   ## Add reads that map to different locations with low alignment scores
   matchScores <- rep(95, length(qnames))
@@ -45,6 +52,9 @@ test_that("blatScores", {
                     strand="+",
                     stringsAsFactors=FALSE)
   sblat2 <- rbind(sblat, tmp)
+  ##
+  ## these should all pass since off-target have low scores
+  ##
   s2 <- blatScores(sblat2, stags, "SOME_ID")
   expect_true(all(s2$passQC))
 
