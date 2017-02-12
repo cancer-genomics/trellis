@@ -70,26 +70,32 @@ not_in_filters <- function(x, filters){
 #' Segmentation of the transformed counts is performed by the circular
 #' binary segmentation algorithm implemented in the \code{DNAcopy}
 #' package.
-#' 
+#'
 #' @param param a \code{SegmentParam} object
-#' @param bins a \code{GRanges} object containing adjusted counts.  Note, the adjusted counts must be stored in a column named \code{adjusted}.
+#'
+#' @param bins a \code{GRanges} object containing adjusted counts. Note, the
+#'   adjusted counts must be stored in a column named \code{adjusted}.
+#'
 #' @param ... additional arguments to \code{segment} in the \code{DNAcopy} package
-#' @seealso \code{\link[DNAcopy]{segment}} for description of circular
-#'   binary segmentation and references therein; see
-#'   \code{\link[svclasses]{SegmentParam-class}} for a description of the default
-#'   parameters settings passed to the \code{segment} function. See \code{\link[svpreprocess]{sv_preprocess}} for obtaining normalized counts for segmentation.
+#'
+#' @seealso \code{\link[DNAcopy]{segment}} for description of circular binary
+#'   segmentation and references therein; see
+#'   \code{\link[svclasses]{SegmentParam-class}} for a description of the
+#'   default parameters settings passed to the \code{segment} function. See
+#'   \code{\link[svpreprocess]{sv_preprocess}} for obtaining normalized counts
+#'   for segmentation.
 #' @export
 segmentBins <- function(bins, param=SegmentParam(), ...){
   chroms <- seqlevels(bins)
   results <- vector("list", length(chroms))
   for(i in seq_along(chroms)){
     chr <- chroms[i]
-    chrbins <- keepSeqlevels(bins, chr)
+    chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
     if(length(chrbins) < 2) next()
     results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }
   g <- unlist(GRangesList(results))
-  seqlevels(g, force=TRUE) <- seqlevels(bins)
+  seqlevels(g, pruning.mode="coarse") <- seqlevels(bins)
   seqinfo(g) <- seqinfo(bins)
   g
 }
@@ -101,7 +107,7 @@ segmentCoverage <- function(object, param=SegmentParam(), ...){
   results <- vector("list", length(chroms))
   for(i in seq_along(chroms)){
     chr <- chroms[i]
-    obj <- keepSeqlevels(object, chr)
+    obj <- keepSeqlevels(object, chr, pruning.mode="coarse")
     if(nrow(obj) < 2) next()
     results[[i]] <- .segment(obj, param=param, ...)
   }
