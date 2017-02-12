@@ -113,7 +113,7 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
 #'   \code{paste0("sv", seq_along(g))} where g is the \code{GRanges}
 #'   object.
 #'
-#' 
+#'
 #' @param cnv  A \code{GRanges} object (e.g., candidate somatic deletions)
 #' @param germline_filters A \code{GRanges} object (e.g., germline
 #'   CNVs and regions of low sequence quality)
@@ -323,7 +323,8 @@ addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
 #'   content
 #' @param param A \code{DeletionParam} object
 deletion_call <- function(aview, pview, cnv, 
-                          gr_filters, param=DeletionParam()){
+                          gr_filters,
+                          param=DeletionParam()){
   if(!is.null(gr_filters)){
     cnv <- germlineFilters(cnv, gr_filters, pview, param)
   } else {
