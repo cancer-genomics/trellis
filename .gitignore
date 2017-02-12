@@ -5,3 +5,4 @@
 man/
 /svalignments.Rproj
 data/*
+/vignettes/svalignments.pdf

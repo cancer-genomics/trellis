@@ -11,12 +11,11 @@ vignette: >
 
 # Introduction
 
-This package is used to extract properly paired reads and improperly paired
-reads from bam files. The main use-cases are (1) to identify rearranged read
-pairs that support structural variants, (2) assess BLAT realignment of selected
-reads for consistency with putative rearrangements and the whole-genome aligner.
-Most use-cases require a BAM file. For the puporse of illustrating examples in
-this vignette, we use BAM files in the `svbams` package.
+The main use-cases of the `svalignments` package are (1) to identify rearranged
+read pairs that support structural variants, (2) assess BLAT realignment of
+selected reads for consistency with putative rearrangements and the whole-genome
+aligner. Most use-cases require a BAM file. For the purpose of illustrating
+examples in this vignette, we use BAM files in the `svbams` package.
 
 # Extract rearranged read pairs from a BAM file for a region of interest
 
@@ -26,6 +25,7 @@ following code chunk, we load the `svbams` package which contains a small
 bam files for a region of chr15.  
 
 ```{r svbams}
+library(GenomicAlignments)
 library(Rsamtools)
 library(svbams)
 library(svalignments)
@@ -43,6 +43,15 @@ si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
 seqinfo(region) <- si["chr15", ]
 ```
 
+To be sure this region is big enough to capture any interesting nearby features,
+we expand the region of interest to include 5kb on either side of the candidate
+sequence junctions. 
+
+```{r expand}
+region.expand <- GRanges("chr15", IRanges(start(region)-5e3, end(region)+5e3))
+seqinfo(region.expand) <- seqinfo(region)
+```
+ 
 Next, we create a BamViews object that will contain metadata on the bamfiles.
 
 ```{r bamviews}
@@ -51,98 +60,66 @@ bview <- BamViews(bamPaths=bampath)
 ```
 
 The following wrapper for `ScanBamParams` provides a default instance of the
-class with parameters for extracting improperly paired reads.
+class with parameters for extracting improperly paired reads. Note that if
+`which` is missing for `improperAlignmentParams`, all improperly paired reads
+will be extracted from the BAM file. For large BAM files, this can be very slow.
 
-i```{r scanbamparams}
-iparams <- improperAlignmentParams()
-pparams <- properAlignmentParams()
+```{r scanbamparams}
+iparams <- improperAlignmentParams(which=region.expand)
+pparams <- properAlignmentParams(which=region.expand)
 ```
 
-To be sure our region is big enough to capture any interesting nearby features,
-we expand the region of interest to include 5kb on either side of the candidate
-sequence junctions. Next, we specify which part of the indexed BAM file should
-be queried by setting the `which` field in the `ScanBamParam` object.
+Next, we extract a `GAlignmentsPairs` object encapsulating all of the improperly
+and properly paired reads in this region.
 
-```{r expand}
-region.expand <- GRanges("chr15", IRanges(start(region)-5e3, end(region)+5e3))
-seqinfo(region.expand) <- seqinfo(region)
-bamWhich(iparams) <- region.expand
-bamWhich(pparams) <- region.expand
-iparams
-pparams
+```{r GAlignmentPairs}
+irp <- getImproperAlignmentPairs(bview,
+                                 iparams,
+                                 mapq_thr=30,
+                                 use.mcols=TRUE)
+prp <- getProperAlignmentPairs(bview,
+                               pparams,
+                               mapq_thr=30,
+                               use.mcols=TRUE)
 ```
 
-Note, one could extract all improperly paired reads in the BAM file by not
-setting the `which` field. Finally, we read (separately) the improperly-paired
-and properly-paired reads.
-
-TODO: check whether BioC automatically handles this query
-
-```{r improper_pairs}
-
-```
-
-For visualization, te combine the read pairs in a single object.
+For visualization, we melt the `GAlignmentPairs` to `GRanges` and coerce to a
+data.frame. Depending on the size of the region, plotting all properly paired
+reads may not be desirable.
 
 ```{r combine}
-library(GenomicAlignments)
+igr <- ga2gr(irp, is.improper=TRUE)
+pgr <- ga2gr(prp, is.improper=FALSE)
+pgr <- thinProperPairs(pgr, 10)
+gr <- sortByRead1(c(igr, pgr))
+df <- as(gr, "data.frame")
 ```
 
-Below, we create a `StructuralVariant` object. This is really a mess. We need
-unit-testing, better names for the indexing functions, and an easier way to
-instantiate a `StructuralVariant` object from. pseudocode:
-```{r pseudocode, eval=FALSE}
-sv <- StructuralVariant(region, bamfile)
-```
-
-```{r readpairs}
-names(roi) <- "sv1"
-prp_index <- initializeProperIndex2(roi, prp)
-irp_index1 <- initializeImproperIndex2(roi, irp, DeletionParam())
-irp_index2 <- updateImproperIndex2(roi, irp, maxgap=2e3)
-irp_index3 <- .match_index_variant(irp_index1, roi, irp_index2)
-sv <- StructuralVariant(variant=roi,
-                        proper=prp,
-                        improper=irp,
-                        calls="homozygous",
-                        index_proper=prp_index,
-                        index_improper=irp_index3)
-```
-
-
-```{r rearranged_reads2}
-rps <- thinReadPairs(sv, max.out=10000)
-rps <- meltReadPairs(rps)
-```
-
-We again use *ggplot* to plot the data:
-
-```{r plot_rearranged_reads2}
+```{r plot_readpairs, fig.height=5, fig.width=7}
+library(ggplot2)
+library(scales)
 colors <- c("#0072B2", "#009E73")
-fig <- ggplot(rps, aes(ymin=readpair-0.2, ymax=readpair+0.2,
-                xmin=start/1e6, xmax=end/1e6, color=read,
-                fill=read, group=readpair)) +
+df$tagid <- as.numeric(df$tagid)
+ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
+               xmin=start/1e6, xmax=end/1e6, color=read,
+               fill=read, group=tagid)) +
   geom_rect() +
-  xlim(c(min(rps$start), max(rps$end))/1e6) +
-  geom_line(aes(x=start/1e6, y=readpair)) +
+  xlim(c(min(df$start), max(df$end))/1e6) +
+  geom_line(aes(x=start/1e6, y=tagid)) +
   ylab("read pair index") +
   scale_x_continuous(breaks=pretty_breaks(5)) +
-  geom_rect(data=region,
+  geom_rect(data=as.data.frame(region),
             aes(xmin=start/1e6, xmax=end/1e6, ymin=-Inf, ymax=+Inf),
             fill="steelblue", color="transparent", alpha=0.2,
             inherit.aes=FALSE) +
   scale_color_manual(values=colors) +
-  scale_fill_manual(values=colors) + 
+  scale_fill_manual(values=colors) +
   xlab("Mb") +
-  theme(axis.text.x=element_text(size=7)) +
+  theme(axis.text.x=element_text(size=7),
+        axis.text.y=element_blank()) +
   guides(fill=FALSE, color=FALSE)
 ```
 
-Revising the boundaries: see `.reviseEachJunction`.
+## Assessing BLAT alignments
 
-```{r test, eval=FALSE}
-g <- reviseDeletionBorders(sv)
-g1 <- variant(sv)
-
-```
-
+TODO

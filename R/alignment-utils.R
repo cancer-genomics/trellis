@@ -130,17 +130,21 @@ properAlignmentFlags <- function(){
 #' print(params2)
 #' identical(params, params2)
 #' 
-#' @param flags A length-two integer vector as provided by \code{improperAlignmentFlags}
+#' @param flag A length-two integer vector as provided by \code{improperAlignmentFlags}
 #' @export
 #' @rdname alignment-flags
-improperAlignmentParams <- function(flags=improperAlignmentFlags()){
-  ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
+improperAlignmentParams <- function(flag=improperAlignmentFlags(),
+                                    what=c("flag", "mrnm", "mpos", "mapq"),
+                                    ...){
+  ScanBamParam(flag=flag, what=what, ...)
 }
 
 #' @export
 #' @rdname alignment-flags
-properAlignmentParams <- function(flags=properAlignmentFlags()){
-  ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
+properAlignmentParams <- function(flag=properAlignmentFlags(),
+                                  what=c("flag", "mrnm", "mpos", "mapq"),
+                                  ...){
+  ScanBamParam(flag=flag, what=what, ...)
 }
 
 
@@ -416,17 +420,82 @@ get_improper_readpairs <- function(object, bam.file){
 }
 
 #' Convert GAlignments to GRanges with is.improper and pair.index fields
+#' 
 #' @param ga a \code{GAlignments} object
 #' @param is.improper length-one logical vector.  Are the reads improperly paired?
 #' @export
-#' @examples
-#' 
 ga2gr <- function(ga, is.improper=FALSE){
+  id <- names(ga)
   r1.ga <- granges(first(ga))
   r2.ga <- granges(last(ga))
   names(r1.ga) <- names(r2.ga) <- NULL
   r1.ga$read <- "R1"
   r2.ga$read <- "R2"
   r1.ga$is.improper <- r2.ga$is.improper <- is.improper
+  r1.ga$tagid <- id
+  r2.ga$tagid <- id
   c(r1.ga, r2.ga)
+}
+
+#' Sort GRanges object with read values R1 and R2 by start of R1
+#'
+#' In order to plot the read pairs as position versus read pair index,
+#' information on the mates needs to be kept intact and the visualization is
+#' more clear if the reads are sorted by the first read in the pair. This
+#' functions turns the read tag in the 'id' field of the GRanges object to an
+#' ordered factor. The levels of the factor are determined by the start position
+#' of the first read (R1) in the pair.
+#'
+#' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs}
+#' @examples
+#'   library(svbams)
+#'   library(TxDb.Hsapiens.UCSC.hg19.refGene)
+#'   region <- GRanges("chr15", IRanges(63201003, 63209243))
+#'   si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
+#'   seqinfo(region) <- si["chr15", ]
+#'
+#'   bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
+#'   bview <- BamViews(bamPaths=bampath)
+#'
+#'   iparams <- improperAlignmentParams()
+#'   pparams <- properAlignmentParams()
+#'   irp <- getImproperAlignmentPairs(bview,
+#'                                    iparams,
+#'                                    mapq_thr=30,
+#'                                    use.mcols=TRUE)
+#'   g.irp <- ga2gr(irp, is.improper=TRUE)
+#'   prp <- getProperAlignmentPairs(bview,
+#'                                  pparams,
+#'                                  mapq_thr=30,
+#'                                  use.mcols=TRUE)
+#'   g.prp <- ga2gr(prp, is.improper=FALSE)
+#'   gr <- c(g.irp, g.prp)
+#'   gr <- sortByRead1(gr)
+#'   gr
+#' @export
+sortByRead1 <- function(gr){
+  gr.read1 <- gr[gr$read=="R1"]
+  gr.read1 <- gr.read1[order(start(gr.read1))]
+  tagid.levels <- as.character(gr.read1$tagid)
+  gr$tagid <- factor(gr$tagid, levels=tagid.levels)
+  gr <- gr[order(gr$tagid)]
+  gr
+}
+
+#' Thin the proper read pairs to reduce overplotting
+#'
+#' @param gr a \code{GRanges} object of read pairs
+#' @param thin integer indicating how much to thin the properly paired reads.
+#' @export
+thinProperPairs <- function(gr, thin=10){
+  is.proper <- !gr$is.improper
+  if(!any(is.proper)){
+    return(gr)
+  }
+  gr.prp <- gr[is.proper]
+  gr.prp <- sortByRead1(gr.prp)
+  tagid <- unique(as.character(gr.prp$tagid))
+  tagid <- tagid[seq(1, length(tagid), thin)]
+  gr.prp <- gr.prp[gr.prp$tagid %in% tagid]
+  gr.prp
 }
