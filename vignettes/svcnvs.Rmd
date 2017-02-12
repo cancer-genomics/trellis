@@ -141,7 +141,7 @@ Next, we melt these reads into a *data.frame* useful for plotting.
 
 ```{r rearranged_reads}
 rps <- thinReadPairs(deletion)
-rps <- meltReadPairs(rps)
+rps <- svcnvs:::meltReadPairs(rps)
 ```
 
 We again use *ggplot* to plot the data:
@@ -173,60 +173,6 @@ Finally, we make a composite graphic of the log ratios and rearranged reads:
 
 ```{r compoisite}
 grid.arrange(A1, B, ncol=1)
-```
-
-## Extract rearranged read pairs from a BAM file for a region of interest
-
-This section describes how to extract rearranged read pairs from a BAM file for
-a specific genomic region of interest (e.g., a possible deletion). In the
-following code chunk, we load the ```svbams``` package which contains a small
-bam files for this particular region of chr15.  
-
-```{r svbams}
-library(Rsamtools)
-library(svbams)
-path <- system.file("extdata", package="svbams")
-```
-
-Next, we create a BamViews object that will contain metadata on the bamfiles.
-
-```{r bamviews}
-bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
-bview <- BamViews(bamPaths=bampath)
-```
-
-Improper paired alignments can be extracted using the svalignments package.
-
-```{r improper_alignments}
-##
-## create an AlignmentViews object
-##
-param <- improperAlignmentParams()
-irp <- getImproperAlignmentPairs(bview, param,
-                                 mapq_thr=30,
-                                 use.mcols=TRUE)
-```
-
-Extract read pairs
-
-```{r readpairs, eval=FALSE}
-library(svalignments)
-prp <- properReadPairs(bam_path=bamPaths(aview),
-                       gr=roi2,
-                       param=DeletionParam())
-prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
-irp <- addImproperReadPairs2(cnv, aview, param=param)
-irp_index1 <- initializeImproperIndex2(cnv, irp, param)
-irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
-irp_index3 <- .match_index_variant(irp_index1, cnv, irp_index2)
-sv <- StructuralVariant(variant=cnv,
-                        proper=prp,
-                        improper=irp,
-                        copynumber=cnv$seg.mean,
-                        calls=cncalls,
-                        index_proper=prp_index,
-                        index_improper=irp_index3)
-
 ```
 
 
