@@ -63,33 +63,59 @@ annotateRecurrent <- function(rcnvs, grl){
   df.gene
 }
 
+labelGeneName <- function(tx, gr, maxgap){
+  hits <- findOverlaps(tx, gr, maxgap=maxgap)
+  gene_name <- rep(NA, length(gr))
+  gene_name[subjectHits(hits)] <- tx$gene_name[queryHits(hits)]
+  gene_name
+}
+
+#' Summarize frequency of a sample in a GRangesList
+#'
+#' Makes a gene-level table with frequency that gene appears and a vector of comma-delimited sample identifiers with the gene.  Useful for summarizing recurrence of deletions or amplicons by gene.
+#'
+#' @param grl a \code{GRangesList}.  Assumes that each element of the \code{GRangesList} has a \code{id} and a \code{gene_name} field.
+#' @seealso \code{\link{recurrentDeletions}}
+#' @examples
+#'   genes <- GRanges("chr1", IRanges(5, 10))
+#'   genes$gene_name <- "a"
+#'   gr1 <- GRanges(rep("chr1", 2), IRanges(c(4, 8), c(6, 10)), id=rep("id1", 2))
+#'   gr2 <- GRanges("chr1", IRanges(3, 9), id="id2")
+#'   grl <- GRangesList(id1=gr1, id2=gr2)
+#'   grl <- recurrentDeletions(genes, grl, maxgap=5)
+#'   summarizeGeneFreq(grl)
+summarizeGeneFreq <- function(grl){
+  g <- unlist(grl)
+  genes <- unique(g$gene_name)
+  id.list <- lapply(split(g$id, g$gene_name), unique)
+  ids <- sapply(id.list, paste, collapse=",")
+  freq <- elementNROWS(id.list)
+  tab <- data.frame(gene=names(freq),
+                    frequency=freq,
+                    ids=ids)
+}
+
 #' Aggregate deletions to the gene-level when evaluating recurrence
+#'
 #'
 #' @param tx a \code{GRanges} object of transcripts
 #' @param grl a \code{GRangesList} of deletions -- each element is a sample
 #' @param maxgap length-one integer vector passed to \code{findOverlaps}
 #' @export
+#' @seealso \code{\link{summarizeGeneFreq}}
+#' @examples
+#'   genes <- GRanges("chr1", IRanges(5, 10))
+#'   genes$gene_name <- "a"
+#'   gr1 <- GRanges(rep("chr1", 2), IRanges(c(4, 8), c(6, 10)), id=rep("id1", 2))
+#'   gr2 <- GRanges("chr1", IRanges(3, 9), id="id2")
+#'   grl <- GRangesList(id1=gr1, id2=gr2)
+#'   recurrentDeletions(genes, grl, maxgap=5)
 recurrentDeletions <- function(tx, grl, maxgap=5e3){
-  browser()
   gr <- unlist(grl)
-  is_overlap <- is_overlap[ cnts > 1, ] 
-  cnts <- cnts[ cnts > 1 ]
-  ids <- apply(is_overlap, 1, function(is_amplicon, id) {
-    paste(id[is_amplicon], collapse=",")
-  }, id=gsub(".bam", "", colnames(is_overlap)))
-  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts), id=ids)
-  ##
-  ## Gene coordinates
-  ##
-  tx2 <- tx[tx$gene_name %in% result$gene]
-  tx2.list <- GRangesList(sapply(split(tx2, tx2$gene_name), reduce))
-  tx2 <- unlist(tx2.list)
-  tx2 <- tx2[result$gene]
-  stopifnot(identical(names(tx2), as.character(result$gene)))
-  result$chr <- chromosome(tx2)
-  result$start <- start(tx2)
-  result$end <- end(tx2)
-  result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
-  rownames(result) <- NULL
-  result[order(result$freq, decreasing=TRUE), ]
+  gr$gene_name <- labelGeneName(tx, gr, maxgap)
+  gene.freq <- table(gr$gene_name)
+  recurrent.genes <- names(gene.freq)[gene.freq >= 2]
+  gr <- gr[gr$gene_name %in% recurrent.genes]
+  grl <- split(gr, gr$id)
+  grl
 }
