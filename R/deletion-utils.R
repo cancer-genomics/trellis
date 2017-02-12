@@ -1354,33 +1354,8 @@ numberSpanningAmplicons <- function(tx, grl, maxgap=5e3){
   frequency
 }
 
-#' @export
-recurrentDeletions <- function(tx, grl, maxgap=5e3){
-  stop("needs refactoring")
-##  gr <- unlist(grl)
-##
-##
-##  is_overlap <- is_overlap[ cnts > 1, ] 
-##  cnts <- cnts[ cnts > 1 ]
-##  ids <- apply(is_overlap, 1, function(is_amplicon, id) {
-##    paste(id[is_amplicon], collapse=",")
-##  }, id=gsub(".bam", "", colnames(is_overlap)))
-##  result <- data.frame(gene = tx$gene_name, freq=as.integer(cnts), id=ids)
-##  ##
-##  ## Gene coordinates
-##  ##
-##  tx2 <- tx[tx$gene_name %in% result$gene]
-##  tx2.list <- GRangesList(sapply(split(tx2, tx2$gene_name), reduce))
-##  tx2 <- unlist(tx2.list)
-##  tx2 <- tx2[result$gene]
-##  stopifnot(identical(names(tx2), as.character(result$gene)))
-##  result$chr <- chromosome(tx2)
-##  result$start <- start(tx2)
-##  result$end <- end(tx2)
-##  result <- result[, c("gene", "chr", "start", "end", "freq", "id")]
-##  rownames(result) <- NULL
-##  result[order(result$freq, decreasing=TRUE), ]
-}
+
+
 
 #' Extract read pairs from a \code{StructuralVariant} object
 #'

@@ -30,11 +30,12 @@ Suggests:
 License: Artistic-2.0
 LazyData: true
 RoxygenNote: 6.0.1
-Collate:
+Collate: 
     'help.R'
     'amplicon-utils.R'
     'deletion-utils.R'
     'germlineOutliers.R'
     'listCNVs.R'
     'listGenomeFilters.R'
+    'recurrent.R'
     'segment.R'
