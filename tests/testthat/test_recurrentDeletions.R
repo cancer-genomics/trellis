@@ -1,5 +1,6 @@
 context("recurrent deletions")
-testthat("recurrentDeletions", {
+
+test_that("recurrentDeletions", {
   genes <- GRanges("chr1", IRanges(5, 10))
   genes$gene_name <- "a"
   gr1 <- GRanges(rep("chr1", 2), IRanges(c(4, 8), c(6, 10)), id=rep("id1", 2))
@@ -35,8 +36,8 @@ testthat("recurrentDeletions", {
   expect_identical(tab$freq, 2L)
 })
 
-.testthat <- function(expr) NULL
+.test_that <- function(nm, expr) NULL
 
-.testthat("annotateRecurrent", {
+.test_that("annotateRecurrent", {
 
 })
