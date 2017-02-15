@@ -103,18 +103,29 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #'   overlap) or no-germline (no overlap).  If the amplicon is
 #'   completely within the extended germline filter, the amplicon is
 #'   considered fully-germline.
+#'
+#' @param MIN_WIDTH length-one integer vector indicating the minimum size of amplicon (see also \code{joinNearGRanges})
+#'
+#' @param MIN_SEGMEAN_DIFF length-one numeric vector.  Adjacent segments whose means differ by less than this value are candidates for merging by \code{{joinNearGRanges}}
+#'
+#' @param min.gapwidth length-one numeric vector passed to the \code{reduce} method that merges adacent segments with comparable segment means
 #' 
 #' @seealso \code{\link{listGenomeFilters}}
 ampliconParams <- function(AMP_THR=log2(2.75),
                            LOW_THR=log2(1.75),
                            border_size=10e3,
-                           overhang=25e3){
+                           overhang=25e3,
+                           MIN_WIDTH=2000,
+                           MIN_SEGMEAN_DIFF=0.05,
+                           min.gapwidth=3000){
   ##filters <- listGenomeFilters()
   filters <- list()
   filters$border_size <- border_size
   filters$overhang <- overhang
   filters$AMP_THR <- AMP_THR
   filters$LOW_THR <- LOW_THR
+  filters$MIN_WIDTH <- MIN_WIDTH
+  filters$MIN_SEGMEAN_DIFF <- MIN_SEGMEAN_DIFF
   filters
 }
 
@@ -370,20 +381,29 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
 #'
 #' Merges adjacent amplicons (<= 3kb separation) that have similar
 #' segment means.
-#' 
+#'
 #' @keywords internal
 #' @export
 #' @return a \code{GRanges} object of the merged segments
-#' 
+#'
 #' @param object a \code{GRanges} object
+#'
+#' @param thr a length-one numeric vector. If the difference of the average log
+#'   ratio for two segments is less than this number, combine the segments. The
+#'   segment mean of the merged GRanges will be the weighted average, where the
+#'   weights are the segment widths.
 #' 
-#' @param thr a length-one numeric vector.  If the difference of the
-#'   average log ratio for two segments is less than this number,
-#'   combine the segments.
 #'
 #' @param MIN_WIDTH minimum size of amplicon (default 2000)
+#'
+#' @details Merging is performed by the \code{reduce} operation.
 #' 
-joinNearGRanges <- function(object, thr=0.05, MIN_WIDTH=2e3){
+#'
+joinNearGRanges <- function(object, params){
+  ##thr=0.05, MIN_WIDTH=2e3, min.gapwidth=3000){
+  thr <- params[["MIN_SEGMEAN_DIFF"]]
+  MIN_WIDTH <- params[["MIN_WIDTH"]]
+  min.gapwidth <- params[["min.gapwidth"]]
   k <- which(!is.na(object$seg.mean) & width(object) > MIN_WIDTH)
   if(length(k) == 0) return(object)
   g <- object[k]
@@ -401,7 +421,7 @@ joinNearGRanges <- function(object, thr=0.05, MIN_WIDTH=2e3){
   for(i in seq_along(indexlist)){
     j <- indexlist[[i]]
     if(length(j)==1) next()
-    ng <- reduce(g[j], min.gapwidth=3e3)
+    ng <- reduce(g[j], min.gapwidth=min.gapwidth)
     ##
     ## TODO: combining the metadata.  Here, we're just taking the first row
     ##
