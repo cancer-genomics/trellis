@@ -12,8 +12,6 @@ test_that("sv_amplicons_internals", {
   library(Rsamtools)
   library(rtracklayer)
   library(graph)
-  ##install_local("~/Software/svpackages/svbams")
-  ##load_all("~/Software/svpackages/svbams")
   data(germline_filters)
   data(transcripts)
   ##
@@ -21,8 +19,6 @@ test_that("sv_amplicons_internals", {
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
   gr <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-  ##gr.bed <- import("../../../svbams/data-raw/cgov44t_revised.bed")
-  ##gr.bed <- keepSeqlevels(gr.bed, c("chr5", "chr8"), pruning.mode="coarse")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
 
@@ -56,6 +52,7 @@ test_that("sv_amplicons_internals", {
                       IRanges(starts, ends))
   seqinfo(expected) <- seqinfo(transcripts)[c("chr5", "chr8"), ]
   isCircular(seqinfo(expected)) <- c(FALSE, FALSE)
+
   result <- granges(svclasses::amplicons(ag))
   names(result) <- NULL
   expect_identical(result, expected)
@@ -77,14 +74,54 @@ test_that("sv_amplicons_internals", {
   ranges(ag) <- tmp
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
-  LOW_THR <- af[["LOW_THR"]]
+  LOW_THR <- params[["LOW_THR"]]
   ##
   ## REFACTOR: could this step use the saved improper read pairs
   ##
   ## 
   rp <- svalignments::get_readpairs(ag, bamPaths(bview))
-  ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
-  queryRanges(ag) <- focalAmpliconDupRanges(ag, LOW_THR=LOW_THR, MAX_SIZE=500e3)
+  ag1 <- addFocalDupsFlankingAmplicon(ag, rp, NULL)
+  ag2 <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
+  expect_identical(ag1, ag2)
+  ag <- ag1
+
+  qr1 <- focalAmpliconDupRanges(ag, LOW_THR=NULL, MAX_SIZE=500e3)
+  qr2 <- focalAmpliconDupRanges(ag, LOW_THR=LOW_THR, MAX_SIZE=500e3)
+
+  ##
+  ## focalAmpliconDupRanges
+  ##
+  object <- ag
+  g <- ampliconRanges(object)
+  is_dup1 <- isDuplication(ranges(object), minimum_foldchange=NULL)
+  is_dup2 <- isDuplication(ranges(object), minimum_foldchange=LOW_THR)
+  ## is_dup1 is a length-0 logical vector
+  expect_identical(is_dup1, logical())
+
+  ## remove any lower copy ranges that are very large
+  dup_g1 <- ranges(object)[is_dup1] ## is length-0 GRanges.  No ranges will be removed
+  dup_g2 <- ranges(object)[is_dup2] ## identifies several large ranges
+  dup_g <- dup_g[width(dup_g) < MAX_SIZE]
+  g <- sort(c(dup_g, g))
+  if(length(g) > 0){
+    g <- expandGRanges(g, 1e3)
+  }
+  ##start(g) <- start(g)-1e3
+  ##end(g) <- end(g)+1e3
+  ## we do not want to link germline events
+  germ <- germline(object)
+  germ <- expandGRanges(germ, 10e3)
+  ##start(germ) <- start(germ)-10e3
+  ##end(germ) <- pmin(end(germ)+10e3, seqlengths(germ)[as.character(seqnames(germ))])
+  germ <- reduce(germ)
+  g <- filterBy(g, germ, type="within")
+  reduce(g)
+
+
+
+  queryRanges(ag1) <- qr1
+  queryRanges(ag2) <- qr2
+
   irp <- get_improper_readpairs(ag, bamPaths(bview))
   ##
   ## At this point, focal duplications added to the graph have not
@@ -127,14 +164,6 @@ test_that("sv_amplicons_internals", {
   ag <- linkNearAmplicons(ag, maxgap=500e3)
   expect_identical(ag, object)
 
-
-  ag <- filterSmallAmplicons (ag)
-  ag <- setAmpliconGroups (ag)
-  ag <- setGenes (ag, transcripts)
-  ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
-  ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
-  e <- edges(ag)
-  n <- nodes(ag)
   expected <- list("chr8:128,692,001",
                    c("chr5:176,034,001", "chr8:129,164,001", "chr8:129,353,001"),
                    c("chr8:129,353,001", "chr8:128,692,001"),
@@ -146,10 +175,36 @@ test_that("sv_amplicons_internals", {
   expect_identical(e, expected)
   expect_identical(names(e), n)
 
+  trace(sv_amplicons, browser)
   ag2 <- sv_amplicons(bview,
                      segs=gr,
                      amplicon_filters=germline_filters,
                      params=ampliconParams(),
                      transcripts=transcripts)
   expect_identical(ag, ag2)
+})
+
+.test_that <- function(name, expr) NULL
+
+.test_that("Full amplicon analysis of CGOV44T", {
+  library(svfilters.hg19)
+  library(Rsamtools)
+  library(rtracklayer)
+  library(graph)
+  library(svovarian)
+  library(svcnvs)
+  data(germline_filters)
+  data(bviews_hg19)
+  id <- "CGOV44T.bam"
+  setwd("/dcl01/scharpf/data/rscharpf/projects/OvarianCellLines")
+  gr <- readRDS("structuralvar/data/segment/0cbs/CGOV44T.bam.rds")
+  bview <- bviews_hg19[, id]
+  ag2 <- sv_amplicons(bview,
+                      segs=gr,
+                      amplicon_filters=germline_filters,
+                      params=ampliconParams(),
+                      transcripts=transcripts)
+
+  expected <- readRDS("structuralvar/data/segment/1amplicons/CGOV44T.bam.rds")
+
 })

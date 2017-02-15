@@ -932,6 +932,10 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
   object
 }
 
+ampliconFilters <- function(filters){
+  
+}
+
 #' Construct an AmpliconGraph from a BamViews object
 #'
 #' This function constructs an \code{AmpliconGraph} from a
@@ -979,10 +983,10 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 #'
 #' @export
 #' @param bview a \code{BamViews} object
-#' 
+#'
 #' @param segs a \code{GRanges} object of segments with log2
 #'   fold-changes consistent with amplification
-#' 
+#'
 #' @param amplicon_filters a \code{list} of filters
 #' @param params a list of parameters for the amplicon analysis
 #' @param transcripts a \code{GRanges} object of transcripts
@@ -1013,7 +1017,8 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ranges(ag) <- tmp
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
-  LOW_THR <- af[["LOW_THR"]]
+  ##LOW_THR <- params[["LOW_THR"]]
+  LOW_THR <- NULL
   ##
   ## REFACTOR: could this step use the saved improper read pairs
   ##
