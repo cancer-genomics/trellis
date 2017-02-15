@@ -37,24 +37,16 @@ test_that("sv_amplicons_internals", {
   ##
   ag <- makeAGraph(segs, amplicon_filters, params)
   expect_true(validObject(ag))
-
-
   starts <- c(176034001, 128692001, 129164001, 129353001)
   ends <- c(177025001, 129163001, 129322001, 129615001)
   expected <- GRanges(c("chr5", rep("chr8", 3)),
                       IRanges(starts, ends))
   seqinfo(expected) <- seqinfo(transcripts)[c("chr5", "chr8"), ]
   isCircular(seqinfo(expected)) <- c(FALSE, FALSE)
-
   result <- granges(svclasses::amplicons(ag))
   names(result) <- NULL
   expect_identical(result, expected)
   expect_true(all(nodes(ag) %in% names(ranges(ag))))
-
-  centromeres <- af[["centromeres"]]
-  ag <- trimRangesOverlappingCentromere(ag, centromeres)
-  expect_true(all(nodes(ag) %in% names(ranges(ag))))
-
   ##
   ## merge adjacent amplicons that have similar segment means
   ##

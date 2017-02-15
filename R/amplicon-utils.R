@@ -1006,7 +1006,6 @@ makeAGraph <- function(segs, af, params){
 #' @param transcripts a \code{GRanges} object of transcripts
 sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ag <- makeAGraph(segs, amplicon_filters, params)
-  stopifnot(all(nodes(ag) %in% names(ranges(ag))))
   tmp <- joinNearGRanges(ranges(ag), thr=0.05)
   names(tmp) <- ampliconNames(tmp)
   ## the names of the nodes no longer correspond to the range names
