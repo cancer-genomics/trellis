@@ -25,13 +25,11 @@ test_that("sv_amplicons_internals", {
   params <- ampliconParams()
   ## gr is the raw segmentation
   segs <- gr
-
   ag2 <- sv_amplicons(bview,
                       segs=gr,
                       amplicon_filters=germline_filters,
                       params=ampliconParams(),
                       transcripts=transcripts)
-
   ##
   ## Begin testing internals of sv_amplicons
   ##
