@@ -187,6 +187,11 @@ test_that("sv_amplicons_internals", {
 .test_that <- function(name, expr) NULL
 
 .test_that("Full amplicon analysis of CGOV44T", {
+  ##
+  ## This test works for commmit 05d01c6
+  ##
+  ## saved amplicons graphs for the ovarian cell lines can be reproduced with
+  ## commit 05d01c6
   library(svfilters.hg19)
   library(Rsamtools)
   library(rtracklayer)
@@ -205,6 +210,8 @@ test_that("sv_amplicons_internals", {
                       params=ampliconParams(),
                       transcripts=transcripts)
 
+  ## this evaluates to TRUE prior for commmit 05d01c6 and earlier
+  ## (LOW_THR is explicitly set to NULL)
   expected <- readRDS("structuralvar/data/segment/1amplicons/CGOV44T.bam.rds")
-
+  expect_identical(ag2, expected)
 })
