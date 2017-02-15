@@ -115,12 +115,12 @@ test_that("CNAObject", {
   expected <- GRanges("chr3", IRanges(60319001, 60434001))
   tmp <- deletion_call(aview=aview, pview=pview,
                        cnv=g,
-                       gr_filters=filters2)
+                       gr_filters=filters)
   expect_identical(calls(tmp), "homozygous")
   sv_dels <- sv_deletions(gr=g,
                           aview=aview,
                           bview=bview,
                           pview=pview,
                           gr_filters=filters,
-                          param=param)
+                          param=del.params)
 })
