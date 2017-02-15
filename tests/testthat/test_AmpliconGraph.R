@@ -21,28 +21,21 @@ test_that("sv_amplicons_internals", {
   gr <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
-
-  ##
-  ## Begin testing internals of sv_amplicons
-  ##
   amplicon_filters <- germline_filters
   params <- ampliconParams()
   ## gr is the raw segmentation
   segs <- gr
 
-  af <- amplicon_filters
-  af$border_size <- params$border_size
-  af$overhang <- params$overhang
-  AMP_THR <- params$AMP_THR
-  ##AMP_THR <- amplicon_filters[["AMP_THR"]]
-  segs$is_amplicon <- segs$seg.mean > AMP_THR
-  ag <- AmpliconGraph(ranges=segs,
-                      border_size=af[["border_size"]],
-                      assembly_gaps=af[["assembly_gaps"]],
-                      centromeres=af[["centromeres"]],
-                      germline_cnv=af[["germline_cnv"]],
-                      outliers=af[["outliers"]],
-                      overhang=af[["overhang"]])
+  ag2 <- sv_amplicons(bview,
+                      segs=gr,
+                      amplicon_filters=germline_filters,
+                      params=ampliconParams(),
+                      transcripts=transcripts)
+
+  ##
+  ## Begin testing internals of sv_amplicons
+  ##
+  ag <- makeAGraph(segs, amplicon_filters, params)
   expect_true(validObject(ag))
 
 
@@ -144,11 +137,7 @@ test_that("sv_amplicons_internals", {
   ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
 
-  ag2 <- sv_amplicons(bview,
-                      segs=gr,
-                      amplicon_filters=germline_filters,
-                      params=ampliconParams(),
-                      transcripts=transcripts)
+
   expect_identical(ag, ag2)
 })
 

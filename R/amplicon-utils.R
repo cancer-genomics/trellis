@@ -932,8 +932,22 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
   object
 }
 
-ampliconFilters <- function(filters){
-  
+makeAGraph <- function(segs, af, params){
+  af$border_size <- params$border_size
+  af$overhang <- params$overhang
+  AMP_THR <- params$AMP_THR
+  segs$is_amplicon <- segs$seg.mean > AMP_THR
+  ag <- AmpliconGraph(ranges=segs,
+                      border_size=af[["border_size"]],
+                      assembly_gaps=af[["assembly_gaps"]],
+                      centromeres=af[["centromeres"]],
+                      germline_cnv=af[["germline_cnv"]],
+                      outliers=af[["outliers"]],
+                      overhang=af[["overhang"]])
+  if (numNodes (ag) == 0) return (ag)
+  centromeres <- af[["centromeres"]]
+  ag <- trimRangesOverlappingCentromere (ag, centromeres)
+  ag
 }
 
 #' Construct an AmpliconGraph from a BamViews object
@@ -991,23 +1005,7 @@ ampliconFilters <- function(filters){
 #' @param params a list of parameters for the amplicon analysis
 #' @param transcripts a \code{GRanges} object of transcripts
 sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
-  af <- amplicon_filters
-  af$border_size <- params$border_size
-  af$overhang <- params$overhang
-  AMP_THR <- params$AMP_THR
-  ##AMP_THR <- amplicon_filters[["AMP_THR"]]
-  segs$is_amplicon <- segs$seg.mean > AMP_THR
-  ag <- AmpliconGraph(ranges=segs,
-                      border_size=af[["border_size"]],
-                      assembly_gaps=af[["assembly_gaps"]],
-                      centromeres=af[["centromeres"]],
-                      germline_cnv=af[["germline_cnv"]],
-                      outliers=af[["outliers"]],
-                      overhang=af[["overhang"]])
-  stopifnot(all(nodes(ag) %in% names(ranges(ag))))
-  if (numNodes (ag) == 0) return (ag)
-  centromeres <- af[["centromeres"]]
-  ag <- trimRangesOverlappingCentromere (ag, centromeres)
+  ag <- makeAGraph(segs, amplicon_filters, params)
   stopifnot(all(nodes(ag) %in% names(ranges(ag))))
   tmp <- joinNearGRanges(ranges(ag), thr=0.05)
   names(tmp) <- ampliconNames(tmp)
@@ -1042,6 +1040,8 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
   ag
 }
+
+
 
 #' Identify somatic amplicons and grouped amplicons
 #'
