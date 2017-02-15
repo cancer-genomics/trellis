@@ -718,9 +718,9 @@ linkAmplicons <- function(object, rp, edgeParam=FilterEdgeParam()){
 }
 
 linkNearAmplicons <- function(object, maxgap=500e3){
-  hits <- findOverlaps(ampliconRanges(object), maxgap=maxgap,
-                       ignoreSelf=TRUE,
-                       ignoreRedundant=TRUE)
+  hits <- findOverlaps(ampliconRanges(object), maxgap=maxgap)
+  hits <- hits[!isSelfHit(hits)]
+  hits <- hits[!isRedundantHit(hits)]
   if(length(hits)==0) return(object)
   new_edges <- paste(names(ampliconRanges(object))[queryHits(hits)],
                      names(ampliconRanges(object))[subjectHits(hits)],
