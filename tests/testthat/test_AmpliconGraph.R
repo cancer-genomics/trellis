@@ -33,15 +33,17 @@ test_that("AmpliconGraph", {
   segs <- gr
   segs$is_amplicon <- segs$seg.mean > params[["AMP_THR"]]
   ag <- AmpliconGraph(ranges=segs,
-                      border_size=params[["border_size"]],
-                      assembly_gaps=germline_filters[["assembly_gaps"]],
-                      centromeres=germline_filters[["centromeres"]],
-                      germline_cnv=germline_filters[["germline_cnv"]],
-                      outliers=germline_filters[["outliers"]],
-                      overhang=params[["overhang"]])
+                      filters=germline_filters,
+                      params=params)
   if(FALSE){
     saveRDS(ag, file="AmpliconGraph0ada417.rds")
   }
   ag.100362c <- readRDS("AmpliconGraph100362c.rds")
   expect_identical(ag, ag.100362c)
+
+  ag <- makeAGraph(segs, germline_filters, params)
+  if(FALSE){
+    saveRDS(ag, file="makeAGraph.rds")
+  }
 })
+

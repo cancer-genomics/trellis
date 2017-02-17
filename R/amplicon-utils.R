@@ -281,6 +281,16 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
   g
 }
 
+.empty_filters <- function(assembly_gaps=GRanges(),
+                           centromeres=GRanges(),
+                           germline_cnv=GRanges(),
+                           outliers=GRanges()){
+  list(assembly_gaps=assembly_gaps,
+       centromeres=centromeres,
+       germline_cnv=germline_cnv,
+       outliers=outliers)
+}
+
 #' Constructor for AmpliconGraph
 #'
 #' Constructor for \code{AmpliconGraph}.
@@ -302,12 +312,23 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
 #' @rdname AmpliconGraph-constructor
 #' @export
 AmpliconGraph <- function(ranges=GRanges(),
-                          border_size=150e3,
-                          assembly_gaps=GRanges(),
-                          centromeres=GRanges(),
-                          germline_cnv=GRanges(),
-                          outliers=GRanges(),
-                          overhang=5e3){
+                          filters,
+                          params=ampliconParams(border_size=150e3, overhang=5e3)){
+  ##                          border_size=150e3,
+  ##                        assembly_gaps=GRanges(),
+  ##                        centromeres=GRanges(),
+  ##                        germline_cnv=GRanges(),
+  ##                        outliers=GRanges(),
+  ##                        overhang=5e3){
+  if(missing(filters)){
+    filters <- .empty_filters()
+  }
+  assembly_gaps <- filters[["assembly_gaps"]]
+  centromeres <- filters[["centromeres"]]
+  germline_cnv <- filters[["germline_cnv"]]
+  outliers <- filters[["outliers"]]
+  border_size <- params[["border_size"]]
+  overhang <- params[["overhang"]]
   if(missing(ranges)) {
     ag <- new("AmpliconGraph")
     names(ranges(ag)) <- character()
@@ -960,20 +981,18 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 }
 
 makeAGraph <- function(segs, af, params){
-  af$border_size <- params$border_size
-  af$overhang <- params$overhang
-  AMP_THR <- params$AMP_THR
-  segs$is_amplicon <- segs$seg.mean > AMP_THR
+  segs$is_amplicon <- segs$seg.mean > params$AMP_THR
   ag <- AmpliconGraph(ranges=segs,
-                      border_size=af[["border_size"]],
-                      assembly_gaps=af[["assembly_gaps"]],
-                      centromeres=af[["centromeres"]],
-                      germline_cnv=af[["germline_cnv"]],
-                      outliers=af[["outliers"]],
-                      overhang=af[["overhang"]])
+                      filters=af,
+                      params=params)
+  ##border_size=af[["border_size"]],
+  ##                    assembly_gaps=af[["assembly_gaps"]],
+  ##                    centromeres=af[["centromeres"]],
+  ##                    germline_cnv=af[["germline_cnv"]],
+  ##                    outliers=af[["outliers"]],
+  ##                    overhang=af[["overhang"]])
   if (numNodes (ag) == 0) return (ag)
-  centromeres <- af[["centromeres"]]
-  ag <- trimRangesOverlappingCentromere (ag, centromeres)
+  ag <- trimRangesOverlappingCentromere (ag, af[["centromeres"]])
   ag
 }
 
