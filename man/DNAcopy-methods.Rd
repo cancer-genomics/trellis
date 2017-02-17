@@ -2,8 +2,8 @@
 % Please edit documentation in R/DNAcopy-class.R
 \docType{methods}
 \name{DNAcopy-class}
-\alias{DNAcopy}
 \alias{DNAcopy-class}
+\alias{DNAcopy}
 \alias{as}
 \title{Class for storing circular binary segmentation results}
 \arguments{
@@ -31,4 +31,3 @@ as(test1, "GRanges")
 \seealso{
 \code{\link[DNAcopy]{segment}}
 }
-

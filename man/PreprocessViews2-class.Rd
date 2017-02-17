@@ -2,15 +2,15 @@
 % Please edit documentation in R/Preprocess-class.R, R/seqinfo-utils.R
 \docType{class}
 \name{PreprocessViews2-class}
-\alias{PreprocessViews2}
 \alias{PreprocessViews2-class}
+\alias{PreprocessViews2}
+\alias{rowRanges<-,PreprocessViews2,ANY-method}
 \alias{rowRanges,PreprocessViews2,ANY-method}
 \alias{rowRanges,PreprocessViews2-method}
-\alias{rowRanges<-,PreprocessViews2,ANY-method}
-\alias{seqinfo,PreprocessViews2-method}
-\alias{seqinfo<-,PreprocessViews2,seqinfo-method}
-\alias{seqinfo<-,PreprocessViews2-method}
 \alias{seqlevels,PreprocessViews2-method}
+\alias{seqinfo,PreprocessViews2-method}
+\alias{seqinfo<-,PreprocessViews2-method}
+\alias{seqinfo<-,PreprocessViews2,seqinfo-method}
 \title{A container for storing views of preprocessed data}
 \usage{
 PreprocessViews2(object)
@@ -51,6 +51,7 @@ Constructor for PreprocessViews2
 the value of \code{scale}, round to the nearest integer, and then
 save as an integer.  This slot is for internal use only.}
 }}
+
 \examples{
 PreprocessViews2()
 paths(PreprocessViews2())
@@ -63,4 +64,3 @@ paths(pviews)
 See \code{\link{paths}} for the character-vector of file
   paths to the intermediate data.
 }
-

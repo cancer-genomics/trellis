@@ -2,8 +2,8 @@
 % Please edit documentation in R/data.R
 \docType{data}
 \name{rear_cds-data}
-\alias{rear_cds}
 \alias{rear_cds-data}
+\alias{rear_cds}
 \title{An example Transcripts object}
 \format{a \code{Transcripts} object}
 \usage{
@@ -16,4 +16,3 @@ An example Transcripts object
 data(rear_cds)
 }
 \keyword{datasets}
-

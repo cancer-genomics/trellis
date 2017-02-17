@@ -3,8 +3,8 @@
 \docType{methods}
 \name{fuse}
 \alias{fuse}
-\alias{fuse,ClippedTranscripts-method}
 \alias{fuse,TranscriptsFusion-method}
+\alias{fuse,ClippedTranscripts-method}
 \title{Join two clipped transcripts as a GRangesList object}
 \usage{
 fuse(object, nms)
@@ -38,4 +38,3 @@ gene 3' of the fusion.
 \seealso{
 \code{link{clip}}
 }
-

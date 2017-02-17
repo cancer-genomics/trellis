@@ -23,4 +23,3 @@ topics(dp)
 \seealso{
 \code{\link{DataPaths}}
 }
-

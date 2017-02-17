@@ -2,10 +2,10 @@
 % Please edit documentation in R/Preprocess-class.R
 \docType{methods}
 \name{setScale<-}
-\alias{getScale}
-\alias{setScale,PreprocessViews2-method}
 \alias{setScale<-}
+\alias{getScale}
 \alias{setScale<-,PreprocessViews2-method}
+\alias{setScale,PreprocessViews2-method}
 \title{Set numeric scale for \code{PreprocessViews2} object}
 \usage{
 setScale(x) <- value
@@ -26,4 +26,3 @@ numeric
 Exported only for internal use by other packages.
 }
 \keyword{internal}
-

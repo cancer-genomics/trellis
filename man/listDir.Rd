@@ -27,4 +27,3 @@ listDir("preprocess", dp)
 See \code{\linkS4class{DataPaths}}.  See
   \code{\link{topics}} for a listing of the major headings.
 }
-

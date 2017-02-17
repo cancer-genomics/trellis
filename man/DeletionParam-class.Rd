@@ -2,20 +2,20 @@
 % Please edit documentation in R/DeletionParam-class.R
 \docType{class}
 \name{DeletionParam-class}
-\alias{DeletionParam}
 \alias{DeletionParam-class}
+\alias{DeletionParam}
 \alias{bamSeqLevelsStyle}
 \alias{homozygousThr}
-\alias{maxRPsHomozygous}
-\alias{maxRatioObservedToExpected}
-\alias{maxTagDensity}
-\alias{maximumProportionInFilter}
 \alias{maximumWidth}
+\alias{maximumProportionInFilter}
+\alias{maxTagDensity}
+\alias{maxRatioObservedToExpected}
+\alias{minimumWidth}
+\alias{minimumGapWidth}
 \alias{minFlankingHemizygous}
 \alias{minFlankingHomozygous}
 \alias{minRPsHemizygous}
-\alias{minimumGapWidth}
-\alias{minimumWidth}
+\alias{maxRPsHomozygous}
 \title{Parameter class for calling deletions}
 \usage{
 DeletionParam(max_tag_density = 0.75, min_width = 2000, max_width = 2e+06,
@@ -161,8 +161,8 @@ normal samples.}
 
 \item{\code{bam_seqlevels_style}}{character string indicating style of seqnames}
 }}
+
 \examples{
 DeletionParam()
 }
 \keyword{internal}
-

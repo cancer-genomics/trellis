@@ -3,10 +3,10 @@
 \docType{methods}
 \name{improper}
 \alias{improper}
-\alias{improper,Rearrangement-method}
-\alias{improper,StructuralVariant,GAlignmentPairs-method}
 \alias{improper<-}
+\alias{improper,Rearrangement-method}
 \alias{improper<-,StructuralVariant,GAlignmentPairs-method}
+\alias{improper,StructuralVariant,GAlignmentPairs-method}
 \title{Accessor for improper read pairs}
 \usage{
 improper(object)
@@ -34,4 +34,3 @@ different chromosomes.
 \code{\linkS4class{Rearrangement}}
 }
 \keyword{internal}
-

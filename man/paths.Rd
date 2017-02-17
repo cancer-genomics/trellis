@@ -2,8 +2,9 @@
 % Please edit documentation in R/Preprocess-class.R
 \name{paths}
 \alias{paths}
-\alias{paths,PreprocessViews2-method}
 \alias{paths<-}
+\alias{paths<-}
+\alias{paths,PreprocessViews2-method}
 \alias{paths<-,PreprocessViews2-method}
 \title{Accessor for file paths}
 \usage{
@@ -19,4 +20,3 @@ paths(object) <- value
 \description{
 File path to intermediate data saved to disk
 }
-

@@ -3,8 +3,8 @@
 \docType{methods}
 \name{DeletionList}
 \alias{DeletionList}
-\alias{DeletionList,GRangesList-method}
 \alias{DeletionList,list-method}
+\alias{DeletionList,GRangesList-method}
 \alias{DeletionList,missing-method}
 \title{GRangesList-derived class for deletions}
 \usage{
@@ -22,4 +22,3 @@ DeletionList(object)
 \description{
 Each element in the list are the set of deletions for a sample
 }
-

@@ -16,4 +16,3 @@ data(amplicons)
 ampliconRanges(amplicons)
 }
 \keyword{datasets}
-

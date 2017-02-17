@@ -30,4 +30,3 @@ the width of the query.
  identical(test, c(0.6, 0.3))
 
 }
-

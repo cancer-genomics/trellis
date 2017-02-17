@@ -2,8 +2,8 @@
 % Please edit documentation in R/Preprocess-class.R
 \docType{methods}
 \name{setAs}
-\alias{coerce,PreprocessViews2,RangedSummarizedExperiment-method}
 \alias{setAs}
+\alias{coerce,PreprocessViews2,RangedSummarizedExperiment-method}
 \title{Coerce a \code{PreprocessViews2} object to a \code{RangedSummarizedExperiment}}
 \arguments{
 \item{from}{character string ('PreprocessViews2')}
@@ -23,4 +23,3 @@ pviews <- PreprocessViews2()
 as(pviews, "RangedSummarizedExperiment")
 
 }
-

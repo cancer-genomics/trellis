@@ -16,4 +16,3 @@ Recursively create directories from supplied file paths
 \code{\link{dir.create}}
 }
 \keyword{internal}
-

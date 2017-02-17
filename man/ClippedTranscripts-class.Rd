@@ -3,8 +3,8 @@
 \docType{class}
 \name{ClippedTranscripts}
 \alias{ClippedTranscripts}
-\alias{ClippedTranscripts,missing,missing-method}
 \alias{ClippedTranscripts-class}
+\alias{ClippedTranscripts,missing,missing-method}
 \alias{left,ClippedTranscripts-method}
 \alias{right,ClippedTranscripts-method}
 \title{A container for clipped transcripts}
@@ -42,7 +42,7 @@ A container for clipped transcripts
 
 \item{\code{right}}{a \code{GRangesList}}
 }}
+
 \examples{
 ClippedTranscripts()
 }
-

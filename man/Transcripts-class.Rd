@@ -2,17 +2,17 @@
 % Please edit documentation in R/Transcripts-class.R
 \docType{class}
 \name{identifier}
-\alias{"Transcripts",}
-\alias{Transcripts}
-\alias{Transcripts-class}
-\alias{[[,Transcripts,ANY,ANY-method}
-\alias{[[<-,Transcripts,ANY,ANY,GRangesList-method}
-\alias{function(object)}
 \alias{identifier}
-\alias{identifier,Transcripts,ANY-methodsetMethod("identifier",}
+\alias{Transcripts-class}
+\alias{Transcripts}
 \alias{identifier,Transcripts-method}
 \alias{identifier<-,Transcripts-method}
+\alias{identifier,Transcripts,ANY-methodsetMethod("identifier",}
+\alias{"Transcripts",}
+\alias{function(object)}
 \alias{object@id)}
+\alias{[[,Transcripts,ANY,ANY-method}
+\alias{[[<-,Transcripts,ANY,ANY,GRangesList-method}
 \title{Container for storing CDS near a sequence junction}
 \usage{
 identifier(object)
@@ -55,9 +55,9 @@ Container for storing CDS near a sequence junction
 
 \item{\code{id}}{sample id}
 }}
+
 \examples{
 Transcripts()
 }
 \keyword{-internal}
 \keyword{internal}
-

@@ -2,21 +2,22 @@
 % Please edit documentation in R/RearrangmentParams-class.R
 \docType{class}
 \name{RearrangementParams-class}
-\alias{RearrangementParams}
 \alias{RearrangementParams-class}
-\alias{maxClusterSize}
-\alias{maxClusterSize,RearrangementParams-method}
-\alias{minClusterSize}
-\alias{minClusterSize,RearrangementParams-method}
-\alias{minGapWidth}
-\alias{minGapWidth,RearrangementParams-method}
-\alias{minNumberTagsPerCluster}
-\alias{minNumberTagsPerCluster,RearrangementParams-method}
-\alias{percentLinking}
-\alias{percentModalType}
-\alias{percentModalType,RearrangementParams-method}
+\alias{RearrangementParams}
 \alias{rpSeparation}
+\alias{minNumberTagsPerCluster}
+\alias{minClusterSize}
+\alias{maxClusterSize}
+\alias{minGapWidth}
+\alias{percentModalType}
 \alias{rpSeparation,RearrangementParams-method}
+\alias{minNumberTagsPerCluster,RearrangementParams-method}
+\alias{minClusterSize,RearrangementParams-method}
+\alias{minNumberTagsPerCluster,RearrangementParams-method}
+\alias{maxClusterSize,RearrangementParams-method}
+\alias{minGapWidth,RearrangementParams-method}
+\alias{percentModalType,RearrangementParams-method}
+\alias{percentLinking}
 \title{Parameter class for rearrangement analysis}
 \usage{
 RearrangementParams(rp_separation = 10000, min_number_tags_per_cluster = 5,
@@ -115,6 +116,7 @@ Having determined the type of rearrangment supported by each read
 
 \item{\code{percent_linking}}{length-one numeric vector}
 }}
+
 \examples{
 
 ## Default rearrangement parameters for whole genome sequence data
@@ -123,4 +125,3 @@ rp <- RearrangementParams()
 
 }
 \keyword{internal}
-

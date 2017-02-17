@@ -3,11 +3,11 @@
 \docType{class}
 \name{Rearrangement-class}
 \alias{Rearrangement-class}
-\alias{[,Rearrangement,ANY,ANY,ANY-method}
-\alias{length,Rearrangement-method}
-\alias{names,Rearrangement-method}
 \alias{partitioning}
 \alias{partitioning,Rearrangement-method}
+\alias{length,Rearrangement-method}
+\alias{names,Rearrangement-method}
+\alias{[,Rearrangement,ANY,ANY,ANY-method}
 \title{A class for storing rearrangement data}
 \usage{
 partitioning(object)
@@ -74,5 +74,5 @@ belong to the modal rearrangement}
 \item{\code{fraction_linking_tags}}{the fraction of all tags for a linked
 bin that link the two tag clusters}
 }}
-\keyword{internal}
 
+\keyword{internal}

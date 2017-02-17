@@ -3,8 +3,8 @@
 \docType{methods}
 \name{indexRanges}
 \alias{indexRanges}
-\alias{indexRanges,PreprocessViews2-method}
 \alias{indexRanges<-}
+\alias{indexRanges,PreprocessViews2-method}
 \alias{indexRanges<-,PreprocessViews2-method}
 \title{Indexes the GRanges of a BamViews-derived class}
 \usage{
@@ -25,4 +25,3 @@ indexRanges(object) <- value
 Indexes the GRanges of a BamViews-derived class
 }
 \keyword{internal}
-

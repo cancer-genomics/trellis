@@ -3,10 +3,10 @@
 \docType{methods}
 \name{proper}
 \alias{proper}
-\alias{proper,StructuralVariant,GAlignmentPairs-method}
-\alias{proper,StructuralVariant-method}
 \alias{proper<-}
+\alias{proper,StructuralVariant-method}
 \alias{proper<-,StructuralVariant,GAlignmentPairs-method}
+\alias{proper,StructuralVariant,GAlignmentPairs-method}
 \title{Get / set properly paired reads}
 \usage{
 proper(object)
@@ -27,4 +27,3 @@ proper(object) <- value
 Get / set properly paired reads
 }
 \keyword{internal}
-

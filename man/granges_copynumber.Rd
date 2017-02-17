@@ -16,4 +16,3 @@ Calculates the mean normalized read-depth for a set of genomic
 intervals in a \code{GRanges} object.
 }
 \keyword{internal}
-

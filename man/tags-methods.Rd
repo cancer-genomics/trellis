@@ -3,10 +3,10 @@
 \docType{methods}
 \name{tags}
 \alias{tags}
-\alias{tags,Rearrangement,ANY-method}
-\alias{tags,Rearrangement-method}
 \alias{tags<-}
+\alias{tags,Rearrangement-method}
 \alias{tags<-,Rearrangement-method}
+\alias{tags,Rearrangement,ANY-method}
 \title{Accessor for all the improper reads}
 \usage{
 tags(object)
@@ -32,4 +32,3 @@ reads supporting a rearrangement, it may also be important to carry
 forward tags that do not support the rearrangement.
 }
 \keyword{internal}
-

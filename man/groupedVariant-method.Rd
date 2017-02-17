@@ -3,10 +3,10 @@
 \docType{methods}
 \name{groupedVariant}
 \alias{groupedVariant}
-\alias{groupedVariant,StructuralVariant,ANY-method}
-\alias{groupedVariant,StructuralVariant-method}
 \alias{groupedVariant<-}
+\alias{groupedVariant,StructuralVariant-method}
 \alias{groupedVariant<-,StructuralVariant-method}
+\alias{groupedVariant,StructuralVariant,ANY-method}
 \title{Accessor for variable indicating a grouping for deletions}
 \usage{
 groupedVariant(object)
@@ -30,4 +30,3 @@ The grouping can indicate, for example, overlapping hemizygous
 deletions.
 }
 \keyword{internal}
-

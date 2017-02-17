@@ -20,4 +20,3 @@ a \code{GRanges} object for the genomic intervals of the deletions
 \description{
 Extract deletion regions from a StructuralVariant object
 }
-

@@ -2,19 +2,19 @@
 % Please edit documentation in R/ExonSubset-class.R
 \docType{class}
 \name{inRearrangement.left}
-\alias{ExonSubset}
-\alias{ExonSubset-class}
-\alias{ExonSubset-method}
 \alias{inRearrangement.left}
-\alias{inRearrangement.left,ExonSubset-method}
 \alias{inRearrangement.right}
-\alias{inRearrangement.right,ExonSubset-method}
 \alias{name.left}
-\alias{name.left,ExonSubset-method}
 \alias{name.right}
-\alias{name.right,}
+\alias{ExonSubset-class}
+\alias{ExonSubset}
+\alias{name.left,ExonSubset-method}
 \alias{name.right,ExonSubset-method}
+\alias{name.right,}
+\alias{ExonSubset-method}
 \alias{names,ExonSubset-method}
+\alias{inRearrangement.left,ExonSubset-method}
+\alias{inRearrangement.right,ExonSubset-method}
 \title{Container for storing information to subset transcripts}
 \usage{
 inRearrangement.left(object)
@@ -70,8 +70,8 @@ Container for storing information to subset transcripts
 
 \item{\code{inRearrangement.right}}{a \code{LogicalList}}
 }}
+
 \examples{
 ExonSubset()
 }
 \keyword{-internal}
-

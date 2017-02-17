@@ -29,4 +29,3 @@ names(linked) <- "a"
 uncouple(linked)
 
 }
-

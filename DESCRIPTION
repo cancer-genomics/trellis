@@ -29,7 +29,7 @@ License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Collate:
     'help.R'
     'DataPaths-class.R'

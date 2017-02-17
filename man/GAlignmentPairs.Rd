@@ -13,4 +13,3 @@ an empty \code{GAlignmentPairs} object
 Constructor for an empty GAlignmentPairs object
 }
 \keyword{internal}
-

@@ -2,8 +2,8 @@
 % Please edit documentation in R/data.R
 \docType{data}
 \name{rear_list-data}
-\alias{rear_list}
 \alias{rear_list-data}
+\alias{rear_list}
 \title{An example RearrangementList}
 \format{a \code{RearrangementList}}
 \usage{
@@ -18,4 +18,3 @@ modalRearrangement(rear_list)
 linkedBins(rear_list)
 }
 \keyword{datasets}
-

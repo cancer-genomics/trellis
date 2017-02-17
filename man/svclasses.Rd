@@ -8,4 +8,3 @@
 \description{
 svclass provides infrastructure for structural variant analyses of sequencing data.
 }
-

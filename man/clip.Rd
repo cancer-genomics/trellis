@@ -51,4 +51,3 @@ fusion.
 \seealso{
 \code{\link{fuse}}
 }
-

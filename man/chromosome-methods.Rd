@@ -3,13 +3,13 @@
 \docType{methods}
 \name{autosomeNames}
 \alias{autosomeNames}
-\alias{autosomeNames,BamViews-method}
-\alias{autosomeNames,GRanges-method}
 \alias{chromosome}
-\alias{chromosome,GAlignments-method}
 \alias{chromosome,GRanges-method}
 \alias{chromosome,RangedSummarizedExperiment-method}
+\alias{chromosome,GAlignments-method}
 \alias{chromosome,StructuralVariant-method}
+\alias{autosomeNames,BamViews-method}
+\alias{autosomeNames,GRanges-method}
 \title{Extract autosomal (human) sequence levels}
 \usage{
 autosomeNames(object)
@@ -36,4 +36,3 @@ Extract autosomal (human) sequence levels
 
 Return seqnames of a \code{GRanges} object as a character vector
 }
-

@@ -2,24 +2,24 @@
 % Please edit documentation in R/RearrangementList-class.R, R/seqinfo-utils.R
 \docType{class}
 \name{RearrangementList}
-\alias{$,RearrangementList,ANY-method}
-\alias{$,RearrangementList-method}
-\alias{$<-,RearrangementList-method}
 \alias{RearrangementList}
-\alias{RearrangementList,Rearrangement-method}
-\alias{RearrangementList,list-method}
-\alias{RearrangementList,missing-method}
 \alias{RearrangementList-class}
-\alias{[,RearrangementList,ANY,ANY,ANY-method}
-\alias{[[,RearrangementList,ANY,ANY-method}
-\alias{[[<-,RearrangementList,ANY,ANY,ANY-method}
-\alias{colData,RearrangementList,ANY-method}
+\alias{RearrangementList,missing-method}
+\alias{RearrangementList,list-method}
+\alias{RearrangementList,Rearrangement-method}
 \alias{colData,RearrangementList-method}
 \alias{colData<-,RearrangementList,ANY-method}
+\alias{colData,RearrangementList,ANY-method}
 \alias{elementType,RearrangementList-method}
 \alias{length,RearrangementList-method}
 \alias{names,RearrangementList-method}
 \alias{overlapsAny,RearrangementList,GRanges-method}
+\alias{$<-,RearrangementList-method}
+\alias{$,RearrangementList,ANY-method}
+\alias{$,RearrangementList-method}
+\alias{[,RearrangementList,ANY,ANY,ANY-method}
+\alias{[[,RearrangementList,ANY,ANY-method}
+\alias{[[<-,RearrangementList,ANY,ANY,ANY-method}
 \alias{seqlevels,RearrangementList-method}
 \title{Constructor for \code{RearrangementList} class}
 \usage{
@@ -52,8 +52,8 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
 
 \S4method{[[}{RearrangementList,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
-\S4method{[[}{RearrangementList,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE) <-
-  value
+\S4method{[[}{RearrangementList,ANY,ANY,ANY}(x, i, j, ...,
+  drop = FALSE) <- value
 
 \S4method{seqlevels}{RearrangementList}(x)
 }
@@ -119,6 +119,7 @@ rearrangements in a \code{RearrangementList}.
 
 \item{\code{percent_rearrangement}}{a \code{numeric} vector}
 }}
+
 \examples{
 RearrangementList()
 
@@ -129,4 +130,3 @@ RearrangementList()
 \code{\linkS4class{Rearrangement}}
 }
 \keyword{internal}
-

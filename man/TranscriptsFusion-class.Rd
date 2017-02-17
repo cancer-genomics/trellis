@@ -2,19 +2,19 @@
 % Please edit documentation in R/Transcripts-class.R
 \docType{class}
 \name{fusions}
-\alias{TranscriptsFusion}
-\alias{TranscriptsFusion-class}
-\alias{[,TranscriptsFusion,ExonSubset,ANY,ANY-method}
-\alias{fusionNames}
-\alias{fusionNames,TranscriptsFusion-method}
 \alias{fusions}
-\alias{fusions,TranscriptsFusion,list-method}
-\alias{fusions,TranscriptsFusion-method}
 \alias{fusions<-}
-\alias{fusions<-,TranscriptsFusion,list-method}
+\alias{fusionNames}
 \alias{identifier<-}
 \alias{numberFusions}
+\alias{TranscriptsFusion-class}
+\alias{TranscriptsFusion}
+\alias{fusions,TranscriptsFusion-method}
+\alias{fusions<-,TranscriptsFusion,list-method}
+\alias{fusions,TranscriptsFusion,list-method}
+\alias{fusionNames,TranscriptsFusion-method}
 \alias{numberFusions,TranscriptsFusion-method}
+\alias{[,TranscriptsFusion,ExonSubset,ANY,ANY-method}
 \title{A container for fused transcripts}
 \usage{
 fusions(object)
@@ -65,8 +65,8 @@ Container for fused transcripts.
 \describe{
 \item{\code{fusions}}{a \code{list} of fusions}
 }}
+
 \examples{
 TranscriptsFusion()
 }
 \keyword{internal}
-

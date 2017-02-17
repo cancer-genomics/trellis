@@ -2,10 +2,10 @@
 % Please edit documentation in R/Deletion-class.R, R/RearrangementList-class.R
 \docType{methods}
 \name{lapply,StructuralVariant-method}
-\alias{lapply,RearrangementList-method}
 \alias{lapply,StructuralVariant-method}
-\alias{sapply,RearrangementList-method}
 \alias{sapply,StructuralVariant-method}
+\alias{sapply,RearrangementList-method}
+\alias{lapply,RearrangementList-method}
 \title{Functionals for structural variant classes}
 \usage{
 \S4method{lapply}{StructuralVariant}(X, FUN, ...)
@@ -33,4 +33,3 @@
 Functionals for structural variant classes
 }
 \keyword{internal}
-

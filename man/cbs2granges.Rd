@@ -17,4 +17,3 @@ a \code{GRanges} object
 \description{
 Coerce a DNAcopy object to GRanges
 }
-

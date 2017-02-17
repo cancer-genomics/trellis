@@ -3,10 +3,10 @@
 \docType{methods}
 \name{copynumber}
 \alias{copynumber}
-\alias{copynumber,RangedSummarizedExperiment-method}
-\alias{copynumber,StructuralVariant-method}
 \alias{copynumber<-}
+\alias{copynumber,RangedSummarizedExperiment-method}
 \alias{copynumber<-,RangedSummarizedExperiment,matrix-method}
+\alias{copynumber,StructuralVariant-method}
 \alias{copynumber<-,StructuralVariant,ANY-method}
 \title{Accessor for 'copy' assays}
 \usage{
@@ -31,4 +31,3 @@ copynumber(object) <- value
 Extract matrix of log2-transformed estimates of copy number
 relative to autosomal mode or median
 }
-

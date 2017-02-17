@@ -27,4 +27,3 @@ using a \code{PreprocessViews2} object.
 REFACTOR: both ... and withDimnames are ignored.  we should just
 provide a different generic/method.
 }
-

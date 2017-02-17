@@ -17,4 +17,3 @@ When both reads of a pair are aligned to the same chromosome, this
 function makes a \code{GRanges} object of the interval (DNA
 fragment).
 }
-

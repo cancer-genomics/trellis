@@ -2,14 +2,14 @@
 % Please edit documentation in R/SegmentParam-class.R
 \docType{class}
 \name{SegmentParam-class}
-\alias{SegmentParam}
 \alias{SegmentParam-class}
+\alias{SegmentParam}
 \alias{cbs_alpha}
-\alias{cbs_alpha,SegmentParam-method}
-\alias{undo.SD}
-\alias{undo.SD,SegmentParam-method}
 \alias{undo.splits}
+\alias{undo.SD}
+\alias{cbs_alpha,SegmentParam-method}
 \alias{undo.splits,SegmentParam-method}
+\alias{undo.SD,SegmentParam-method}
 \title{A class for storing segmentation parameters}
 \usage{
 SegmentParam(alpha = 0.001, undo.splits = "sdundo", undo.SD = 2,
@@ -57,6 +57,7 @@ A parameters class for segmentation by DNAcopy
 
 \item{\code{verbose}}{A length-one numeric vector}
 }}
+
 \examples{
 sp <- SegmentParam()
 cbs_alpha(sp)
@@ -71,4 +72,3 @@ A description for each of these argments can be found by reading
   the documentation for the \code{segment} function in the
   \code{DNAcopy} package.
 }
-

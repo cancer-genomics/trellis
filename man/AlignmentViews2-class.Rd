@@ -2,16 +2,16 @@
 % Please edit documentation in R/AlignmentViews-class.R
 \docType{class}
 \name{AlignmentViews2-class}
-\alias{AlignmentViews2}
 \alias{AlignmentViews2-class}
-\alias{[,AlignmentViews2,missing,character,ANY-method}
-\alias{[,AlignmentViews2,missing,character-method}
-\alias{[,AlignmentViews2,missing,logical,ANY-method}
-\alias{[,AlignmentViews2,missing,logical-method}
-\alias{[,AlignmentViews2,missing,numeric,ANY-method}
-\alias{[,AlignmentViews2,missing,numeric-method}
+\alias{AlignmentViews2}
 \alias{improperPaths}
 \alias{improperPaths,AlignmentViews2-method}
+\alias{[,AlignmentViews2,missing,numeric,ANY-method}
+\alias{[,AlignmentViews2,missing,numeric-method}
+\alias{[,AlignmentViews2,missing,logical,ANY-method}
+\alias{[,AlignmentViews2,missing,logical-method}
+\alias{[,AlignmentViews2,missing,character,ANY-method}
+\alias{[,AlignmentViews2,missing,character-method}
 \title{Container for storing views to extracted alignments}
 \usage{
 AlignmentViews2(bviews = BamViews(), path)
@@ -64,6 +64,7 @@ Accessor for file names containing improper read pair alignments
 \describe{
 \item{\code{improperAlignmentPaths}}{character-vector of file paths}
 }}
+
 \examples{
   library(Rsamtools)
   require(TestBams)
@@ -76,4 +77,3 @@ Accessor for file names containing improper read pair alignments
   aviews
   improperPaths(aviews)
 }
-

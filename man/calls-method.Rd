@@ -3,10 +3,10 @@
 \docType{methods}
 \name{calls}
 \alias{calls}
-\alias{calls,StructuralVariant,ANY-method}
-\alias{calls,StructuralVariant-method}
 \alias{calls<-}
+\alias{calls,StructuralVariant-method}
 \alias{calls<-,StructuralVariant-method}
+\alias{calls,StructuralVariant,ANY-method}
 \title{Type of deletion}
 \usage{
 calls(object)
@@ -28,4 +28,3 @@ hemizygous, hemizygous+, homozygous, and homozygous+.  The '+'
 denotes that improper read pairs support the deletion identified
 from the read depth analysis.
 }
-

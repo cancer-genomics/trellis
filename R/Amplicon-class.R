@@ -89,21 +89,25 @@ setClass("AmpliconGraph", representation(graph="graphNEL",
 
 setValidity("AmpliconGraph", function(object){
   msg <- TRUE
-  if(length(ampliconRanges(object)) > 0 || length(nodes(object)) > 0){
-    if(length(ampliconRanges(object)) != length(nodes(object))){
-      msg <- "ampliconRanges should be the same length as nodes"
-      return(msg)
-    }
-    if(!identical(names(ampliconRanges(object)), nodes(object))){
-      msg <- "names of ampliconRanges should be identical to the nodes labels"
-      return(msg)
-    }
-##     any_amplicons_in_germline <- anyAmpliconsWithinGermline(object)
-##     if(any_amplicons_in_germline){
-##       msg <- "Some amplicons are contained within CNV / outiers identified in germline"
-##       return(msg)
-##     }
+  if(!identical(names(ranges(object)), nodes(object))){
+    msg <- "names of amplicons should be identical to the nodes labels"
+    return(msg)
   }
+##  if(length(ampliconRanges(object)) > 0 || length(nodes(object)) > 0){
+##    if(length(ampliconRanges(object)) != length(nodes(object))){
+##      msg <- "ampliconRanges should be the same length as nodes"
+##      return(msg)
+##    }
+##    if(!identical(names(ampliconRanges(object)), nodes(object))){
+##      msg <- "names of ampliconRanges should be identical to the nodes labels"
+##      return(msg)
+##    }
+##    ##     any_amplicons_in_germline <- anyAmpliconsWithinGermline(object)
+##    ##     if(any_amplicons_in_germline){
+##    ##       msg <- "Some amplicons are contained within CNV / outiers identified in germline"
+##    ##       return(msg)
+##    ##     }
+  ##  }
   if(any(names(ranges(object))=="") || is.null(names(ranges(object)))){
     msg <- "GRanges in slot ranges must be named.  See ampliconNames()"
     return(msg)

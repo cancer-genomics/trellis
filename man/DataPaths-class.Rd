@@ -2,10 +2,10 @@
 % Please edit documentation in R/DataPaths-class.R
 \docType{class}
 \name{DataPaths-class}
-\alias{DataPaths}
 \alias{DataPaths-class}
-\alias{[,DataPaths,character,ANY,ANY-method}
+\alias{DataPaths}
 \alias{[[,DataPaths,character,ANY-method}
+\alias{[,DataPaths,character,ANY,ANY-method}
 \title{A class for storing file paths to intermediate data types}
 \usage{
 DataPaths(path = tempdir(), rootname = "sv_data", dryrun = FALSE)
@@ -58,4 +58,3 @@ all_paths["gc"]
 \seealso{
 \code{\link{topics}}
 }
-

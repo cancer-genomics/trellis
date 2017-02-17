@@ -2,16 +2,20 @@
 % Please edit documentation in R/Deletion-class.R
 \docType{methods}
 \name{indexProper}
-\alias{indexImproper}
-\alias{indexImproper,StructuralVariant,list-method}
-\alias{indexImproper,StructuralVariant-method}
-\alias{indexImproper<-}
-\alias{indexImproper<-,StructuralVariant,list-method}
 \alias{indexProper}
-\alias{indexProper,StructuralVariant,list-method}
-\alias{indexProper,StructuralVariant-method}
 \alias{indexProper<-}
+\alias{indexImproper<-}
+\alias{indexImproper}
 \alias{indexProper<-,StructuralVariant,list-method}
+\alias{indexProper,StructuralVariant,list-method}
+\alias{indexImproper<-,StructuralVariant,list-method}
+\alias{indexImproper,StructuralVariant,list-method}
+\alias{indexProper,StructuralVariant-method}
+\alias{indexProper<-,StructuralVariant,list-method}
+\alias{indexProper,StructuralVariant,list-method}
+\alias{indexImproper,StructuralVariant-method}
+\alias{indexImproper<-,StructuralVariant,list-method}
+\alias{indexImproper,StructuralVariant,list-method}
 \title{Accessor of an index for the proper read pairs}
 \usage{
 indexProper(object)
@@ -46,4 +50,3 @@ a numeric vector
 Accessor of an index for the proper read pairs
 }
 \keyword{internal}
-
