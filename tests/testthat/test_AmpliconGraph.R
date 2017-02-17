@@ -48,7 +48,7 @@ test_that("sv_amplicons_internals", {
   ##
   ## merge adjacent amplicons that have similar segment means
   ##
-  tmp <- joinNearGRanges(ranges(ag), thr=0.05)
+  tmp <- joinNearGRanges(ranges(ag), params)
   names(tmp) <- ampliconNames(tmp)
 
   ## the names of the nodes no longer correspond to the range names
@@ -62,7 +62,7 @@ test_that("sv_amplicons_internals", {
   ##
   ## REFACTOR: could this step use the saved improper read pairs
   ##
-  ## 
+  ##
   rp <- svalignments::get_readpairs(ag, bamPaths(bview))
   ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
   qr <- focalAmpliconDupRanges(ag, LOW_THR=LOW_THR, MAX_SIZE=500e3)
@@ -114,7 +114,8 @@ test_that("sv_amplicons_internals", {
 
   expected <- list("chr8:128,692,001",
                    c("chr8:129,353,001", "chr8:128,692,001", "chr8:129,164,001"),
-                   c("chr5:176,034,001", "chr8:129,164,001", "chr8:129,353,001", "chr8:128,515,001"))
+                   c("chr5:176,034,001", "chr8:129,164,001", "chr8:129,353,001",
+                     "chr8:128,515,001"))
   names(expected) <- c("chr5:176,034,001",
                        "chr8:128,515,001",
                        "chr8:128,692,001")

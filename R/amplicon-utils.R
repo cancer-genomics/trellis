@@ -126,6 +126,7 @@ ampliconParams <- function(AMP_THR=log2(2.75),
   filters$LOW_THR <- LOW_THR
   filters$MIN_WIDTH <- MIN_WIDTH
   filters$MIN_SEGMEAN_DIFF <- MIN_SEGMEAN_DIFF
+  filters$min.gapwidth <- min.gapwidth
   filters
 }
 
@@ -437,7 +438,8 @@ joinNearGRanges <- function(object, params){
   object2 <- filterBy(object, gnew)
   object3 <- c(object2, gnew)
   object3$seg.mean <- round(object3$seg.mean, 2)
-  sort(object3)
+  object3 <- sort(object3)
+  object3
 }
 
 flankingRanges <- function(object, shift=2){
@@ -1026,7 +1028,7 @@ makeAGraph <- function(segs, af, params){
 #' @param transcripts a \code{GRanges} object of transcripts
 sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ag <- makeAGraph(segs, amplicon_filters, params)
-  tmp <- joinNearGRanges(ranges(ag), thr=0.05)
+  tmp <- joinNearGRanges(ranges(ag), params)
   names(tmp) <- ampliconNames(tmp)
   ## the names of the nodes no longer correspond to the range names
   ## stopifnot(nodes(ag) %in% names(tmp)), and so

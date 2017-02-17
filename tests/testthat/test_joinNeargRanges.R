@@ -8,7 +8,8 @@ test_that("joinNearGRanges", {
   names(gr) <-letters[1:5]
   params <- ampliconParams(MIN_SEGMEAN_DIFF=0.2)
   merged <- joinNearGRanges(gr, params)
-  expect_identical(gr, merged) ## only merges if amplicon is at least 2kb
+  expected <- gr
+  expect_identical(expected, merged) ## only merges if amplicon is at least 2kb
   params$MIN_WIDTH <- 500
   merged <- joinNearGRanges(gr, params)
   expected <- GRanges(rep("chr1", 3), IRanges(c(1001, 3001, 9001), width=c(1000, 5000, 1000)))
