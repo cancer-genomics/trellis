@@ -89,47 +89,22 @@ test_that("sv_amplicons_internals", {
   }
   ag.ffab104 <- readRDS("linkFocalDups.ffab104.rds")
   expect_identical(ag.ffab104, ag)
-})
 
-  
-.test_that <- function(nm, expr) NULL
-
-.test_that("", {
   ag <- linkAmplicons(ag, irp, edgeParam=param)
-  expect_identical(numEdges(ag), 2)
-  expect_identical(numNodes(ag), 5L)
+  if(FALSE){
+    saveRDS(ag, file="linkAmplicons.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("linkAmplicons.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
 
-  ##
-  ## linkNearAmplicons
-  ##
-  object <- ag
-  maxgap <- 500e3
-  ##
-  ## *remove some arguments*
-  ##
-  hits <- findOverlaps(ampliconRanges(object), maxgap=maxgap)
-  hits <- hits[!isSelfHit(hits)]
-  hits <- hits[!isRedundantHit(hits)]
-  if(length(hits)==0) return(object)
-  new_edges <- paste(names(ampliconRanges(object))[queryHits(hits)],
-                     names(ampliconRanges(object))[subjectHits(hits)],
-                     sep="-")
-  from <-  node1(new_edges)
-  to <- node2(new_edges)
-  existing <- edges(object)[from] ## is 'to' in any of the existing edges
-  edge_exists <- mapply(function(to, existing) to %in% existing,
-                        to=to, existing=existing)
-  new_edges <- new_edges[!edge_exists]
-  if(length(new_edges)==0) return(object)
-  graph(object) <- addEdge(node1(new_edges),
-                           node2(new_edges), graph(object))
-  ## END
-
-  ## TODO: add maxgap as parameter
   ag <- linkNearAmplicons(ag, maxgap=500e3)
-  expect_identical(ag, object)
-  e <-edges(ag)
+  if(FALSE){
+    saveRDS(ag, file="linkNearAmplicons.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("linkNearAmplicons.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
 
+  e <-edges(ag)
   expected <- list("chr8:128,692,001",
                    c("chr8:129,353,001", "chr8:128,692,001", "chr8:129,164,001"),
                    c("chr5:176,034,001", "chr8:129,164,001", "chr8:129,353,001",
@@ -139,15 +114,34 @@ test_that("sv_amplicons_internals", {
                        "chr8:128,692,001")
   expect_identical(e[1:3], expected)
   expect_identical(nodes(ag), names(e))
-
   ag <- filterSmallAmplicons (ag)
+  if(FALSE){
+    saveRDS(ag, file="filterSmallAmplicons.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("filterSmallAmplicons.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
+
   ag <- setAmpliconGroups (ag)
+  if(FALSE){
+    saveRDS(ag, file="setAmpliconGroups.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("setAmpliconGroups.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
+
   ag <- setGenes (ag, transcripts)
+  if(FALSE){
+    saveRDS(ag, file="setAmpliconGenes.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("setAmpliconGenes.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
+
   ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
-
-
-  expect_identical(ag, ag2)
+  if(FALSE){
+    saveRDS(ag, file="setDrivers.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("setDrivers.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
 })
 
 .test_that <- function(name, expr) NULL
