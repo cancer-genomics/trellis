@@ -43,7 +43,7 @@ test_that("AmpliconGraph", {
 
   ag <- makeAGraph(segs, germline_filters, params)
   if(FALSE){
-    saveRDS(ag, file="makeAGraph.rds")
+    saveRDS(ag, file="makeAGraphffab104.rds")
   }
 })
 

@@ -23,17 +23,12 @@ test_that("sv_amplicons_internals", {
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   amplicon_filters <- germline_filters
   params <- ampliconParams()
-  ## gr is the raw segmentation
-  segs <- gr
-  ag2 <- sv_amplicons(bview,
-                      segs=gr,
-                      amplicon_filters=germline_filters,
-                      params=ampliconParams(),
-                      transcripts=transcripts)
   ##
   ## Begin testing internals of sv_amplicons
   ##
   ag <- makeAGraph(segs, amplicon_filters, params)
+  ag.ffab104 <- readRDS("makeAGraphffab104.rds")
+  expect_identical(ag, ag.ffab104)
   expect_true(validObject(ag))
   starts <- c(176034001, 128692001, 129164001, 129353001)
   ends <- c(177025001, 129163001, 129322001, 129615001)
@@ -65,7 +60,19 @@ test_that("sv_amplicons_internals", {
   ##
   rp <- svalignments::get_readpairs(ag, bamPaths(bview))
   ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
+  if(FALSE){
+    saveRDS(ag, file="svcnvs/tests/testthat/addFocalDups.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("addFocalDups.ffab104.rds")
+  expect_identical(ag, ag.ffab104)
+
   qr <- focalAmpliconDupRanges(ag, LOW_THR=LOW_THR, MAX_SIZE=500e3)
+  if(FALSE){
+    saveRDS(qr, file="svcnvs/tests/testthat/focalAmpliconDup.ffab104.rds")
+  }
+  qr.ffab104 <- readRDS("focalAmpliconDup.ffab104.rds")
+  expect_identical(qr, qr.ffab104)
+
   expected <- GRanges("chr5", IRanges(58519001, 58788001))
   seqinfo(expected) <- seqinfo(qr)
   expect_identical(qr[1], expected)
@@ -77,6 +84,17 @@ test_that("sv_amplicons_internals", {
   ##
   param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
   ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR, edgeParam=param)
+  if(FALSE){
+    saveRDS(ag, file="linkFocalDups.ffab104.rds")
+  }
+  ag.ffab104 <- readRDS("linkFocalDups.ffab104.rds")
+  expect_identical(ag.ffab104, ag)
+})
+
+  
+.test_that <- function(nm, expr) NULL
+
+.test_that("", {
   ag <- linkAmplicons(ag, irp, edgeParam=param)
   expect_identical(numEdges(ag), 2)
   expect_identical(numNodes(ag), 5L)
