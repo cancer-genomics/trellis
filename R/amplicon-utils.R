@@ -271,6 +271,16 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
             xy
           })
 
+.add_mcols <- function(g){
+  g$seg.mean <- NA
+  g$is_amplicon <- FALSE
+  g$hgnc <- as.character(NA)
+  g$driver <- as.character(NA)
+  g$biol_sign <- as.character(NA)
+  g$groups <- as.factor(NA)
+  g
+}
+
 #' Constructor for AmpliconGraph
 #'
 #' Constructor for \code{AmpliconGraph}.
@@ -312,12 +322,7 @@ AmpliconGraph <- function(ranges=GRanges(),
   ##
   g <- gaps0(ranges)
   if(length(g) > 0){
-    g$seg.mean <- NA
-    g$is_amplicon <- FALSE
-    g$hgnc <- as.character(NA)
-    g$driver <- as.character(NA)
-    g$biol_sign <- as.character(NA)
-    g$groups <- as.factor(NA)
+    g <- .add_mcols(g)
     ranges <- sort(c(ranges, g))
   }
   ##
