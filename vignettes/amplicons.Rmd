@@ -16,6 +16,7 @@ This vignette illustrates the workflow for identifying linked amplicons.
 # Workflow
 
 ```{r packages}
+library(Rsamtools)
 library(svpreprocess)
 library(svcnvs)
 ```
@@ -53,7 +54,7 @@ amplicons.
 
 ```{r initialgraph}
 params[["AMP_THR"]]
-ag <- makeAGraph(segs, germline_filters, params)
+ag <- svcnvs:::makeAGraph(segs, germline_filters, params)
 print(ag)
 ```
 

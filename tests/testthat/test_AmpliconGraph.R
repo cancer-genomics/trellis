@@ -1,4 +1,4 @@
-context("amplicons")
+context("AmpliconGraph")
 
 test_that("AmpliconGraph", {
   ag <- AmpliconGraph()
@@ -15,22 +15,15 @@ test_that("AmpliconGraph", {
   ## read in some CNVs
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
-  gr <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
 
   ##
   ## Begin testing internals of sv_amplicons
   ##
-  amplicon_filters <- germline_filters
-  params <- ampliconParams()
   ## gr is the raw segmentation
-  segs <- gr
-
-  amplicon_filters <- germline_filters
   params <- ampliconParams()
-  ## gr is the raw segmentation
-  segs <- gr
   segs$is_amplicon <- segs$seg.mean > params[["AMP_THR"]]
   ag <- AmpliconGraph(ranges=segs,
                       filters=germline_filters,

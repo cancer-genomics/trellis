@@ -18,7 +18,7 @@ test_that("sv_amplicons_internals", {
   ## read in some CNVs
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
-  gr <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   amplicon_filters <- germline_filters
