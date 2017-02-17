@@ -57,10 +57,39 @@ ag <- makeAGraph(segs, germline_filters, params)
 print(ag)
 ```
 
+The four amplicons in this initial graph serve as seeds. We next evaluate
+whether any of the segments can be merged. In particular, if two adjacent
+segments have an absolute difference of means less than `MIN_SEGMEAN_DIFF`, the
+adjacent segments are merged.
 
+```{r joinNear}
+params[["MIN_SEGMEAN_DIFF"]]
+merged <- joinNearGRanges(ranges(ag), params)
+names(merged) <- ampliconNames(merged)
+nmerged <- length(ranges(ag)) - length(merged)
+nmerged
+```
 
+We use improperly paired reads to link amplicons. First, we extract the
+improperly paired reads and then we evaluate whether there are duplications
+flanking the seed amplicons that can be linked to the seeds by the improperly
+paired reads. In order to link the flanking segments to the seeds, we require
+the adjacent segments to have mean log ratios consistent with a duplication
+(`LOW_THR`).
 
+```{r improperlyPaired}
+params[["LOW_THR"]]
+rp <- svalignments::get_readpairs(ag, bamPaths(bview))
+ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
+ag
+```
 
+TODO: what does this do. how does the graph change? What do these segments look
+like?
 
-
-
+```{r focalAmpDup}
+qr <- focalAmpliconDupRanges(ag, LOW_THR=params[["LOW_THR"]],
+                             MAX_SIZE=500e3)
+queryRanges(ag) <- qr
+qr
+```
