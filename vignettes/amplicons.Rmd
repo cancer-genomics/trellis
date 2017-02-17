@@ -1,0 +1,66 @@
+---
+title: "Identifying linked amplicons"
+author: "Robert Scharpf"
+date: \today
+output: BiocStyle::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Overview of svcnvs package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc} 
+---
+
+# Introduction
+
+This vignette illustrates the workflow for identifying linked amplicons.
+
+# Workflow
+
+```{r packages}
+library(svpreprocess)
+library(svcnvs)
+```
+
+We assume the bin-level estimates of coverage have been normalized, transformed
+to the log-scale, and segmented. We load the segmented log ratios from the
+ovarian cell CGOV44T and the corresponding BamView.
+
+```{r load_data}
+cv.extdata <- system.file("extdata", package="svcnvs")
+segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+extdata <- system.file("extdata", package="svbams")
+bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
+```
+
+Next, we load sequence- and germline-based filters.
+
+```{r filters}
+library(svfilters.hg19)
+data(germline_filters)
+```
+
+A default set of parameters for linking amplicons can be generated using the function `ampliconParams`:
+
+```{r params}
+params <- ampliconParams()
+```
+
+An initial amplicon graph (with no edges) is constructed based on a hard
+threshold of the segment means. The print method provides various summary
+statistics of the data contained in this object, including the number of
+amplicons, the number of links between the amplicons (currently 0), the total
+size of the sequence-based filters (234.47 Mb), and the total size of the
+amplicons.
+
+```{r initialgraph}
+params[["AMP_THR"]]
+ag <- makeAGraph(segs, germline_filters, params)
+print(ag)
+```
+
+
+
+
+
+
+
+
