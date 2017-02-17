@@ -66,7 +66,9 @@ test_that("sv_amplicons_internals", {
   ag.ffab104 <- readRDS("addFocalDups.ffab104.rds")
   expect_identical(ag, ag.ffab104)
 
-  qr <- focalAmpliconDupRanges(ag, LOW_THR=LOW_THR, MAX_SIZE=500e3)
+  ## TODO: ADD MAX_SIZE
+  qr <- focalAmpliconDupRanges(ag, LOW_THR=params[["LOW_THR"]],
+                               MAX_SIZE=500e3)
   if(FALSE){
     saveRDS(qr, file="svcnvs/tests/testthat/focalAmpliconDup.ffab104.rds")
   }
