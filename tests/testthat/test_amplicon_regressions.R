@@ -85,7 +85,7 @@ test_that("sv_amplicons_internals", {
   ## been linked to any of the seeds
   ##
   ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
-  ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR, edgeParam=params[["edge"]])
+  ag <- linkFocalDups(ag, irp, params)
   if(FALSE){
     saveRDS(ag, file="linkFocalDups.ffab104.rds")
   }

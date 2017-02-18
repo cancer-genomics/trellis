@@ -688,8 +688,9 @@ addDuplications <- function(object, granges, edges){
   object
 }
 
-linkFocalDups <- function(object, rp, LOW_THR,
-                         edgeParam=FilterEdgeParam()){
+linkFocalDups <- function(object, rp, params){
+  LOW_THR <- params[["LOW_THR"]]
+  edgeParam <- params[["edge"]]
   if(totalWidth(queryRanges(object))==0) return(object)
   anchors <- numberAnchored(object, rp)
   se_anchors <- singleEndAnchors(anchors)
@@ -1093,8 +1094,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=paired_bin_filter)
   ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
   edge.p <- params[["edge"]]
-  ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR,
-                      edgeParam=edge.p)
+  ag <- linkFocalDups(ag, irp, params)
   ag <- linkAmplicons(ag, irp, edgeParam=edge.p)
   ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   ag <- filterSmallAmplicons (ag)
