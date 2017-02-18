@@ -18,7 +18,6 @@ test_that("addFocalDupsFlankingAmplicon", {
   ## setAmpliconGroups fails
   ranges(ag) <- merged
   rp <- svalignments::get_readpairs(ag, bamfile)
-
   flanks <- flankingDuplications(ag, minimum_foldchange=params[["LOW_THR"]])
   ## these are two segments that are amplified to a lesser extent than the most
   ## amplified amplicon on chr8
@@ -50,7 +49,6 @@ test_that("addFocalDupsFlankingAmplicon", {
       geom_segment(aes(color=is_amplicon), size=3) +
       scale_color_manual(values=c("gray", "blue")) +
       facet_wrap(~seqnames)
-
     ## show the flanking regions
     segs.chr8 <- segs[segs$seqnames=="chr8", ]
     ggplot(segs.chr8, aes(x=start,
@@ -86,8 +84,7 @@ test_that("addFocalDupsFlankingAmplicon", {
   left <- lapply(flank$left, "[", which(cntsLeft >= minimum_count))
   right <- lapply(flank$right, "[", which(cntsRight >= minimum_count))
   dup_gr <- list(left=left, right=right)##flanking_duplications[cnts >= minimum_count]
-  ##L <- max(length(dup_gr$left[[1]]), length(dup_gr$right[[2]]))
-  ##expect_identical(L, 0L)
   ## does nothing since dup_gr is length 0
   ag2 <- addFlanks(ag, dup_gr)
+  expect_identical(ag2, ag)
 })
