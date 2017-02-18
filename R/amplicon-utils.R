@@ -601,7 +601,6 @@ addFocalDupsFlankingAmplicon <- function(object, rp, params){
                                  minimum_foldchange=params[["LOW_THR"]])
   rpsegs <- readPairsAsSegments(rp)
   dup_gr <- linkedDuplicatedRanges(object, rpsegs, flanks, params)
-  L <- max(length(dup_gr$left[[1]]), length(dup_gr$right[[2]]))
   object <- addFlanks(object, dup_gr)
   object
 }
