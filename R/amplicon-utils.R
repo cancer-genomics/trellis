@@ -822,8 +822,9 @@ germline <- function(object){
 #'   log2 ratio of a low-copy amplicon
 #' @param MAX_SIZE A length-one numeric vector providing the maximum
 #'   size of a focal amplicon
-focalAmpliconDupRanges <- function(object, LOW_THR=log2(1.75),
-                                   MAX_SIZE=500e3){
+focalAmpliconDupRanges <- function(object, params){
+  LOW_THR <- params[["LOW_THR"]]
+  MAX_SIZE <- params[["maxgap"]]
   g <- ampliconRanges(object)
   is_dup <- isDuplication(ranges(object), minimum_foldchange=LOW_THR)
   ## remove any lower copy ranges that are very large
@@ -833,13 +834,12 @@ focalAmpliconDupRanges <- function(object, LOW_THR=log2(1.75),
   if(length(g) > 0){
     g <- expandGRanges(g, 1e3)
   }
-  ##start(g) <- start(g)-1e3
-  ##end(g) <- end(g)+1e3
   ## we do not want to link germline events
   germ <- germline(object)
+  ##
+  ## TODO: add expansion to params
+  ##
   germ <- expandGRanges(germ, 10e3)
-  ##start(germ) <- start(germ)-10e3
-  ##end(germ) <- pmin(end(germ)+10e3, seqlengths(germ)[as.character(seqnames(germ))])
   germ <- reduce(germ)
   g <- filterBy(g, germ, type="within")
   reduce(g)
@@ -1084,7 +1084,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ##
   rp <- get_readpairs(ag, bamPaths(bview))
   ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
-  queryRanges(ag) <- focalAmpliconDupRanges(ag, LOW_THR=LOW_THR, MAX_SIZE=500e3)
+  queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
   irp <- get_improper_readpairs(ag, bamPaths(bview))
   ##
   ## At this point, focal duplications added to the graph have not

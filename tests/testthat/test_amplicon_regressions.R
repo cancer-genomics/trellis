@@ -67,8 +67,9 @@ test_that("sv_amplicons_internals", {
   expect_identical(ag, ag.ffab104)
 
   ## TODO: ADD MAX_SIZE
-  qr <- focalAmpliconDupRanges(ag, LOW_THR=params[["LOW_THR"]],
-                               MAX_SIZE=500e3)
+  qr <- focalAmpliconDupRanges(ag, params)
+  ##LOW_THR=params[["LOW_THR"]],
+    ##                           MAX_SIZE=500e3)
   if(FALSE){
     saveRDS(qr, file="svcnvs/tests/testthat/focalAmpliconDup.ffab104.rds")
   }
@@ -99,7 +100,7 @@ test_that("sv_amplicons_internals", {
   ag.ffab104 <- readRDS("linkAmplicons.ffab104.rds")
   expect_identical(ag.ffab104, ag)
 
-  ag <- linkNearAmplicons(ag, maxgap=500e3)
+  ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   if(FALSE){
     saveRDS(ag, file="linkNearAmplicons.ffab104.rds")
   }
