@@ -591,10 +591,9 @@ addFlanks <- function(object, dup_granges){
 #' 
 #' @param LOW_THR a length-one numeric vector indicating the minimum
 #'   number log2 fold change
-#' 
+#' @export
 addFocalDupsFlankingAmplicon <- function(object, rp, LOW_THR){
   if(totalWidth(queryRanges(object))==0) return(object)
-  ##flanks <- flankingDuplications(object, ampliconRanges(object), minimum_foldchange=LOW_THR)
   flanks <- flankingDuplications(object, minimum_foldchange=LOW_THR)
   rpsegs <- readPairsAsSegments(rp)
   dup_gr <- linkedDuplicatedRanges(object, rpsegs, flanks)
