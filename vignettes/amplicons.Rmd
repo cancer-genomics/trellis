@@ -71,17 +71,56 @@ nmerged <- length(ranges(ag)) - length(merged)
 nmerged
 ```
 
+In order to plot the linked amplicons as a graph, we load several supporting
+packages that support visualization of graph objects. In addition, we write a
+wrapper for plotting the graphs.
+
+```{r plotfun}
+library(gridExtra)
+library(grid)
+library(GGally)
+library(network)
+library(sna)
+library(svplots)
+plotAmpGraph <- function(ag, transcripts, color.guide=FALSE){
+  B <- svplots:::plot_amplicons(ag)
+  B1 <- as(B, "graphAM")
+  am <- B1@adjMat
+  net <- network(am, directed=FALSE)
+  chroms <- sapply(strsplit(colnames(am), ":"), "[", 1)
+  ar <- ampliconRanges(ag)
+  hits <- findOverlaps(ar, transcripts, maxgap=5000)
+  cancer.con <- split(transcripts$cancer_connection[subjectHits(hits)],
+                      queryHits(hits))
+  is.driver <- sapply(cancer.con, any)
+  is.driver2 <- rep(FALSE, ncol(am))
+  is.driver2[as.integer(names(is.driver))] <- is.driver
+  net %v% "chrom" <- chroms
+  net %v% "driver" <- is.driver2
+  B <- ggnet2(net,
+              color="chrom",
+              palette="Dark2",
+              shape="driver",
+              size="degree") +
+    guides(size=FALSE,
+           shape=FALSE,
+           color=color.guide)
+  B1 <- ggplotGrob(B)
+  B1
+}
+```
+
 We use improperly paired reads to link amplicons. First, we extract the
 improperly paired reads and then we evaluate whether there are duplications
 flanking the seed amplicons that can be linked to the seeds by the improperly
 paired reads. In order to link the flanking segments to the seeds, we require
 the adjacent segments to have mean log ratios consistent with a duplication
-(`LOW_THR`).
+(see ```LOW_THR```).
 
-```{r improperlyPaired}
+```{r properly_paired}
 params[["LOW_THR"]]
 rp <- svalignments::get_readpairs(ag, bamPaths(bview))
-ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
+ag <- svcnvs:::addFocalDupsFlankingAmplicon(ag, rp, params[["LOW_THR"]])
 ag
 ```
 
@@ -89,8 +128,29 @@ TODO: what does this do. how does the graph change? What do these segments look
 like?
 
 ```{r focalAmpDup}
-qr <- focalAmpliconDupRanges(ag, LOW_THR=params[["LOW_THR"]],
-                             MAX_SIZE=500e3)
+qr <- focalAmpliconDupRanges(ag, params)
 queryRanges(ag) <- qr
 qr
+```
+
+```{r improperly_paired}
+irp <- svalignments::get_improper_readpairs(ag, bamPaths(bview))
+p0 <- plotAmpGraph(ag, transcripts)
+ag <- svcnvs:::linkFocalDups(ag, irp, params)
+p1 <- plotAmpGraph(ag, transcripts)
+ag <- svcnvs:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
+p2 <- plotAmpGraph(ag, transcripts)
+ag <- svcnvs:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
+p3 <- plotAmpGraph(ag, transcripts)
+ag <- filterSmallAmplicons (ag)
+ag <- setAmpliconGroups (ag)
+ag <- setGenes (ag, transcripts)
+ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
+ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
+p4 <- plotAmpGraph(ag, transcripts, color.guide=guide_legend(title=""))
+```
+
+
+```{r graph}
+grid.arrange(p1, p4)
 ```
