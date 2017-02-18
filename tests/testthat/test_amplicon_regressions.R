@@ -84,8 +84,8 @@ test_that("sv_amplicons_internals", {
   ## At this point, focal duplications added to the graph have not
   ## been linked to any of the seeds
   ##
-  param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
-  ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR, edgeParam=param)
+  ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
+  ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR, edgeParam=params[["edge"]])
   if(FALSE){
     saveRDS(ag, file="linkFocalDups.ffab104.rds")
   }
@@ -144,6 +144,11 @@ test_that("sv_amplicons_internals", {
   }
   ag.ffab104 <- readRDS("setDrivers.ffab104.rds")
   expect_identical(ag.ffab104, ag)
+
+  ag2 <- sv_amplicons(bview, segs,
+                      germline_filters,
+                      params, transcripts)
+  expect_identical(ag, ag2)
 })
 
 .test_that <- function(name, expr) NULL

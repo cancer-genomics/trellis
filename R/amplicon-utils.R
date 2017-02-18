@@ -85,20 +85,20 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #'
 #' @return Returns a list of germline filters and some of the hard
 #'   thresholds used in the amplicon analysis.
-#' 
+#'
 #' @param build character string providing UCSC genome build
 #'   (currently, must be hg19)
-#' 
+#'
 #' @param AMP_THR numeric threshold for high copy amplicon
-#' 
+#'
 #' @param LOW_THR numeric a lower threshold used when considering
 #'   amplicons that are bridged by improper read pairs to a high copy
 #'   amplicon
-#' 
+#'
 #' @param border_size used to construct a query (GRanges object) for
 #'   additional amplicons neighboring a focal amplicon. TODO: more
 #'   detail needed.
-#' 
+#'
 #' @param overhang An integer indicating how much to expand the
 #'   germline filter on each size.  Using \code{overlapsAny}, a
 #'   determination is made whether an amplicon is part-germline (any
@@ -115,7 +115,10 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @param maxgap length-one numeric vector. Passed to \code{findOverlaps} when
 #'   evaluating whether the amplicon ranges overlap with other amplicons (see
 #'   \code{linkNearAmplicons}}).
-#' @seealso \code{\link{listGenomeFilters}}
+#'
+#' @param frequency
+#' @param minimum_maxdist
+#' @param bad_bins a \code{GRanges} object of problematic bins
 ampliconParams <- function(AMP_THR=log2(2.75),
                            LOW_THR=log2(1.75),
                            border_size=10e3,
@@ -123,8 +126,14 @@ ampliconParams <- function(AMP_THR=log2(2.75),
                            MIN_WIDTH=2000,
                            MIN_SEGMEAN_DIFF=0.05,
                            min.gapwidth=3000,
-                           maxgap=500e3){
+                           maxgap=500e3,
+                           frequency=5,
+                           minimum_maxdist=50,
+                           bad_bins=GRanges()){
   ##filters <- listGenomeFilters()
+  edge <- FilterEdgeParam(freq=5,
+                          minimum_maxdist=minimum_maxdist,
+                          bad_bins=bad_bins)
   filters <- list()
   filters$border_size <- border_size
   filters$overhang <- overhang
@@ -134,6 +143,7 @@ ampliconParams <- function(AMP_THR=log2(2.75),
   filters$MIN_SEGMEAN_DIFF <- MIN_SEGMEAN_DIFF
   filters$min.gapwidth <- min.gapwidth
   filters$maxgap <- maxgap
+  filters$edge <- edge
   filters
 }
 
@@ -1081,10 +1091,12 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ##
   ##paired_bin_filter <- af[["paired_bin_filter"]]
   ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=paired_bin_filter)
-  param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
-  ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR, edgeParam=param)
-  ag <- linkAmplicons(ag, irp, edgeParam=param)
-  ag <- linkNearAmplicons(ag, maxgap=500e3)
+  ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
+  edge.p <- params[["edge"]]
+  ag <- linkFocalDups(ag, irp, LOW_THR=LOW_THR,
+                      edgeParam=edge.p)
+  ag <- linkAmplicons(ag, irp, edgeParam=edge.p)
+  ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   ag <- filterSmallAmplicons (ag)
   ag <- setAmpliconGroups (ag)
   ag <- setGenes (ag, transcripts)
