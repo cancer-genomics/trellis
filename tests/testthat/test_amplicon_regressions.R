@@ -59,7 +59,7 @@ test_that("sv_amplicons_internals", {
   ##
   ##
   rp <- svalignments::get_readpairs(ag, bamPaths(bview))
-  ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
+  ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
   if(FALSE){
     saveRDS(ag, file="svcnvs/tests/testthat/addFocalDups.ffab104.rds")
   }
@@ -146,6 +146,50 @@ test_that("sv_amplicons_internals", {
   ag.ffab104 <- readRDS("setDrivers.ffab104.rds")
   expect_identical(ag.ffab104, ag)
 
+  ag2 <- sv_amplicons(bview, segs,
+                      germline_filters,
+                      params, transcripts)
+  expect_identical(ag, ag2)
+})
+
+
+test_that("no germline filter", {
+  library(svfilters.hg19)
+  library(svbams)
+  library(Rsamtools)
+  library(rtracklayer)
+  library(graph)
+  data(germline_filters)
+  data(transcripts)
+  ##
+  ## read in some CNVs
+  ##
+  cv.extdata <- system.file("extdata", package="svcnvs")
+  segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  extdata <- system.file("extdata", package="svbams")
+  bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
+  params <- ampliconParams()
+  germline_filters[["germline_cnv"]] <- GRanges()
+  ##
+  ## Begin testing internals of sv_amplicons
+  ##
+  ag <- makeAGraph(segs, germline_filters, params)
+  tmp <- joinNearGRanges(ranges(ag), params)
+  names(tmp) <- ampliconNames(tmp)
+  ranges(ag) <- tmp
+  rp <- svalignments::get_readpairs(ag, bamPaths(bview))
+  ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
+  qr <- focalAmpliconDupRanges(ag, params)
+  queryRanges(ag) <- qr
+  irp <- svalignments::get_improper_readpairs(ag, bamPaths(bview))
+  ag <- linkFocalDups(ag, irp, params)
+  ag <- linkAmplicons(ag, irp, edgeParam=param)
+  ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
+  ag <- filterSmallAmplicons (ag)
+  ag <- setAmpliconGroups (ag)
+  ag <- setGenes (ag, transcripts)
+  ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
+  ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
   ag2 <- sv_amplicons(bview, segs,
                       germline_filters,
                       params, transcripts)
