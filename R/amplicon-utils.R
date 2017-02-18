@@ -64,11 +64,12 @@ setGeneric("filterBy", function(query, subject, type="any", ...) standardGeneric
 #' @aliases filterBy,GRanges,GRanges-method
 #' @rdname filterBy-methods
 setMethod("filterBy", c("GRanges", "GRanges"),
-          function(query, subject, type="any", ...){
+          function(query, subject, ...){
             dropbins <- unique(queryHits(findOverlaps(query, subject, type=type, ...)))
             if(length(dropbins) > 0)
               query <- query[-dropbins]
             return(query)
+            ##query[!overlapsAny(query, subject, ...)]
           })
 
 node2 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][2])
