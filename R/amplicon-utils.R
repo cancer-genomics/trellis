@@ -587,11 +587,11 @@ addFlanks <- function(object, dup_granges){
 #' REFACTORING: overly complicated with many abstractions.  Needs an
 #' example to step through
 #'
-#' 
+#'
 #' @param object a \code{AmpliconGraph}
-#' 
+#'
 #' @param rp a \code{GAlignmentPairs} object
-#' 
+#'
 #' @param params a list of parameters for amplicon analyses
 #' @seealso \code{\link{ampliconParams}}}
 #' @export
