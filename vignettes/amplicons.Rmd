@@ -120,7 +120,7 @@ the adjacent segments to have mean log ratios consistent with a duplication
 ```{r properly_paired}
 params[["LOW_THR"]]
 rp <- svalignments::get_readpairs(ag, bamPaths(bview))
-ag <- svcnvs:::addFocalDupsFlankingAmplicon(ag, rp, params[["LOW_THR"]])
+ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
 ag
 ```
 

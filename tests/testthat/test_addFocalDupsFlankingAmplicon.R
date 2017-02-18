@@ -4,8 +4,7 @@ test_that("addFocalDupsFlankingAmplicon", {
   ##
   ## We already have a regression test for this function in amplicon_regressions
   ##
-  ## - these unit tests breakdown this function into pieces for a better
-  ##   understanding of how it works
+  ## - these unit tests breakdown this function into its components
   ##
   extdata <- system.file("extdata", package="svbams")
   bamfile <- file.path(extdata, "cgov44t_revised.bam")
