@@ -129,6 +129,7 @@ ampliconParams <- function(AMP_THR=log2(2.75),
                            maxgap=500e3,
                            frequency=5,
                            minimum_maxdist=50,
+                           minimum_count=5,
                            bad_bins=GRanges()){
   ##filters <- listGenomeFilters()
   edge <- FilterEdgeParam(freq=5,
@@ -143,6 +144,8 @@ ampliconParams <- function(AMP_THR=log2(2.75),
   filters$MIN_SEGMEAN_DIFF <- MIN_SEGMEAN_DIFF
   filters$min.gapwidth <- min.gapwidth
   filters$maxgap <- maxgap
+  filters$minimum_maxdist=minimum_maxdist
+  filters$minimum_count=minimum_count
   filters$edge <- edge
   filters
 }
@@ -526,8 +529,8 @@ minimumBasepairCoverage <- function(rp, regions){
 
 linkedDuplicatedRanges <- function(object, rpsegs,
                                    flanking_duplications,
-                                   ##flanking_gaps,
-                                   minimum_count=5){
+                                   params){
+  minimum_count <- params[["min_count"]]
   flank <- flanking_duplications
   lengths <- unlist(lapply(flank, elementNROWS))
   ##if(any(lengths != 1)) stop("Flanking regions must be length-one GRanges")
@@ -589,14 +592,15 @@ addFlanks <- function(object, dup_granges){
 #' 
 #' @param rp a \code{GAlignmentPairs} object
 #' 
-#' @param LOW_THR a length-one numeric vector indicating the minimum
-#'   number log2 fold change
+#' @param params a list of parameters for amplicon analyses
+#' @seealso \code{\link{ampliconParams}}}
 #' @export
-addFocalDupsFlankingAmplicon <- function(object, rp, LOW_THR){
+addFocalDupsFlankingAmplicon <- function(object, rp, params){
   if(totalWidth(queryRanges(object))==0) return(object)
-  flanks <- flankingDuplications(object, minimum_foldchange=LOW_THR)
+  flanks <- flankingDuplications(object,
+                                 minimum_foldchange=params[["LOW_THR"]])
   rpsegs <- readPairsAsSegments(rp)
-  dup_gr <- linkedDuplicatedRanges(object, rpsegs, flanks)
+  dup_gr <- linkedDuplicatedRanges(object, rpsegs, flanks, params)
   L <- max(length(dup_gr$left[[1]]), length(dup_gr$right[[2]]))
   object <- addFlanks(object, dup_gr)
   object
@@ -1082,7 +1086,7 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ## REFACTOR: could this step use the saved improper read pairs
   ##
   rp <- get_readpairs(ag, bamPaths(bview))
-  ag <- addFocalDupsFlankingAmplicon(ag, rp, LOW_THR)
+  ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
   queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
   irp <- get_improper_readpairs(ag, bamPaths(bview))
   ##
