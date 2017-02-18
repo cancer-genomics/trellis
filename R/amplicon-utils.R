@@ -25,7 +25,9 @@ setMethod("bothEndAnchors", "AnchoredReadPairs",
 
 
 FilterEdgeParam <- function(freq=5, minimum_maxdist=50, bad_bins=GRanges()){
-  list(freq=freq, minimum_maxdist=minimum_maxdist, bad_bins=bad_bins)
+  list(freq=freq,
+       minimum_maxdist=minimum_maxdist,
+       bad_bins=bad_bins)
 }
 
 gaps0 <- function(x){
@@ -109,7 +111,10 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @param MIN_SEGMEAN_DIFF length-one numeric vector.  Adjacent segments whose means differ by less than this value are candidates for merging by \code{{joinNearGRanges}}
 #'
 #' @param min.gapwidth length-one numeric vector passed to the \code{reduce} method that merges adacent segments with comparable segment means
-#' 
+#'
+#' @param maxgap length-one numeric vector. Passed to \code{findOverlaps} when
+#'   evaluating whether the amplicon ranges overlap with other amplicons (see
+#'   \code{linkNearAmplicons}}).
 #' @seealso \code{\link{listGenomeFilters}}
 ampliconParams <- function(AMP_THR=log2(2.75),
                            LOW_THR=log2(1.75),
@@ -117,7 +122,8 @@ ampliconParams <- function(AMP_THR=log2(2.75),
                            overhang=25e3,
                            MIN_WIDTH=2000,
                            MIN_SEGMEAN_DIFF=0.05,
-                           min.gapwidth=3000){
+                           min.gapwidth=3000,
+                           maxgap=500e3){
   ##filters <- listGenomeFilters()
   filters <- list()
   filters$border_size <- border_size
@@ -127,6 +133,7 @@ ampliconParams <- function(AMP_THR=log2(2.75),
   filters$MIN_WIDTH <- MIN_WIDTH
   filters$MIN_SEGMEAN_DIFF <- MIN_SEGMEAN_DIFF
   filters$min.gapwidth <- min.gapwidth
+  filters$maxgap <- maxgap
   filters
 }
 
