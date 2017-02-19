@@ -159,6 +159,7 @@ test_that("no germline filter", {
   library(Rsamtools)
   library(rtracklayer)
   library(graph)
+  library(svalignments)
   data(germline_filters)
   data(transcripts)
   ##
@@ -170,14 +171,15 @@ test_that("no germline filter", {
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   params <- ampliconParams()
   germline_filters[["germline_cnv"]] <- GRanges()
+  germline_filters[["outliers"]] <- GRanges()
   ##
   ## Begin testing internals of sv_amplicons
   ##
   ag <- makeAGraph(segs, germline_filters, params)
-  tmp <- joinNearGRanges(ranges(ag), params)
-  names(tmp) <- ampliconNames(tmp)
-  ranges(ag) <- tmp
-  rp <- svalignments::get_readpairs(ag, bamPaths(bview))
+  merged <- joinNearGRanges(ranges(ag), params)
+  names(merged) <- ampliconNames(merged)
+  ranges(ag) <- merged
+  rp <- get_readpairs(ag, bamPaths(bview))
   ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
   qr <- focalAmpliconDupRanges(ag, params)
   queryRanges(ag) <- qr

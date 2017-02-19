@@ -18,7 +18,6 @@ test_that("AmpliconGraph", {
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
-
   ##
   ## Begin testing internals of sv_amplicons
   ##
