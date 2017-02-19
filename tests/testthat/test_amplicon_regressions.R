@@ -1,4 +1,4 @@
-context("amplicons")
+context("Amplicon regressions")
 
 test_that("AmpliconGraph", {
   ag <- AmpliconGraph()
