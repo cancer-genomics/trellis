@@ -1,6 +1,6 @@
 context("Deletion regressions")
 
-test_that("sv_deletions", {
+test_that("deletions_segs", {
   library(Rsamtools)
   library(svfilters.hg19)
   library(svpreprocess)
@@ -10,42 +10,52 @@ test_that("sv_deletions", {
   id.rds <- paste0(id, ".rds")
   bamfile <- file.path(extdata, id)
   bview <- Rsamtools::BamViews(bamPaths=bamfile)
-  br <- bamRanges(bview)
-
   data(segments, package="svcnvs")
+  data(deletion, package="svcnvs")
+  gr <- variant(deletion)
+  gr <- expandGRanges(gr, 10000)
   segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
+  segs <- segs[overlapsAny(segs, gr)]
+  seqlevels(segs) <- seqlevels(gr)
+  seqinfo(segs) <- seqinfo(gr)
+  if(FALSE){
+    saveRDS(segs, file="segs.4adcc78.rds")
+  }
+  segs.4adcc78 <- readRDS("segs.4adcc78.rds")
+  expect_identical(segs, segs.4adcc78)
 
   ## seqinfo is required in the AlignmentViews object. Adding seqinfo to the
   ## BamViews ensures this information is propogated to the AlignmentViews
   ## object
+  br <- bamRanges(bview)
   seqlevels(br) <- seqlevels(segs)
   seqinfo(br) <- seqinfo(segs)
   bamRanges(bview) <- br
+  if(FALSE){
+    saveRDS(bview, file="bview.4adcc78.rds")
+  }
+  if(FALSE){
+    iparams <- improperAlignmentParams(which=gr)
+    irp <- getImproperAlignmentPairs(bview,
+                                     iparams,
+                                     mapq_thr=30,
+                                     use.mcols=TRUE)
+    ##
+    ## TODO: refactor sv_deletions. Currently, we have to save the improperly
+    ## paired reads to disk because sv_deletions reads from disk
+    ##
+    saveRDS(irp, file=irp.file)
+  }
+})
 
-
-
-  data(deletion, package="svcnvs")
-  gr <- variant(deletion)
-  gr <- expandGRanges(gr, 10000)
-  segs <- segs[overlapsAny(segs, gr)]
+test_that("sv_deletions", {
+  bview <- readRDS("bview.4adcc78.rds")
+  segs <- readRDS("segs.4adcc78.rds")
   ##
   ## extract improper alignments
   ##
-  iparams <- improperAlignmentParams(which=gr)
-  irp <- getImproperAlignmentPairs(bview,
-                                   iparams,
-                                   mapq_thr=30,
-                                   use.mcols=TRUE)
-  ##
-  ## TODO: refactor sv_deletions. Currently, we have to save the improperly
-  ## paired reads to disk because sv_deletions reads from disk
-  ##
   irp.file <- "getImproperAlignmentPairs.rds"
-  saveRDS(irp, file=irp.file)
   aview <- AlignmentViews2(bview, path=irp.file)
-  ##
-  ## Create pviews object
-  ##
   ddir <- system.file("extdata", package="svpreprocess",
                       mustWork=TRUE)
   cov.file <- file.path(ddir, "preprocessed_coverage.rds")
@@ -54,8 +64,6 @@ test_that("sv_deletions", {
 
   filters <- reduceGenomeFilters(germline_filters)
   dparam <- DeletionParam()
-  seqlevels(segs) <- seqlevels(gr)
-  seqinfo(segs) <- seqinfo(gr)
   dels <- sv_deletions(gr=segs,
                        aview=aview,
                        bview=bview,
@@ -67,85 +75,212 @@ test_that("sv_deletions", {
   }
   dels.ba3c739 <- readRDS("sv_deletions.ba3c739.rds")
   expect_identical(dels, dels.ba3c739)
+})
 
-  ##
-  ## sv_deletions
-  ##
-  gr_filters <- filters
-  gr <- segs
-  param <- dparam
+test_that("deletion_call", {
+  library(svfilters.hg19)
+  filters <- reduceGenomeFilters(germline_filters)
+  dparam <- DeletionParam()
+  bview <- readRDS("bview.4adcc78.rds")
+  segs <- readRDS("segs.4adcc78.rds")
+
+  ddir <- system.file("extdata", package="svpreprocess",
+                      mustWork=TRUE)
+  cov.file <- file.path(ddir, "preprocessed_coverage.rds")
+  data(pview, package="svpreprocess")
+  paths(pview) <- cov.file
 
   ##
   ## deletion_call
   ##
-  cnv <- germlineFilters(gr, filters, pview, dparam)
+  bview <- readRDS("bview.4adcc78.rds")
+  segs <- readRDS("segs.4adcc78.rds")
+  ##
+  ## extract improper alignments
+  ##
+  irp.file <- "getImproperAlignmentPairs.rds"
+  aview <- AlignmentViews2(bview, path=irp.file)
+  result <- deletion_call(aview=aview,
+                          pview=pview,
+                          cnv=segs,
+                          gr_filters=filters,
+                          param=dparam)
+  if(FALSE){
+    saveRDS(result, file="deletion_call.4adcc78.rds")
+  }
+  expected <- readRDS("deletion_call.4adcc78.rds")
+  expect_identical(result, expected)
+})
+
+test_that("addImproperReadPairs2", {
+  library(svalignments)
+  dparam <- DeletionParam()
+  cnv <- readRDS("segs.4adcc78.rds")
+  bview <- readRDS("bview.4adcc78.rds")
+  irp.file <- "getImproperAlignmentPairs.rds"
+  aview <- AlignmentViews2(bview, path=irp.file)
   ##
   ## TODO: this cutoff will be much too conservative in samples where tumor
   ## purity is less than 90%. Add tumor_purity to param object and take into
   ## account tumor_purity for determining cutoff
   ##
-  thr <- log2(homozygousThr(dparam))
-  cncalls <- ifelse(cnv$seg.mean < thr, "homozygous", "hemizygous")
-  prp <- properReadPairs(bam_path=bamPaths(aview),
-                         gr=cnv, param=param)
-  prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
   irp <- addImproperReadPairs2(cnv, aview, param=dparam)
-  irp_index1 <- initializeImproperIndex2(cnv, irp, dparam)
-  irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
-  irp_index3 <- .match_index_variant(irp_index1, cnv, irp_index2)
-  ##irp <- irp[validPairForDeletion(irp)]
-  ##irp_index <- initializeImproperIndex2(cnv, irp, param)
-  sv <- StructuralVariant(variant=cnv,
-                          proper=prp,
-                          improper=irp,
-                          copynumber=cnv$seg.mean,
-                          calls=cncalls,
-                          index_proper=prp_index,
-                          index_improper=irp_index3)
-
-  sv2 <- deletion_call(aview, pview, gr, gr_filters)
-  expect_identical(sv, sv2)
-
-  calls(sv) <- rpSupportedDeletions(sv, param=dparam, pview=pview)
-  is_hemizygous <- calls(sv)=="hemizygous"
-  sv <- sv[!is_hemizygous]
-  if(length(sv) == 0) return(sv)
-  sv <- reviseEachJunction(sv, pview, aview, dparam)
-  if(length(sv) == 0) return(sv)
-  copynumber(sv) <- granges_copynumber(variant(sv), pview)
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
-  expect_identical(calls(sv), "homozygous+")
-
-  is_hemizygous <- calls (sv) == "hemizygous"
-  sv <- sv[!is_hemizygous]
-  if(length(sv) == 0) return(sv)
-  sv <- removeSameStateOverlapping(sv)
-
-  indexImproper(sv) <- updateImproperIndex (sv, maxgap=500)
-  calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
-  is_hemizygous <- calls(sv) == "hemizygous"
-  sv <- sv[!is_hemizygous]
-  if(length(sv) == 0) return(sv)
-
-  sv2 <- leftHemizygousHomolog(sv, pview, param)
-  sv3 <- rightHemizygousHomolog(sv2, pview, param)
-  calls(sv3) <- rpSupportedDeletions(sv3, param, pview)
-  message("Removing hemizygous deletions without rearranged RPs")
-  sv4 <- sv3[calls(sv3) != "hemizygous"]
-  if(length(sv4)==0) return(sv4)
-
-  message("Refining homozygous boundaries by spanning hemizygous+")
-  sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv4)
-  sv6 <- callOverlappingHemizygous(sv5)
-  sv7 <- removeSameStateOverlapping(sv6) 
-
-  sv8 <- SVFilters(sv7, gr_filters, pview, param=param)
-  sv9 <- groupSVs(sv8)
-  id <- names(aview)
-  sv9 <- allProperReadPairs(sv9, param, bfile=bamPaths(bview), zoom.out=1)
-  if(length(sv9@proper) > 25e3){
-    proper(sv9) <- sv9@proper[sample(seq_along(sv9@proper), 25e3)]
-    indexProper(sv9) <- initializeProperIndex3(sv9, zoom.out=1)
+  if(FALSE){
+    saveRDS(irp, file="addImproperReadPairs2.4adcc78.rds")
   }
-  expect_identical(sv9, dels.ba3c739)
+  irp.4adcc78 <- readRDS("addImproperReadPairs2.4adcc78.rds")
+  expect_identical(irp, irp.4adcc78)
+})
+
+getPview <- function(){
+  ddir <- system.file("extdata", package="svpreprocess",
+                      mustWork=TRUE)
+  cov.file <- file.path(ddir, "preprocessed_coverage.rds")
+  data(pview, package="svpreprocess")
+  paths(pview) <- cov.file
+  pview
+}
+
+test_that("rpSupportedDeletions", {
+  sv <- readRDS("deletion_call.4adcc78.rds")
+  pview <- getPview()
+  dparam <- DeletionParam()
+  calls <- rpSupportedDeletions(sv, param=dparam,
+                                pview=pview)
+  expect_identical(calls, "homozygous+")
+})
+
+test_that("reviseEachJunction", {
+  sv <- readRDS("deletion_call.4adcc78.rds")  
+  calls(sv) <- "homozygous+"
+  pview <- getPview()
+  bview <- readRDS("bview.4adcc78.rds")
+  irp.file <- "getImproperAlignmentPairs.rds"
+  aview <- AlignmentViews2(bview, path=irp.file)
+  dparam <- DeletionParam()
+  sv <- reviseEachJunction(object=sv,
+                           pview=pview,
+                           aview=aview,
+                           param=dparam)
+  g <- variant(sv)
+  if(FALSE){
+    saveRDS(g, file="reviseEachJunction.4adcc78.rds")
+  }
+  g.4adcc78 <- readRDS("reviseEachJunction.4adcc78.rds")
+  expect_identical(g.4adcc78, g)
+})
+
+test_that("granges_copynumber", {
+  pview <- getPview()
+  sv <- readRDS("deletion_call.4adcc78.rds")  
+  calls(sv) <- "homozygous+"
+  g <- readRDS("reviseEachJunction.4adcc78.rds")
+  variant(sv) <- g
+  cn <- granges_copynumber(variant(sv), pview)
+  expect_equal(-8.785, cn[[1]])
+  copynumber(sv) <- cn
+  expect_equal(copynumber(sv), cn)
+
+  ## TODO maxgap should be part of the parameters
+  index <- updateImproperIndex (sv, maxgap=500)
+  if(FALSE){
+    saveRDS(index, file="updateImproperIndex.4adcc78.rds")
+    indexImproper(sv) <- index
+    saveRDS(sv, file="sv_granges_copynumber.4adcc78.rds")
+  }
+  index.4adcc78 <- readRDS("updateImproperIndex.4adcc78.rds")
+  expect_identical(index, index.4adcc78)
+})
+
+## tests after granges_copynumber for a homozygous+ deletion
+test_that("sv_deletions2", {
+  pview <- getPview()
+  param <- DeletionParam()
+  ## the only variant is homozygous+, so these functions are not doing anything
+  sv <- readRDS("sv_granges_copynumber.4adcc78.rds")
+  expect_identical(leftHemizygousHomolog(sv, pview, param), sv)
+  expect_identical(rightHemizygousHomolog(sv, pview, param), sv)
+
+  library(svfilters.hg19)
+  filters <- reduceGenomeFilters(germline_filters)
+  expect_identical(SVFilters(sv, filters, pview, param=param), sv)
+  sv2 <- groupSVs(sv)
+  expect_identical(groupedVariant(sv2), factor(1))
+
+  bview <- readRDS("bview.4adcc78.rds")
+  irp.file <- "getImproperAlignmentPairs.rds"
+  aview <- AlignmentViews2(bview, path=irp.file)
+  id <- names(aview)
+  sv3 <- allProperReadPairs(sv2, param,
+                            bfile=bamPaths(bview), zoom.out=1)
+  prp <- proper(sv3)
+  if(FALSE){
+    saveRDS(sv3, file="allProperReadPairs.4adcc78.rds")
+  }
+  sv.4adcc78 <- readRDS("allProperReadPairs.4adcc78.rds")
+  expect_identical(sv.4adcc78, sv3)
+})
+
+test_that("germlineFilters", {
+  library(svfilters.hg19)
+  dparam <- DeletionParam()
+  filters <- reduceGenomeFilters(germline_filters)
+
+  ddir <- system.file("extdata", package="svpreprocess",
+                      mustWork=TRUE)
+  cov.file <- file.path(ddir, "preprocessed_coverage.rds")
+  data(pview, package="svpreprocess")
+  paths(pview) <- cov.file
+
+  data(segments, package="svcnvs")
+  segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
+  ##
+  ## We only have a small region of the bam file
+  ## - subset the segments
+  data(deletion, package="svcnvs")
+  gr <- variant(deletion)
+  gr <- expandGRanges(gr, 10000)
+  segs <- subsetByOverlaps(segs, gr)
+
+  cnvs <- germlineFilters(cnv=segs,
+                          germline_filters=filters,
+                          pview=pview,
+                          param=dparam)
+  if(FALSE){
+    saveRDS(cnvs, file="germlineFilters.9492f3f.rds")
+  }
+  cnvs.9492f3f <- readRDS("germlineFilters.9492f3f.rds")
+  expect_identical(cnvs, cnvs.9492f3f)
+
+  expected <- cnvs
+  ##
+  ## germlineFilters
+  ##
+  cnv <- segs
+  not_germline <- isNotGermline(cnv, filters, dparam)
+  ##
+  ## idea is to compute the segment means for a much larger region and then to
+  ##  calculate the fold change from the original cnv to the broader region -
+  ##  for this unit test, the result should be 0
+  egr <- expandGRanges(cnv, 0 * width(cnv))
+  expect_identical(start(egr), start(cnv))
+  cn <- granges_copynumber(egr, pview)
+  expect_equal(cnv$seg.mean, as.numeric(cn),
+               scale=1, tolerance=0.5)
+
+  egr <- expandGRanges(cnv, 15 * width(cnv))
+  cn_context <- granges_copynumber(egr, pview)
+  fc <- (cnv$seg.mean - cn_context)
+  expect_equivalent(fc < -3, c(FALSE, TRUE, FALSE))
+
+  is_big <- isLargeHemizygous(cnv, dparam)
+  expect_true(!any(is_big))
+  select <- !is_big & not_germline & fc < -0.515
+  cnv <- cnv[select]
+  cnvr <- reduce(cnv)
+  K <- width(cnvr) > 2000
+  cnvr <- cnvr[K]
+  cnv <- cnv[K]
+  names(cnv) <- paste0("sv", seq_along(cnv))
+  expect_identical(cnv, expected)
 })
