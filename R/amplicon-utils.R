@@ -1087,12 +1087,12 @@ makeAGraph <- function(segs, af, params){
 #' @param transcripts a \code{GRanges} object of transcripts
 sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ag <- makeAGraph(segs, amplicon_filters, params)
-  tmp <- joinNearGRanges(ranges(ag), params)
-  names(tmp) <- ampliconNames(tmp)
+  merged <- joinNearGRanges(ranges(ag), params)
+  names(merged) <- ampliconNames(merged)
   ## the names of the nodes no longer correspond to the range names
   ## stopifnot(nodes(ag) %in% names(tmp)), and so
   ## setAmpliconGroups fails
-  ranges(ag) <- tmp
+  ranges(ag) <- merged
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
   LOW_THR <- params[["LOW_THR"]]
