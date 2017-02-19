@@ -118,8 +118,9 @@ the adjacent segments to have mean log ratios consistent with a duplication
 (see ```LOW_THR```).
 
 ```{r properly_paired}
+library(svalignments)
 params[["LOW_THR"]]
-rp <- svalignments::get_readpairs(ag, bamPaths(bview))
+rp <- get_readpairs(ag, bamPaths(bview))
 ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
 ag
 ```
@@ -134,14 +135,10 @@ qr
 ```
 
 ```{r improperly_paired}
-irp <- svalignments::get_improper_readpairs(ag, bamPaths(bview))
-p0 <- plotAmpGraph(ag, transcripts)
+irp <- get_improper_readpairs(ag, bamPaths(bview))
 ag <- svcnvs:::linkFocalDups(ag, irp, params)
-p1 <- plotAmpGraph(ag, transcripts)
 ag <- svcnvs:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
-p2 <- plotAmpGraph(ag, transcripts)
 ag <- svcnvs:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
-p3 <- plotAmpGraph(ag, transcripts)
 ag <- filterSmallAmplicons (ag)
 ag <- setAmpliconGroups (ag)
 ag <- setGenes (ag, transcripts)
@@ -152,5 +149,5 @@ p4 <- plotAmpGraph(ag, transcripts, color.guide=guide_legend(title=""))
 
 
 ```{r graph}
-grid.arrange(p1, p4)
+grid.arrange(p4)
 ```
