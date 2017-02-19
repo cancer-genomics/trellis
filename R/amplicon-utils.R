@@ -1095,7 +1095,6 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ranges(ag) <- merged
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
-  LOW_THR <- params[["LOW_THR"]]
   ##
   ## REFACTOR: could this step use the saved improper read pairs
   ##
