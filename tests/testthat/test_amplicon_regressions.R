@@ -65,93 +65,138 @@ test_that("sv_amplicons_internals", {
   }
   ag.ffab104 <- readRDS("addFocalDups.ffab104.rds")
   expect_identical(ag, ag.ffab104)
+})
 
+test_that("focalAmpliconDupRanges", {
+  params <- ampliconParams()
+  ag <- readRDS("addFocalDups.ffab104.rds")
   ## TODO: ADD MAX_SIZE
   qr <- focalAmpliconDupRanges(ag, params)
-  ##LOW_THR=params[["LOW_THR"]],
-    ##                           MAX_SIZE=500e3)
   if(FALSE){
     saveRDS(qr, file="svcnvs/tests/testthat/focalAmpliconDup.ffab104.rds")
   }
   qr.ffab104 <- readRDS("focalAmpliconDup.ffab104.rds")
   expect_identical(qr, qr.ffab104)
-
   expected <- GRanges("chr5", IRanges(58519001, 58788001))
   seqinfo(expected) <- seqinfo(qr)
   expect_identical(qr[1], expected)
+})
+
+test_that("linkFocalDups", {
+  ag <- readRDS("addFocalDups.ffab104.rds")
+  qr <- readRDS("focalAmpliconDup.ffab104.rds")
   queryRanges(ag) <- qr
+  extdata <- system.file("extdata", package="svbams")
+  bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   irp <- svalignments::get_improper_readpairs(ag, bamPaths(bview))
   ##
   ## At this point, focal duplications added to the graph have not
   ## been linked to any of the seeds
   ##
-  ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
+  params <- ampliconParams()
   ag <- linkFocalDups(ag, irp, params)
   if(FALSE){
     saveRDS(ag, file="linkFocalDups.ffab104.rds")
   }
   ag.ffab104 <- readRDS("linkFocalDups.ffab104.rds")
   expect_identical(ag.ffab104, ag)
+})
 
-  ag <- linkAmplicons(ag, irp, edgeParam=param)
+test_that("linkAmplicons", {
+  ag <- readRDS("linkFocalDups.ffab104.rds")
+  extdata <- system.file("extdata", package="svbams")
+  bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
+  irp <- svalignments::get_improper_readpairs(ag, bamPaths(bview))
+  params <- ampliconParams()
+  ag <- linkAmplicons(ag, irp, edgeParam=params[["edge"]])
   if(FALSE){
-    saveRDS(ag, file="linkAmplicons.ffab104.rds")
+    saveRDS(ag, file="linkAmplicons.4adcc78.rds")
   }
-  ag.ffab104 <- readRDS("linkAmplicons.ffab104.rds")
-  expect_identical(ag.ffab104, ag)
+  ag.4adcc78 <- readRDS("linkAmplicons.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag)
+})
 
+test_that("linkNearAmplicons", {
+  params <- ampliconParams()
+  ag <- readRDS("linkAmplicons.4adcc78.rds")
   ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   if(FALSE){
-    saveRDS(ag, file="linkNearAmplicons.ffab104.rds")
+    saveRDS(ag, file="linkNearAmplicons.4adcc78.rds")
   }
-  ag.ffab104 <- readRDS("linkNearAmplicons.ffab104.rds")
-  expect_identical(ag.ffab104, ag)
+  ag.4adcc78 <- readRDS("linkNearAmplicons.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag)
+##  e <-edges(ag)
+##  e <- e[-1]
+##  expected <- list("chr8:128,692,001",
+##                   c("chr8:129,353,001", "chr8:128,692,001", "chr8:129,164,001"),
+##                   c("chr5:176,034,001", "chr8:129,164,001", "chr8:129,353,001",
+##                     "chr8:128,515,001"))
+##  names(expected) <- c("chr5:176,034,001",
+##                       "chr8:128,515,001",
+##                       "chr8:128,692,001")
+##  expect_identical(e[1:3], expected)
+##  expect_identical(nodes(ag), names(e))
+})
 
-  e <-edges(ag)
-  expected <- list("chr8:128,692,001",
-                   c("chr8:129,353,001", "chr8:128,692,001", "chr8:129,164,001"),
-                   c("chr5:176,034,001", "chr8:129,164,001", "chr8:129,353,001",
-                     "chr8:128,515,001"))
-  names(expected) <- c("chr5:176,034,001",
-                       "chr8:128,515,001",
-                       "chr8:128,692,001")
-  expect_identical(e[1:3], expected)
-  expect_identical(nodes(ag), names(e))
+test_that("filterSmallAmplicons", {
+  ag <- readRDS("linkNearAmplicons.4adcc78.rds")
   ag <- filterSmallAmplicons (ag)
   if(FALSE){
-    saveRDS(ag, file="filterSmallAmplicons.ffab104.rds")
+    saveRDS(ag, file="filterSmallAmplicons.4adcc78.rds")
   }
-  ag.ffab104 <- readRDS("filterSmallAmplicons.ffab104.rds")
-  expect_identical(ag.ffab104, ag)
+  ag.4adcc78 <- readRDS("filterSmallAmplicons.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag)
+})
 
+test_that("setAmpliconGroups", {
+  ag <- readRDS("filterSmallAmplicons.4adcc78.rds")
   ag <- setAmpliconGroups (ag)
   if(FALSE){
-    saveRDS(ag, file="setAmpliconGroups.ffab104.rds")
+    saveRDS(ag, file="setAmpliconGroups.4adcc78.rds")
   }
-  ag.ffab104 <- readRDS("setAmpliconGroups.ffab104.rds")
-  expect_identical(ag.ffab104, ag)
+  ag.4adcc78 <- readRDS("setAmpliconGroups.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag)
+})
 
+test_that("setGenes", {
+  library(svfilters.hg19)
+  ag <- readRDS("setAmpliconGroups.4adcc78.rds")
   ag <- setGenes (ag, transcripts)
   if(FALSE){
-    saveRDS(ag, file="setAmpliconGenes.ffab104.rds")
+    saveRDS(ag, file="setAmpliconGenes.4adcc78.rds")
   }
-  ag.ffab104 <- readRDS("setAmpliconGenes.ffab104.rds")
-  expect_identical(ag.ffab104, ag)
+  ag.4adcc78 <- readRDS("setAmpliconGenes.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag)
+})
 
+test_that("setDrivers", {
+  library(svfilters.hg19)
+  ag <- readRDS("setAmpliconGenes.4adcc78.rds")
   ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
   if(FALSE){
-    saveRDS(ag, file="setDrivers.ffab104.rds")
+    saveRDS(ag, file="setDrivers.4adcc78.rds")
   }
-  ag.ffab104 <- readRDS("setDrivers.ffab104.rds")
-  expect_identical(ag.ffab104, ag)
-
-  ag2 <- sv_amplicons(bview, segs,
-                      germline_filters,
-                      params, transcripts)
-  expect_identical(ag, ag2)
+  ag.4adcc78 <- readRDS("setDrivers.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag)
 })
 
+test_that("sv_amplicons", {
+  library(svfilters.hg19)
+  cv.extdata <- system.file("extdata", package="svcnvs")
+  segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  ag <- readRDS("setDrivers.4adcc78.rds")
+  extdata <- system.file("extdata", package="svbams")
+  bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
+  params <- ampliconParams()
+  ag2 <- sv_amplicons(bview=bview,
+                      segs=segs,
+                      amplicon_filters=germline_filters,
+                      params=params,
+                      transcripts=transcripts)
+  ag.4adcc78 <- readRDS("setDrivers.4adcc78.rds")
+  expect_identical(ag.4adcc78, ag2)
+})
 
 test_that("no germline filter", {
   library(svfilters.hg19)
@@ -181,21 +226,26 @@ test_that("no germline filter", {
   ranges(ag) <- merged
   rp <- get_readpairs(ag, bamPaths(bview))
   ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
-  qr <- focalAmpliconDupRanges(ag, params)
-  queryRanges(ag) <- qr
-  irp <- svalignments::get_improper_readpairs(ag, bamPaths(bview))
+  queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
+  irp <- get_improper_readpairs(ag, bamPaths(bview))
   ag <- linkFocalDups(ag, irp, params)
-  ag <- linkAmplicons(ag, irp, edgeParam=param)
+  ag <- linkAmplicons(ag, irp, edgeParam=params[["edge"]])
   ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   ag <- filterSmallAmplicons (ag)
   ag <- setAmpliconGroups (ag)
   ag <- setGenes (ag, transcripts)
   ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
+
   ag2 <- sv_amplicons(bview, segs,
                       germline_filters,
                       params, transcripts)
   expect_identical(ag, ag2)
+  if(FALSE){
+    saveRDS(ag2, file="sv_deletion.4adcc78.rds")
+  }
+  ag.4adcc78 <- readRDS("sv_deletion.4adcc78.rds")
+  expect_identical(ag2, ag.4adcc78)
 })
 
 .test_that <- function(name, expr) NULL

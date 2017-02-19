@@ -36,7 +36,6 @@ test_that("addFocalDupsFlankingAmplicon", {
   ## nothing on the right
   right1 <- granges(flanks$right$first)
   right2 <- granges(flanks$right$last)
-  left.dups <- c(left1, left2)
   if(FALSE){
     flanks.df <- as.data.frame(left.flanks)
     segs <- as.data.frame(ranges(ag))
