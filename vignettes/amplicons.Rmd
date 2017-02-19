@@ -71,6 +71,43 @@ nmerged <- length(ranges(ag)) - length(merged)
 nmerged
 ```
 
+
+We use improperly paired reads to link amplicons. First, we extract the
+improperly paired reads and then we evaluate whether there are duplications
+flanking the seed amplicons that can be linked to the seeds by the improperly
+paired reads. In order to link the flanking segments to the seeds, we require
+the adjacent segments to have mean log ratios consistent with a duplication
+(see ```LOW_THR```).
+
+```{r properly_paired}
+library(svalignments)
+params[["LOW_THR"]]
+rp <- get_readpairs(ag, bamPaths(bview))
+ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
+ag
+```
+
+TODO: what does this do. how does the graph change? What do these segments look
+like?
+
+```{r focalAmpDup}
+qr <- focalAmpliconDupRanges(ag, params)
+queryRanges(ag) <- qr
+qr
+```
+
+```{r improperly_paired}
+irp <- get_improper_readpairs(ag, bamPaths(bview))
+ag <- svcnvs:::linkFocalDups(ag, irp, params)
+ag <- svcnvs:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
+ag <- svcnvs:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
+ag <- filterSmallAmplicons (ag)
+ag <- setAmpliconGroups (ag)
+ag <- setGenes (ag, transcripts)
+ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
+ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
+```
+
 In order to plot the linked amplicons as a graph, we load several supporting
 packages that support visualization of graph objects. In addition, we write a
 wrapper for plotting the graphs.
@@ -110,44 +147,8 @@ plotAmpGraph <- function(ag, transcripts, color.guide=FALSE){
 }
 ```
 
-We use improperly paired reads to link amplicons. First, we extract the
-improperly paired reads and then we evaluate whether there are duplications
-flanking the seed amplicons that can be linked to the seeds by the improperly
-paired reads. In order to link the flanking segments to the seeds, we require
-the adjacent segments to have mean log ratios consistent with a duplication
-(see ```LOW_THR```).
-
-```{r properly_paired}
-library(svalignments)
-params[["LOW_THR"]]
-rp <- get_readpairs(ag, bamPaths(bview))
-ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
-ag
-```
-
-TODO: what does this do. how does the graph change? What do these segments look
-like?
-
-```{r focalAmpDup}
-qr <- focalAmpliconDupRanges(ag, params)
-queryRanges(ag) <- qr
-qr
-```
-
-```{r improperly_paired}
-irp <- get_improper_readpairs(ag, bamPaths(bview))
-ag <- svcnvs:::linkFocalDups(ag, irp, params)
-ag <- svcnvs:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
-ag <- svcnvs:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
-ag <- filterSmallAmplicons (ag)
-ag <- setAmpliconGroups (ag)
-ag <- setGenes (ag, transcripts)
-ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
-ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
-p4 <- plotAmpGraph(ag, transcripts, color.guide=guide_legend(title=""))
-```
-
 
 ```{r graph}
+p4 <- plotAmpGraph(ag, transcripts, color.guide=guide_legend(title=""))
 grid.arrange(p4)
 ```
