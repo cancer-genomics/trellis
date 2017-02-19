@@ -65,7 +65,7 @@ reduceGenomeFilters <- function(filters, seqlev){
   ##filters <- filters[-match("transcripts", names(filters))]
   r <- reduce(unlist(GRangesList(lapply(filters, granges))))
   if(missing(seqlev)) return(r)
-  keepSeqlevels(r, seqlev)  
+  keepSeqlevels(r, seqlev, pruning.mode="coarse")
 }
 
 #' List germline rearrangement filters derived from 10 lymphoblast
@@ -106,5 +106,5 @@ reduceRearFilters <- function(filters, seqlev){
   ##filters <- listRearFilters()
   r <- reduce(unlist(filters))
   if(missing(seqlev)) return(r)
-  keepSeqlevels(r, seqlev)
+  keepSeqlevels(r, seqlev, pruning.mode="coarse")
 }
