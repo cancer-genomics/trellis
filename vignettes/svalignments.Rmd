@@ -51,7 +51,7 @@ sequence junctions.
 region.expand <- GRanges("chr15", IRanges(start(region)-5e3, end(region)+5e3))
 seqinfo(region.expand) <- seqinfo(region)
 ```
- 
+
 Next, we create a BamViews object that will contain metadata on the bamfiles.
 
 ```{r bamviews}
