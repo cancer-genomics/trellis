@@ -399,22 +399,6 @@ isHemizygousDeletion <- function(object, param, pview){
 #' \code{minFlankingHemizgyous(param)}, a deletion is designated as
 #' "hemizygous+" if hemizygous and "homozygous+" if homozygous.
 #'
-#' @examples
-#' library(svovarian)
-#' library(svpreprocess)
-#' dirs <- projectOvarian()
-#' ut_path <- file.path(dirs[["unit_test"]], "deletion_pipeline")
-#' sv <- readRDS(file=file.path(ut_path, "sv7.rds"))
-#' del_list <- readRDS(file.path(ut_path, "del_list.rds"))
-#' bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-#' index <- match(gsub(".bam", "", names(del_list)[12]),
-#'                Rsamtools::bamSamples(bviews)$Flow.Cell.ID)
-#' bview <- bviews[, index]
-#' pview <- sv_preprocess(bview, dirs)
-#' ## number of improper read pairs supporting each deletion
-#' param <- DeletionParam()
-#' cncalls <- rpSupportedDeletions(sv, param, pview)
-#'
 #' @return a character-vector of deletion calls
 #' @export
 #' @param object a \code{StructuralVariant} object
@@ -1202,6 +1186,7 @@ numberSpanningAmplicons <- function(tx, grl, maxgap=5e3){
 #' pairs with insert size less than 3kb.
 #'
 #' @param object  a \code{StructuralVariant} object
+#' @param max.out length-one integer vector: the maximum number of read pairs to return
 #' @export
 thinReadPairs <- function(object, max.out=25e3){
   rp <- readPairs(object)
