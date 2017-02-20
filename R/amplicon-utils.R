@@ -87,9 +87,6 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @return Returns a list of germline filters and some of the hard
 #'   thresholds used in the amplicon analysis.
 #'
-#' @param build character string providing UCSC genome build
-#'   (currently, must be hg19)
-#'
 #' @param AMP_THR numeric threshold for high copy amplicon
 #'
 #' @param LOW_THR numeric a lower threshold used when considering
@@ -120,6 +117,9 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @param frequency minimum number of read pairs 
 #' 
 #' @param minimum_maxdist TODO
+#'
+#' @param minimum_count a length-one integer vector: minimum number of
+#'   improperly paired reads required to link two amplicons
 #' 
 #' @param bad_bins a \code{GRanges} object of problematic bins
 ampliconParams <- function(AMP_THR=log2(2.75),
@@ -318,31 +318,14 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
 #'
 #' Constructor for \code{AmpliconGraph}.
 #'
-#' @param ranges a \code{GRanges} of the amplicons
-#' 
-#' @param border_size used to construct a query for additional
-#'   amplicons neighboring a focal amplicon. TODO: more detail needed.
-#' 
-#' @param assembly_gaps a \code{GRanges} object of the assembly gaps
-#' 
-#' @param centromeres a \code{GRanges} object of the centromeres
-#' 
-#' @param germline_cnv a \code{GRanges} object of germline CNVs
-#' 
-#' @param outliers a \code{GRanges} object of germline outliers
-#' 
-#' @param overhang a length-one numeric vector
+#' @param ranges a \code{GRanges} object of the segmented normalized copy number 
+#' @param filters a list of germline CNV and sequence-based filters
+#' @param params a list of parameters
 #' @rdname AmpliconGraph-constructor
 #' @export
 AmpliconGraph <- function(ranges=GRanges(),
                           filters,
                           params=ampliconParams(border_size=150e3, overhang=5e3)){
-  ##                          border_size=150e3,
-  ##                        assembly_gaps=GRanges(),
-  ##                        centromeres=GRanges(),
-  ##                        germline_cnv=GRanges(),
-  ##                        outliers=GRanges(),
-  ##                        overhang=5e3){
   if(missing(filters)){
     filters <- .empty_filters()
   }
