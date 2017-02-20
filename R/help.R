@@ -5,20 +5,20 @@
 #' @name svalignments
 #' @import methods
 #' @import svclasses
-#' @importMethodsFrom S4Vectors mcols mcols<- elementNROWS 
+#' @importMethodsFrom S4Vectors mcols mcols<- elementNROWS
 #' @importFrom S4Vectors isTRUEorFALSE
 #' @importFrom S4Vectors queryHits subjectHits
-#' @importMethodsFrom GenomicAlignments readGAlignments first last 
+#' @importMethodsFrom GenomicAlignments readGAlignments first last
 #' @importFrom GenomicAlignments makeGAlignmentPairs findMateAlignment GAlignmentPairs GAlignments
-#' @importFrom Rsamtools scanBamFlag bamPaths bamFlagAsBitMatrix 
-#' @importMethodsFrom Rsamtools ScanBamParam 
+#' @importFrom Rsamtools scanBamFlag bamPaths bamFlagAsBitMatrix bamMapqFilter
+#' @importMethodsFrom Rsamtools ScanBamParam
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths
 #' @importMethodsFrom GenomeInfoDb seqlevelsStyle seqlevelsStyle<-
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importFrom IRanges IRanges
 #' @importMethodsFrom IRanges reduce width disjoin overlapsAny pintersect subsetByOverlaps unlist findOverlaps
-#' @importFrom GenomicRanges GRanges GRangesList
-#' @importMethodsFrom GenomicRanges granges strand strand<- width intersect 
-#' @importMethodsFrom SummarizedExperiment rowRanges rowRanges<- 
+#' @import GenomicRanges
 #' @importFrom dplyr tbl_df
+#' @importFrom utils read.delim
+#' @importFrom stats setNames
 NULL

@@ -498,6 +498,7 @@ removeAmbiguous <- function(x, blat){
 #'   by \code{scoreBlatExperiment}
 #' 
 #' @examples
+#' \dontrun{
 #'  library(svovarian)
 #'  dirs <- projectOvarian(rootname="OvarianData2")
 #'  if(FALSE){
@@ -513,6 +514,7 @@ removeAmbiguous <- function(x, blat){
 #'  filtered_rlist <- removeAmbiguousAln(rlist, blat_list)
 #'  print(filtered_rlist)
 #'  }
+#' }
 removeAmbiguousAln <- function(rlist, blat_list){
   mapply(removeAmbiguous, x=rlist, blat=blat_list)
 }
