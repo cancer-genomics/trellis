@@ -54,14 +54,14 @@ amplicons.
 
 ```{r initialgraph}
 params[["AMP_THR"]]
-ag <- svcnvs:::makeAGraph(segs, germline_filters, params)
+ag <- makeAGraph(segs, germline_filters, params)
 print(ag)
 ```
 
-The four amplicons in this initial graph serve as seeds. We next evaluate
-whether any of the segments can be merged. In particular, if two adjacent
-segments have an absolute difference of means less than `MIN_SEGMEAN_DIFF`, the
-adjacent segments are merged.
+The four high-copy focal amplicons in this initial graph serve as seeds. We next
+evaluate whether any of the segments can be merged. In particular, we merge
+adjacent segments having segment means that differ by less than
+`MIN_SEGMEAN_DIFF`.
 
 ```{r joinNear}
 params[["MIN_SEGMEAN_DIFF"]]
@@ -96,16 +96,18 @@ queryRanges(ag) <- qr
 qr
 ```
 
+TODO: Explain the steps below.
+
 ```{r improperly_paired}
 irp <- get_improper_readpairs(ag, bamPaths(bview))
 ag <- svcnvs:::linkFocalDups(ag, irp, params)
 ag <- svcnvs:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
 ag <- svcnvs:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
-ag <- filterSmallAmplicons (ag)
-ag <- setAmpliconGroups (ag)
-ag <- setGenes (ag, transcripts)
-ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
-ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
+ag <- svcnvs:::filterSmallAmplicons (ag)
+ag <- svcnvs:::setAmpliconGroups (ag)
+ag <- svcnvs:::setGenes (ag, transcripts)
+ag <- svcnvs:::setDrivers (ag, transcripts, clin_sign=TRUE)
+ag <- svcnvs:::setDrivers (ag, transcripts, clin_sign=FALSE)
 ```
 
 In order to plot the linked amplicons as a graph, we load several supporting
@@ -113,6 +115,7 @@ packages that support visualization of graph objects. In addition, we write a
 wrapper for plotting the graphs.
 
 ```{r plotfun}
+library(ggplot2)
 library(gridExtra)
 library(grid)
 library(GGally)
