@@ -298,19 +298,19 @@ blatScores <- function(blat, tags, id, thr=0.8){
 #' }
 #'
 #' @return a list of \code{tbl_df} objects
-#' 
+#'
 #' @param id sample id
 #'
 #' @param blat data.frame of blat records from the command-line blat tool
-#' 
+#'
 #' @param tags a \code{tbl_df} object of the read sequences
-#' 
+#'
 #' @param dirs a \code{DataPaths} object
-#' 
+#'
 #' @param thr a length-one numeric vector indicating the fraction of
 #'   improper reads that are of high quality for a given
 #'   rearrangement.
-#' 
+#'
 scoreBlatExperiment <- function(id, blat, tags, dirs, thr=0.8){
   parsed_file <- file.path(dirs[["4parsed_mapped"]], paste0(id, ".rds"))
   if(file.exists(parsed_file)){
