@@ -12,6 +12,9 @@ test_that("improper alignment parameters", {
   flags <- improperAlignmentFlags()
   params2 <- improperAlignmentParams(flag=flags)
   expect_identical(params, params2)
+
+  params3 <- improperAlignmentParams(flag=flags, mapqFilter=30)
+  expect_identical(bamMapqFilter(params3), 30L)
 })
 
 .test_that <- function(expr, ...) NULL

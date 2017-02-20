@@ -129,7 +129,8 @@ properAlignmentFlags <- function(){
 #' params2 <- improperAlignmentParams()
 #' print(params2)
 #' identical(params, params2)
-#' 
+#'
+#' @param ... additional arguments to \code{ScanBamParam} such as \code{mapqFilter}
 #' @param flag A length-two integer vector as provided by \code{improperAlignmentFlags}
 #' @export
 #' @rdname alignment-flags
