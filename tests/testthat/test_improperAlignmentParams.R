@@ -33,12 +33,10 @@ test_that("read_pairs_from_bam", {
   bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
   bview <- BamViews(bamPaths=bampath)
 
-  iparams <- improperAlignmentParams(which=region)
+  iparams <- improperAlignmentParams(which=region, mapqFilter=30)
   pparams <- properAlignmentParams(which=region)
   irp <- getImproperAlignmentPairs(bview,
-                                   iparams,
-                                   mapq_thr=30,
-                                   use.mcols=TRUE)
+                                   iparams)
   expect_identical(length(irp), 57L)
   g.irp <- ga2gr(irp, is.improper=TRUE)
   expect_identical(length(g.irp), 57L*2L)
