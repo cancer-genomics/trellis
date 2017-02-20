@@ -6,7 +6,7 @@ output: BiocStyle::pdf_document
 vignette: >
   %\VignetteIndexEntry{Overview of svcnvs package}
   %\VignetteEngine{knitr::rmarkdown}
-  %\usepackage[utf8]{inputenc}
+  %\usepackage[utf8]{inputenc} 
 ---
 
 # Introduction
@@ -14,10 +14,9 @@ vignette: >
 This package is used to segment normalized coverage by circular binary
 segmentation and to identify deletions and amplicons through a combination of
 changes in normalized coverage and read pairs with aberrant spacing or
-orientation. *Segmentation should probably be extracted into a separate
-package.*
+orientation. *Segmentation should probably be extracted into a separate package.*
 
-# Workflow
+# Preprocessing
 
 This vignette requires the *svpreprocess* package for loading a views for the
 bin-level preprocessed coverage estimates. *TODO: Purpose of modular processing
@@ -28,9 +27,10 @@ Views object below from scratch*.
 ```{r packages}
 library(svpreprocess)
 library(svcnvs)
+library(svfilters.hg19)
 ```
 
-```{r views}
+```{r pviews}
 data(pview, package="svpreprocess")
 ```
 
@@ -42,15 +42,93 @@ cov.file <- file.path(ddir, "preprocessed_coverage.rds")
 paths(pview) <- cov.file
 ```
 
-TODO: show how deletions are called from the views object above.
+# Segmentation
 
-Here, we are loading results from segmentation of the preprocessed coverage as
-well as an object of called deletions from the *sv_deletions* function for the
-ovarian cancer cell line CGOV44T.
+TODO
 
-```{r deletion}
+```{r segments}
 data(segments, package="svcnvs")
-data(deletion, package="svcnvs")
+```
+
+# Deletions
+
+The deletion analysis uses improperly paired reads as well as the segmented
+normalized coverage. We use two additional 'views' objects to faciliate these
+analyses: (i) a views object for the BAM files (`BamViews`) and (ii) a views
+object for the improperly paired reads (`AlignmentViews`). We instantiate these
+views in the following code chunk:
+
+```{r views}
+library(Rsamtools)
+extdata <- system.file("extdata", package="svbams")
+id <- "CGOV44T.bam"
+id.rds <- paste0(id, ".rds")
+bamfile <- file.path(extdata, id)
+bview <- Rsamtools::BamViews(bamPaths=bamfile)
+seqinfo(bamRanges(bview)) <- seqinfo(segments)["chr15", ]
+```
+
+So that the examples run very quickly in this vignette, we limit our deletion
+analysis to chromosome 15. 
+
+```{r seqinfo}
+segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
+region.of.interest <- GRanges("chr15", IRanges(63201003-10e3, 63209243+10e3))
+seqinfo(region.of.interest) <- seqinfo(segs)
+segs <- segs[overlapsAny(segs, region.of.interest)]
+segs
+```
+
+Next, we extract improperly paired reads from this region by passing `segs` to
+the `which` argument of the `improperAlignmentParams` function.
+
+```{r improper_pairs}
+segs2 <- expandGRanges(segs, 10e3)
+iparams <- improperAlignmentParams(which=reduce(segs2))
+## TODO mapq_thr should be part of iparams.  Don't need use.mcols
+irp <- getImproperAlignmentPairs(bview, iparams,
+                                 mapq_thr=30,
+                                 use.mcols=TRUE)
+length(irp)
+irp.file <- tempfile()
+saveRDS(irp, file=irp.file)
+aview <- AlignmentViews2(bview, path=irp.file)
+```
+
+Filters for germline CNVs and sequence artifacts are available from the
+`svfilters` package. Here, we load the hg19 filters.
+
+```{r germline_filters}
+data(germline_filters, package="svfilters.hg19")
+filters <- reduceGenomeFilters(germline_filters)
+```
+
+
+```{r sv_deletions}
+dparam <- DeletionParam()
+deletion <- sv_deletions(gr=segs,
+                         bview=bview,
+                         aview=aview,
+                         pview=pview,
+                         gr_filters=filters,
+                         param=dparam)
+```
+
+# Amplicons
+
+To illustrate how amplicons are identified and linked by improperly paired
+reads, we load segmentation results from chromosomes 5 and 8.
+
+```{r amplified_segments}
+cv.extdata <- system.file("extdata", package="svcnvs")
+segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+aparams <- ampliconParams()
+ag <- sv_amplicons(bview=bview,
+                   segs=segs,
+                   amplicon_filters=germline_filters,
+                   params=aparams,
+                   transcripts=transcripts)
+ag
 ```
 
 # Plotting deletions
@@ -175,6 +253,9 @@ Finally, we make a composite graphic of the log ratios and rearranged reads:
 grid.arrange(A1, B, ncol=1)
 ```
 
+# Plotting amplicon graphs
+
+See the amplicons vignette.
 
 
 
