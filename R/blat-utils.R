@@ -286,6 +286,7 @@ blatScores <- function(blat, tags, id, thr=0.8){
 #'
 #' @seealso See \code{blatScores}
 #' @examples
+#' \dontrun{
 #'  library(svovarian)
 #'  dirs <- projectOvarian(rootname="OvarianData2")
 #'  if(FALSE){
@@ -294,6 +295,7 @@ blatScores <- function(blat, tags, id, thr=0.8){
 #'    parsed <- scoreBlatExperiment(id, blat, tags, dirs)
 #'    parsed
 #'  }
+#' }
 #'
 #' @return a list of \code{tbl_df} objects
 #' 
@@ -488,15 +490,15 @@ removeAmbiguous <- function(x, blat){
 #' include only those rearrangement ids that remain in the BLAT
 #' \code{data.frame}.
 #'
-#' 
+#'
 #' @seealso See \code{blatScores} for the approach used to QC
 #'   BLAT-aligned reads.
-#' 
+#'
 #' @export
 #' @param rlist a \code{RearrangementList}
 #' @param blat_list a list of \code{data.frame} objects, as returned
 #'   by \code{scoreBlatExperiment}
-#' 
+#'
 #' @examples
 #' \dontrun{
 #'  library(svovarian)
