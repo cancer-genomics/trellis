@@ -1043,7 +1043,6 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 #' @export
 sv_deletions <- function(gr, aview, bview, pview,
                          gr_filters,
-                         improper_pairs,
                          param=DeletionParam()){
   ##gr <- germlineFilters(gr, gr_filters, pview)
   sv <- deletion_call(aview, pview, gr, gr_filters)
