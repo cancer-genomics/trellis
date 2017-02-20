@@ -56,10 +56,11 @@ listGenomeFilters <- function(){
 #'
 #' @return a reduced \code{GRanges} object of germline and sequence filters
 #' @export
+#' @param filters a list of germline CNV filters as GRanges objects
 #' @param seqlev character vector of sequence names
 #' @seealso See \code{\link[GenomicRanges]{inter-range-methods}} for a
 #'   description of \code{reduce}.
-#' 
+#'
 reduceGenomeFilters <- function(filters, seqlev){
   ##filters <- listGenomeFilters()
   ##filters <- filters[-match("transcripts", names(filters))]
@@ -99,6 +100,7 @@ listRearFilters <- function(){
 #'
 #' @return a \code{GRanges} object
 #' @seealso \code{\link{listRearFilters}}
+#' @param filters a list of germline CNV filters
 #' @param seqlev character vector of sequence names
 #' 
 #' @export
