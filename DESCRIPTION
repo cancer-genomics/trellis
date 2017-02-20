@@ -26,7 +26,8 @@ Suggests:
     testthat,
     svpreprocess,
     svfilters.hg19,
-    svbams
+    svbams,
+    rtracklayer
 License: Artistic-2.0
 LazyData: true
 RoxygenNote: 6.0.1
