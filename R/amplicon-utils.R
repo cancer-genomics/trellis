@@ -1064,20 +1064,6 @@ makeAGraph <- function(segs, af, params){
 #'   \code{\linkS4class{AmpliconGraph}} for each sample in an
 #'   experiment.
 #'
-#' @examples
-#'   library(svovarian)
-#'   library(svfilters.hg19)
-#'   id <- "CGOV2T"
-#'   data(lymph_ids)
-#'   data(germline_filters)
-#'   data(transcripts)
-#'   params <- ampliconParams()
-#'   bviews <- readRDS(file.path(dp[1], "bviews_hg19.rds"))
-#'   bviews <- bviews[, id]
-#'   grl <- readRDS(file.path(dp["segment"], "grl_hg19.rds"))
-#'   ## Requires bam file
-#'   ag <- sv_amplicons(bviews[, id], grl[[id]], germline_filters, params)
-#'
 #' @export
 #' @param bview a \code{BamViews} object
 #'

@@ -20,26 +20,11 @@ outlierFrequencyPerBin <- function(pviews, NMAD=5){
 #' REFACTOR: Each major directory in the DataPaths should have a final
 #' subdirectory with a views object.
 #'
-#' @examples
-#' \dontrun{
-#' library(svovarian)
-#' data(lymph_ids)
-#' dp <- projectOvarian()
-#' pv <- readRDS(file.path(dp[["final_preprocess"]], "pviews_hg19.rds"))
-#' paths(pv) <- file.path(dp["3background"], rdsId(pv))
-#' pv <- pv[, lymph_ids]
-#' out <- germlineOutliers(pv)
-#' }
-#' 
 #' @export
-#' 
 #' @return a \code{GRanges} object of the reduced outlier genomic intervals
-#' 
 #' @param pviews a \code{PreprocessViews2} object
-#' 
 #' @param NMAD a length-one numeric vector indicating the number of
 #'   mads from zero
-#' 
 germlineOutliers <- function(pviews, NMAD=5){
   freq <- outlierFrequencyPerBin(pviews, NMAD=NMAD)
   outlier_bins <- rowRanges(pviews)[freq >= 2]
