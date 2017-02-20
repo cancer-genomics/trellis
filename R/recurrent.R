@@ -1,8 +1,8 @@
 #' Annotate table of amplified genes with linked drivers and the number of
 #' samples for which a driver is linked
 #'
-#' @param ramps a table of recurrent amplicons
-#' @param amp_grl a \code{GRangesList} of amplicons (each element is a sample)
+#' @param rcnvs a table of recurrent CNVs
+#' @param grl a \code{GRangesList} of the segmented copy number (each element is a sample)
 #'
 #' @seealso See \code{\link{recurrentDrivers}} for making a table of recurrent amplicons
 #' @export
