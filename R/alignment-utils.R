@@ -140,6 +140,7 @@ improperAlignmentParams <- function(flag=improperAlignmentFlags(),
   ScanBamParam(flag=flag, what=what, ...)
 }
 
+
 #' @export
 #' @rdname alignment-flags
 properAlignmentParams <- function(flag=properAlignmentFlags(),
@@ -191,27 +192,23 @@ getImproperAlignmentPairs <- function(object,
 #' @param param a \code{ScanBamParam} object.
 #' @param mapq_thr the minimum mapq score (numeric)
 #' @param use.mcols logical
-#' 
+#'
+#' @details TODO: default value for mapqFilter is -Inf for historical reasons. Should reset to more reasonable default (e.g., 30).
 #' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
 #'   for details regarding \code{use.mcols} argument.  See
 #'   \code{\link{improperAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getProperAlignmentPairs <- function(object,
-                                    param=properAlignmentParams(),
-                                    mapq_thr=-Inf,
-                                    use.mcols=TRUE){
+                                    param=properAlignmentParams(mapqFilter=-Inf)){
   bam.file <- bamPaths(object)
-  flags <- properAlignmentFlags()
-  if(missing(param)){
-    param <- ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"))
-  }
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
+  mapq_thr <- bamMapqFilter(param)
   if(mapq_thr > -Inf){
     irp <- irp[ mcols(irp)$mapq >= mapq_thr ]
   }
-  irp2 <- makeGAlignmentPairs2(irp, use.mcols=use.mcols, use.names=TRUE)
+  irp2 <- makeGAlignmentPairs2(irp, use.mcols=TRUE, use.names=TRUE)
   irp2
 }
 

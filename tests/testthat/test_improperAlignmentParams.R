@@ -34,7 +34,7 @@ test_that("read_pairs_from_bam", {
   bview <- BamViews(bamPaths=bampath)
 
   iparams <- improperAlignmentParams(which=region, mapqFilter=30)
-  pparams <- properAlignmentParams(which=region)
+  pparams <- properAlignmentParams(which=region, mapqFilter=30)
   irp <- getImproperAlignmentPairs(bview,
                                    iparams)
   expect_identical(length(irp), 57L)
@@ -43,9 +43,7 @@ test_that("read_pairs_from_bam", {
   expect_true(all(g.irp$is.improper))
 
   prp <- getProperAlignmentPairs(bview,
-                                 pparams,
-                                 mapq_thr=30,
-                                 use.mcols=TRUE)
+                                 pparams)
   g.prp <- ga2gr(prp, is.improper=FALSE)
   mcol.vars <- colnames(mcols(g.prp))
   expect_identical(mcol.vars, c("read", "is.improper", "tagid"))
