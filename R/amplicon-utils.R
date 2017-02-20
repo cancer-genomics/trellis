@@ -581,10 +581,12 @@ addFlanks <- function(object, dup_granges){
 #' @param params a list of parameters for amplicon analyses
 #' @seealso \code{\link{ampliconParams}}
 #' @examples
+#' \dontrun{
 #'   path <- file.path(system.file(package="svcnvs"), "tests/testthat")
 #'   ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
 #'   params <- ampliconParams()
 #'   ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
+#' }
 #' @export
 addFocalDupsFlankingAmplicon <- function(object, rp, params){
   if(totalWidth(queryRanges(object))==0) return(object)
