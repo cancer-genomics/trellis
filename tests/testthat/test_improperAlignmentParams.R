@@ -15,6 +15,21 @@ test_that("improper alignment parameters", {
 
   params3 <- improperAlignmentParams(flag=flags, mapqFilter=30)
   expect_identical(bamMapqFilter(params3), 30L)
+  params3 <- improperAlignmentParams(flag=flags, mapqFilter=0)
+
+  params <- properAlignmentParams()
+  expect_true(bamFlag(params)[["isPaired"]])
+  expect_true(bamFlag(params)[["isProperPair"]])
+  expect_true(!bamFlag(params)[["isUnmappedQuery"]])
+  expect_true(!bamFlag(params)[["hasUnmappedMate"]])
+  expect_true(!bamFlag(params)[["isDuplicate"]])
+  expect_true(is.na(bamFlag(params)[["isNotPassingQualityControls"]]))
+  flags <- properAlignmentFlags()
+  pparams2 <- improperAlignmentParams(flag=flags, mapqFilter=30)
+  expect_identical(bamMapqFilter(pparams2), 30L)
+
+  pparams2 <- improperAlignmentParams(flag=flags, mapqFilter=0)
+  expect_identical(bamMapqFilter(pparams2), 30L)
 })
 
 .test_that <- function(expr, ...) NULL

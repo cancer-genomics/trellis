@@ -161,7 +161,7 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #' @param param a \code{ScanBamParam} object.
 #' @param use.mcols logical
 #'
-#' @details TODO: mapqFilter is set to -Inf by default for historical reasons.
+#' @details TODO: mapqFilter is set to 0 by default for historical reasons.
 #'   Should provide better default (e.g., mapqFilter=30).
 #'
 #' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
@@ -170,7 +170,7 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(object,
-                                      param=improperAlignmentParams(mapqFilter=-Inf)){
+                                      param=improperAlignmentParams(mapqFilter=0)){
   bam.file <- bamPaths(object)
   flags <- improperAlignmentFlags()
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
@@ -194,14 +194,14 @@ getImproperAlignmentPairs <- function(object,
 #' @param mapq_thr the minimum mapq score (numeric)
 #' @param use.mcols logical
 #'
-#' @details TODO: default value for mapqFilter is -Inf for historical reasons. Should reset to more reasonable default (e.g., 30).
+#' @details TODO: default value for mapqFilter is 0 for historical reasons. Should reset to more reasonable default (e.g., 30).
 #' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
 #'   for details regarding \code{use.mcols} argument.  See
 #'   \code{\link{improperAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getProperAlignmentPairs <- function(object,
-                                    param=properAlignmentParams(mapqFilter=-Inf)){
+                                    param=properAlignmentParams(mapqFilter=0)){
   bam.file <- bamPaths(object)
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
@@ -240,15 +240,12 @@ getProperAlignmentPairs <- function(object,
 #' @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
 #' @param use.mcols length-one logical vector
 writeImproperAlignments2 <- function(aview,
-                                     param=improperAlignmentParams(),
-                                     mapq_thr=-Inf, use.mcols=TRUE){
+                                     param=improperAlignmentParams(mapqFilter=0)){
   if(file.exists(improperPaths(aview))){
     return(invisible())
   }
   aln_path <- improperPaths(aview)
-  irp <- getImproperAlignmentPairs(aview, param,
-                                   mapq_thr=mapq_thr,
-                                   use.mcols=use.mcols)
+  irp <- getImproperAlignmentPairs(aview, param)
   out.file <- improperPaths(aview)
   saveRDS(irp, file=out.file)
   invisible()
