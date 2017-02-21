@@ -50,7 +50,10 @@ listGenomeFilters <- function(){
 #'   \code{seqlev} (if provided).
 #'
 #' @examples
-#' filters <- reduceGenomeFilters("hg19")
+#' library(svfilters.hg19)
+#' filter.list <- listGenomeFilters()
+#' filter.list <- filter.list[names(filter.list) != "transcripts"]
+#' filters <- reduceGenomeFilters(filter.list)
 #'
 #' @seealso \code{\link{listGenomeFilters}}
 #'
