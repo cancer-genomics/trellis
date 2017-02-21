@@ -35,11 +35,9 @@ test_that("deletions_segs", {
     saveRDS(bview, file="bview.4adcc78.rds")
   }
   if(FALSE){
-    iparams <- improperAlignmentParams(which=gr)
+    iparams <- improperAlignmentParams(which=gr, mapqFilter=30)
     irp <- getImproperAlignmentPairs(bview,
-                                     iparams,
-                                     mapq_thr=30,
-                                     use.mcols=TRUE)
+                                     iparams)
     ##
     ## TODO: refactor sv_deletions. Currently, we have to save the improperly
     ## paired reads to disk because sv_deletions reads from disk
