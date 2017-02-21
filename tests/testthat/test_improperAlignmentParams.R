@@ -72,6 +72,15 @@ test_that("read_pairs_from_bam", {
   ## duplicated tags
   expect_identical(length(gr)/2, sum(duplicated(gr$tagid))*1)
   gr <- sortByRead1(gr)
+
+  ##
+  ## ga2gr should return a length-0 GRanges object when there are no
+  ## proper/improper alignment pairs
+  ##
+  prp2 <- prp[rep(FALSE, length(prp))]
+  lengthzero.gr <- ga2gr(prp2, is.improper=FALSE)
+  expect_is(lengthzero.gr, "GRanges")
+  expect_identical(length(lengthzero.gr), 0L)
 })
 
 
