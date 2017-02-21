@@ -81,6 +81,11 @@ test_that("read_pairs_from_bam", {
   lengthzero.gr <- ga2gr(prp2, is.improper=FALSE)
   expect_is(lengthzero.gr, "GRanges")
   expect_identical(length(lengthzero.gr), 0L)
+
+  pgr2 <- ga2gr(prp2, is.improper=FALSE)
+  pgr2 <- thinProperPairs(pgr2, 10)
+  gr <- sortByRead1(c(g.irp, pgr2))
+  expect_is(gr, "GRanges")
 })
 
 
