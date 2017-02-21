@@ -6,7 +6,7 @@ output: BiocStyle::pdf_document
 vignette: >
   %\VignetteIndexEntry{Overview of svcnvs package}
   %\VignetteEngine{knitr::rmarkdown}
-  %\usepackage[utf8]{inputenc} 
+  %\usepackage[utf8]{inputenc}
 ---
 
 # Introduction
@@ -22,7 +22,7 @@ examples in this vignette, we use BAM files in the `svbams` package.
 This section describes how to extract rearranged read pairs from a BAM file for
 a specific genomic region of interest (e.g., a possible deletion). In the
 following code chunk, we load the `svbams` package which contains a small
-bam files for a region of chr15.  
+bam files for a region of chr15.
 
 ```{r svbams}
 library(GenomicAlignments)
@@ -45,7 +45,7 @@ seqinfo(region) <- si["chr15", ]
 
 To be sure this region is big enough to capture any interesting nearby features,
 we expand the region of interest to include 5kb on either side of the candidate
-sequence junctions. 
+sequence junctions.
 
 ```{r expand}
 region.expand <- GRanges("chr15", IRanges(start(region)-5e3, end(region)+5e3))
@@ -65,8 +65,8 @@ class with parameters for extracting improperly paired reads. Note that if
 will be extracted from the BAM file. For large BAM files, this can be very slow.
 
 ```{r scanbamparams}
-iparams <- improperAlignmentParams(which=region.expand)
-pparams <- properAlignmentParams(which=region.expand)
+iparams <- improperAlignmentParams(which=region.expand, mapqFilter=30)
+pparams <- properAlignmentParams(which=region.expand, mapqFilter=30)
 ```
 
 Next, we extract a `GAlignmentsPairs` object encapsulating all of the improperly
@@ -74,13 +74,9 @@ and properly paired reads in this region.
 
 ```{r GAlignmentPairs}
 irp <- getImproperAlignmentPairs(bview,
-                                 iparams,
-                                 mapq_thr=30,
-                                 use.mcols=TRUE)
+                                 iparams)
 prp <- getProperAlignmentPairs(bview,
-                               pparams,
-                               mapq_thr=30,
-                               use.mcols=TRUE)
+                               pparams)
 ```
 
 For visualization, we melt the `GAlignmentPairs` to `GRanges` and coerce to a
