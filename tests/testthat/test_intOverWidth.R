@@ -7,8 +7,8 @@ test_that("intOverWidth", {
   expect_identical(test, c(0.6, 0.3))
 
   filters <- GRanges(c("chr1", "chrX"), IRanges(c(5, 8), c(20, 10000)))
-  seqlevels(filters, force=TRUE) <- autosomes()
-  seqlevels(del, force=TRUE) <- autosomes()
+  seqlevels(filters, pruning.mode="coarse") <- autosomes()
+  seqlevels(del, pruning.mode="coarse") <- autosomes()
   test <- intOverWidth(del, filters)
   expect_identical(test, c(0.6, 0))
 
