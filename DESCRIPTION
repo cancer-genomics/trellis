@@ -18,7 +18,7 @@ Imports:
     IRanges,
     GenomicRanges,
     DNAcopy,
-    svalignments,
+    svalignments (>= 0.0.9),
     graph,
     RBGL,
     SummarizedExperiment

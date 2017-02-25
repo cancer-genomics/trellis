@@ -74,11 +74,9 @@ test_that("CNAObject", {
   ## - do not require AlignmentViews
   ## create an AlignmentViews object
   library(svalignments)
-  iparams <- improperAlignmentParams()
+  iparams <- improperAlignmentParams(mapqFilter=30)
   file <- paste0(tempdir(), "cgov10t.rds")
-  irp <- getImproperAlignmentPairs(bview, param=iparams,
-                                   mapq_thr=30,
-                                   use.mcols=TRUE)
+  irp <- getImproperAlignmentPairs(bview, param=iparams)
   saveRDS(irp, file=file)
   aview <- AlignmentViews2(bview, file)
 
