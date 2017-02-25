@@ -173,9 +173,9 @@ df <- data.frame(logr=assays(pview2)[, 1],
 
 We restrict the y-axis limits to a suitable range for visualizing the log
 ratios, thresholding log ratios that are extreme. We highlight the region
-identified by the segmentation in the ggplot graphic and use dashed lines to
-indicate the more precise deletion boundaries identified from the rearranged
-read pairs that were used in the *sv_deletion* function. 
+identified by the segmentation in the ggplot graphic (the boundaries for the
+deletion are subsequently revised by the improperly paired reads as described in
+the next section).
 
 ```{r plot_logratios}
 ylim <- c(-9, 2)
@@ -221,7 +221,9 @@ rps <- thinReadPairs(deletion)
 rps <- svcnvs:::meltReadPairs(rps)
 ```
 
-We again use *ggplot* to plot the data:
+We again use *ggplot* to plot the data. Note the vertical dashed lines depict
+the more precise boundaries of the deletion made possible by the improperly
+paired (rearranged) reads.
 
 ```{r plot_rearranged_reads}
 colors <- c("#0072B2", "#009E73")
@@ -241,7 +243,8 @@ p <- ggplot(rps, aes(ymin=readpair-0.2, ymax=readpair+0.2,
   scale_fill_manual(values=colors) + 
   xlab("Mb") +
   theme(axis.text.x=element_text(size=7)) +
-  guides(fill=FALSE, color=FALSE)
+  guides(fill=FALSE, color=FALSE) +
+  geom_vline(xintercept=c(start(roi)/1e6, end(roi)/1e6), linetype="dashed")
 B <- ggplotGrob(p)
 ```
 
