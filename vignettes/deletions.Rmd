@@ -11,7 +11,16 @@ vignette: >
 
 # Introduction
 
-This vignette illustrates the workflow for identifying deletions.
+This vignette illustrates the workflow for identifying deletions from a
+segmented genome. While the segmentation date could be from whole genome, whole
+exome, or targeted sequencing platforms, the steps in this vignette primarily
+illustrate the steps for using improperly paired reads to improve the precision
+and specificity of a set of candidate deletions. For whole exome and targeted
+platforms, DNA fragments that flank the new sequence junctions formed by
+deletions are less likely to be sequenced. Consequently, the statistical
+analyses for identifying somatic deletions from these platforms primary rely on
+appropriate filters for germline CNVs and sequence artifacts as well as
+adjustments for tumor purity.
 
 # Workflow
 
@@ -22,5 +31,18 @@ library(svcnvs)
 ```
 
 
+We assume the GC-normalized, log2-transformed coverage for whole genome, whole
+exome, or targeted sequencing platforms have already segmented. See @ @, for
+instance. Here, we load segemented data from whole genome sequencing of an
+ovarian cell line CGOV44T.
 
-  
+```{r segments}
+data(segments, package="svcnvs")
+```
+
+In the following code chunk, we identify candidate deletions using a
+hard-threshold of the segment means. For the ovarian cell line, we expect 100%
+purity and a reasonable threshold for deletions is usually in the range [-0.5,
+-0.75]. As this vignette will show how to use improperly paired reads to rule
+out false positives,
+
