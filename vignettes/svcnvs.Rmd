@@ -28,6 +28,7 @@ Views object below from scratch*.
 library(svpreprocess)
 library(svcnvs)
 library(svfilters.hg19)
+library(svalignments)
 ```
 
 ```{r pviews}
@@ -135,7 +136,7 @@ We will use the *ggplot2* and *gridExtra* packages for plotting the deletions.
 
 ```{r plot_libraries}
 library(ggplot2)
-library(gridExtra)
+suppressPackageStartupMessages(library(gridExtra))
 library(scales)
 ```
 
@@ -145,7 +146,7 @@ surrounding region, we create a second *GRanges* object that includes 200kb of
 the flanking genome on each side of the deletion.
 
 ```{r region_of_interest}
-library(SummarizedExperiment)
+suppressPackageStartupMessages(library(SummarizedExperiment))
 ##
 ## region of interest (roi)
 ##
