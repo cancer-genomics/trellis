@@ -18,12 +18,11 @@
 \alias{maxRPsHomozygous}
 \title{Parameter class for calling deletions}
 \usage{
-DeletionParam(max_tag_density = 0.75, min_width = 2000, max_width = 2e+06,
-  min_gapwidth = 10000, tag_density_homozygous_thr = 0.1,
-  min_RPs_in_hemizygous = 1, max_RPs_in_homozygous = 100,
-  nflanking_hemizygous = 5L, nflanking_homozygous = 5L,
-  maxRatioObservedToExpected = 2L, max_proportion_in_filter = 0.75,
-  bam_seqlevels_style = "UCSC")
+DeletionParam(min_width = 2000, max_width = 2e+06, min_gapwidth = 10000,
+  tag_density_homozygous_thr = 0.1, min_RPs_in_hemizygous = 1,
+  max_RPs_in_homozygous = 100, nflanking_hemizygous = 5L,
+  nflanking_homozygous = 5L, maxRatioObservedToExpected = 2L,
+  max_proportion_in_filter = 0.75, bam_seqlevels_style = "UCSC")
 
 bamSeqLevelsStyle(object)
 
@@ -50,10 +49,6 @@ minRPsHemizygous(object)
 maxRPsHomozygous(object)
 }
 \arguments{
-\item{max_tag_density}{length-one numeric vector indicating the
-maximum fold change for calling deletions (assumes threshold
-provided using linear-scale).}
-
 \item{min_width}{length-one numeric vector indicating the minimum
 width of a CNV segment.}
 
@@ -101,25 +96,23 @@ normal samples.}
 
 \item{object}{a \code{DeletionParam}}
 
+\item{max_tag_density}{length-one numeric vector indicating the
+maximum fold change for calling deletions (assumes threshold
+provided using linear-scale).}
+
 \item{object}{a \code{DeletionParam}}
 }
 \value{
 a \code{DeletionParam} object
 }
 \description{
-Parameter class for calling deletions
+#' @slot tag_density_homozygous_thr length-one numeric vector
+  indicating the maximum fold change expected for a homozygous
+  deletion
 }
 \section{Slots}{
 
 \describe{
-\item{\code{max_tag_density}}{length-one numeric vector indicating the
-maximum fold change for calling deletions (assumes threshold
-provided using linear-scale).}
-
-\item{\code{tag_density_homozygous_thr}}{length-one numeric vector
-indicating the maximum fold change expected for a homozygous
-deletion}
-
 \item{\code{min_width}}{length-one numeric vector indicating the minimum
 width of a CNV segment.}
 
