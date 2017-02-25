@@ -1,6 +1,6 @@
 Package: svclasses
 Title: Classes for somatic structural variation analyses
-Version: 0.0.14
+Version: 0.0.15
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: This package contains classes and methods used for structural
     variant analyses.
@@ -22,7 +22,7 @@ Suggests:
     DNAcopy,
     knitr,
     testthat,
-    TestBams,
+    svbams,
     BSgenome.Hsapiens.UCSC.hg19,
     TxDb.Hsapiens.UCSC.hg19.refGene
 License: Artistic-2.0

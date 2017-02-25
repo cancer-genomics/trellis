@@ -5,15 +5,16 @@ test_that("AlignmentViews", {
   expect_identical(rdsId(av), character())
   
   library(Rsamtools)
-  require(TestBams)
-  extdata <- system.file("extdata", package="TestBams")
-  bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
+  require(svbams)
+  extdata <- system.file("extdata", package="svbams")
+  bam.file <- list.files(extdata, pattern="cgov10t\\.bam$", full.name=TRUE)
   bv <- BamViews(bam.file)
   dp <- tempfile()
   aviews <- AlignmentViews2(bv, dp)
-  expect_error(validObject(aviews))
-  files <- replicate(2, tempfile())
-  aviews <- AlignmentViews2(bv, files)
+  ## allow non-existing files since this can create headaches
+  ## expect_error(validObject(aviews))
+  tmp.file <- tempfile()
+  aviews <- AlignmentViews2(bv, tmp.file)
   expect_identical(length(improperPaths(aviews)),
                    ncol(bv))
   expect_true(validObject(aviews[, 1]))
