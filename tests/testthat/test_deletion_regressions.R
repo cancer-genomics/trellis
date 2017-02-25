@@ -47,6 +47,7 @@ test_that("deletions_segs", {
 })
 
 test_that("sv_deletions", {
+  library(svfilters.hg19)
   bview <- readRDS("bview.4adcc78.rds")
   segs <- readRDS("segs.4adcc78.rds")
   ##
