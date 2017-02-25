@@ -84,11 +84,9 @@ the `which` argument of the `improperAlignmentParams` function.
 
 ```{r improper_pairs}
 segs2 <- expandGRanges(segs, 10e3)
-iparams <- improperAlignmentParams(which=reduce(segs2))
+iparams <- improperAlignmentParams(which=reduce(segs2), mapqFilter=30)
 ## TODO mapq_thr should be part of iparams.  Don't need use.mcols
-irp <- getImproperAlignmentPairs(bview, iparams,
-                                 mapq_thr=30,
-                                 use.mcols=TRUE)
+irp <- getImproperAlignmentPairs(bview, iparams)
 length(irp)
 irp.file <- tempfile()
 saveRDS(irp, file=irp.file)
