@@ -3,11 +3,7 @@ NULL
 
 #' Parameter class for calling deletions
 #'
-#' @slot max_tag_density length-one numeric vector indicating the
-#'   maximum fold change for calling deletions (assumes threshold
-#'   provided using linear-scale).
-#' 
-#' @slot tag_density_homozygous_thr length-one numeric vector
+#' #' @slot tag_density_homozygous_thr length-one numeric vector
 #'   indicating the maximum fold change expected for a homozygous
 #'   deletion
 #' 
@@ -56,8 +52,7 @@ NULL
 #' DeletionParam()
 #' @rdname DeletionParam-class
 #' @export
-setClass("DeletionParam", representation(max_tag_density="numeric",
-                                         tag_density_homozygous_thr="numeric",
+setClass("DeletionParam", representation(tag_density_homozygous_thr="numeric",
                                          min_width="numeric",
                                          max_width="numeric",
                                          min_gapwidth="numeric",
@@ -110,8 +105,7 @@ setClass("DeletionParam", representation(max_tag_density="numeric",
 #' @export
 #' @return a \code{DeletionParam} object
 #' @rdname DeletionParam-class
-DeletionParam <- function(max_tag_density=0.75,
-                          min_width=2e3,
+DeletionParam <- function(min_width=2e3,
                           max_width=2e6,
                           min_gapwidth=10e3,
                           tag_density_homozygous_thr=0.1,
@@ -123,7 +117,6 @@ DeletionParam <- function(max_tag_density=0.75,
                           max_proportion_in_filter=0.75,
                           bam_seqlevels_style="UCSC"){
   new("DeletionParam",
-      max_tag_density=max_tag_density,
       min_width=min_width,
       max_width=max_width,
       min_gapwidth=min_gapwidth,
