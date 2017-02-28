@@ -116,6 +116,10 @@ ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
   guides(fill=FALSE, color=FALSE)
 ```
 
+# Extract barcoded rearranged read pairs from a targeted sequencing experiment 
+
+Jacob TODO
+
 ## Assessing BLAT alignments
 
 TODO
