@@ -587,30 +587,6 @@ addVariant2 <- function(v, object, cn, cncall, param){
   sv2
 }
 
-.hemizygousBorders <- function(object, object2, param){
-  segs <- readPairsAsSegments(proper(object))
-  g <- gaps(segs)
-  g <- g[width(g) > 2e3]
-
-  v <- expandGRanges(variant(object), 1e3)
-  hits <- findOverlaps(g, v, type="within")
-  if(length(hits) > 0){
-    ## Need to add a homozygous region
-    j <- unique(queryHits(hits))
-    newg <- g[j]
-    ##if(length(newg) > 1) browser()
-    seqlevels(newg, pruning.mode="coarse") <- seqlevels(variant(object))
-    seqinfo(newg) <- seqinfo(variant(object))
-    epsilon <- rep(log2(1/50), length(newg))
-    object2 <- addVariant2(newg,
-                          object=object2,
-                          cn=epsilon,
-                          cncall=rep("homozygous", length(newg)),
-                          param=param)
-  }
-  object2
-}
-
 hemizygousBorders2 <- function(object, param){
   index <- grep("hemizygous", calls(object))
   sv <- object
@@ -622,18 +598,6 @@ hemizygousBorders2 <- function(object, param){
   sv
 }
 
-##
-## If a hemizygous deletion spans a gap in the proper read pairs of at least
-## 2kb, then include the gap as a homozygous deletion
-##
-hemizygousBorders <- function(object, param){
-  index <- grep("hemizygous", calls(object))
-  object2 <- object
-  for(i in index){
-    object2 <- .hemizygousBorders(object=object[i], object2=object2, param=param) ##object2=object2, param=param)
-  }
-  object2
-}
 
 improperReadPairs <- function(aview, gr, param=DeletionParam()){
   irp <- readRDS(improperPaths(aview))
