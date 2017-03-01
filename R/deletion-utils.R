@@ -571,21 +571,20 @@ addVariant2 <- function(v, object, cn, cncall, param){
 ##  truth1       :  -----|      |--------------
 ##  truth2       :|---------|        |---------
 ##  homozyg gap  :         ->   <-
-.hemizygousBorders2 <- function(object, param){
-  gaps.in.hemi.del <- gapsInHemiDel(proper(object),
-                                    variant(object))
-  if(length(gaps.in.hemi.del) == 0) return(object)
+.hemizygousBorders2 <- function(del.gr, sv, param){
+  gaps.in.hemi.del <- gapsInHemiDel(proper(sv), del.gr)
+  if(length(gaps.in.hemi.del) == 0) return(sv)
   ##
   ## the gap is potentially a homozygous deletion formed by overlapping
   ## hemizygous deletions
   ##
   epsilon <- rep(log2(1/50), length(gaps.in.hemi.del))
-  object2 <- addVariant2(gaps.in.hemi.del,
-                         object=object,
-                         cn=epsilon,
-                         cncall=rep("homozygous", length(gaps.in.hemi.del)),
-                         param=param)
-  object2
+  sv2 <- addVariant2(gaps.in.hemi.del,
+                     object=sv,
+                     cn=epsilon,
+                     cncall=rep("homozygous", length(gaps.in.hemi.del)),
+                     param=param)
+  sv2
 }
 
 .hemizygousBorders <- function(object, object2, param){
@@ -603,7 +602,7 @@ addVariant2 <- function(v, object, cn, cncall, param){
     seqlevels(newg, pruning.mode="coarse") <- seqlevels(variant(object))
     seqinfo(newg) <- seqinfo(variant(object))
     epsilon <- rep(log2(1/50), length(newg))
-    object2 <- addVariant(newg,
+    object2 <- addVariant2(newg,
                           object=object2,
                           cn=epsilon,
                           cncall=rep("homozygous", length(newg)),
@@ -612,12 +611,26 @@ addVariant2 <- function(v, object, cn, cncall, param){
   object2
 }
 
+hemizygousBorders2 <- function(object, param){
+  index <- grep("hemizygous", calls(object))
+  sv <- object
+  hemizygous.gr <- variant(object)[index]
+  for(i in seq_along(hemizygous.gr)){
+    sv <- .hemizygousBorders2(del.gr=hemizygous.gr[i],
+                              sv=sv, param=param)
+  }
+  sv
+}
 
+##
+## If a hemizygous deletion spans a gap in the proper read pairs of at least
+## 2kb, then include the gap as a homozygous deletion
+##
 hemizygousBorders <- function(object, param){
   index <- grep("hemizygous", calls(object))
   object2 <- object
   for(i in index){
-    object2 <- .hemizygousBorders(object=object[i], object2=object2, param=param)
+    object2 <- .hemizygousBorders(object=object[i], object2=object2, param=param) ##object2=object2, param=param)
   }
   object2
 }
@@ -653,7 +666,7 @@ improperReadPairs <- function(aview, gr, param=DeletionParam()){
   if(any(is.dup)){
     object <- object[!is.dup]
   }
-  object <- hemizygousBorders(object, param)
+  object <- hemizygousBorders2(object, param)
   irp <- improperReadPairs(aview, variant(object), param=param)
   improper(object) <- irp
   indexImproper(object) <- updateImproperIndex2(variant(object), irp, maxgap=500)
@@ -854,7 +867,7 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, par
     g <- GRanges(seqnames(g)[1], IRanges(min(start(g)), max(end(g))))
     seqlevels(g, pruning.mode="coarse") <- seqlevels(homdel)
     seqinfo(g) <- seqinfo(homdel)
-    object2 <- addVariant(v=g,
+    object2 <- addVariant2(v=g,
                           object=object,
                           cn=log2(1/50),
                           cncall="homozygous",
@@ -879,7 +892,7 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, par
   portion_notspanning <- setdiff(hemdel, homdel)
   means <- granges_copynumber(portion_notspanning, pview)
   means <- sum(means*width(portion_notspanning))/sum(width(portion_notspanning))
-  object2 <- addVariant(v=hemdel,
+  object2 <- addVariant2(v=hemdel,
                         object=object,
                         cn=means,
                         cncall="hemizygous+",
