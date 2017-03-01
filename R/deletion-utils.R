@@ -511,15 +511,88 @@ addVariant <- function(v, object, cn, cncall, param){
   sv2
 }
 
-##
+allGapsInReadPairs <- function(proper.readpairs){
+  segs <- readPairsAsSegments(proper.readpairs)
+  g <- gaps(segs)
+  g <- g[width(g) > 2e3]
+  g
+}
+
+gapsInHemiDel <- function(proper.readpairs, deletion.gr){
+  all.gaps <- allGapsInReadPairs(proper.readpairs)
+  expanded.deletion <- expandGRanges(deletion.gr, 1e3)
+  gaps.in.hemi.del <- subsetByOverlaps(all.gaps, expanded.deletion, type="within")
+  if(length(gaps.in.hemi.del) > 0){
+    si <- seqinfo(deletion.gr)
+    seqlevels(gaps.in.hemi.del, pruning.mode="coarse") <- seqlevels(si)
+    seqinfo(gaps.in.hemi.del) <- si    
+  }
+  gaps.in.hemi.del
+}
+
+spansHomozygousDel <- function(sv){
+  hits <- homozygousHits(sv)
+  length(hits > 0)
+}
+
+addVariant2 <- function(v, object, cn, cncall, param){
+  v$seg.mean <- cn
+  v$sample <- variant(object)$sample[1]
+  svtmp <- StructuralVariant(variant=v,
+                             improper=object@improper,
+                             proper=object@proper,
+                             copynumber=cn,
+                             calls=cncall)
+  indexImproper(svtmp) <- initializeImproperIndex3(svtmp, param)
+  indexProper(svtmp) <- initializeProperIndex3(svtmp, zoom.out=1)
+  indexImproper(svtmp) <- updateImproperIndex(svtmp, maxgap=1e3)
+
+  ##cnvs <- c(v, granges(variant(object)))
+  cnvs <- c(v, variant(object))
+  ids <- paste0("sv", seq_along(cnvs))
+  cnvs <- setNames(cnvs, ids)
+  cncalls <- as.character(c(cncall, calls(object)))
+  cns <- as.numeric(c(cn, copynumber(object)))
+  index_proper <- setNames(c(indexProper(svtmp), indexProper(object)), ids)
+  index_improper <- setNames(c(indexImproper(svtmp), indexImproper(object)), ids)
+  sv2 <- StructuralVariant(cnvs,
+                           calls=cncalls,
+                           copynumber=cns,
+                           proper=object@proper,
+                           improper=object@improper,
+                           index_proper=index_proper,
+                           index_improper=index_improper)
+  sv2 <- sv2[!duplicated(cnvs)]
+  sv2
+}
+
+
 ## Check for overlapping hemizygous deletions that create a homozygous deletion
 ##  truth1       :  -----|      |--------------
 ##  truth2       :|---------|        |---------
 ##  homozyg gap  :         ->   <-
+.hemizygousBorders2 <- function(object, param){
+  gaps.in.hemi.del <- gapsInHemiDel(proper(object),
+                                    variant(object))
+  if(length(gaps.in.hemi.del) == 0) return(object)
+  ##
+  ## the gap is potentially a homozygous deletion formed by overlapping
+  ## hemizygous deletions
+  ##
+  epsilon <- rep(log2(1/50), length(gaps.in.hemi.del))
+  object2 <- addVariant2(gaps.in.hemi.del,
+                         object=object,
+                         cn=epsilon,
+                         cncall=rep("homozygous", length(gaps.in.hemi.del)),
+                         param=param)
+  object2
+}
+
 .hemizygousBorders <- function(object, object2, param){
   segs <- readPairsAsSegments(proper(object))
   g <- gaps(segs)
   g <- g[width(g) > 2e3]
+
   v <- expandGRanges(variant(object), 1e3)
   hits <- findOverlaps(g, v, type="within")
   if(length(hits) > 0){
