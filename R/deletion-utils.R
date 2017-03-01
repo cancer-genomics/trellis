@@ -571,7 +571,7 @@ addVariant2 <- function(v, object, cn, cncall, param){
 ##  truth1       :  -----|      |--------------
 ##  truth2       :|---------|        |---------
 ##  homozyg gap  :         ->   <-
-.hemizygousBorders2 <- function(del.gr, sv, param){
+.hemizygousBorders <- function(del.gr, sv, param){
   gaps.in.hemi.del <- gapsInHemiDel(proper(sv), del.gr)
   if(length(gaps.in.hemi.del) == 0) return(sv)
   ##
@@ -587,12 +587,12 @@ addVariant2 <- function(v, object, cn, cncall, param){
   sv2
 }
 
-hemizygousBorders2 <- function(object, param){
+hemizygousBorders <- function(object, param){
   index <- grep("hemizygous", calls(object))
   sv <- object
   hemizygous.gr <- variant(object)[index]
   for(i in seq_along(hemizygous.gr)){
-    sv <- .hemizygousBorders2(del.gr=hemizygous.gr[i],
+    sv <- .hemizygousBorders(del.gr=hemizygous.gr[i],
                               sv=sv, param=param)
   }
   sv
@@ -630,7 +630,7 @@ improperReadPairs <- function(aview, gr, param=DeletionParam()){
   if(any(is.dup)){
     object <- object[!is.dup]
   }
-  object <- hemizygousBorders2(object, param)
+  object <- hemizygousBorders(object, param)
   irp <- improperReadPairs(aview, variant(object), param=param)
   improper(object) <- irp
   indexImproper(object) <- updateImproperIndex2(variant(object), irp, maxgap=500)
