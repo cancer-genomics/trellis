@@ -1,6 +1,6 @@
 Package: svalignments
 Title: Methods for extracting and viewing improper alignments
-Version: 0.0.9
+Version: 0.0.10
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: Methods for extracting and viewing improper alignments.
 Depends:
@@ -19,5 +19,6 @@ LazyData: true
 Suggests:
     testthat,
     svbams,
+    data.table,
     TxDb.Hsapiens.UCSC.hg19.refGene
 RoxygenNote: 6.0.1
