@@ -9,8 +9,10 @@ test_that("readGAlignmentPairs", {
   expect_true(file.exists(targeted.bam))
   gr <- GRanges("chr8", IRanges(5000, 100000))
   seqinfo(gr) <- Seqinfo(seqnames="chr8", seqlengths=146364022)
-  param <- ScanBamParam(flag=scanBamFlag(isSecondaryAlignment=FALSE,
-                                         isUnmappedQuery=FALSE),
+  flags <- scanBamFlag(isUnmappedQuery=FALSE,
+                       hasUnmappedMate=FALSE,
+                       isSecondaryAlignment=FALSE)
+  param <- ScanBamParam(flag=flags,
                         which=gr,
                         mapqFilter=30,
                         tag="BC")
