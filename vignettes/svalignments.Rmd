@@ -116,9 +116,63 @@ ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
   guides(fill=FALSE, color=FALSE)
 ```
 
-# Extract barcoded rearranged read pairs from a targeted sequencing experiment 
+# Extract read pairs from BAM file with exogenous barcodes
 
-Jacob TODO
+TODO: A brief description of what we mean by exogenous versus endogenous
+barcodes.
+
+```{r targeted_bam}
+targeted.bam <- file.path(path, "PGDX5881P_PS_Seq_novo.sorted_nofa.bam")
+library(data.table)
+library(dplyr)
+library(GenomicAlignments)
+### Read in GAlignmentPairs
+### Not getting rid of duplicates yet
+### Not sure if BC tag is unique to pgdx
+gr <- GRanges("chr8", IRanges(5000, 100000))
+seqinfo(gr) <- Seqinfo(seqnames="chr8", seqlengths=146364022)
+param <- ScanBamParam(flag=scanBamFlag(isSecondaryAlignment=FALSE,
+                                       isUnmappedQuery=FALSE),
+                      ##which=gr,
+                      mapqFilter=30,
+                      tag="BC")
+galp <- readGAlignmentPairs(targeted.bam, param=param)
+```
+
+Next, we extract the barcode from the GAlignmentPairs object and convert the
+paired reads to DNA fragments.
+
+```{r barcode}
+### Get barcode
+barcode <- mcols(GenomicAlignments::first(galp))$BC
+## Only care about this part of the barcode since first 8 BP are same within a
+## sample
+mcols(galp)$barcode <- substr(barcode, 9, 16)
+fragments <- granges(galp, on.discordant.seqnames = "drop",
+                     use.mcols=TRUE)
+```
+
+Finally, we identify the set of unique fragments, coercing the `GRanges` object
+to a `data.table` and grouping the fragments by chromosome, start, end, and
+barcode.
+
+```{r unique_fragments}
+### Now to data.table
+fragments.dt <- data.table(chr = as.character(seqnames(fragments)),
+                           start = start(fragments),
+                           end = end(fragments),
+                           barcode = fragments$barcode)
+### Get unique fragments
+uniquefragments <-
+    fragments.dt %>%
+    group_by(chr, start, end, barcode) %>%
+    summarize(n = n()) %>%
+    filter(n > 2)
+### Get widths
+uniquefragments <-
+    uniquefragments %>%
+    mutate(width = start - end + 1)
+```
 
 ## Assessing BLAT alignments
 
