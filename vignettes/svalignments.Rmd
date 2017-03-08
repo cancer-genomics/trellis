@@ -159,11 +159,11 @@ barcode. We do this because using the `unique` function on our fragments `GRange
 
 ```{r unique_fragments}
 ### Now to data.table
-fragments.dt <- data.frame(chr = as.character(seqnames(fragments)),
+fragments.df <- data.frame(chr = as.character(seqnames(fragments)),
                            start = start(fragments),
                            end = end(fragments),
                            barcode = fragments$barcode)
-which.isduplicated <- duplicated(fragments.dt)
+which.isduplicated <- duplicated(fragments.df)
 fragments <- fragments[!which.isduplicated]
 ```
 
