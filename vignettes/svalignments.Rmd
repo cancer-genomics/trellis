@@ -123,9 +123,7 @@ barcodes.
 
 ```{r targeted_bam}
 targeted.bam <- file.path(path, "PGDX5881P_PS_Seq_novo.sorted_nofa.bam")
-library(data.table)
 library(dplyr)
-library(GenomicAlignments)
 ### Read in GAlignmentPairs
 ### Not getting rid of duplicates yet
 ### Not sure if BC tag is unique to pgdx
@@ -133,10 +131,13 @@ gr <- GRanges("chr8", IRanges(5000, 100000))
 seqinfo(gr) <- Seqinfo(seqnames="chr8", seqlengths=146364022)
 param <- ScanBamParam(flag=scanBamFlag(isSecondaryAlignment=FALSE,
                                        isUnmappedQuery=FALSE),
-                      ##which=gr,
-                      mapqFilter=30,
+                      which=gr,
+                      what="mapq",
                       tag="BC")
 galp <- readGAlignmentPairs(targeted.bam, param=param)
+read1mapq <- mcols(GenomicAlignments::first(galp))$mapq
+read2mapq <- mcols(GenomicAlignments::second(galp))$mapq
+galp <- galp[read1mapq >= 30 & read2mapq >= 30]
 ```
 
 Next, we extract the barcode from the GAlignmentPairs object and convert the
@@ -153,25 +154,17 @@ fragments <- granges(galp, on.discordant.seqnames = "drop",
 ```
 
 Finally, we identify the set of unique fragments, coercing the `GRanges` object
-to a `data.table` and grouping the fragments by chromosome, start, end, and
-barcode.
+to a `data.frame` and grouping the fragments by chromosome, start, end, and
+barcode. We do this because using the `unique` function on our fragments `GRanges` object will not take into account the barcode.
 
 ```{r unique_fragments}
 ### Now to data.table
-fragments.dt <- data.table(chr = as.character(seqnames(fragments)),
+fragments.dt <- data.frame(chr = as.character(seqnames(fragments)),
                            start = start(fragments),
                            end = end(fragments),
                            barcode = fragments$barcode)
-### Get unique fragments
-uniquefragments <-
-    fragments.dt %>%
-    group_by(chr, start, end, barcode) %>%
-    summarize(n = n()) %>%
-    filter(n > 2)
-### Get widths
-uniquefragments <-
-    uniquefragments %>%
-    mutate(width = start - end + 1)
+which.isduplicated <- duplicated(fragments.dt)
+fragments <- fragments[!which.isduplicated]
 ```
 
 ## Assessing BLAT alignments
