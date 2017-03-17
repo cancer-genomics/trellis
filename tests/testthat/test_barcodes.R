@@ -13,8 +13,8 @@ test_that("readGAlignmentPairs", {
                        hasUnmappedMate=FALSE,
                        isSecondaryAlignment=FALSE)
   param <- ScanBamParam(flag=flags,
-                        which=gr,
+                        ##which=gr,
                         mapqFilter=30,
                         tag="BC")
-  expect_is(readGAlignmentPairs(targeted.bam, param=param), "GAlignmentPairs")
+  galp <- readGAlignmentPairs(targeted.bam, param=param)
 })
