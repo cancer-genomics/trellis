@@ -87,9 +87,3 @@ test_that("read_pairs_from_bam", {
   gr <- sortByRead1(c(g.irp, pgr2))
   expect_is(gr, "GRanges")
 })
-
-
-
-
-
-
