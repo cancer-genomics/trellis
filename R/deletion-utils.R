@@ -880,22 +880,34 @@ adjudicateHomozygousOverlap <- function(g, object){
   object
 }
 
+removeSameStateOverlapping2 <- function(sv){
+  sv <- adjudicateHomozygousOverlap2(sv)
+  sv2 <- adjudicateHemizygousOverlap2(sv)
+  sv2
+}
+
 removeSameStateOverlapping <- function(sv){
   v <- variant(sv)
   r <- reduce(v)
   if(length(r) == length(v)) return(sv)
-  hits <- findOverlaps(variant(sv), r)
+  hits <- findOverlaps(v, r)
   hitlist <- split(queryHits(hits), subjectHits(hits))
   hitlist <- hitlist[elementNROWS(hitlist) > 1]
   if(length(hitlist) == 0) return(sv)
   sv2 <- sv
   for(j in seq_along(hitlist)){
     k <- hitlist[[j]]
-    tmp <- v[k]
+    gr <- v[k]
     cncalls <- gsub("\\+", "", calls(sv)[k])
     hemi1_or_hemi2 <- cncalls=="hemizygous" | cncalls=="OverlappingHemizygous"
-    sv2 <- adjudicateHemizygousOverlap(tmp[hemi1_or_hemi2], sv2)
-    sv2 <- adjudicateHomozygousOverlap(tmp[cncalls=="homozygous"], sv2)
+    sv2 <- adjudicateHemizygousOverlap(gr[hemi1_or_hemi2], sv2)
+    gr <- gr[cncalls=="homozygous"]
+    if(length(gr) < 2) next()
+    sv2 <- removeDuplicateSv(gr, sv2)
+    gr <- gr[names(gr) %in% names(variant(sv2))]
+    if(length(gr) < 2) next()
+    if(!anyOverlaps(gr, variant(sv2))) next()
+    sv2 <- adjudicateHomozygousOverlap2(tmp, sv2)
   }
   sv2
 }
