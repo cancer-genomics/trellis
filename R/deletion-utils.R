@@ -3,6 +3,7 @@ NULL
 
 setGeneric("clusterReadPairs", function(object) standardGeneric("clusterReadPairs"))
 setGeneric("reviseJunction", function(object) standardGeneric("reviseJunction"))
+setGeneric("variant<-", function(object, value) standardGeneric("variant<-"))
 
 setClass("LeftAlignmentPairs", contains="GAlignmentPairs")
 
@@ -14,11 +15,39 @@ setValidity("LeftAlignmentPairs", function(object){
   msg
 })
 
+setReplaceMethod("variant", c("StructuralVariant", "GRanges"),
+                 function(object, value){
+                   object@variant <- value
+                   object
+                 })
+
 setMethod("clusterReadPairs", "LeftAlignmentPairs", function(object){
   boundary_starts <- start(first(object))
   boundary_ends <- start(last(object))
   cumsum(c(0, diff(boundary_starts) > 200 | diff(boundary_ends) > 200))
 })
+
+setMethod("combine", c("StructuralVariant", "StructuralVariant"),
+          function(x, y, ...){
+            cnv <- c(variant(x), variant(y))
+            prp <- c(proper(x), proper(y))
+            irp <- c(improper(x), improper(y))
+            cn <- c(copynumber(x), copynumber(y))
+            calls <- c(calls(x), calls(y))
+
+            prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
+            irp_index1 <- initializeImproperIndex2(cnv, irp, DeletionParam())
+            irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
+            irp_index3 <- .match_index_variant(irp_index1, cnv, irp_index2)
+            sv <- StructuralVariant(variant=cnv,
+                                    proper=prp,
+                                    improper=irp,
+                                    copynumber=cn,
+                                    calls=calls,
+                                    index_proper=prp_index,
+                                    index_improper=irp_index3)
+            sv
+          })
 
 setMethod("reviseJunction", "StructuralVariant", function(object){
   v <- variant(object)
