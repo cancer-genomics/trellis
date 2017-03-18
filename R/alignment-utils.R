@@ -157,7 +157,7 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #' @return a \code{GAlignmentPairs} object
 #' @keywords internal
 #' @export
-#' @param object a \code{AlignmentViews2} object
+#' @param bam.file complete path to BAM file
 #' @param param a \code{ScanBamParam} object.
 #' @param use.mcols logical
 #'
@@ -169,9 +169,9 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   \code{\link{improperAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
-getImproperAlignmentPairs <- function(object,
+getImproperAlignmentPairs <- function(bam.file,
                                       param=improperAlignmentParams(mapqFilter=0)){
-  bam.file <- bamPaths(object)
+  ##bam.file <- bamPaths(object)
   flags <- improperAlignmentFlags()
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
@@ -189,7 +189,7 @@ getImproperAlignmentPairs <- function(object,
 #' @return a \code{GAlignmentPairs} object
 #' @keywords internal
 #' @export
-#' @param object a \code{BamViews} object
+#' @param bam.file a \code{BamViews} object
 #' @param param a \code{ScanBamParam} object.
 #' @param mapq_thr the minimum mapq score (numeric)
 #' @param use.mcols logical
@@ -200,9 +200,9 @@ getImproperAlignmentPairs <- function(object,
 #'   \code{\link{improperAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
-getProperAlignmentPairs <- function(object,
+getProperAlignmentPairs <- function(bam.file,
                                     param=properAlignmentParams(mapqFilter=0)){
-  bam.file <- bamPaths(object)
+  ##bam.file <- bamPaths(object)
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
   mapq_thr <- bamMapqFilter(param)
@@ -235,17 +235,18 @@ getProperAlignmentPairs <- function(object,
 #' 
 #' @rdname AlignmentViews2
 #' @export
-#' @param aview a \code{AlignmentViews2} object
+#' @param bam.file complete path to BAM file
 #' @param param a \code{ScanBamParam} object
 #' @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
 #' @param use.mcols length-one logical vector
-writeImproperAlignments2 <- function(aview,
+writeImproperAlignments2 <- function(bam.file,
                                      param=improperAlignmentParams(mapqFilter=0)){
-  if(file.exists(improperPaths(aview))){
+  .Deprecated()
+  if(file.exists(bam.file)){
     return(invisible())
   }
-  aln_path <- improperPaths(aview)
-  irp <- getImproperAlignmentPairs(aview, param)
+  ##aln_path <- improperPaths(aview)
+  irp <- getImproperAlignmentPairs(bam.file, param)
   out.file <- improperPaths(aview)
   saveRDS(irp, file=out.file)
   invisible()
@@ -449,16 +450,15 @@ ga2gr <- function(ga, is.improper=FALSE){
 #'   seqinfo(region) <- si["chr15", ]
 #'
 #'   bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
-#'   bview <- BamViews(bamPaths=bampath)
 #'
 #'   iparams <- improperAlignmentParams()
 #'   pparams <- properAlignmentParams()
-#'   irp <- getImproperAlignmentPairs(bview,
+#'   irp <- getImproperAlignmentPairs(bampath,
 #'                                    iparams,
 #'                                    mapq_thr=30,
 #'                                    use.mcols=TRUE)
 #'   g.irp <- ga2gr(irp, is.improper=TRUE)
-#'   prp <- getProperAlignmentPairs(bview,
+#'   prp <- getProperAlignmentPairs(bampath,
 #'                                  pparams,
 #'                                  mapq_thr=30,
 #'                                  use.mcols=TRUE)
