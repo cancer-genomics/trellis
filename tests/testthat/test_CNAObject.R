@@ -76,7 +76,7 @@ test_that("CNAObject", {
   library(svalignments)
   iparams <- improperAlignmentParams(mapqFilter=30)
   file <- paste0(tempdir(), "cgov10t.rds")
-  irp <- getImproperAlignmentPairs(bview, param=iparams)
+  irp <- getImproperAlignmentPairs(bamPaths(bview), param=iparams)
   saveRDS(irp, file=file)
   aview <- AlignmentViews2(bview, file)
 
