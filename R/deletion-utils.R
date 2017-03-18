@@ -677,6 +677,44 @@ removeDuplicateIntervals <- function(g, object){
   object
 }
 
+adjudicateHemizygousOverlap2 <- function(object){
+  cncalls <- gsub("\\+", "", calls(object))
+  hemi1_or_hemi2 <- cncalls=="hemizygous" | cncalls=="OverlappingHemizygous"
+  if(!any(hemi1_or_hemi2)) return(object)
+  g <- variant(object)
+  if(length(g) < 2) return(object)
+  is.duplicated <- duplicated(g)
+  if(any(is.duplicated)){
+    object <- removeDuplicateIntervals(g, object)
+  }
+  g <- g[names(g) %in% names(variant(object))]
+  if(length(g) < 2) return(object)
+  ##
+  ## If one interval is contained in another, drop the interval with the least
+  ## support.
+  ##
+  self_hits <- selfHits(g, type="within")
+  if(length(hits) == 0){
+    ## one interval is not contained within another.  Keep both
+    ## -----------          -----------
+    ## ------           ---------------
+    return(object)
+  }
+  ## Keep the interval with most support
+  ## -------------        --------------
+  ## ---------------     ---------------
+  ##
+  k <- match(names(g), names(variant(object)))
+  indices <- indexImproper(object[k])
+  drop <- which.min(elementNROWS(indices))
+  if(length(drop) > 0){
+    dropid <- names(g)[drop]
+    dropindex <- match(dropid, names(variant(object)))
+    object <- object[-dropindex]
+  }
+  object
+}
+
 adjudicateHemizygousOverlap <- function(g, object){
   if(length(g) < 2) return(object)
   is.duplicated <- duplicated(g)
