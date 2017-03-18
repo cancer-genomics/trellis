@@ -167,6 +167,6 @@ which.isduplicated <- duplicated(fragments.df)
 fragments <- fragments[!which.isduplicated]
 ```
 
-## Assessing BLAT alignments
+# Write selected reads to fasta
 
 TODO

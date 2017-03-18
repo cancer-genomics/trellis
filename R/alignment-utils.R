@@ -1,3 +1,5 @@
+#' @include AllGenerics.R
+
 #' Find total width of a \code{GRanges} object
 #'
 #' Adds the width of the intervals in a \code{GRanges} object. 
@@ -493,3 +495,71 @@ thinProperPairs <- function(gr, thin=10){
   gr.prp <- gr.prp[gr.prp$tagid %in% tagid]
   gr.prp
 }
+
+.seqdataframe <- function(gpairs, MAX){
+  df <- as.data.frame(first(gpairs))
+  if(nrow(df) > MAX){
+    index <- sample(seq_len(MAX), MAX)
+  } else index <- seq_len(nrow(df))
+  df <- df[index, ]
+  df2 <- as.data.frame(last(gpairs))
+  df2 <- df2[index, ]
+  df$read <- rep("R1", nrow(df))
+  df2$read <- rep("R2", nrow(df))
+  df <- rbind(df, df2)
+  df
+}
+
+filterPairedReads <- function(gpairs, bins, params){
+  gpairs <- gpairs[ aberrantSep(gpairs, rpSeparation(params)) ]
+  gpairs <- gpairs [ !isDuplicate(gpairs) ]
+  cnt <- countOverlaps(bins, first(gpairs)) + countOverlaps(bins, last(gpairs))
+  gpairs <- subsetByOverlaps(gpairs, bins [ cnt >= minNumberTagsPerCluster(params) ])
+  gpairs
+}
+
+.getReadSeqsForRear <- function(object, bam.file, param, MAX){
+  irp <- improper(object)
+  flags <- improperAlignmentFlags()
+  lb <- linkedBins(object)
+  bins <- c(granges(lb), granges(lb$linked.to))
+  what <- c("qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq")
+  scan.param <- ScanBamParam(flag=flags, what=what, which=bins, mapqFilter=30)
+  rps <- getImproperAlignmentPairs(bam.file,
+                                   scan.param)
+  rps2 <- filterPairedReads(rps, bins, param)
+  df <- .seqdataframe(rps2, MAX)
+  ##df$id <- rep(names(align_view), nrow(df))
+  df$id <- rep(basename(bam.file), nrow(df))
+  df$rearrangement.id <- rep(names(linkedBins(object)), nrow(df))
+  df
+}
+
+#' @aliases getSequenceOfReads,Rearrangement-method
+#' @rdname getSequenceOfReads-methods
+setMethod("getSequenceOfReads", "Rearrangement",
+          function(object,
+                   bam.file,
+                   params=RearrangementParams(),
+                   MAX=25L){
+            .getReadSeqsForRear(object, bam.file, params, MAX)
+          })
+
+#' @aliases getSequenceOfReads,RearrangementList-method
+#' @rdname getSequenceOfReads-methods
+setMethod("getSequenceOfReads", "RearrangementList",
+          function(object,
+                   bam.file,
+                   params=RearrangementParams(),
+                   MAX=25L){
+            tag.list <- vector("list", length(object))
+            for(j in seq_along(object)){
+              r <- object[[j]]
+              tag.list[[j]] <- .getReadSeqsForRear(r, bam.file,
+                                                   params, MAX=MAX)
+            }
+            tags <- do.call(rbind, tag.list)
+            readId <- paste(tags$qname, tags$read, sep="_")
+            tags <- tags[!duplicated(readId), ]
+            tags
+          })
