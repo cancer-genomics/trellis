@@ -201,8 +201,10 @@ updateImproperIndex <- function(sv, maxgap=2e3){
   hitsLeft <- findOverlaps(left_boundary, irp, maxgap=maxgap)
   hitsRight <- findOverlaps(right_boundary, irp, maxgap=maxgap)
 
-  index_left <- split(subjectHits(hitsLeft), names(left_boundary)[queryHits(hitsLeft)])
-  index_right <- split(subjectHits(hitsRight), names(right_boundary)[queryHits(hitsRight)])
+  index_left <- split(subjectHits(hitsLeft),
+                      names(left_boundary)[queryHits(hitsLeft)])
+  index_right <- split(subjectHits(hitsRight),
+                       names(right_boundary)[queryHits(hitsRight)])
 
   ## concatenate indices for each element of the index list
   index_all <- setNames(vector("list", length(sv)), names(variant(sv)))
@@ -708,6 +710,97 @@ adjudicateHemizygousOverlap <- function(g, object){
     object <- object[-dropindex]
   }
   object
+}
+
+removeDuplicateSv <- function(object){
+  g <- variant(object)
+  is.duplicated <- duplicated(g)
+  if(any(is.duplicated)){
+    object <- removeDuplicateIntervals(g, object)
+  }
+  object
+}
+
+selfHits <- function(g, ...){
+  hits <- findOverlaps(g, ...)
+  hits <- hits[subjectHits(hits) != queryHits(hits)]
+  hits
+}
+
+.merge_partial_overlap <- function(sv){
+  gr <- variant(sv)
+  cn <- copynumber(sv)
+  cn2 <- sum(cn*width(variant(sv)))/sum(width(variant(sv)))
+  ##  nms <- names(g)[m]
+  ##  names(rr) <- nms[1]
+  ##  dropid <- nms[-1]
+  ##  dropindex <- match(dropid, names(variant(object)))
+  ##  object <- object[-dropindex]
+  sv2 <- sv[1]  ## only keep the first
+  rgr <- setNames(reduce(gr), names(gr)[1])
+  rgr$seg.mean <- cn2
+  rgr$sample <- gr$sample[1]
+  variant(sv2) <- rgr
+  copynumber(sv2) <- cn2
+  indexImproper(sv2) <- updateImproperIndex(sv2, maxgap=1e3)
+  indexProper(sv2) <- initializeProperIndex3(sv2, zoom.out=1)
+  ##  ## update the improperPair index
+  ##  v <- variant(object)
+  ##  i <- match(names(rr), names(v))
+  ##  v[i] <- rr
+  ##  variant(object) <- v
+  ##  obj <- object[i]
+  ##  indexImproper(obj) <- updateImproperIndex(obj, maxgap=1e3)
+  ##  indexProper(obj) <- initializeProperIndex3(obj, zoom.out=1)
+  ##  copynumber(obj) <- cn2
+  calls(sv2) <- "homozygous"
+  ##indices <- indexImproper(sv2)
+  ##K <- match(names(rr), names(indices))
+  ##indices[[K]] <- indexImproper(obj)[[1]]
+  ##object@index_improper <- indices
+  ##indices <- indexProper(object)
+  ##indices[[K]] <- indexProper(obj)[[1]]
+  ##object@index_proper <- indices
+  sv2
+}
+
+#' Check whether any homozygous deletions overlap. If overlap, keep the reduced
+#' interval
+adjudicateHomozygousOverlap2 <- function(object){
+  gr <- variant(object)
+  gr <- gr[calls(object)=="homozygous"]
+  if(length(gr) < 2) return(object)
+  sv2 <- removeDuplicateSv(object)
+  gr <- variant(sv2)
+  if(length(gr) < 2) next()
+  self_hits <- selfHits(variant(sv2))
+  if(length(self_hits) == 0) return(sv2)
+  ##
+  ## (1)---------   ----------
+  ## (2)-------        -------
+  ## Remove (1)
+  self_hits <- selfHits(variant(sv2), type="within")
+  if(length(self_hits) > 0){
+    sv2 <- sv2[-queryHits(self_hits)]
+  }
+  ##
+  ## Overlapping
+  ## -------------        --------------
+  ## ---------------     ---------------
+  ##
+  ## Take the union.
+  hits <- findOverlaps(variant(sv2), reduce(variant(sv2)))
+  indices <- split(queryHits(hits), subjectHits(hits))
+  indices <- indices[elementNROWS(indices) > 1]
+  svnew <- sv2
+  for(k in seq_along(indices)){
+    m <- indices[[k]]
+    sv3 <- .merge_partial_overlap(sv2[m])
+    svnew <- combine(svnew[-m], sv3)
+  }
+  is.dup <- duplicated(variant(svnew))
+  svnew <- svnew[!is.dup]
+  svnew
 }
 
 adjudicateHomozygousOverlap <- function(g, object){
