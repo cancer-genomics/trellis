@@ -73,9 +73,9 @@ Next, we extract a `GAlignmentsPairs` object encapsulating all of the improperly
 and properly paired reads in this region.
 
 ```{r GAlignmentPairs}
-irp <- getImproperAlignmentPairs(bview,
+irp <- getImproperAlignmentPairs(bampath,
                                  iparams)
-prp <- getProperAlignmentPairs(bview,
+prp <- getProperAlignmentPairs(bampath,
                                pparams)
 ```
 
