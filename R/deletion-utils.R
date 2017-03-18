@@ -957,7 +957,6 @@ reviseEachJunction <- function(object, pview, aview, param=DeletionParam()){
   copynumber(object) <- granges_copynumber(variant(object), pview)
   calls(object) <- rpSupportedDeletions(object, param, pview)
   object <- object[calls(object) != "hemizygous"]
-  object <- removeSameStateOverlapping(object)
   object
 }
 
@@ -1266,13 +1265,13 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 sv_deletions <- function(gr, aview, bview, pview,
                          gr_filters,
                          param=DeletionParam()){
-  ##gr <- germlineFilters(gr, gr_filters, pview)
   sv <- deletion_call(aview, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
   is_hemizygous <- calls(sv)=="hemizygous"
   sv <- sv[!is_hemizygous]
   if(length(sv) == 0) return(sv)
   sv <- reviseEachJunction(sv, pview, aview, param)
+  sv <- removeSameStateOverlapping2(sv)
   if(length(sv) == 0) return(sv)
   copynumber(sv) <- granges_copynumber(variant(sv), pview)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
@@ -1280,7 +1279,7 @@ sv_deletions <- function(gr, aview, bview, pview,
   is_hemizygous <- calls (sv) == "hemizygous"
   sv <- sv[!is_hemizygous]
   if(length(sv) == 0) return(sv)
-  sv <- removeSameStateOverlapping(sv)
+  sv <- removeSameStateOverlapping2(sv)
 
   indexImproper(sv) <- updateImproperIndex (sv, maxgap=500)
   calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
@@ -1298,8 +1297,8 @@ sv_deletions <- function(gr, aview, bview, pview,
   message("Refining homozygous boundaries by spanning hemizygous+")
   sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv4)
   sv6 <- callOverlappingHemizygous(sv5)
-  sv7 <- removeSameStateOverlapping(sv6)  
-  
+  sv7 <- removeSameStateOverlapping2(sv6) 
+
   sv8 <- SVFilters(sv7, gr_filters, pview, param=param)
   sv9 <- groupSVs(sv8)
   id <- names(aview)
