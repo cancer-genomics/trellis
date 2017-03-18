@@ -161,6 +161,7 @@ test_that("reviseEachJunction", {
                            pview=pview,
                            aview=aview,
                            param=dparam)
+  sv <- removeSameStateOverlapping2(sv)
   g <- variant(sv)
   if(FALSE){
     saveRDS(g, file="reviseEachJunction.4adcc78.rds")
@@ -282,4 +283,12 @@ test_that("germlineFilters", {
   cnv <- cnv[K]
   names(cnv) <- paste0("sv", seq_along(cnv))
   expect_identical(cnv, expected)
+})
+
+.test_that <- function(name, expr) NULL
+
+test_that("removeSameStateOverlapping2", {
+  sv <- readRDS("sv.rds")
+  sv2 <- removeSameStateOverlapping2(sv)
+  expect_identical(length(sv2), 79L)
 })
