@@ -327,7 +327,7 @@ addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
   irp <- irp[unique(subjectHits(hits))]
   if(length(irp) > 0){
     names(irp) <- paste0("i", seq_along(irp))
-  } 
+  }
   ##sv@improper <- irp
   ##sv@length_improper <- length(irp)
   ##sv
@@ -696,7 +696,7 @@ adjudicateHemizygousOverlap2 <- function(object){
   ## support.
   ##
   self_hits <- selfHits(g, type="within")
-  if(length(hits) == 0){
+  if(length(self_hits) == 0){
     ## one interval is not contained within another.  Keep both
     ## -----------          -----------
     ## ------           ---------------
