@@ -250,8 +250,10 @@ updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   hitsLeft <- findOverlaps(left_boundary, irp, maxgap=maxgap)
   hitsRight <- findOverlaps(right_boundary, irp, maxgap=maxgap)
 
-  index_left <- split(subjectHits(hitsLeft), names(left_boundary)[queryHits(hitsLeft)])
-  index_right <- split(subjectHits(hitsRight), names(right_boundary)[queryHits(hitsRight)])
+  index_left <- split(subjectHits(hitsLeft),
+                      names(left_boundary)[queryHits(hitsLeft)])
+  index_right <- split(subjectHits(hitsRight),
+                       names(right_boundary)[queryHits(hitsRight)])
 
   ## concatenate indices for each element of the index list
   index_all <- setNames(vector("list", length(gr)), names(gr))
