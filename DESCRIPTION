@@ -26,6 +26,7 @@ Suggests:
     testthat,
     svpreprocess,
     svfilters.hg19,
+    svfilters.hg18,   
     svbams
 License: Artistic-2.0
 LazyData: true
