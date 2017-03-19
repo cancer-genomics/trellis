@@ -1271,7 +1271,7 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 #' @param param a \code{DeletionParam} object
 #' @export
 sv_deletions <- function(gr, aview, bview, pview,
-                         gr_filters,
+                         gr_filters=germlineFilters(genome(gr)[[1]]),
                          param=DeletionParam()){
   sv <- deletion_call(aview, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
