@@ -74,8 +74,10 @@ reduceGenomeFilters <- function(filters, seqlev){
 
 genomeFilters <- function(build=c("hg19", "hg18")){
   build <- match.arg(build)
-  data(genome_filters, envir=environment())
-  reduceGenomeFilters(genome_filters)
+  svfilters <- paste0("svfilters.", build)
+  data(germline_filters, package=svfilters,
+       envir=environment())
+  reduceGenomeFilters(germline_filters)
 }
 
 #' List germline rearrangement filters derived from 10 lymphoblast
