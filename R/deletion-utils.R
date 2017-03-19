@@ -1289,7 +1289,7 @@ sv_deletions <- function(gr, aview, bview, pview,
   if(length(sv) == 0) return(sv)
   sv <- removeSameStateOverlapping2(sv)
 
-  indexImproper(sv) <- updateImproperIndex (sv, maxgap=500)
+  indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
   calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
   is_hemizygous <- calls(sv) == "hemizygous"
   sv <- sv[!is_hemizygous]
