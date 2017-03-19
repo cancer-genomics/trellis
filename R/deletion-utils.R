@@ -1283,8 +1283,11 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
 #' @param param a \code{DeletionParam} object
 #' @export
 sv_deletions <- function(gr, aview, bview, pview,
-                         gr_filters=germlineFilters(genome(gr)[[1]]),
+                         gr_filters,
                          param=DeletionParam()){
+  if(missing(gr_filters)){
+    gr_filters <- genomeFilters(genome(gr)[[1]])
+  }
   sv <- deletion_call(aview, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
   is_hemizygous <- calls(sv)=="hemizygous"
