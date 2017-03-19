@@ -290,5 +290,5 @@ test_that("germlineFilters", {
 test_that("removeSameStateOverlapping2", {
   sv <- readRDS("sv.rds")
   sv2 <- removeSameStateOverlapping2(sv)
-  expect_identical(length(sv2), 79L)
+  expect_identical(length(sv2), 80L)
 })
