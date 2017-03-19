@@ -119,24 +119,22 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
 #' Identify focal, somatic hemizygous deletions and somatic homozygous
 #' deletions
 #'
-#' Segmentation of bin-level normalized log2 ratios yields a set of
-#' genomic intervals each having an associated mean. We define
-#' candidate somatic deletions as those having a segment mean less
-#' than a specified cutoff (e.g., less than the theoretical segment
-#' mean of a hemizygous deletion on log2 scale).  For each candidate
-#' CNV, we assess whether the variant can be explained by events
-#' identified in germline samples processed in the same batch, or by
-#' sequence artifacts (low mappability and/or GC). To help ensure that
-#' the deletion is focal (not a small deletion embedded in a larger
-#' deletion), we (i) verify that the candidate CNV (\code{cnv}) has a
-#' mean log ratio less than the mean log ratio of the neighboring
-#' segments by an amount of approx. -0.5 [log2(0.7)] and (ii) assess
-#' whether the interval could plausibly be a large hemizygous
-#' deletion.  Candidate somatic deletions identified by this function
-#' have the following properties: (i) not germline, (ii) unlikely to
-#' be large hemizygous deletions, (iii) the difference in mean of the
-#' segment and neighboring segments is less than -0.5, and (iv) have a
-#' width of at least 2kb.
+#' Segmentation of bin-level normalized log2 ratios yields a set of genomic
+#' intervals each having an associated mean. We define candidate somatic
+#' deletions as those having a segment mean less than a specified cutoff (e.g.,
+#' the theoretical segment mean of a hemizygous deletion on log2 scale). For
+#' each candidate CNV, we assess whether the variant can be explained by events
+#' identified in germline samples processed in the same batch, or by sequence
+#' artifacts (low mappability and/or GC). To help ensure that the deletion is
+#' focal (not a small deletion embedded in a larger deletion), we (i) verify
+#' that the candidate CNV (\code{cnv}) has a mean log ratio less than the mean
+#' log ratio of the neighboring segments by an amount of approx. -0.5
+#' [log2(0.7)] and (ii) assess whether the interval could plausibly be a large
+#' hemizygous deletion. Candidate somatic deletions identified by this function
+#' have the following properties: (i) not germline, (ii) unlikely to be large
+#' hemizygous deletions, (iii) the difference in mean of the segment and
+#' neighboring segments is less than -0.5, and (iv) have a width of at least
+#' 2kb.
 #'
 #' @return a named \code{GRanges} object.  The names are given by
 #'   \code{paste0("sv", seq_along(g))} where g is the \code{GRanges}
@@ -150,17 +148,32 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
 #' @param param A \code{DeletionParam} object
 #' @export
 germlineFilters <- function(cnv, germline_filters, pview, param=DeletionParam()){
+  if(missing(germline_filters)){
+    germline_filters <- genomeFilters(genome(cnv)[[1]])
+  }
   if(!is.null(germline_filters)){
     not_germline <- isNotGermline(cnv, germline_filters, param)
   } else {
     ## assume for now that none of the cnvs are germline
     not_germline <- rep(TRUE, length(cnv))
   }
-  egr <- expandGRanges(cnv, 15*width(cnv))
-  fc_context <- granges_copynumber(egr, pview)
-  fc <- 2^(cnv$seg.mean-fc_context)
+  ##
+  ## For unit testing, we may not be able to evaluate the context
+  ##
+  width.cnv <- sum(as.numeric(width(cnv)))
+  width.bins <- sum(as.numeric(width(bamRanges(pview))))
   is_big <- isLargeHemizygous(cnv, param)
-  select <- !is_big & not_germline & fc < 0.7
+  if(width.bins/width.cnv > 15){
+    evaluate_context <- TRUE
+  } else evaluate_context <- FALSE
+  if(evaluate_context){
+    egr <- expandGRanges(cnv, 15*width(cnv))
+    fc_context <- granges_copynumber(egr, pview)
+    fc <- 2^(cnv$seg.mean-fc_context)
+    select <- !is_big & not_germline & fc < 0.7
+  }  else{
+    select <- !is_big & not_germline
+  }
   cnv <- cnv[select]
   if(length(cnv) == 0) {
     return(cnv)
@@ -358,11 +371,10 @@ addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
 deletion_call <- function(aview, pview, cnv, 
                           gr_filters,
                           param=DeletionParam()){
-  if(!is.null(gr_filters)){
-    cnv <- germlineFilters(cnv, gr_filters, pview, param)
-  } else {
-    names(cnv) <- paste0("sv", seq_along(cnv))
+  if(missing(gr_filters)){
+    gr_filters <- genomeFilters(genome(cnv)[[1]])
   }
+  cnv <- germlineFilters(cnv, gr_filters, pview, param)
   if(length(cnv) == 0) {
     return(StructuralVariant())
   }
