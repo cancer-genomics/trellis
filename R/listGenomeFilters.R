@@ -72,6 +72,12 @@ reduceGenomeFilters <- function(filters, seqlev){
   keepSeqlevels(r, seqlev, pruning.mode="coarse")
 }
 
+genomeFilters <- function(build=c("hg19", "hg18")){
+  build <- match.arg(build)
+  data(genome_filters, envir=environment())
+  reduceGenomeFilters(genome_filters)
+}
+
 #' List germline rearrangement filters derived from 10 lymphoblast
 #' cell lines (mixed ethnicities) and 8 normal blood sammples.
 #'
