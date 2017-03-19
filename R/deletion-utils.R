@@ -921,9 +921,15 @@ adjudicateHomozygousOverlap <- function(g, object){
 }
 
 removeSameStateOverlapping2 <- function(sv){
-  sv <- adjudicateHomozygousOverlap2(sv)
-  sv2 <- adjudicateHemizygousOverlap2(sv)
-  sv2
+  cncalls <- gsub("\\+", "", calls(sv))
+  is.homdel <- cncalls == "homozygous"
+  sv.homdel <- sv[is.homdel]
+  sv.hemdel <- sv[!is.homdel]
+  sv.hemdel <- adjudicateHemizygousOverlap2(sv.hemdel)
+  sv.homdel <- adjudicateHomozygousOverlap2(sv.homdel)
+  sv <- combine(sv.hemdel, sv.homdel)
+  sv <- sort(sv)
+  sv
 }
 
 removeSameStateOverlapping <- function(sv){
