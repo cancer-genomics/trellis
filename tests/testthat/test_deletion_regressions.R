@@ -291,6 +291,7 @@ test_that("germlineFilters", {
   cnvr <- cnvr[K]
   cnv <- cnv[K]
   names(cnv) <- paste0("sv", seq_along(cnv))
+  cnv <- keepSeqlevels(cnv, "chr15", pruning.mode="coarse")
   expect_identical(cnv, expected)
 })
 
