@@ -28,7 +28,8 @@ Suggests:
     svfilters.hg19,
     svfilters.hg18,   
     svbams,
-    rtracklayer
+    rtracklayer,
+    knitr
 VignetteBuilder: knitr
 License: Artistic-2.0
 LazyData: true
