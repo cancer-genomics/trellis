@@ -818,10 +818,12 @@ germline <- function(object){
 #' @seealso \code{\link{ampliconParams}}
 #' @examples
 #'   ## load a previously saved AmpliconGraph from a regression unit test
-#'   path <- system.file("testthat", package="svcnvs")
-#'   ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
-#'   params <- ampliconParams()
-#'   focalAmpliconDupRanges(ag, params)
+#'   \dontrun{
+#'     path <- system.file("testthat", package="svcnvs")
+#'     ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
+#'     params <- ampliconParams()
+#'     focalAmpliconDupRanges(ag, params)
+#' }
 #' @export
 focalAmpliconDupRanges <- function(object, params){
   LOW_THR <- params[["LOW_THR"]]
