@@ -1292,20 +1292,7 @@ widthNotSpannedByFilter <- function(cnv, filters){
   w
 }
 
-SVFilters <- function(sv, all_filters, view, zoom.out=1, param){
-  svcontext <- expandGRanges(variant(sv), 10*zoom.out*width(variant(sv))) ## 5percent window
-  fc_context <- granges_copynumber(svcontext, view)
-  ##fc <- 2^(fc_context-copynumber(sv))
-  fc <- 2^(copynumber(sv) - fc_context)
 
-  broad_hemizygous <- copynumber(sv) > log2(homozygousThr(param)) &
-    width(variant(sv)) > maximumWidth(param)
-  frac <- intOverWidth(variant(sv), all_filters)
-  w <- widthNotSpannedByFilter(variant(sv), all_filters)
-  is_dup <- duplicated(variant(sv))
-  sv <- sv[frac < 0.75 & w > 2e3 & fc < 0.7 & !is_dup & !broad_hemizygous]
-  sv
-}
 
 groupSVs <- function(object){
   g <- variant(object)
@@ -1334,26 +1321,14 @@ removeHemizygous <- function(sv){
   sv
 }
 
-revise <- function(sv, pview, aview, param){
-  sv <- removeSameStateOverlapping2(sv)
-  if(length(sv) == 0) return(sv)
+revise <- function(sv, aview, pview, param){
   copynumber(sv) <- granges_copynumber(variant(sv), pview)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
-  ##sv <- removeHemizygous(sv)
-  ##if(length(sv) == 0) return(sv)
-  sv <- removeSameStateOverlapping2(sv)
   indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
   calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
-  ##sv <- removeHemizygous(sv)
-  ##if(length(sv) == 0) return(sv)
-
   sv2 <- leftHemizygousHomolog(sv, pview, param)
   sv3 <- rightHemizygousHomolog(sv2, pview, param)
   calls(sv3) <- rpSupportedDeletions(sv3, param, pview)
-
-  message("Removing hemizygous deletions without rearranged RPs")
-  ##sv4 <- removeHemizygous(sv3)
-  ##if(length(sv4)==0) return(sv4)
   message("Refining homozygous boundaries by spanning hemizygous+")
   sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
   sv6 <- callOverlappingHemizygous(sv5)
@@ -1389,10 +1364,16 @@ sv_deletions <- function(gr, aview, bview, pview,
   }
   sv <- deletion_call(aview, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
-  ##sv <- removeHemizygous(sv)
+  sv <- removeHemizygous(sv)
   sv <- reviseEachJunction(sv, pview, aview, param)
   sv <- removeHemizygous(sv)
   sv <- revise(sv, aview, pview, param)
+  sv <- finalize_deletions(sv, gr_filters, pview, bview, param)
+  sv
+}
+
+finalize_deletions <- function(sv, gr_filters, pview, bview,
+                               param){
   sv <- SVFilters(sv, gr_filters, pview, param=param)
   sv <- groupSVs(sv)
   id <- names(aview)
