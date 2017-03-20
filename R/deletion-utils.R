@@ -1375,8 +1375,12 @@ sv_deletions <- function(gr, aview, bview, pview,
 setMethod("rename", "StructuralVariant", function(x, ...){
   nms <- paste0("sv", seq_along(variant(x)))
   names(variant(x)) <- nms
-  names(indexImproper(x)) <- nms
-  names(indexProper(x)) <- nms
+  ip <- indexProper(x)
+  names(ip) <- nms
+  x@index_proper <- ip
+  ip <- indexImproper(x)
+  names(ip) <- nms
+  x@index_improper <- ip
   names(copynumber(x)) <- nms
   x
 })
@@ -1385,7 +1389,6 @@ finalize_deletions <- function(sv, gr_filters, pview, bview,
                                param){
   sv <- SVFilters(sv, gr_filters, pview, param=param)
   sv <- groupSVs(sv)
-  id <- names(aview)
   sv <- allProperReadPairs(sv, param,
                            bfile=bamPaths(bview), zoom.out=1)
   if(length(sv@proper) > 25e3){
