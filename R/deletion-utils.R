@@ -1512,7 +1512,11 @@ thinReadPairs <- function(object, max.out=25e3){
 meltReadPairs <- function(rps){
   is.improper <- names(rps) != ""
   names(rps) <- NULL
-  df <- as(rps, "data.frame")
+  df <- data.frame(seqnames=as.character(seqnames(rps)),
+                  start.first=start(first(rps)), end.first=end(first(rps)),
+                  start.last=start(last(rps)),
+                  end.last=end(last(rps)))
+  ##df <- as(rps, "data.frame")
   df$readpair <- seq_len(nrow(df))
   df1 <- df[, c("start.first", "end.first", "readpair")]
   df2 <- df[, c("start.last", "end.last", "readpair")]
