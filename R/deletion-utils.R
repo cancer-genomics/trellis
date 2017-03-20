@@ -280,10 +280,52 @@ updateImproperIndex <- function(sv, maxgap=2e3){
   index_irp
 }
 
+.hits <- function(query, subject, ...){
+  hits <- findOverlaps(query, subject, ...)
+  setNames(subjectHits(hits), names(query)[queryHits(hits)])
+}
+
+.hits_union <- function(i1, i2){
+  nms <- unique(c(names(i1), names(i2)))
+  x <- lapply(nms, function(id, i1, i2){
+    c(i1[names(i1)==id], i2[names(i2)==id])
+  }, i1=i1, i2=i2)
+  names(x) <- nms
+  x
+}
+
+.hits_intersection <- function(i1, i2){
+  nms <- unique(c(names(i1), names(i2)))
+  x <- lapply(nms, function(id, i1, i2){
+    intersect(i1[names(i1)==id], i2[names(i2)==id])
+  }, i1=i1, i2=i2)
+  names(x) <- nms
+  x
+}
+
+## Returns a list of indices
+## - list is of the same length as the number of variants (length of gr)
+##
+## - each element contains a vector of indices into the improper read pairs
+##  (irp) object
 updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   left_boundary <- resize(gr, width=2)
   right_boundary <- resize(gr, width=2, fix="end")
-  ##irp <- sv@improper
+  if(FALSE){
+    ##irp <- sv@improper
+    fst <- granges(first(irp))
+    lst <- granges(last(irp))
+    i1 <- .hits(left_boundary, fst, maxgap=maxgap)
+    i4 <- .hits(right_boundary, lst, maxgap=maxgap)
+    hits1 <- .hits_intersection(i1, i4)
+
+    i2 <- .hits(left_boundary, lst, maxgap=maxgap)
+    i3 <- .hits(right_boundary, fst, maxgap=maxgap)
+    hits2 <- .hits_intersection(i2, i3)
+    index_list <- mapply(function(x,y) unique(c(x, y)),
+                         hits1, hits2)
+    return(index_list)
+  }
   hitsLeft <- findOverlaps(left_boundary, irp, maxgap=maxgap)
   hitsRight <- findOverlaps(right_boundary, irp, maxgap=maxgap)
 
@@ -307,7 +349,7 @@ updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   ## Assess whether there are any rearranged read pair clusters
   ## 1. order read pairs by left most alignment
   irp_id <- lapply(updated_index_list, function(i, irp) names(irp)[i], irp=irp)
-  lrp <- leftAlwaysFirst(irp)##, names(irp)
+  lrp <- leftAlwaysFirst(irp) ##, names(irp)
   lrplist <- lapply(irp_id, function(id, lrp) lrp[names(lrp) %in% id], lrp=lrp)
   ## 2. cluster the read pairs for each element
   cl_list <- lapply(lrplist, clusterReadPairs)
@@ -407,6 +449,7 @@ deletion_call <- function(aview, pview, cnv,
   prp <- properReadPairs(bam_path=bamPaths(aview),
                          gr=cnv, param=param)
   prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
+  ## change name to filterImproperReadPairs
   irp <- addImproperReadPairs2(cnv, aview, param=param)
   irp_index1 <- initializeImproperIndex2(cnv, irp, param)
   irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
