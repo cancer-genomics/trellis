@@ -976,7 +976,6 @@ reviseEachJunction <- function(object, pview, aview, param=DeletionParam()){
   indexProper(object) <- initializeProperIndex3(object, zoom.out=1)
   copynumber(object) <- granges_copynumber(variant(object), pview)
   calls(object) <- rpSupportedDeletions(object, param, pview)
-  object <- object[calls(object) != "hemizygous"]
   object
 }
 
