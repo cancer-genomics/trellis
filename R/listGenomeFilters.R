@@ -13,24 +13,27 @@
 #' REFACTORING: Separate filters from the parameter list. Create a
 #' single filter object for both the amplicon and deletion analyses.
 #'
+#' @param genome length-one character vector specifying UCSC genome build
 #' @return a named list
 #'
 #' @examples
-#' filters <- listGenomeFilters()
-#' 
+#' filters <- listGenomeFilters("hg19")
+#'
 #' @export
-#' 
-listGenomeFilters <- function(){
+#'
+listGenomeFilters <- function(genome=c("hg19", "hg18")){
   ##if(ucsc_build != "hg19") stop("Only available for build hg19")
-  data(transcripts, envir=environment())
+  genome <- match.arg(genome)
+  pkg <- paste0("svfilters.", genome)
+  data(transcripts, package=pkg, envir=environment())
   transcripts <- get("transcripts")
-  data(assembly_gaps, envir=environment())
+  data(assembly_gaps, package=pkg, envir=environment())
   assembly_gaps <- get("assembly_gaps")
-  data(gaps, envir=environment())
+  data(gaps, package=pkg, envir=environment())
   gaps <- get("gaps")
   centromeres <- gaps[gaps$type=="centromere"]
   seqinfo(centromeres) <- seqinfo(assembly_gaps)
-  data(coverage_filters, envir=environment())
+  data(coverage_filters, package=pkg, envir=environment())
   coverage_filters <- get("coverage_filters")
   cnv <- reduce(c(coverage_filters[["amplicon"]],
                   coverage_filters[["deletion"]]))
@@ -51,7 +54,7 @@ listGenomeFilters <- function(){
 #'
 #' @examples
 #' library(svfilters.hg19)
-#' filter.list <- listGenomeFilters()
+#' filter.list <- listGenomeFilters("hg19")
 #' filter.list <- filter.list[names(filter.list) != "transcripts"]
 #' filters <- reduceGenomeFilters(filter.list)
 #'
