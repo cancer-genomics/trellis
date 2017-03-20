@@ -1322,47 +1322,20 @@ sv_deletions <- function(gr, aview, bview, pview,
   }
   sv <- deletion_call(aview, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
-  is_hemizygous <- calls(sv)=="hemizygous"
-  sv <- sv[!is_hemizygous]
-  if(length(sv) == 0) return(sv)
+  ##sv <- removeHemizygous(sv)
   sv <- reviseEachJunction(sv, pview, aview, param)
-  sv <- removeSameStateOverlapping2(sv)
-  if(length(sv) == 0) return(sv)
-  copynumber(sv) <- granges_copynumber(variant(sv), pview)
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
-
-  is_hemizygous <- calls (sv) == "hemizygous"
-  sv <- sv[!is_hemizygous]
-  if(length(sv) == 0) return(sv)
-  sv <- removeSameStateOverlapping2(sv)
-
-  indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
-  calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
-  is_hemizygous <- calls(sv) == "hemizygous"
-  sv <- sv[!is_hemizygous]
-  if(length(sv) == 0) return(sv)
-
-  sv2 <- leftHemizygousHomolog(sv, pview, param)
-  sv3 <- rightHemizygousHomolog(sv2, pview, param)
-  calls(sv3) <- rpSupportedDeletions(sv3, param, pview)
-  message("Removing hemizygous deletions without rearranged RPs")
-  sv4 <- sv3[calls(sv3) != "hemizygous"]
-  if(length(sv4)==0) return(sv4)
-
-  message("Refining homozygous boundaries by spanning hemizygous+")
-  sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv4)
-  sv6 <- callOverlappingHemizygous(sv5)
-  sv7 <- removeSameStateOverlapping2(sv6) 
-
-  sv8 <- SVFilters(sv7, gr_filters, pview, param=param)
-  sv9 <- groupSVs(sv8)
+  sv <- removeHemizygous(sv)
+  sv <- revise(sv, aview, pview, param)
+  sv <- SVFilters(sv, gr_filters, pview, param=param)
+  sv <- groupSVs(sv)
   id <- names(aview)
-  sv9 <- allProperReadPairs(sv9, param, bfile=bamPaths(bview), zoom.out=1)
-  if(length(sv9@proper) > 25e3){
-    proper(sv9) <- sv9@proper[sample(seq_along(sv9@proper), 25e3)]
-    indexProper(sv9) <- initializeProperIndex3(sv9, zoom.out=1)
+  sv <- allProperReadPairs(sv, param,
+                           bfile=bamPaths(bview), zoom.out=1)
+  if(length(sv@proper) > 25e3){
+    proper(sv) <- sv@proper[sample(seq_along(sv@proper), 25e3)]
+    indexProper(sv) <- initializeProperIndex3(sv, zoom.out=1)
   }
-  sv9
+  sv
 }
 
 #' Extract a GRangesList of all identified deletions in a project
