@@ -14,7 +14,7 @@
 #' @importFrom DNAcopy CNA segment
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importMethodsFrom GenomeInfoDb seqlevelsStyle<- seqlevelsStyle seqlevels seqlevels<- seqlengths
-#' @importMethodsFrom GenomeInfoDb seqlevels seqnames seqinfo
+#' @importMethodsFrom GenomeInfoDb seqlevels seqnames seqinfo genome
 #' @importFrom GenomicAlignments GAlignmentPairs
 #' @importMethodsFrom GenomicAlignments first last
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
