@@ -86,17 +86,17 @@ genomeFilters <- function(build=c("hg19", "hg18")){
 #' List germline rearrangement filters derived from 10 lymphoblast
 #' cell lines (mixed ethnicities) and 8 normal blood sammples.
 #'
+#' @param genome length-one character vector indicating genome build (hg18 or hg19)
 #' @return a \code{GRangesList}
 #' @examples
-#' listRearFilters()
+#' listRearFilters("hg19")
 #' @seealso \code{\link{reduceRearFilters}}
 #' @export
-listRearFilters <- function(){
-  data(lymphoblast_rear, envir=environment())
+listRearFilters <- function(genome=c("hg19", "hg18")){
+  genome <- match.arg(genome)
+  pkg <- paste0("svfilters.", genome)
+  data("lymphoblast_rear", package=pkg, envir=environment())
   lymphoblast_rear <- get("lymphoblast_rear")
-  ##data(normalblood_rear_hg19, envir=environment())
-  ##GRangesList(lymphoblast=lymphoblast_rear_hg19,
-  ##normalblood=normalblood_rear_hg19)
   lymphoblast_rear
 }
 
