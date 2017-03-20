@@ -25,6 +25,8 @@ a GRanges object. Save to disk in the appropriate format and instantiate the
 Views object below from scratch*.
 
 ```{r packages}
+library(GenomicRanges)
+library(svclasses)
 library(svpreprocess)
 library(svcnvs)
 library(svfilters.hg19)
@@ -87,7 +89,7 @@ the `which` argument of the `improperAlignmentParams` function.
 segs2 <- expandGRanges(segs, 10e3)
 iparams <- improperAlignmentParams(which=reduce(segs2), mapqFilter=30)
 ## TODO mapq_thr should be part of iparams.  Don't need use.mcols
-irp <- getImproperAlignmentPairs(bview, iparams)
+irp <- getImproperAlignmentPairs(bamfile, iparams)
 length(irp)
 irp.file <- tempfile()
 saveRDS(irp, file=irp.file)

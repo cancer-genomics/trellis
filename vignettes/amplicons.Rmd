@@ -4,7 +4,7 @@ author: "Robert Scharpf"
 date: \today
 output: BiocStyle::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Overview of svcnvs package}
+  %\VignetteIndexEntry{Linked amplicons}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc} 
 ---
