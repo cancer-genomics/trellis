@@ -1373,12 +1373,12 @@ sv_deletions <- function(gr, aview, bview, pview,
 }
 
 setMethod("rename", "StructuralVariant", function(x, ...){
-  nms <- paste0("sv", seq_along(variant(sv)))
-  names(variant(sv)) <- nms
-  names(indexImproper(sv)) <- nms
-  names(indexProper(sv)) <- nms
-  names(copynumber(sv)) <- nms
-  sv
+  nms <- paste0("sv", seq_along(variant(x)))
+  names(variant(x)) <- nms
+  names(indexImproper(x)) <- nms
+  names(indexProper(x)) <- nms
+  names(copynumber(x)) <- nms
+  x
 })
 
 finalize_deletions <- function(sv, gr_filters, pview, bview,
