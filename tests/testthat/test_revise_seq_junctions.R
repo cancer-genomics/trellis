@@ -4,7 +4,7 @@ context("Revising sequence junctions")
 
 ## overlapping hemizygous deletions on chromosome 3
 
-.test_that("scratch", {
+test_that("overlappingHemizgyous", {
   library(Rsamtools)
   library(svbams)
   bamdir <- system.file("extdata", package="svbams")
@@ -59,12 +59,10 @@ context("Revising sequence junctions")
       geom_segment(data=df2, aes(x=start, xend=end, y=y, yend=y),
                    inherit.aes=FALSE)
   }
-
   sv <- deletion_call(aview, pview, gr)
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
   sv <- removeHemizygous(sv)
   sv <- reviseEachJunction(sv, pview, aview, param)
-
   sv.revise <- revise(sv, aview, pview, param)
   if(FALSE){
     df3 <- data.frame(start=start(variant(sv)),
@@ -102,9 +100,9 @@ context("Revising sequence junctions")
   sv.finalize <- finalize_deletions(sv, gr_filters,
                                     pview, bview,
                                     param)
-  expect_identical(variant(sv.finalize),
-                   variant(sv))
 
+  expect_identical(sv.finalize,
+                   rename(sort(sv)))
   expect_identical(variant(sv.finalize),
                    variant(sv1))
   if(FALSE){
