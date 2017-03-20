@@ -883,8 +883,8 @@ selfHits <- function(g, ...){
   sv2
 }
 
-#' Check whether any homozygous deletions overlap. If overlap, keep the reduced
-#' interval
+## Check whether any homozygous deletions overlap. If overlap, keep the reduced
+## interval
 adjudicateHomozygousOverlap2 <- function(object){
   gr <- variant(object)
   gr <- gr[calls(object)=="homozygous"]
