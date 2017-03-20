@@ -60,6 +60,7 @@ test_that("overlappingHemizgyous", {
                    inherit.aes=FALSE)
   }
   sv <- deletion_call(aview, pview, gr)
+  param <- DeletionParam()
   calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
   sv <- removeHemizygous(sv)
   sv <- reviseEachJunction(sv, pview, aview, param)
@@ -89,20 +90,17 @@ test_that("overlappingHemizgyous", {
   sv <- removeHemizygous(sv7)
   expect_identical(sv, sv.revise)
 
-  i <- order(variant(sv))
-  j <- order(variant(expected.sv))
-  g <- granges(variant(sv[i]))
-  g.expected <- granges(variant(expected.sv[j]))
+  sv2 <- rename(sort(sv))
+  expected <- rename(sort(expected.sv))
+  g <- granges(variant(sv2))
+  g.expected <- granges(variant(expected))
   expect_identical(start(g), start(g.expected))
   expect_identical(end(g), end(g.expected))
-  expect_identical(calls(sv)[i], calls(expected.sv)[j])
-
+  expect_identical(calls(sv2), calls(expected))
+  gr_filters <- genomeFilters("hg19")
   sv.finalize <- finalize_deletions(sv, gr_filters,
                                     pview, bview,
                                     param)
-
-  expect_identical(sv.finalize,
-                   rename(sort(sv)))
   expect_identical(variant(sv.finalize),
                    variant(sv1))
   if(FALSE){
