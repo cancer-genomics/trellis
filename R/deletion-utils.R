@@ -116,6 +116,28 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
     (width(g) > maximumWidth(param))
 }
 
+SVFilters <- function(sv, all_filters, view, zoom.out=1, param){
+  evaluate_context <- evaluateContext(variant(sv), view)
+  if(evaluate_context){
+    svcontext <- expandGRanges(variant(sv),
+                               10*zoom.out*width(variant(sv))) ## 5percent window
+    fc_context <- granges_copynumber(svcontext, view)
+    ##fc <- 2^(fc_context-copynumber(sv))
+    fc <- 2^(copynumber(sv) - fc_context)
+  }
+  broad_hemizygous <- copynumber(sv) > log2(homozygousThr(param)) &
+    width(variant(sv)) > maximumWidth(param)
+  frac <- intOverWidth(variant(sv), all_filters)
+  w <- widthNotSpannedByFilter(variant(sv), all_filters)
+  is_dup <- duplicated(variant(sv))
+  if(evaluate_context){
+    sv <- sv[frac < 0.75 & w > 2e3 & fc < 0.7 & !is_dup & !broad_hemizygous]
+  } else{
+    sv <- sv[frac < 0.75 & w > 2e3 & !is_dup & !broad_hemizygous]
+  }
+  sv
+}
+
 #' Identify focal, somatic hemizygous deletions and somatic homozygous
 #' deletions
 #'
@@ -160,12 +182,8 @@ germlineFilters <- function(cnv, germline_filters, pview, param=DeletionParam())
   ##
   ## For unit testing, we may not be able to evaluate the context
   ##
-  width.cnv <- sum(as.numeric(width(cnv)))
-  width.bins <- sum(as.numeric(width(bamRanges(pview))))
+  evaluate_context <- evaluateContext(cnv, pview)
   is_big <- isLargeHemizygous(cnv, param)
-  if(width.bins/width.cnv > 15){
-    evaluate_context <- TRUE
-  } else evaluate_context <- FALSE
   if(evaluate_context){
     egr <- expandGRanges(cnv, 15*width(cnv))
     fc_context <- granges_copynumber(egr, pview)
@@ -184,6 +202,12 @@ germlineFilters <- function(cnv, germline_filters, pview, param=DeletionParam())
   cnv <- cnv[K]
   names(cnv) <- paste0("sv", seq_along(cnv))
   cnv
+}
+
+evaluateContext <- function(g, pview){
+  width.cnv <- sum(as.numeric(width(g)))
+  width.bins <- sum(as.numeric(width(bamRanges(pview))))
+  width.bins/width.cnv > 15  
 }
 
 initializeImproperIndex <- function(sv, param){
