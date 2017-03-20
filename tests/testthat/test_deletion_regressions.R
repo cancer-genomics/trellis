@@ -46,6 +46,15 @@ test_that("deletions_segs", {
   }
 })
 
+
+
+expect_identical2 <- function(sv1, sv2){
+  variant(sv1) <- granges(variant(sv1))
+  variant(sv2) <- granges(variant(sv2))
+  expect_identical(sv1, sv2)
+}
+
+
 test_that("sv_deletions", {
   library(svfilters.hg19)
   bview <- readRDS("bview.4adcc78.rds")
@@ -73,7 +82,8 @@ test_that("sv_deletions", {
     saveRDS(dels, file="sv_deletions.ba3c739.rds")
   }
   dels.ba3c739 <- readRDS("sv_deletions.ba3c739.rds")
-  expect_identical(dels, dels.ba3c739)
+  dels.ba3c739 <- rename(sort(dels.ba3c739))
+  expect_identical2(dels.ba3c739, dels)
 })
 
 test_that("deletion_call", {
@@ -90,15 +100,11 @@ test_that("deletion_call", {
   paths(pview) <- cov.file
 
   ##
-  ## deletion_call
-  ##
-  bview <- readRDS("bview.4adcc78.rds")
-  segs <- readRDS("segs.4adcc78.rds")
-  ##
   ## extract improper alignments
   ##
   irp.file <- "getImproperAlignmentPairs.rds"
   aview <- AlignmentViews2(bview, path=irp.file)
+  segs <- segs[segs$seg.mean < -1]
   result <- deletion_call(aview=aview,
                           pview=pview,
                           cnv=segs,
@@ -108,7 +114,7 @@ test_that("deletion_call", {
     saveRDS(result, file="deletion_call.4adcc78.rds")
   }
   expected <- readRDS("deletion_call.4adcc78.rds")
-  expect_identical(result, expected)
+  expect_identical2(result, expected)
 })
 
 test_that("addImproperReadPairs2", {
@@ -241,7 +247,7 @@ test_that("germlineFilters", {
   gr <- variant(deletion)
   gr <- expandGRanges(gr, 10000)
   segs <- subsetByOverlaps(segs, gr)
-
+  segs <- segs[segs$seg.mean < -1]
   cnvs <- germlineFilters(cnv=segs,
                           germline_filters=filters,
                           pview=pview,
@@ -256,6 +262,8 @@ test_that("germlineFilters", {
   ##
   ## germlineFilters
   ##
+  data(segments, package="svcnvs")
+  segs <- subsetByOverlaps(segments, gr)
   cnv <- segs
   not_germline <- isNotGermline(cnv, filters, dparam)
   ##
@@ -271,7 +279,8 @@ test_that("germlineFilters", {
   egr <- expandGRanges(cnv, 15 * width(cnv))
   cn_context <- granges_copynumber(egr, pview)
   fc <- (cnv$seg.mean - cn_context)
-  expect_equivalent(fc < -3, c(FALSE, TRUE, FALSE))
+  is.lessthan <- as.logical(fc < -3)
+  expect_identical(is.lessthan, c(FALSE, TRUE, FALSE))
 
   is_big <- isLargeHemizygous(cnv, dparam)
   expect_true(!any(is_big))
