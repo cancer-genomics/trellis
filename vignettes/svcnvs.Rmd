@@ -165,7 +165,7 @@ containing the preprocessed coverage.
 
 ```{r dataframes}
 pview2 <- pview[queryHits(findOverlaps(rowRanges(pview), roi2)), ]
-segs <- keepSeqlevels(segs, seqlevels(roi), pruning.mode="coarse")
+segs <- keepSeqlevels(segments, seqlevels(roi), pruning.mode="coarse")
 segs.df <- as(segs, "data.frame")
 df <- data.frame(logr=assays(pview2)[, 1],
                  start=start(rowRanges(pview2)))
