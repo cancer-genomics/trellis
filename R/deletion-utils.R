@@ -1372,6 +1372,15 @@ sv_deletions <- function(gr, aview, bview, pview,
   sv
 }
 
+setMethod("rename", "StructuralVariant", function(x, ...){
+  nms <- paste0("sv", seq_along(variant(sv)))
+  names(variant(sv)) <- nms
+  names(indexImproper(sv)) <- nms
+  names(indexProper(sv)) <- nms
+  names(copynumber(sv)) <- nms
+  sv
+})
+
 finalize_deletions <- function(sv, gr_filters, pview, bview,
                                param){
   sv <- SVFilters(sv, gr_filters, pview, param=param)
@@ -1383,6 +1392,7 @@ finalize_deletions <- function(sv, gr_filters, pview, bview,
     proper(sv) <- sv@proper[sample(seq_along(sv@proper), 25e3)]
     indexProper(sv) <- initializeProperIndex3(sv, zoom.out=1)
   }
+  sv <- rename(sort(sv))
   sv
 }
 
