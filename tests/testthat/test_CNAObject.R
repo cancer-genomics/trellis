@@ -89,7 +89,7 @@ test_that("CNAObject", {
   ##
   ## critical to set scale. otherwise, the granges_copynumber is ridiculous
   ##
-  ## TODO: All of these segments but the homozygous deletion gets filtered
+  ## TODO: All of these segments but the homozygous deletion get filtered
   ## because of the fold-change context. Would be better to only compare to the
   ## segment means of the adjacent segment. The drawback is multiple segments
   ## that have about the same mean within a deletion.
@@ -106,19 +106,4 @@ test_that("CNAObject", {
   g2 <- germlineFilters(cnv=g.cnv,
                         germline_filters=filters,
                         pview=pview)
-  ##
-  ## Checking against the current behavior. However, 5 CNVs would be the correct
-  ## result for this region.
-  ##
-  expected <- GRanges("chr3", IRanges(60319001, 60434001))
-  tmp <- deletion_call(aview=aview, pview=pview,
-                       cnv=g,
-                       gr_filters=filters)
-  expect_identical(calls(tmp), "homozygous")
-  sv_dels <- sv_deletions(gr=g,
-                          aview=aview,
-                          bview=bview,
-                          pview=pview,
-                          gr_filters=filters,
-                          param=del.params)
 })
