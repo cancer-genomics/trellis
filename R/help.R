@@ -10,7 +10,7 @@
 #' @import svclasses
 #' @import S4Vectors
 #' @importFrom BiocGenerics combine
-#' @importFrom Rsamtools bamPaths
+#' @importFrom Rsamtools bamPaths bamRanges
 #' @importFrom DNAcopy CNA segment
 #' @importFrom GenomeInfoDb keepSeqlevels
 #' @importMethodsFrom GenomeInfoDb seqlevelsStyle<- seqlevelsStyle seqlevels seqlevels<- seqlengths
