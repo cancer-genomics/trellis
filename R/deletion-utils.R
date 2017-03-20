@@ -1261,6 +1261,39 @@ allProperReadPairs <- function(sv, param, bfile, zoom.out=1){
   sv
 }
 
+removeHemizygous <- function(sv){
+  is_hemizygous <- calls(sv)=="hemizygous"
+  sv <- sv[!is_hemizygous]
+  sv
+}
+
+revise <- function(sv, pview, aview, param){
+  sv <- removeSameStateOverlapping2(sv)
+  if(length(sv) == 0) return(sv)
+  copynumber(sv) <- granges_copynumber(variant(sv), pview)
+  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
+  ##sv <- removeHemizygous(sv)
+  ##if(length(sv) == 0) return(sv)
+  sv <- removeSameStateOverlapping2(sv)
+  indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
+  calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
+  ##sv <- removeHemizygous(sv)
+  ##if(length(sv) == 0) return(sv)
+
+  sv2 <- leftHemizygousHomolog(sv, pview, param)
+  sv3 <- rightHemizygousHomolog(sv2, pview, param)
+  calls(sv3) <- rpSupportedDeletions(sv3, param, pview)
+
+  message("Removing hemizygous deletions without rearranged RPs")
+  ##sv4 <- removeHemizygous(sv3)
+  ##if(length(sv4)==0) return(sv4)
+  message("Refining homozygous boundaries by spanning hemizygous+")
+  sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
+  sv6 <- callOverlappingHemizygous(sv5)
+  sv7 <- removeSameStateOverlapping2(sv6) 
+  sv7
+}
+
 #' Creates a StructuralVariant object for a sample
 #'
 #' Creates a \code{StructuralVariant} object encapsulating information
