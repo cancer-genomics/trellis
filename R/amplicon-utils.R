@@ -1015,6 +1015,7 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 #' @examples
 #'   library(svfilters.hg19)
 #'   library(svbams)
+#'   library(Rsamtools)
 #'   data(germline_filters)
 #'   ##
 #'   ## read in some CNVs

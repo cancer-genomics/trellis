@@ -133,47 +133,6 @@ checkMcols <- function(x, id){
 #'   \code{\link[svclasses]{SegmentParam-class}} for a description of the default
 #'   parameters settings passed to the \code{segment} function.
 #'
-#' @examples
-#' library(Rsamtools)
-#' library(svpreprocess)
-#' extdir <- system.file("extdata", package="svclasses")
-#' bviews <- readRDS(file.path(extdir, "bamviews_example.rds"))
-#'
-#' set.seed(123)
-#' gc <- round(runif(nrow(bviews), 30, 80), 0)
-#' mp <- as.integer(round(runif(nrow(bviews), 600, 1000), 0))
-#' bamRanges(bviews)$gc <- gc
-#' bamRanges(bviews)$map <- mp
-#'
-#' unlink(DataPaths(tempdir(), "Test", dryrun=TRUE))
-#' tree <- DataPaths(tempdir(), "Test", dryrun=FALSE)
-#' views <- countExperiment2(bviews, tree)
-#' colnames(views) <- gsub("\\.bam", "", colnames(views))
-#' views <- transformExperiment(views, tree)
-#' views <- gcExperiment2(views, tree)
-#' grl <- segmentExperiment(views, tree)
-#' class(grl)
-#' unlist(grl)
-#' identical(names(grl), colnames(views))
-#'
-#'
-#' ## The granges object for each sample is saved in the provided
-#' ##  directory tree.  In particular, list.files(tree[["cbs"]]) ##
-#' ##  Calling segmentExperiment a second time merely reads these
-#' ##  objects from disk:
-#' grl2 <- segmentExperiment(views, tree)
-#' identical(grl, grl2)
-#'
-#' ## To rerun the sementation, these files must be removed or a
-#' ##  different 'tree' object must be passed. For example, if we wanted
-#' ##  to rerun with different segmentation parameters
-#' 
-#' unlink(list.files(tree[["cbs"]], full.names=TRUE))
-#' sp <- SegmentParam(alpha=0.05)
-#' \dontrun{
-#'   grl3 <- segmentExperiment(views, tree, sp)
-#' }
-#'
 #' @return A \code{GRangesList} object.  Each element is the set of
 #'   \code{GRanges} for a given sample.  Meta-columns of the
 #'   \code{GRanges} elements are \code{seg.mean} (the segment mean)
@@ -190,6 +149,7 @@ checkMcols <- function(x, id){
 #' @param ... Additional arguments are passed to the \code{segment}
 #'   function in the \code{DNAcopy} package.
 segmentExperiment <- function(object, tree, param=SegmentParam(), ...){
+  .Deprecated()
   files <- file.path(tree[["cbs"]], rdsId(object))
   J <- seq_len(ncol(object))
   grl <- vector("list", length(J))
