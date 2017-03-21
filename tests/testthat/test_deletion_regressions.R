@@ -6,7 +6,8 @@ test_that("deletions_segs", {
   library(svpreprocess)
   data(germline_filters, package="svfilters.hg19")
   extdata <- system.file("extdata", package="svbams")
-  id <- "CGOV44T.bam"
+  ##id <- "CGOV44T.bam"
+  id <- "cgov44t_revised.bam"
   id.rds <- paste0(id, ".rds")
   bamfile <- file.path(extdata, id)
   bview <- Rsamtools::BamViews(bamPaths=bamfile)
@@ -51,7 +52,7 @@ test_that("deletions_segs", {
 expect_identical2 <- function(sv1, sv2){
   variant(sv1) <- granges(variant(sv1))
   variant(sv2) <- granges(variant(sv2))
-  expect_identical(sv1, sv2)
+  expect_equivalent(sv1, sv2)
 }
 
 
@@ -224,7 +225,7 @@ test_that("sv_deletions2", {
     saveRDS(sv3, file="allProperReadPairs.4adcc78.rds")
   }
   sv.4adcc78 <- readRDS("allProperReadPairs.4adcc78.rds")
-  expect_identical(sv.4adcc78, sv3)
+  expect_identical2(sv.4adcc78, sv3)
 })
 
 test_that("germlineFilters", {

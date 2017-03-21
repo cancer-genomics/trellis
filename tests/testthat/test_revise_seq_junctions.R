@@ -30,7 +30,10 @@ test_that("overlappingHemizgyous", {
   gr <- gr[gr$seg.mean < log2(0.75)]
 
   bview <- BamViews(bamPaths=bamfile, bamRanges=bins)
+  irp <- readRDS(irpfile)
   aview <- AlignmentViews2(bview, irpfile)
+
+
   pview <- PreprocessViews2(bview)
   paths(pview) <- lrfile
   setScale(pview) <- 1000
