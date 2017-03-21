@@ -104,13 +104,16 @@ listRearFilters <- function(genome=c("hg19", "hg18")){
 #' from 10 lymphoblast cell lines (mixed ethnicities) and 8 normal
 #' blood sammples.
 #'
+#' TODO: deprecate
+#'
 #' @details
 #'
 #' The reduced set is restricted to the sequence names provided in
 #'   \code{seqlev} (if provided).
 #'
 #' @examples
-#' reduceRearFilters()
+#' filters <- listRearFilters("hg19")
+#' reduceRearFilters(filters, "chr1")
 #'
 #' @return a \code{GRanges} object
 #' @seealso \code{\link{listRearFilters}}

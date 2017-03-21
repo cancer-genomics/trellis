@@ -70,20 +70,22 @@ labelGeneName <- function(tx, gr, maxgap){
   gene_name
 }
 
-#' Summarize frequency of a sample in a GRangesList
-#'
-#' Makes a gene-level table with frequency that gene appears and a vector of comma-delimited sample identifiers with the gene.  Useful for summarizing recurrence of deletions or amplicons by gene.
-#'
-#' @param grl a \code{GRangesList}.  Assumes that each element of the \code{GRangesList} has a \code{id} and a \code{gene_name} field.
-#' @seealso \code{\link{recurrentDeletions}}
-#' @examples
-#'   genes <- GRanges("chr1", IRanges(5, 10))
-#'   genes$gene_name <- "a"
-#'   gr1 <- GRanges(rep("chr1", 2), IRanges(c(4, 8), c(6, 10)), id=rep("id1", 2))
-#'   gr2 <- GRanges("chr1", IRanges(3, 9), id="id2")
-#'   grl <- GRangesList(id1=gr1, id2=gr2)
-#'   grl <- recurrentDeletions(genes, grl, maxgap=5)
-#'   summarizeGeneFreq(grl)
+## #' Summarize frequency of a sample in a GRangesList
+## #'
+## #' Makes a gene-level table with frequency that gene appears and a vector of
+## #' comma-delimited sample identifiers with the gene. Useful for summarizing
+## #' recurrence of deletions or amplicons by gene.
+## #'
+## #' @param grl a \code{GRangesList}.  Assumes that each element of the \code{GRangesList} has a \code{id} and a \code{gene_name} field.
+## #' @seealso \code{\link{recurrentDeletions}}
+## #' @examples
+## #'   genes <- GRanges("chr1", IRanges(5, 10))
+## #'   genes$gene_name <- "a"
+## #'   gr1 <- GRanges(rep("chr1", 2), IRanges(c(4, 8), c(6, 10)), id=rep("id1", 2))
+## #'   gr2 <- GRanges("chr1", IRanges(3, 9), id="id2")
+## #'   grl <- GRangesList(id1=gr1, id2=gr2)
+## #'   grl <- recurrentDeletions(genes, grl, maxgap=5)
+## #'   tab <- summarizeGeneFreq(grl)
 summarizeGeneFreq <- function(grl){
   g <- unlist(grl)
   genes <- unique(g$gene_name)
