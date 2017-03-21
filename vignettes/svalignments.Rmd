@@ -118,8 +118,8 @@ ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
 
 # Extract read pairs from BAM file with exogenous barcodes
 
-TODO: A brief description of what we mean by exogenous versus endogenous
-barcodes.
+DEPRECATE: duplicates can be marked in a way that is barcode-aware. Downstream
+processing would be identical.
 
 ```{r targeted_bam}
 targeted.bam <- file.path(path, "PGDX5881P_PS_Seq_novo.sorted_nofa.bam")
