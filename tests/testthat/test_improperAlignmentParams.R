@@ -45,7 +45,7 @@ test_that("read_pairs_from_bam", {
   si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
   seqinfo(region) <- si["chr15", ]
 
-  bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
+  bampath <- list.files(path, pattern="cgov44t_revised.bam$", full.names=TRUE)
   bview <- BamViews(bamPaths=bampath)
 
   iparams <- improperAlignmentParams(which=region, mapqFilter=30)
