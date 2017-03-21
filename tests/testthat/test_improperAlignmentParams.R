@@ -50,8 +50,7 @@ test_that("read_pairs_from_bam", {
 
   iparams <- improperAlignmentParams(which=region, mapqFilter=30)
   pparams <- properAlignmentParams(which=region, mapqFilter=30)
-  irp <- getImproperAlignmentPairs(bampath,
-                                   iparams)
+  irp <- getImproperAlignmentPairs(bampath, iparams)
   expect_identical(length(irp), 57L)
   g.irp <- ga2gr(irp, is.improper=TRUE)
   expect_identical(length(g.irp), 57L*2L)
