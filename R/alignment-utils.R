@@ -163,6 +163,12 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #' @param param a \code{ScanBamParam} object.
 #' @param use.mcols logical
 #'
+#' @examples
+#'   library(svbams)
+#'   path <- system.file("extdata", package="svbams")
+#'   bam.file <- file.path(path, "cgov10t.bam")
+#'   irp <- getImproperAlignmentPairs(bam.file)
+#'
 #' @details TODO: mapqFilter is set to 0 by default for historical reasons.
 #'   Should provide better default (e.g., mapqFilter=30).
 #'
@@ -173,7 +179,6 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(bam.file,
                                       param=improperAlignmentParams(mapqFilter=0)){
-  ##bam.file <- bamPaths(object)
   flags <- improperAlignmentFlags()
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)

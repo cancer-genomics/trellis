@@ -22,3 +22,10 @@ Suggests:
     data.table,
     TxDb.Hsapiens.UCSC.hg19.refGene
 RoxygenNote: 6.0.1
+Collate: 
+    'help.R'
+    'AllGenerics.R'
+    'alignment-utils.R'
+    'blat-utils.R'
+    'data.R'
+    'galignment-utils.R'
