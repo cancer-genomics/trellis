@@ -1351,14 +1351,14 @@ removeHemizygous <- function(sv){
   sv
 }
 
-revise <- function(sv, aview, pview, param){
-  copynumber(sv) <- granges_copynumber(variant(sv), pview)
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
+revise <- function(sv, bins, param){
+  copynumber(sv) <- granges_copynumber2(variant(sv), bins)
+  calls(sv) <- rpSupportedDeletions(sv, param=param, bins)
   indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
-  calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
-  sv2 <- leftHemizygousHomolog(sv, pview, param)
-  sv3 <- rightHemizygousHomolog(sv2, pview, param)
-  calls(sv3) <- rpSupportedDeletions(sv3, param, pview)
+  calls(sv) <- rpSupportedDeletions(sv, param, bins)
+  sv2 <- leftHemizygousHomolog(sv, bins, param)
+  sv3 <- rightHemizygousHomolog(sv2, bins, param)
+  calls(sv3) <- rpSupportedDeletions(sv3, param, bins)
   message("Refining homozygous boundaries by spanning hemizygous+")
   sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
   sv6 <- callOverlappingHemizygous(sv5)
@@ -1378,27 +1378,27 @@ revise <- function(sv, aview, pview, param){
 #' reduce the size of the object. For reproducibility, set a seed prior to
 #' running this function.
 #'
-#' 
-#' @param gr a \code{GRanges} object
-#' @param aview a \code{AlignmentViews2} object
-#' @param bview a \code{BamViews} object
-#' @param pview a \code{PreprocessViews2} object
+#' @param preprocess a list of preprocessing summaries (see \code{preprocessData})
 #' @param gr_filters a \code{GRanges} object of germline filters
 #' @param param a \code{DeletionParam} object
+#' @seealso \code{\link{preprocessData}}
 #' @export
-sv_deletions <- function(gr, aview, bview, pview,
+sv_deletions <- function(preprocess,
                          gr_filters,
                          param=DeletionParam()){
   if(missing(gr_filters)){
-    gr_filters <- genomeFilters(genome(gr)[[1]])
+    gr_filters <- genomeFilters(preprocess$genome)
   }
-  sv <- deletion_call(aview, pview, gr, gr_filters)
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
+  sv <- deletion_call(preprocess, gr_filters, param)
+  ##sv <- deletion_call(bam.file, improper_rp, pview, gr, gr_filters)
+  calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   sv <- removeHemizygous(sv)
-  sv <- reviseEachJunction(sv, pview, aview, param)
+  sv <- reviseEachJunction(sv, preprocess$bins, preprocess$improper_rp, param)
   sv <- removeHemizygous(sv)
-  sv <- revise(sv, aview, pview, param)
-  sv <- finalize_deletions(sv, gr_filters, pview, bview, param)
+  sv <- revise(sv, bins=preprocess$bins, param=param)
+  sv <- finalize_deletions(sv=sv, preprocess,
+                           gr_filters=gr_filters,
+                           param=param)
   sv
 }
 
@@ -1415,12 +1415,17 @@ setMethod("rename", "StructuralVariant", function(x, ...){
   x
 })
 
-finalize_deletions <- function(sv, gr_filters, pview, bview,
-                               param){
-  sv <- SVFilters(sv, gr_filters, pview, param=param)
+finalize_deletions <- function(sv, preprocess, gr_filters,
+                               param=DeletionParam()){
+  if(missing(gr_filters)){
+    gr_filters <- genomeFilters(preprocess$genome)
+  }
+  bins <- preprocess$bins
+  bam.file <- preprocess$bam.file
+  sv <- SVFilters(sv, gr_filters, bins, param=param)
   sv <- groupSVs(sv)
   sv <- allProperReadPairs(sv, param,
-                           bfile=bamPaths(bview), zoom.out=1)
+                           bfile=bam.file, zoom.out=1)
   if(length(sv@proper) > 25e3){
     proper(sv) <- sv@proper[sample(seq_along(sv@proper), 25e3)]
     indexProper(sv) <- initializeProperIndex3(sv, zoom.out=1)
@@ -1559,4 +1564,16 @@ meltReadPairs <- function(rps){
   df$read <- factor(df$read, levels=c("first", "last"))
   df$is.improper <- rep(is.improper, 2)
   df
+}
+
+preprocessData <- function(bam.file=NULL,
+                           genome,
+                           bins,
+                           segments,
+                           improper_rp){
+  list(bam.file=bam.file,
+       genome=genome,
+       bins=bins,
+       segments=segments,
+       improper_rp=improper_rp)
 }
