@@ -102,13 +102,16 @@ setClass("DeletionParam", representation(tag_density_homozygous_thr="numeric",
 #' unassembled regions, and outliers observed in a bin for 2 or more
 #' normal samples.
 #' @param bam_seqlevels_style character string indicating style of seqnames
+#' @param build length-1 character vector indicating genome build (must be hg18 or hg19)
 #' @export
 #' @return a \code{DeletionParam} object
 #' @rdname DeletionParam-class
 DeletionParam <- function(min_width=2e3,
                           max_width=2e6,
                           min_gapwidth=10e3,
-                          tag_density_homozygous_thr=0.1,
+                          homozygous_thr=-3,
+                          hemizygous_thr=-0.7,
+                          tumor_purity=1,
                           min_RPs_in_hemizygous=1,
                           max_RPs_in_homozygous=100,
                           nflanking_hemizygous=5L,
@@ -120,7 +123,9 @@ DeletionParam <- function(min_width=2e3,
       min_width=min_width,
       max_width=max_width,
       min_gapwidth=min_gapwidth,
-      tag_density_homozygous_thr=tag_density_homozygous_thr,
+      homozygous_thr=homozygous_thr,
+      hemizygous_thr=hemizygous_thr,
+      tumor_purity=tumor_purity, ## this should be estimated
       min_RPs_in_hemizygous=min_RPs_in_hemizygous,
       max_RPs_in_homozygous=max_RPs_in_homozygous,
       nflanking_hemizygous=nflanking_hemizygous,
@@ -140,7 +145,13 @@ bamSeqLevelsStyle <- function(object) object@bam_seqlevels_style
 #' @rdname DeletionParam-class
 #' @param object a \code{DeletionParam}
 #' @export
-homozygousThr <- function(object) object@tag_density_homozygous_thr
+homozygousThr <- function(object) object@homozygous_thr
+
+#' @keywords internal
+#' @rdname DeletionParam-class
+#' @param object a \code{DeletionParam}
+#' @export
+hemizygousThr <- function(object) object@hemizygous_thr
 
 #' @keywords internal
 #' @rdname DeletionParam-class
@@ -194,7 +205,8 @@ maxRPsHomozygous <- function(object) object@max_RPs_in_homozygous
 
 setMethod("show", "DeletionParam", function(object){
   cat("'DeletionParam' class:\n")
-  cat("   read depth threshold for homozygous: ", homozygousThr(object), "\n")
+  cat("   log_ratio threshold for homozygous: ", homozygousThr(object), "\n")
+  cat("   log_ratio threshold for hemizygous: ", hemizygousThr(object), "\n")
   cat("   minimum # flanking read pairs\n")
   cat("            - homozygous:", minFlankingHomozygous(object), "\n")
   cat("            - hemizygous:", minFlankingHemizygous(object), "\n")
