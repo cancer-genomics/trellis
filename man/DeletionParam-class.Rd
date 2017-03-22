@@ -6,9 +6,9 @@
 \alias{DeletionParam}
 \alias{bamSeqLevelsStyle}
 \alias{homozygousThr}
+\alias{hemizygousThr}
 \alias{maximumWidth}
 \alias{maximumProportionInFilter}
-\alias{maxTagDensity}
 \alias{maxRatioObservedToExpected}
 \alias{minimumWidth}
 \alias{minimumGapWidth}
@@ -19,20 +19,21 @@
 \title{Parameter class for calling deletions}
 \usage{
 DeletionParam(min_width = 2000, max_width = 2e+06, min_gapwidth = 10000,
-  tag_density_homozygous_thr = 0.1, min_RPs_in_hemizygous = 1,
-  max_RPs_in_homozygous = 100, nflanking_hemizygous = 5L,
-  nflanking_homozygous = 5L, maxRatioObservedToExpected = 2L,
-  max_proportion_in_filter = 0.75, bam_seqlevels_style = "UCSC")
+  homozygous_thr = -3, hemizygous_thr = -0.7, tumor_purity = 1,
+  min_RPs_in_hemizygous = 1, max_RPs_in_homozygous = 100,
+  nflanking_hemizygous = 5L, nflanking_homozygous = 5L,
+  maxRatioObservedToExpected = 2L, max_proportion_in_filter = 0.75,
+  bam_seqlevels_style = "UCSC")
 
 bamSeqLevelsStyle(object)
 
 homozygousThr(object)
 
+hemizygousThr(object)
+
 maximumWidth(object)
 
 maximumProportionInFilter(object)
-
-maxTagDensity(object)
 
 maxRatioObservedToExpected(object)
 
@@ -49,56 +50,60 @@ minRPsHemizygous(object)
 maxRPsHomozygous(object)
 }
 \arguments{
-\item{min_width}{length-one numeric vector indicating the minimum
-width of a CNV segment.}
+\item{min_width}{length-one numeric vector indicating the minimum width of a
+CNV segment.}
 
-\item{max_width}{length-one numeric vector indicating the maximum
-width of a CNV segment.}
+\item{max_width}{length-one numeric vector indicating the maximum width of a
+CNV segment.}
 
-\item{min_gapwidth}{length-one numeric vector used to reduce
-deletion calls. Provided that the segment means of adjacent
-deletions are qualitatively similar, two deletions less than
-min_gapwidth apart will be merged into a single CNV.}
+\item{min_gapwidth}{length-one numeric vector used to reduce deletion calls.
+Provided that the segment means of adjacent deletions are qualitatively
+similar, two deletions less than min_gapwidth apart will be merged into a
+single CNV.}
 
-\item{tag_density_homozygous_thr}{length-one numeric vector
-indicating the maximum fold change expected for a homozygous
-deletion}
+\item{homozygous_thr}{length-one numeric vector indicating the maximum log2
+ratio expected for a homozygous deletion}
 
-\item{min_RPs_in_hemizygous}{length-one numeric vector indicating
-the minimum number of rearranged read pairs that can be spanned by
-a hemizygous deletion. [PARAMETER NOT USED]}
+\item{hemizygous_thr}{length-one numeric vector indicating the maximum log2
+ratio expected for a hemizygous deletion}
 
-\item{max_RPs_in_homozygous}{length-one numeric vector indicating
-the maximum number of read pairs allowed to be spanned by a
-homozygous deletion.  [PARAMETER NOT USED]}
+\item{tumor_purity}{length-one numeric vector in [0, 1]}
 
-\item{nflanking_hemizygous}{length-one numeric vector indicating the
-minimum number of rearranged RPs required for calling a hemizygous
-deletion with higher confidence.  Hemizygous deletions with
-rearranged RPs are given higher priority over hemizygous deletions
-supported only by the tag density.}
+\item{min_RPs_in_hemizygous}{length-one numeric vector indicating the minimum
+number of rearranged read pairs that can be spanned by a hemizygous
+deletion. [PARAMETER NOT USED]}
 
-\item{nflanking_homozygous}{length-one numeric vector indicating the
-minimum number of rearranged RPs required for calling a homozygous
-deletion with higher confidence.  Homozygous deletions with
-rearranged RPs are given higher priority over homozygous deletions
-supported only by the tag density.}
+\item{max_RPs_in_homozygous}{length-one numeric vector indicating the maximum
+number of read pairs allowed to be spanned by a homozygous deletion.
+[PARAMETER NOT USED]}
+
+\item{nflanking_hemizygous}{length-one numeric vector indicating the minimum
+number of rearranged RPs required for calling a hemizygous deletion with
+higher confidence. Hemizygous deletions with rearranged RPs are given
+higher priority over hemizygous deletions supported only by the tag
+density.}
+
+\item{nflanking_homozygous}{length-one numeric vector indicating the minimum
+number of rearranged RPs required for calling a homozygous deletion with
+higher confidence. Homozygous deletions with rearranged RPs are given
+higher priority over homozygous deletions supported only by the tag
+density.}
 
 \item{maxRatioObservedToExpected}{length-one numeric vector [IGNORED?]}
 
-\item{max_proportion_in_filter}{length-one numeric vector indicating
-the maximum proportion of a CNV that can be covered by one of the
-filters.  The filters are germline CNV, low mappability, low GC /
-unassembled regions, and outliers observed in a bin for 2 or more
-normal samples.}
+\item{max_proportion_in_filter}{length-one numeric vector indicating the
+maximum proportion of a CNV that can be covered by one of the filters. The
+filters are germline CNV, low mappability, low GC / unassembled regions,
+and outliers observed in a bin for 2 or more normal samples.}
 
 \item{bam_seqlevels_style}{character string indicating style of seqnames}
 
 \item{object}{a \code{DeletionParam}}
 
-\item{max_tag_density}{length-one numeric vector indicating the
-maximum fold change for calling deletions (assumes threshold
-provided using linear-scale).}
+\item{build}{length-1 character vector indicating genome build (must be hg18
+or hg19)}
+
+\item{object}{a \code{DeletionParam}}
 
 \item{object}{a \code{DeletionParam}}
 }
