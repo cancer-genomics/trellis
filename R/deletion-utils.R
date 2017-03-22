@@ -405,6 +405,23 @@ initializeProperIndex3 <- function(sv, zoom.out=1){
   initializeProperIndex2(variant(sv), sv@proper, zoom.out=zoom.out)
 }
 
+improperRP <- function(gr, irp, param=DeletionParam()){
+  irp <- updateObject(irp)
+  si <- seqinfo(gr)
+  sl <- seqlevels(si)
+  seqlevels(irp, pruning.mode="coarse") <- sl
+  d <- abs(start(first(irp)) - start(last(irp)))
+  irp <- irp[d < maximumWidth(param)]
+  seqlevelsStyle(irp) <- seqlevelsStyle(si)
+  irp <- irp[chromosome(first(irp)) == chromosome(last(irp))]
+  hits <- findOverlaps(gr, irp, maxgap=minimumGapWidth(param))
+  irp <- irp[unique(subjectHits(hits))]
+  if(length(irp) > 0){
+    names(irp) <- paste0("i", seq_along(irp))
+  }
+  irp  
+}
+
 addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
   irp <- readRDS(improperPaths(aview))
   irp <- updateObject(irp)
