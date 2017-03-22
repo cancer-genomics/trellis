@@ -195,11 +195,11 @@ germlineFilters <- function(preprocess, germline_filters, param=DeletionParam())
   ##
   ## For unit testing, we may not be able to evaluate the context
   ##
-  evaluate_context <- evaluateContext(cnv, pview)
+  evaluate_context <- evaluateContext(cnv, bins)
   is_big <- isLargeHemizygous(cnv, param)
   if(evaluate_context){
     egr <- expandGRanges(cnv, 15*width(cnv))
-    fc_context <- granges_copynumber(egr, pview)
+    fc_context <- granges_copynumber2(egr, bins)
     fc <- 2^(cnv$seg.mean-fc_context)
     select <- !is_big & not_germline & fc < 0.7
   }  else{
@@ -217,10 +217,10 @@ germlineFilters <- function(preprocess, germline_filters, param=DeletionParam())
   cnv
 }
 
-evaluateContext <- function(g, pview){
+evaluateContext <- function(g, bins){
   width.cnv <- sum(as.numeric(width(g)))
-  width.bins <- sum(as.numeric(width(bamRanges(pview))))
-  width.bins/width.cnv > 15  
+  width.bins <- sum(as.numeric(width(bins)))
+  width.bins/width.cnv > 15
 }
 
 initializeImproperIndex <- function(sv, param){
