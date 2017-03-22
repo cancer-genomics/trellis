@@ -178,7 +178,7 @@ SVFilters <- function(sv, all_filters, bins, zoom.out=1, param){
 #' @param germline_filters A \code{GRanges} object (e.g., germline
 #'   CNVs and regions of low sequence quality)
 #' @param param A \code{DeletionParam} object
-#' @seealso \code{\link{preprocessData}}}
+#' @seealso \code{\link{preprocessData}}
 #' @export
 germlineFilters <- function(preprocess, germline_filters, param=DeletionParam()){
   cnv <- preprocess$segments
@@ -1566,6 +1566,15 @@ meltReadPairs <- function(rps){
   df
 }
 
+#' Collect preprocessed bin-level data, segmentation, and improperly paired
+#' reads in a list
+#'
+#' @param bam.file length-one character vector providing path to BAM file
+#' @param genome length-one character vector providing genome build (hg18 or hg19)
+#' @param bins a \code{GRanges} object with \code{log_ratio} in the \code{mcols}
+#' @param segments a \code{GRanges} object with \code{seg.mean} in the \code{mcols}
+#' @param improper_rp a \code{GAlignmentPairs} object with improperly paired reads
+#' @export
 preprocessData <- function(bam.file=NULL,
                            genome,
                            bins,
