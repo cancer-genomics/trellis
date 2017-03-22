@@ -4,9 +4,13 @@ context("Revising sequence junctions")
 
 ## overlapping hemizygous deletions on chromosome 3
 
-test_that("overlappingHemizgyous", {
-  library(Rsamtools)
-  library(svbams)
+cgov10t_preprocess <- function(){
+  chroms <- c("chr3", "chr3", "chr3", "chr4", "chr9", "chrX")
+  starts <- c(59600000, 60246000, 175025000, 12660000, 9800000, 6686000)
+  ends <- c(61000000, 60700000, 175167000, 12770000, 10500000, 7000000)
+  bed <- GRanges(chroms, IRanges(starts, ends))
+  bed <- keepSeqlevels(bed, "chr3", pruning.mode="coarse")
+
   bamdir <- system.file("extdata", package="svbams")
   bamfile <- file.path(bamdir, "cgov10t.bam")
   svfile <- file.path(bamdir, "cgov10t_deletions.rds")
@@ -23,26 +27,24 @@ test_that("overlappingHemizgyous", {
   ## make sure all improper read pairs are available
   irpfile <- file.path(bamdir, "cgov10t_irp.rds")
   irp <- readRDS(irpfile)
-  mapped <- irp[!is.na(as.character(seqnames(irp)))]
-  expect_true(all(overlapsAny(expected.irp, mapped, type="within")))
+  lr <- readRDS(lrfile)
+  bins$log_ratio <- lr/1000
+  segments <- readRDS(cbsfile)
+  segments <- keepSeqlevels(segments, "chr3", pruning.mode="coarse")
+  segments <- segments[segments$seg.mean < -0.7]
+  segments <- subsetByOverlaps(segments, bed)
+  pdat <- preprocessData(bam.file=bamfile,
+                         genome=genome(bins)[[1]],
+                         bins=bins,
+                         segments=segments,
+                         improper_rp=irp)
+}
 
-  gr <- readRDS(cbsfile)
-  gr <- gr[gr$seg.mean < log2(0.75)]
-
-  bview <- BamViews(bamPaths=bamfile, bamRanges=bins)
-  irp <- readRDS(irpfile)
-  aview <- AlignmentViews2(bview, irpfile)
-
-
-  pview <- PreprocessViews2(bview)
-  paths(pview) <- lrfile
-  setScale(pview) <- 1000
-
-  set.seed(123)
-  sv1 <- sv_deletions(gr=gr,
-                      aview=aview,
-                      bview=bview,
-                      pview=pview)
+test_that("overlappingHemizgyous", {
+  library(Rsamtools)
+  library(svbams)
+  pdat <- cgov10t_preprocess()
+  sv1 <- sv_deletions(pdat)
   if(FALSE){
     df <- data.frame(start=start(bins),
                      lr=bins$log_ratios/1000)
@@ -62,12 +64,13 @@ test_that("overlappingHemizgyous", {
       geom_segment(data=df2, aes(x=start, xend=end, y=y, yend=y),
                    inherit.aes=FALSE)
   }
-  sv <- deletion_call(aview, pview, gr)
+  sv <- deletion_call(pdat)
   param <- DeletionParam()
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
+  calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   sv <- removeHemizygous(sv)
-  sv <- reviseEachJunction(sv, pview, aview, param)
-  sv.revise <- revise(sv, aview, pview, param)
+  sv <- reviseEachJunction(sv, pdat$bins, pdat$improper_rp, param)
+  ##pdat$improper_rp, param)
+  sv.revise <- revise(sv, pdat$bins, param)
   if(FALSE){
     df3 <- data.frame(start=start(variant(sv)),
                       end=end(variant(sv)),
@@ -79,13 +82,13 @@ test_that("overlappingHemizgyous", {
       geom_segment(data=df3, aes(x=start, xend=end, y=y, yend=y),
                    inherit.aes=FALSE)
   }
-  copynumber(sv) <- granges_copynumber(variant(sv), pview)
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pview=pview)
+  copynumber(sv) <- granges_copynumber2(variant(sv), pdat$bins)
+  calls(sv) <- rpSupportedDeletions(sv, param=param, pdat$bins)
   indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
-  calls(sv) <- rpSupportedDeletions(sv, param, pview=pview)
-  sv2 <- leftHemizygousHomolog(sv, pview, param)
-  sv3 <- rightHemizygousHomolog(sv2, pview, param)
-  calls(sv3) <- rpSupportedDeletions(sv3, param, pview)
+  calls(sv) <- rpSupportedDeletions(sv, param, pdat$bins)
+  sv2 <- leftHemizygousHomolog(sv, pdat$bins, param)
+  sv3 <- rightHemizygousHomolog(sv2, pdat$bins, param)
+  calls(sv3) <- rpSupportedDeletions(sv3, param, pdat$bins)
   message("Refining homozygous boundaries by spanning hemizygous+")
   sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
   sv6 <- callOverlappingHemizygous(sv5)
@@ -102,7 +105,8 @@ test_that("overlappingHemizgyous", {
   expect_identical(calls(sv2), calls(expected))
   gr_filters <- genomeFilters("hg19")
   sv.finalize <- finalize_deletions(sv, gr_filters,
-                                    pview, bview,
+                                    pdat$bins,
+                                    pdat$bam.file,
                                     param)
   expect_identical(variant(sv.finalize),
                    variant(sv1))
