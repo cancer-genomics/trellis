@@ -381,6 +381,11 @@ readPairsNearVariant <- function(object, bam.file){
 #' @export
 get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
   g <- queryRanges(object)
+  get_readpairs2(g, bam.file, flags)
+}
+
+#' @export
+get_readpairs2 <- function(g, bam.file, flags=scanBamFlag()){
   galp <- .scan_all_readpairs(g, bam.file, flags)
   validR1 <- overlapsAny(first(galp), g)
   validR2 <- overlapsAny(last(galp), g)
