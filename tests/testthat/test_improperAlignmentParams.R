@@ -3,6 +3,7 @@ context("improper alignment parameters")
 test_that("improper alignment parameters", {
   library(Rsamtools)
   params <- improperAlignmentParams()
+  expect_true(is.na(bamMapqFilter(params)))
   expect_true(bamFlag(params)[["isPaired"]])
   expect_true(!bamFlag(params)[["isProperPair"]])
   expect_true(!bamFlag(params)[["isUnmappedQuery"]])
