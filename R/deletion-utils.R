@@ -174,16 +174,17 @@ SVFilters <- function(sv, all_filters, bins, zoom.out=1, param){
 #'   \code{paste0("sv", seq_along(g))} where g is the \code{GRanges}
 #'   object.
 #'
-#'
-#' @param cnv  A \code{GRanges} object (e.g., candidate somatic deletions)
+#' @param preprocess a list of preprocessed data. See \code{preprocessData}
 #' @param germline_filters A \code{GRanges} object (e.g., germline
 #'   CNVs and regions of low sequence quality)
-#' @param pview A \code{PreprocessViews} object
 #' @param param A \code{DeletionParam} object
+#' @seealso \code{\link{preprocessData}}}
 #' @export
-germlineFilters <- function(cnv, germline_filters, pview, param=DeletionParam()){
+germlineFilters <- function(preprocess, germline_filters, param=DeletionParam()){
+  cnv <- preprocess$segments
+  bins <- preprocess$bins
   if(missing(germline_filters)){
-    germline_filters <- genomeFilters(genome(cnv)[[1]])
+    germline_filters <- genomeFilters(preprocess$genome)
   }
   if(!is.null(germline_filters)){
     not_germline <- isNotGermline(cnv, germline_filters, param)
