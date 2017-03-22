@@ -178,12 +178,12 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(bam.file,
-                                      param=improperAlignmentParams(mapqFilter=0)){
+                                      param=improperAlignmentParams()){
   flags <- improperAlignmentFlags()
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
   mapq_thr <- bamMapqFilter(param)
-  if(mapq_thr > -Inf){
+  if(!is.na(mapq_thr)){
     irp <- irp[ mcols(irp)$mapq >= mapq_thr ]
   }
   irp2 <- makeGAlignmentPairs2(irp, use.mcols=TRUE, use.names=TRUE)
@@ -213,7 +213,7 @@ getProperAlignmentPairs <- function(bam.file,
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
   mapq_thr <- bamMapqFilter(param)
-  if(mapq_thr > -Inf){
+  if(!is.na(mapq_thr)){
     irp <- irp[ mcols(irp)$mapq >= mapq_thr ]
   }
   irp2 <- makeGAlignmentPairs2(irp, use.mcols=TRUE, use.names=TRUE)
