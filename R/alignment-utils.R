@@ -426,6 +426,26 @@ get_improper_readpairs <- function(object, bam.file){
   galp
 }
 
+get_improper_readpairs2 <- function(g, bam.file){
+  if(totalWidth(g)==0) {
+    galp <- GAlignmentPairs(first=GAlignments(),
+                            last=GAlignments(),
+                            isProperPair=logical())
+    return(galp)
+  }
+  ## expand the query regions by 2kb on each side
+  g2 <- reduce(expandGRanges(g, 2e3L))
+  p <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE, isProperPair=FALSE),
+                    what=c("flag", "mrnm", "mpos"), which=g)
+  ##x <- readGAlignmentsFromBam(bam.file, param=p, use.names=TRUE)
+  x <- readGAlignments(bam.file, param=p, use.names=TRUE)
+  galp <- makeGAlignmentPairs2(x, use.mcols="flag")
+  validR1 <- overlapsAny(first(galp), g)
+  validR2 <- overlapsAny(last(galp), g)
+  galp <- galp[validR1 & validR2]
+  galp
+}
+
 #' Convert GAlignments to GRanges with is.improper and pair.index fields
 #'
 #' @param ga a \code{GAlignments} object
