@@ -1389,6 +1389,8 @@ sv_deletions <- function(preprocess,
   if(missing(gr_filters)){
     gr_filters <- genomeFilters(preprocess$genome)
   }
+  segs <- preprocess$segments
+  preprocess$segments <- segs[segs$seg.mean < hemizygousThr(param)]
   sv <- deletion_call(preprocess, gr_filters, param)
   ##sv <- deletion_call(bam.file, improper_rp, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
