@@ -494,12 +494,12 @@ deletion_call <- function(preprocess,
 
 }
 
-checkHemizygousSpanningHomozygous <- function(object, hits, param, pview){
+checkHemizygousSpanningHomozygous <- function(object, hits, param, bins){
   spanning_variant <- variant(object)[subjectHits(hits)]
   cncall <- setNames(calls(object), names(variant(object)))
   ## check the part of the interval not containing the homozygous deletion
   portion_notspanning <- setdiff(spanning_variant, variant(object)[queryHits(hits)])
-  means <- granges_copynumber(portion_notspanning, pview)
+  means <- granges_copynumber2(portion_notspanning, bins)
   means <- sum(means*width(portion_notspanning))/sum(width(portion_notspanning))
   if(means > log2(homozygousThr(param))){
     lirp <- elementNROWS(indexImproper(object))
@@ -510,8 +510,9 @@ checkHemizygousSpanningHomozygous <- function(object, hits, param, pview){
   cncall[names(spanning_variant)]
 }
 
-isHemizygousDeletion <- function(object, param, pview){
-  is_hemizygous <- copynumber(object) >= log2(homozygousThr(param)) | is.na(copynumber(object))
+isHemizygousDeletion <- function(object, param, bins){
+  is_hemizygous <- copynumber(object) >= log2(homozygousThr(param)) |
+    is.na(copynumber(object))
   names(is_hemizygous) <- names(variant(object))
   ## If a hemizygous region contains a homozygous region, the fold
   ## change will be very small but it cwould still be hemizygous...
@@ -525,7 +526,7 @@ isHemizygousDeletion <- function(object, param, pview){
   if(length(hits) > 0){
     for(j in seq_len(length(hits))){
       hitsj <- hits[j]
-      cncall <- checkHemizygousSpanningHomozygous(checkhom, hitsj, param, pview)
+      cncall <- checkHemizygousSpanningHomozygous(checkhom, hitsj, param, bins)
       is_hemizygous[names(cncall)] <- length(grep("hemizygous", cncall)) > 0
     }
   }
@@ -541,14 +542,15 @@ isHemizygousDeletion <- function(object, param, pview){
 #'
 #' @return a character-vector of deletion calls
 #' @export
-#' @param object a \code{StructuralVariant} object
+#' @param sv a \code{StructuralVariant} object
 #' @param param a \code{DeletionParam} object
-#' @param pview a \code{PreprocessViews2} object
-rpSupportedDeletions <- function(object, param, pview){
+#' @param bins a \code{GRanges} object containing the bins used in preprocessing
+#'   with mcols value 'log_ratio'
+rpSupportedDeletions <- function(sv, param, bins){
   ## NA means that there were no queryRanges in the view -- i.e., all bins were masked
-  is_hemizygous <- isHemizygousDeletion(object, param, pview)
+  is_hemizygous <- isHemizygousDeletion(sv, param, bins)
   cncalls <- ifelse(is_hemizygous, "hemizygous", "homozygous")
-  number_improper <- elementNROWS(sapply(object, improper))
+  number_improper <- elementNROWS(sapply(sv, improper))
   MIN <- param@nflanking_hemizygous
   cncalls[number_improper >= MIN] <- paste0(cncalls[number_improper >= MIN], "+")
   as.character(cncalls)
@@ -757,25 +759,25 @@ improperReadPairs <- function(aview, gr, param=DeletionParam()){
   irp
 }
 
-.reviseEachJunction <- function(object, param=DeletionParam(), pview, aview){
-  svs <- reviseDeletionBorders(object)
+.reviseEachJunction <- function(sv, bins, improper_rp, param=DeletionParam()){
+  svs <- reviseDeletionBorders(sv)
   ##
   ## for the duplicated ranges, revert back to the original
   ##
-  svs[duplicated(svs)] <- variant(object)[duplicated(svs)]
-  variant(object) <- svs
-  copynumber(object) <- granges_copynumber(svs, pview)
-  variant(object) <- homozygousBorders(object, svs)
-  is.dup <- duplicated(variant(object))
+  svs[duplicated(svs)] <- variant(sv)[duplicated(svs)]
+  variant(sv) <- svs
+  copynumber(sv) <- granges_copynumber2(svs, bins)
+  variant(sv) <- homozygousBorders(sv, svs)
+  is.dup <- duplicated(variant(sv))
   if(any(is.dup)){
-    object <- object[!is.dup]
+    sv <- sv[!is.dup]
   }
-  object <- hemizygousBorders(object, param)
-  irp <- improperReadPairs(aview, variant(object), param=param)
-  improper(object) <- irp
-  indexImproper(object) <- updateImproperIndex2(variant(object), irp, maxgap=500)
-  calls(object) <- rpSupportedDeletions(object, param, pview)
-  sort(object)
+  sv <- hemizygousBorders(sv, param)
+  irp <- improperRP(variant(sv), improper_rp, param=param)
+  improper(sv) <- irp
+  indexImproper(sv) <- updateImproperIndex2(variant(sv), irp, maxgap=500)
+  calls(sv) <- rpSupportedDeletions(sv, param, bins)
+  sort(sv)
 }
 
 removeDuplicateIntervals <- function(g, object){
@@ -1065,16 +1067,16 @@ removeSameStateOverlapping <- function(sv){
   sv2
 }
 
-reviseEachJunction <- function(object, pview, aview, param=DeletionParam()){
+reviseEachJunction <- function(sv, bins, improper_rp, param=DeletionParam()){
   message("Revising junctions...")
-  object <- .reviseEachJunction(object, param, pview, aview)
-  indexProper(object) <- initializeProperIndex3(object, zoom.out=1)
-  copynumber(object) <- granges_copynumber(variant(object), pview)
-  calls(object) <- rpSupportedDeletions(object, param, pview)
-  object
+  sv <- .reviseEachJunction(sv, bins, improper_rp, param)
+  indexProper(sv) <- initializeProperIndex3(sv, zoom.out=1)
+  copynumber(sv) <- granges_copynumber2(variant(sv), bins)
+  calls(sv) <- rpSupportedDeletions(sv, param, bins)
+  sv
 }
 
-findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, param){
+findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, bins, param){
   K <- queryHits(hits)[1]
   ##homdel <- variant(object)[K]
   if(length(hits) < 5) return(object) ##nothing to do
@@ -1127,7 +1129,7 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, par
     hemdel <- homdel
     ## Remove the gaps and recompute the foldchange
     portion_notspanning <- setdiff(hemdel, g)
-    means <- granges_copynumber(portion_notspanning, pview)
+    means <- granges_copynumber2(portion_notspanning, bins)
     means <- sum(means*width(portion_notspanning))/sum(width(portion_notspanning))
     ##
     ## Update the call and the fold change
@@ -1139,18 +1141,18 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, pview, par
   seqlevels(hemdel,pruning.mode="coarse") <- seqlevels(homdel)
   seqinfo(hemdel) <- seqinfo(homdel)
   portion_notspanning <- setdiff(hemdel, homdel)
-  means <- granges_copynumber(portion_notspanning, pview)
+  means <- granges_copynumber2(portion_notspanning, bins)
   means <- sum(means*width(portion_notspanning))/sum(width(portion_notspanning))
   object2 <- addVariant2(v=hemdel,
-                        object=object,
-                        cn=means,
-                        cncall="hemizygous+",
-                        param=param)
+                         object=object,
+                         cn=means,
+                         cncall="hemizygous+",
+                         param=param)
   indexImproper(object2) <- updateImproperIndex(object2)
   sort(object2)
 }
 
-leftHemizygousHomolog <- function(object, pview, param){
+leftHemizygousHomolog <- function(object, bins, param){
   ## #########################################################################
   ##
   ## Identifying overlapping hemizygous deletions
@@ -1195,7 +1197,7 @@ leftHemizygousHomolog <- function(object, pview, param){
                                                 homdel=homdel,
                                                 irp=irp,
                                                 object=object2,
-                                                pview=pview,
+                                                bins=bins,
                                                 param=param)
     }
   }
@@ -1218,7 +1220,7 @@ leftAlwaysFirst <- function(rp){
   as(rp2, "LeftAlignmentPairs")
 }
 
-rightHemizygousHomolog <- function(object, pview, param){
+rightHemizygousHomolog <- function(object, bins, param){
   ## 2.  Find RRP 2 by getting all improper read pairs near the left
   ## end of the homozygous deletion
   homindex <- which(calls(object)=="homozygous")
@@ -1246,7 +1248,7 @@ rightHemizygousHomolog <- function(object, pview, param){
                                                 homdel=homdel,
                                                 irp=irp,
                                                 object=object2,
-                                                pview=pview,
+                                                bins=bins,
                                                 param=param)
     }
   }
