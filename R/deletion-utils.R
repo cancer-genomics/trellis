@@ -112,7 +112,7 @@ isNotGermline <- function(g, all_filters, param=DeletionParam()){
 }
 
 isLargeHemizygous <- function(g, param=DeletionParam()){
-  (g$seg.mean > log2(homozygousThr(param))) &
+  (g$seg.mean > homozygousThr(param)) &
     (width(g) > maximumWidth(param))
 }
 
@@ -137,7 +137,7 @@ SVFilters <- function(sv, all_filters, bins, zoom.out=1, param){
     ##fc <- 2^(fc_context-copynumber(sv))
     fc <- 2^(copynumber(sv) - fc_context)
   }
-  broad_hemizygous <- copynumber(sv) > log2(homozygousThr(param)) &
+  broad_hemizygous <- copynumber(sv) > homozygousThr(param) &
     width(variant(sv)) > maximumWidth(param)
   frac <- intOverWidth(variant(sv), all_filters)
   w <- widthNotSpannedByFilter(variant(sv), all_filters)
@@ -471,7 +471,7 @@ deletion_call <- function(preprocess,
   if(length(cnv) == 0) {
     return(StructuralVariant())
   }
-  thr <- log2(homozygousThr(param))
+  thr <- homozygousThr(param)
   cncalls <- ifelse(cnv$seg.mean < thr, "homozygous", "hemizygous")
   prp <- properReadPairs(bam_path=preprocess$bam.file,
                          gr=cnv, param=param)
@@ -501,7 +501,7 @@ checkHemizygousSpanningHomozygous <- function(object, hits, param, bins){
   portion_notspanning <- setdiff(spanning_variant, variant(object)[queryHits(hits)])
   means <- granges_copynumber2(portion_notspanning, bins)
   means <- sum(means*width(portion_notspanning))/sum(width(portion_notspanning))
-  if(means > log2(homozygousThr(param))){
+  if(means > homozygousThr(param)){
     lirp <- elementNROWS(indexImproper(object))
     L <- lirp[subjectHits(hits)]
     tmp <- ifelse(L <= 4, "hemizygous", "hemizygous+")
@@ -511,7 +511,7 @@ checkHemizygousSpanningHomozygous <- function(object, hits, param, bins){
 }
 
 isHemizygousDeletion <- function(object, param, bins){
-  is_hemizygous <- copynumber(object) >= log2(homozygousThr(param)) |
+  is_hemizygous <- copynumber(object) >= homozygousThr(param) |
     is.na(copynumber(object))
   names(is_hemizygous) <- names(variant(object))
   ## If a hemizygous region contains a homozygous region, the fold

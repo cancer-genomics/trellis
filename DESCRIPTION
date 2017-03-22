@@ -7,7 +7,7 @@ Description: Segments bin-level estimates of copy number.  Use both read
     amplicons, we use read pairs to identify grouped amplicons.
 Depends:
     R (>= 3.2.0),
-    svclasses (>= 0.0.14)
+    svclasses (>= 0.0.16)
 Imports:
     methods,
     BiocGenerics,
