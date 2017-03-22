@@ -9,8 +9,8 @@ test_that("CNAObject", {
   ## normalize bin counts
   bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode="coarse")
   bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
-  bview <- BamViews(bamRanges=bins,
-                    bamPaths=file.path(path, "cgov10t.bam"))
+  bam.file <- file.path(path, "cgov10t.bam")
+  bview <- BamViews(bamRanges=bins, bamPaths=bam.file)
 
   bins$cnt <- binCounts(bview)
   bins$std_cnt <- binNormalize(bins)
@@ -21,29 +21,10 @@ test_that("CNAObject", {
   ##  small region )
   ##
   gc.adj <- gc.adj - 0.6
-  gc.adji <- as.integer(round(1000*gc.adj, 0))
-
-  preprocessdir <- tempdir()
-  fname <- file.path(preprocessdir, rdsId(bview))
-  saveRDS(gc.adji, file=fname)
-  pview <- PreprocessViews2(bview)
-  paths(pview) <- fname
-  setScale(pview) <- 1000
-  ## a preprocess views object
-  dat <- CNAObject(pview)
-  expect_is(dat, "CNA")
-
-  select <- 1:10
-  dat2 <- CNAObject(pview[select, ])
-  expect_identical(dat[select, ], dat2)
-
-  bins$gc.adj <- gc.adj
-  bins$id <- colnames(pview)[1]
-  dat3 <- CNAObject(bins, "gc.adj")
-  expect_equal(dat$cgov10t.bam, dat3$cgov10t.bam, tolerance=0.001)
-
+  ##gc.adji <- as.integer(round(1000*gc.adj, 0))
+  bins$log_ratio <- gc.adj
   seg.params <- SegmentParam()
-  bins$adjusted <- bins$gc.adj
+  bins$adjusted <- bins$log_ratio
   g <- segmentBins(bins, seg.params)
   starts <- c(59599001,
               59812001,
@@ -70,40 +51,13 @@ test_that("CNAObject", {
   g.cnv <- g[g$seg.mean < -0.5]
   del.params <- DeletionParam()
   ## find all improper reads
-  ## TODO:  refactor sv_deletions
-  ## - do not require AlignmentViews
-  ## create an AlignmentViews object
   library(svalignments)
   iparams <- improperAlignmentParams(mapqFilter=30)
-  file <- paste0(tempdir(), "cgov10t.rds")
-  irp <- getImproperAlignmentPairs(bamPaths(bview), param=iparams)
-  saveRDS(irp, file=file)
-  aview <- AlignmentViews2(bview, file)
-
-  ## create a PreprocessViews object
-  pview <- PreprocessViews2(bview)
-  gc.adji <- as.integer(round(1000*gc.adj, 0))
-  file <- file.path(tempdir(), "tmp.rds")
-  saveRDS(gc.adji, file=file)
-  pview@bamPaths <- file
-  ##
-  ## critical to set scale. otherwise, the granges_copynumber is ridiculous
-  ##
-  ## TODO: All of these segments but the homozygous deletion get filtered
-  ## because of the fold-change context. Would be better to only compare to the
-  ## segment means of the adjacent segment. The drawback is multiple segments
-  ## that have about the same mean within a deletion.
-  ##
-  setScale(pview) <- 1000L
-  egr <- expandGRanges(g.cnv, 15*width(g.cnv))
-  fc_context <- granges_copynumber(g.cnv, pview)
-  expect_equivalent(as.numeric(fc_context),
-                    c(-1.0480, -1.1000, -8.9300, -1.0145, -1.0520))
-  fc_context2 <- granges_copynumber(egr, pview)
-  expect_equivalent(as.numeric(fc_context2),
-                    c(-0.8965, -0.8965, -0.8965, -0.8965, -0.8965 ))
-  filters <- reduceGenomeFilters(germline_filters)
-  g2 <- germlineFilters(cnv=g.cnv,
-                        germline_filters=filters,
-                        pview=pview)
+  irp <- getImproperAlignmentPairs(cnvbam.file, iparams)
+  pdat <- preprocessData(bam.file=bam.file,
+                         genome="hg19",
+                         bins=bins,
+                         segments=g,
+                         improper_rp=irp)
+  sv <- sv_deletions(pdat)
 })
