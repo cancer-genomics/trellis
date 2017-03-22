@@ -437,9 +437,6 @@ addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
   if(length(irp) > 0){
     names(irp) <- paste0("i", seq_along(irp))
   }
-  ##sv@improper <- irp
-  ##sv@length_improper <- length(irp)
-  ##sv
   irp
 }
 
@@ -464,23 +461,24 @@ addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
 #'   sequence-based filters identified by low mappability and/or GC
 #'   content
 #' @param param A \code{DeletionParam} object
-deletion_call <- function(aview, pview, cnv, 
+deletion_call <- function(preprocess, 
                           gr_filters,
                           param=DeletionParam()){
   if(missing(gr_filters)){
-    gr_filters <- genomeFilters(genome(cnv)[[1]])
+    gr_filters <- genomeFilters(preprocess$genome)
   }
-  cnv <- germlineFilters(cnv, gr_filters, pview, param)
+  cnv <- germlineFilters(preprocess, gr_filters, param)
   if(length(cnv) == 0) {
     return(StructuralVariant())
   }
   thr <- log2(homozygousThr(param))
   cncalls <- ifelse(cnv$seg.mean < thr, "homozygous", "hemizygous")
-  prp <- properReadPairs(bam_path=bamPaths(aview),
+  prp <- properReadPairs(bam_path=preprocess$bam.file,
                          gr=cnv, param=param)
   prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
   ## change name to filterImproperReadPairs
-  irp <- addImproperReadPairs2(cnv, aview, param=param)
+  ##irp <- addImproperReadPairs2(cnv, aview, param=param)
+  irp <- improperRP(cnv, preprocess$improper_rp, param=param)
   irp_index1 <- initializeImproperIndex2(cnv, irp, param)
   irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
   irp_index3 <- .match_index_variant(irp_index1, cnv, irp_index2)
