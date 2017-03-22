@@ -116,12 +116,24 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
     (width(g) > maximumWidth(param))
 }
 
-SVFilters <- function(sv, all_filters, view, zoom.out=1, param){
-  evaluate_context <- evaluateContext(variant(sv), view)
+granges_copynumber2 <- function(gr, bins){
+  hits <- findOverlaps(gr, bins)
+  if (!any(duplicated(names(gr))) && !is.null(names(gr))) {
+    split_by <- factor(names(gr)[queryHits(hits)], levels = names(gr))
+  }
+  else {
+    split_by <- queryHits(hits)
+  }
+  fc_context <- tapply(bins$log_ratio[subjectHits(hits)], queryHits(hits), median)
+  as.numeric(fc_context)
+}
+
+SVFilters <- function(sv, all_filters, bins, zoom.out=1, param){
+  evaluate_context <- evaluateContext(variant(sv), bins)
   if(evaluate_context){
     svcontext <- expandGRanges(variant(sv),
                                10*zoom.out*width(variant(sv))) ## 5percent window
-    fc_context <- granges_copynumber(svcontext, view)
+    fc_context <- granges_copynumber2(svcontext, bins)
     ##fc <- 2^(fc_context-copynumber(sv))
     fc <- 2^(copynumber(sv) - fc_context)
   }
