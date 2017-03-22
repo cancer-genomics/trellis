@@ -26,7 +26,7 @@ Views object below from scratch*.
 
 ```{r packages}
 library(GenomicRanges)
-library(svclasses)
+library(Rsamtools)
 library(svpreprocess)
 library(svcnvs)
 library(svfilters.hg19)
@@ -42,15 +42,26 @@ Update the file path in the views object to file containing the preprocessed cov
 ```{r views_filepath}
 ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
 cov.file <- file.path(ddir, "preprocessed_coverage.rds")
-paths(pview) <- cov.file
+log_ratio <- readRDS(cov.file)/1000
+data(bins1kb, package="svfilters.hg19")
+seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+bins1kb$log_ratio <- log_ratio
 ```
 
 # Segmentation
 
 TODO
 
+So that the examples run very quickly in this vignette, we limit our deletion
+analysis to chromosome 15. 
+
 ```{r segments}
 data(segments, package="svcnvs")
+segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
+region.of.interest <- GRanges("chr15", IRanges(63201003-10e3, 63209243+10e3))
+seqinfo(region.of.interest) <- seqinfo(segs)
+segs <- segs[overlapsAny(segs, region.of.interest)]
+segs
 ```
 
 # Deletions
@@ -62,25 +73,11 @@ object for the improperly paired reads (`AlignmentViews`). We instantiate these
 views in the following code chunk:
 
 ```{r views}
-library(Rsamtools)
 extdata <- system.file("extdata", package="svbams")
 id <- "CGOV44T.bam"
-id.rds <- paste0(id, ".rds")
 bamfile <- file.path(extdata, id)
-bview <- Rsamtools::BamViews(bamPaths=bamfile)
-seqinfo(bamRanges(bview)) <- seqinfo(segments)["chr15", ]
 ```
 
-So that the examples run very quickly in this vignette, we limit our deletion
-analysis to chromosome 15. 
-
-```{r seqinfo}
-segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
-region.of.interest <- GRanges("chr15", IRanges(63201003-10e3, 63209243+10e3))
-seqinfo(region.of.interest) <- seqinfo(segs)
-segs <- segs[overlapsAny(segs, region.of.interest)]
-segs
-```
 
 Next, we extract improperly paired reads from this region by passing `segs` to
 the `which` argument of the `improperAlignmentParams` function.
@@ -90,29 +87,20 @@ segs2 <- expandGRanges(segs, 10e3)
 iparams <- improperAlignmentParams(which=reduce(segs2), mapqFilter=30)
 ## TODO mapq_thr should be part of iparams.  Don't need use.mcols
 irp <- getImproperAlignmentPairs(bamfile, iparams)
-length(irp)
-irp.file <- tempfile()
-saveRDS(irp, file=irp.file)
-aview <- AlignmentViews2(bview, path=irp.file)
+pdata <- preprocessData(bam.file=bamfile,
+                        genome="hg19",
+                        bins=bins1kb,
+                        segments=segments,
+                        improper_rp=irp)
+##length(irp)
+##irp.file <- tempfile()
+##saveRDS(irp, file=irp.file)
+##aview <- AlignmentViews2(bview, path=irp.file)
 ```
-
-Filters for germline CNVs and sequence artifacts are available from the
-`svfilters` package. Here, we load the hg19 filters.
-
-```{r germline_filters}
-data(germline_filters, package="svfilters.hg19")
-filters <- reduceGenomeFilters(germline_filters)
-```
-
 
 ```{r sv_deletions}
 dparam <- DeletionParam()
-deletion <- sv_deletions(gr=segs,
-                         bview=bview,
-                         aview=aview,
-                         pview=pview,
-                         gr_filters=filters,
-                         param=dparam)
+deletion <- sv_deletions(preprocess=pdata, param=dparam)
 ```
 
 # Amplicons
@@ -121,6 +109,7 @@ To illustrate how amplicons are identified and linked by improperly paired
 reads, we load segmentation results from chromosomes 5 and 8.
 
 ```{r amplified_segments}
+bview <- BamViews(bamPaths=bamfile, bamRanges=bins1kb)
 cv.extdata <- system.file("extdata", package="svcnvs")
 segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
 aparams <- ampliconParams()
@@ -148,12 +137,11 @@ surrounding region, we create a second *GRanges* object that includes 200kb of
 the flanking genome on each side of the deletion.
 
 ```{r region_of_interest}
-suppressPackageStartupMessages(library(SummarizedExperiment))
 ##
 ## region of interest (roi)
 ##
 roi <- variant(deletion)
-roi <- keepSeqlevels(roi, as.character(seqnames(roi)))
+seqlevels(roi, pruning.mode="coarse") <- "chr15"
 expand <- 200e3
 roi2 <- GRanges(seqnames(roi), IRanges(start(roi)-expand,
                                        end(roi) + expand))
@@ -166,6 +154,7 @@ the segments for this particular chromosome and sample and a data.frame
 containing the preprocessed coverage.
 
 ```{r dataframes}
+pview <- PreprocessViews2(bview)
 pview2 <- pview[queryHits(findOverlaps(rowRanges(pview), roi2)), ]
 segs <- keepSeqlevels(segments, seqlevels(roi), pruning.mode="coarse")
 segs.df <- as(segs, "data.frame")
