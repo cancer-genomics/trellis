@@ -1,4 +1,7 @@
-## a convenience function for unit tests
+## a convenience function for unit tests. Not useful in practice because these
+## functions may take a long time to run on a large BAM file
+##
+## 
 listReadPairs <- function(bam.file, segments){
   dparam <- DeletionParam()
   aparam <- ampliconParams()
@@ -15,7 +18,7 @@ listReadPairs <- function(bam.file, segments){
 
 
   irp.params <- improperAlignmentParams(mapqFilter=30)
-  improper_rp <- getImproperAlignmentPairs(bamfile, irp.params)
+  improper_rp <- getImproperAlignmentPairs(bam.file, irp.params)
   read_pairs <- list(proper_del=proper.del,
                      proper_amp=proper.amp,
                      improper=improper_rp)
