@@ -52,8 +52,15 @@ test_that("CNAObject", {
   del.params <- DeletionParam()
   ## find all improper reads
   library(svalignments)
+  proper.del <- properReadPairs(bam.file,
+                                gr=reduce(g.cnv, min.gapwidth=2000),
+                                param=del.params)
+
   iparams <- improperAlignmentParams(mapqFilter=30)
-  irp <- getImproperAlignmentPairs(cnvbam.file, iparams)
+  irp <- getImproperAlignmentPairs(bam.file, iparams)
+  read_pairs <- list(improper=irp,
+                     proper_del=proper.del)
+
   pdat <- preprocessData(bam.file=bam.file,
                          genome="hg19",
                          bins=bins,
