@@ -1139,7 +1139,7 @@ initialize_graph2 <- function(preprocess, filters, params){
   segs <- preprocess$segments
   segs$is_amplicon <- segs$seg.mean > params$AMP_THR
   preprocess$segments <- segs
-  ag <- makeAGraph2(preprocess$segments, amplicon_filters, params)
+  ag <- makeAGraph2(preprocess$segments, filters, params)
   merged <- joinNearGRanges(ranges(ag), params)
   names(merged) <- ampliconNames(merged)
   ## the names of the nodes no longer correspond to the range names
@@ -1156,7 +1156,37 @@ add_amplicons <- function(ag, bam.file, params){
   ag
 }
 
-
+#' Construct an AmpliconGraph from a BamViews object
+#'
+#' This function constructs an \code{AmpliconGraph} from a
+#' \code{BamViews} object for a single sample.  By default, the seeds
+#' of the graph are focal amplicons with fold-change of nearly 3
+#' relative to the diploid genome (log2(2.75)).  The threshold of
+#' seeding amplicons can be adjusted by the \code{ampliconParams}
+#' function. After seeding the graph with high-copy focal amplicons,
+#' both neighboring (flanking) and distant low-copy focal amplicons
+#' are added to the graph object.  Next, improperly paired reads in
+#' which both the first and last read align to any queryRange of the
+#' graph object are parsed from the bam file ( this function will
+#' throw an error if not all files in \code{bamPaths} exist).  If 5 or
+#' more improperly paired reads bridge a node to another node, these
+#' amplicons are grouped.  Further, if a low-copy amplicon is bridged
+#' to an existing node, the low-copy amplicon will become a node in
+#' the graph. Amplicon groups are defined by the edges between nodes,
+#' where the edges represent improperly paired reads that support a
+#' junction between two amplicons.
+#'
+#'
+#' @seealso See \code{ampliconParams} for default parameters. The
+#'   wrapper \code{\link{sv_amplicon_exp}} constructs and saves an
+#'   \code{\linkS4class{AmpliconGraph}} for each sample in an
+#'   experiment.
+#'
+#' @export
+#' @param preprocess a list of the preprocessed data (TODO)
+#' @param amplicon_filters a \code{list} of filters
+#' @param params a list of parameters for the amplicon analysis
+#' @export
 sv_amplicons2 <- function(preprocess, amplicon_filters,
                           params=ampliconParams()){
   if(missing(amplicon_filters)){
