@@ -48,23 +48,4 @@ test_that("CNAObject", {
       geom_segment(data=df.segs, aes(x=start, xend=end,
                                      y=seg.mean, yend=seg.mean))
   }
-  g.cnv <- g[g$seg.mean < -0.5]
-  del.params <- DeletionParam()
-  ## find all improper reads
-  library(svalignments)
-  proper.del <- properReadPairs(bam.file,
-                                gr=reduce(g.cnv, min.gapwidth=2000),
-                                param=del.params)
-
-  iparams <- improperAlignmentParams(mapqFilter=30)
-  irp <- getImproperAlignmentPairs(bam.file, iparams)
-  read_pairs <- list(improper=irp,
-                     proper_del=proper.del)
-
-  pdat <- preprocessData(bam.file=bam.file,
-                         genome="hg19",
-                         bins=bins,
-                         segments=g,
-                         improper_rp=irp)
-  sv <- sv_deletions(pdat)
 })

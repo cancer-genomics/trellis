@@ -58,10 +58,15 @@ cgov44t_preprocess<- function(){
   lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
   seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
   bins1kb$log_ratio <- lr
+
+  del.gr <- segs[segs$seg.mean < hemizygousThr(DeletionParam())]
+  proper.del <- properReadPairs(bamfile,
+                                gr=reduce(del.gr, min.gapwidth=2000))
+  rps <- list(improper=irp, proper_del=proper.del)
   pdat <- preprocessData(bam.file=bamfile,
                          genome=genome(segs)[[1]],
                          segments=segs,
-                         improper_rp=irp,
+                         read_pairs=rps,
                          bins=bins1kb)
 }
 
@@ -91,13 +96,14 @@ test_that("deletion_call", {
 test_that("addImproperReadPairs2", {
   library(svalignments)
   pdat <- cgov44t_preprocess()
-  cnv <- germlineFilters(pdat)
+  rps <- pdat[["read_pairs"]]
   ##
   ## TODO: this cutoff will be much too conservative in samples where tumor
   ## purity is less than 90%. Add tumor_purity to param object and take into
   ## account tumor_purity for determining cutoff
   ##
-  irp <- improperRP(cnv, pdat$improper_rp)
+  cnv <- germlineFilters(pdat)
+  irp <- improperRP(cnv, rps$improper)
   ##
   ## The current version return a GAlignmentPairs object with 2 fewer RPs. These
   ## additional RPs are more than 10kb from the candidate deletions -- they are
@@ -124,9 +130,11 @@ test_that("reviseEachJunction", {
   sv <- readRDS("deletion_call.4adcc78.rds")  
   calls(sv) <- "homozygous+"
   ## note, we can not use the improper read pairs stored in the sv object
+  rps <- pdat$read_pairs
+  irp <- rps$improper
   sv <- reviseEachJunction(sv,
                            pdat$bins,
-                           pdat$improper_rp)
+                           irp)
   sv <- removeSameStateOverlapping2(sv)
   g <- variant(sv)
   if(FALSE){

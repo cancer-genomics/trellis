@@ -66,7 +66,8 @@ test_that("overlappingHemizgyous", {
   param <- DeletionParam()
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   sv <- removeHemizygous(sv)
-  sv <- reviseEachJunction(sv, pdat$bins, pdat$improper_rp, param)
+  improper_rp <- pdat$read_pairs[["improper"]]
+  sv <- reviseEachJunction(sv, pdat$bins, improper_rp, param)
   ##pdat$improper_rp, param)
   sv.revise <- revise(sv, pdat$bins, param)
   if(FALSE){

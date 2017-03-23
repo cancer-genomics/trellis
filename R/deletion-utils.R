@@ -476,12 +476,12 @@ deletion_call <- function(preprocess,
   ##prp <- properReadPairs(bam_path=preprocess$bam.file,
   ##                       gr=cnv, param=param)
   rps <- preprocess$read_pairs
-  prp <- prp[["proper_del"]]
+  prp <- rps[["proper_del"]]
   prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
   ## change name to filterImproperReadPairs
   ##irp <- addImproperReadPairs2(cnv, aview, param=param)
   improper_rp <- rps[["improper"]]
-  irp <- improperRP(cnv, preprocess$improper_rp, param=param)
+  irp <- improperRP(cnv, improper_rp, param=param)
   irp_index1 <- initializeImproperIndex2(cnv, irp, param)
   irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
   irp_index3 <- .match_index_variant(irp_index1, cnv, irp_index2)
