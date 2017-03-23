@@ -1587,10 +1587,23 @@ preprocessData <- function(bam.file=NULL,
                            genome,
                            bins,
                            segments,
-                           improper_rp){
+                           read_pairs){
   list(bam.file=bam.file,
        genome=genome,
        bins=bins,
        segments=segments,
-       improper_rp=improper_rp)
+       read_pairs=read_pairs)
+}
+
+
+preprocessData2 <- function(bam.file=NULL,
+                           genome,
+                           bins,
+                           segments,
+                           read_pairs){
+  list(bam.file=bam.file,
+       genome=genome,
+       bins=bins,
+       segments=segments,
+       read_pairs=read_pairs)
 }
