@@ -1398,9 +1398,11 @@ sv_deletions <- function(preprocess,
   ##sv <- deletion_call(bam.file, improper_rp, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   sv <- removeHemizygous(sv)
-  sv <- reviseEachJunction(sv, preprocess$bins, preprocess$improper_rp, param)
+  improper_rp <- preprocess$read_pairs[["improper"]]
+  sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
   sv <- removeHemizygous(sv)
   sv <- revise(sv, bins=preprocess$bins, param=param)
+  ## requires bam file
   sv <- finalize_deletions(sv=sv, preprocess,
                            gr_filters=gr_filters,
                            param=param)
@@ -1429,6 +1431,7 @@ finalize_deletions <- function(sv, preprocess, gr_filters,
   bam.file <- preprocess$bam.file
   sv <- SVFilters(sv, gr_filters, bins, param=param)
   sv <- groupSVs(sv)
+  ## requires bam file
   sv <- allProperReadPairs(sv, param,
                            bfile=bam.file, zoom.out=1)
   if(length(sv@proper) > 25e3){
