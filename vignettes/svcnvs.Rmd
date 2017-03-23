@@ -90,7 +90,7 @@ irp <- getImproperAlignmentPairs(bamfile, iparams)
 pdata <- preprocessData(bam.file=bamfile,
                         genome="hg19",
                         bins=bins1kb,
-                        segments=segs,
+                        segments=segments,
                         improper_rp=irp)
 ##length(irp)
 ##irp.file <- tempfile()

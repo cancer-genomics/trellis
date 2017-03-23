@@ -11,7 +11,7 @@ cgov10t_preprocess <- function(){
   bed <- GRanges(chroms, IRanges(starts, ends))
   bed <- keepSeqlevels(bed, "chr3", pruning.mode="coarse")
 
-  bamdir <- system.file("extdata", package="svbams", mustWork=TRUE)
+  bamdir <- system.file("extdata", package="svbams")
   bamfile <- file.path(bamdir, "cgov10t.bam")
   svfile <- file.path(bamdir, "cgov10t_deletions.rds")
   expected.sv <- readRDS(svfile)
@@ -23,19 +23,21 @@ cgov10t_preprocess <- function(){
   ##
   ## todo: regenerate irp from bamfile
   ##
+
   ## make sure all improper read pairs are available
-  ##irpfile <- file.path(bamdir, "cgov10t_irp.rds")
-  ##irp <- readRDS(irpfile)
+  irpfile <- file.path(bamdir, "cgov10t_irp.rds")
+  irp <- readRDS(irpfile)
   lr <- readRDS(lrfile)
   bins$log_ratio <- lr/1000
   segments <- readRDS(cbsfile)
+  segments <- keepSeqlevels(segments, "chr3", pruning.mode="coarse")
+  segments <- segments[segments$seg.mean < -0.7]
   segments <- subsetByOverlaps(segments, bed)
-  read_pairs <- listReadPairs(bamfile, segments)
   pdat <- preprocessData(bam.file=bamfile,
                          genome=genome(bins)[[1]],
                          bins=bins,
                          segments=segments,
-                         read_pairs=read_pairs)
+                         improper_rp=irp)
 }
 
 test_that("overlappingHemizgyous", {
@@ -95,14 +97,17 @@ test_that("overlappingHemizgyous", {
   expect_identical(sv, sv.revise)
 
   sv2 <- rename(sort(sv))
-  ##expected <- rename(sort(expected.sv))
+  expected <- rename(sort(expected.sv))
   g <- granges(variant(sv2))
-  ##g.expected <- granges(variant(expected))
-  ##expect_identical(start(g), start(g.expected))
-  ##expect_identical(end(g), end(g.expected))
-  ##expect_identical(calls(sv2), calls(expected))
+  g.expected <- granges(variant(expected))
+  expect_identical(start(g), start(g.expected))
+  expect_identical(end(g), end(g.expected))
+  expect_identical(calls(sv2), calls(expected))
   gr_filters <- genomeFilters("hg19")
-  sv.finalize <- finalize_deletions(sv, pdat, gr_filters, param)
+  sv.finalize <- finalize_deletions(sv, gr_filters,
+                                    pdat$bins,
+                                    pdat$bam.file,
+                                    param)
   expect_identical(variant(sv.finalize),
                    variant(sv1))
   if(FALSE){
