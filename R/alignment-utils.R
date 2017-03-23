@@ -410,6 +410,11 @@ get_improper_readpairs <- function(object, bam.file){
   ##x <- readGAlignmentsFromBam(bam.file, param=p, use.names=TRUE)
   x <- readGAlignments(bam.file, param=p, use.names=TRUE)
   galp <- makeGAlignmentPairs2(x, use.mcols="flag")
+  galp <- subsetByOverlaps2(galp, g)
+  galp
+}
+
+subsetByOverlaps2 <- function(galp, g){
   validR1 <- overlapsAny(first(galp), g)
   validR2 <- overlapsAny(last(galp), g)
   galp <- galp[validR1 & validR2]
