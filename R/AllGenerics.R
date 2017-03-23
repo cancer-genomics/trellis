@@ -1,4 +1,5 @@
 #' @include help.R
+NULL
 
 #' Extract sequences of reads supporting rearrangements from a bam file
 #'
