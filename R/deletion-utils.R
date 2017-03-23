@@ -1399,6 +1399,8 @@ sv_deletions <- function(preprocess,
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   sv <- removeHemizygous(sv)
   improper_rp <- preprocess$read_pairs[["improper"]]
+  mapq <- mcols(first(improper_rp))$mapq > 30 & mcols(last(improper_rp))$mapq > 30
+  improper_rp <- improper_rp[mapq]
   sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
   sv <- removeHemizygous(sv)
   sv <- revise(sv, bins=preprocess$bins, param=param)
