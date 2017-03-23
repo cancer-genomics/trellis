@@ -277,6 +277,7 @@ thinReadPairQuery <- function(g, zoom.out=1){
                         end(g)[greater_20kb]+5e3))
   gg <- c(granges(g3), g4, g5)
   dj <- disjoin(gg)
+  ## TODO: consider reduce here. The same read pair will be in multiple bins
   dj
 }
 
