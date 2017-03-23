@@ -21,7 +21,8 @@
 #' @importFrom IRanges IRanges
 #' @importMethodsFrom IRanges overlapsAny subsetByOverlaps
 #' @import GenomicRanges
-#' @importFrom svalignments properReadPairs readPairsNearVariant get_readpairs get_improper_readpairs totalWidth
+#' @importFrom svalignments properReadPairs readPairsNearVariant get_readpairs get_improper_readpairs totalWidth get_readpairs2
+#' @importFrom svalignments improperAlignmentParams getImproper
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges edges addEdge addNode nodes
 #' @importMethodsFrom SummarizedExperiment rowRanges assays

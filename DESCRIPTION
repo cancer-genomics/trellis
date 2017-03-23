@@ -41,5 +41,6 @@ Collate:
     'germlineOutliers.R'
     'listCNVs.R'
     'listGenomeFilters.R'
+    'read_pairs.R'
     'recurrent.R'
     'segment.R'
