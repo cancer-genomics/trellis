@@ -1,44 +1,5 @@
 context("Deletion regressions")
 
-## test_that("deletions_segs", {
-##   library(Rsamtools)
-##   library(svfilters.hg19)
-##   library(svpreprocess)
-##   data(germline_filters, package="svfilters.hg19")
-##   extdata <- system.file("extdata", package="svbams")
-##   ##id <- "CGOV44T.bam"
-##   id <- "cgov44t_revised.bam"
-##   id.rds <- paste0(id, ".rds")
-##   bamfile <- file.path(extdata, id)
-##   bview <- Rsamtools::BamViews(bamPaths=bamfile)
-##   data(segments, package="svcnvs")
-##   data(deletion, package="svcnvs")
-##   gr <- variant(deletion)
-##   gr <- expandGRanges(gr, 10000)
-##   segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
-##   segs <- segs[overlapsAny(segs, gr)]
-##   seqlevels(segs) <- seqlevels(gr)
-##   seqinfo(segs) <- seqinfo(gr)
-##   if(FALSE){
-##     saveRDS(segs, file="segs.4adcc78.rds")
-##   }
-##   segs.4adcc78 <- readRDS("segs.4adcc78.rds")
-##   expect_identical(segs, segs.4adcc78)
-## 
-##   ## seqinfo is required in the AlignmentViews object. Adding seqinfo to the
-##   ## BamViews ensures this information is propogated to the AlignmentViews
-##   ## object
-##   br <- bamRanges(bview)
-##   seqlevels(br) <- seqlevels(segs)
-##   seqinfo(br) <- seqinfo(segs)
-##   bamRanges(bview) <- br
-##   if(FALSE){
-##     saveRDS(bview, file="bview.4adcc78.rds")
-##   }
-## })
-
-
-
 expect_identical2 <- function(sv1, sv2){
   variant(sv1) <- granges(variant(sv1))
   variant(sv2) <- granges(variant(sv2))
@@ -51,7 +12,9 @@ cgov44t_preprocess<- function(){
   bamfile <- file.path(extdata, id)
   segs <- readRDS("segs.4adcc78.rds")
 
-  gr <- readRDS("~/Dropbox/OvarianCellLines/structuralvar/data/segment/0cbs/CGOV44T.bam.rds")
+  ##gr <- readRDS("~/Dropbox/OvarianCellLines/structuralvar/data/segment/0cbs/CGOV44T.bam.rds")
+  cnvpath <- system.file("extdata", package="svcnvs")
+  gr <- readRDS(file.path(cnvpath, "cgov44t_segments.rds"))
   segs <- keepSeqlevels(gr, "chr15", pruning.mode="coarse")
 
   irp.file <- file.path(extdata, "cgov44t_improper.rds")
