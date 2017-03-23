@@ -50,9 +50,15 @@ cgov44t_preprocess<- function(){
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
   segs <- readRDS("segs.4adcc78.rds")
-  irp.file <- "getImproperAlignmentPairs.rds"
-  ##aview <- AlignmentViews2(bview, path=irp.file)
+
+  gr <- readRDS("~/Dropbox/OvarianCellLines/structuralvar/data/segment/0cbs/CGOV44T.bam.rds")
+  segs <- keepSeqlevels(gr, "chr15", pruning.mode="coarse")
+
+  irp.file <- file.path(extdata, "cgov44t_improper.rds")
   irp <- readRDS(irp.file)
+  ##irp.file <- "getImproperAlignmentPairs.rds"
+  ##aview <- AlignmentViews2(bview, path=irp.file)
+  ##irp <- readRDS(irp.file)
   ddir <- system.file("extdata", package="svpreprocess",
                       mustWork=TRUE)
   lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
@@ -96,14 +102,16 @@ test_that("deletion_call", {
 test_that("addImproperReadPairs2", {
   library(svalignments)
   pdat <- cgov44t_preprocess()
-  rps <- pdat[["read_pairs"]]
+  improper_rp <- pdat$read_pairs[["improper"]]
+  mapq <- mcols(first(improper_rp))$mapq > 30 & mcols(last(improper_rp))$mapq > 30
+  improper_rp <- improper_rp[mapq]
   ##
   ## TODO: this cutoff will be much too conservative in samples where tumor
   ## purity is less than 90%. Add tumor_purity to param object and take into
   ## account tumor_purity for determining cutoff
   ##
   cnv <- germlineFilters(pdat)
-  irp <- improperRP(cnv, rps$improper)
+  irp <- improperRP(cnv, improper_rp)
   ##
   ## The current version return a GAlignmentPairs object with 2 fewer RPs. These
   ## additional RPs are more than 10kb from the candidate deletions -- they are
@@ -113,7 +121,7 @@ test_that("addImproperReadPairs2", {
     saveRDS(irp, file="addImproperReadPairs2.4adcc78.rds")
   }
   irp.4adcc78 <- readRDS("addImproperReadPairs2.4adcc78.rds")
-  expect_identical(irp, irp.4adcc78[1:72])
+  expect_equivalent(irp, irp.4adcc78[1:72])
 })
 
 test_that("rpSupportedDeletions", {
