@@ -1146,36 +1146,57 @@ initialize_graph2 <- function(preprocess, filters, params){
   ## stopifnot(nodes(ag) %in% names(tmp)), and so
   ## setAmpliconGroups fails
   ranges(ag) <- merged
-  ##REMOTE <- file.exists(preprocess$bam.file)
-  ##if(!REMOTE) stop ("Path to BAM files is invalid")
-  ##
-  ## REFACTOR: could this step use the saved improper read pairs
-  ##
-  ##rp <- get_readpairs(ag, bamPaths(bview))
-  rps <- preprocess$read_pairs
-  proper_rp <- rps$proper
+  ag
+}
+
+add_amplicons <- function(ag, bam.file, params){
+  proper_rp <- get_readpairs2(queryRanges(ag), bam.file)
   ag <- addFocalDupsFlankingAmplicon(ag, proper_rp, params)
   queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
-  improper_rp <- rps$improper
-  ##irp <- get_improper_readpairs(ag, bamPaths(bview))
+  ag
+}
+
+
+sv_amplicons2 <- function(preprocess, amplicon_filters,
+                          params=ampliconParams()){
+  if(missing(amplicon_filters)){
+    amplicon_filters <- ampliconFilters(preprocess$genome)
+  }
+  ag <- initialize_graph2(preprocess, amplicon_filters, params)
   ##
-  ## At this point, focal duplications added to the graph have not
-  ## been linked to any of the seeds
+  ## Requires bam file -- can not work remotely
   ##
-  ##paired_bin_filter <- af[["paired_bin_filter"]]
-  ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=paired_bin_filter)
-  ##param <- FilterEdgeParam(minimum_maxdist=50, bad_bins=GRanges())
+  ag <- add_amplicons(ag, preprocess$bam.file, params)
+  improper_rp <- preprocess$read_pairs[["improper"]]
+  ag <- link_amplicons(ag, improper_rp, params)
+  tx <- getTranscripts(preprocess$genome)
+  ag <- annotate_amplicons(ag, tx)
+  ag
+}
+
+getTranscripts <- function(genome){
+  pkg <- paste0("svfilters.", genome)
+  data(transcripts, package=pkg, envir=environment())
+  transcripts
+}
+
+link_amplicons <- function(ag, improper_rp, params){
   edge.p <- params[["edge"]]
   ag <- linkFocalDups(ag, improper_rp, params)
   ag <- linkAmplicons(ag, improper_rp, edgeParam=edge.p)
   ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   ag <- filterSmallAmplicons (ag)
   ag <- setAmpliconGroups (ag)
-  ag <- setGenes (ag, transcripts)
-  ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
-  ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
   ag
 }
+
+annotate_amplicons <- function(ag, tx){
+  ag <- setGenes (ag, tx)
+  ag <- setDrivers (ag, tx, clin_sign=TRUE)
+  ag <- setDrivers (ag, tx, clin_sign=FALSE)
+  ag
+}
+
 
 
 
