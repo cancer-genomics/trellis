@@ -18,26 +18,26 @@ orientation. *Segmentation should probably be extracted into a separate package.
 
 # Preprocessing
 
-This vignette requires the *svpreprocess* package for loading a views for the
-bin-level preprocessed coverage estimates. *TODO: Purpose of modular processing
-is not to depend on the preprocessing package. Read in normalized coverage from
-a GRanges object. Save to disk in the appropriate format and instantiate the
-Views object below from scratch*.
+
+Additional packages required for this vignette are the `svfilter.hg19` package
+that contains various sequence filters for structural variant analyses and the
+`svalignments` package that contains wrappers for extracting properly- and
+improperly-paired reads from a BAM file.
+
 
 ```{r packages}
 library(GenomicRanges)
 library(Rsamtools)
-library(svpreprocess)
 library(svcnvs)
 library(svfilters.hg19)
 library(svalignments)
 ```
 
-```{r pviews}
-data(pview, package="svpreprocess")
-```
-
-Update the file path in the views object to file containing the preprocessed coverage.
+Next, we load an object containg the normalized and $\log_2$-transformed
+coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the
+genome. The $\log_2$ ratios were multipled by 1000, rounded to the nearest
+integer, and saved as integers in a serialized R object to reduce the memory
+footpring.
 
 ```{r views_filepath}
 ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
@@ -50,76 +50,79 @@ bins1kb$log_ratio <- log_ratio
 
 # Segmentation
 
-TODO
-
-So that the examples run very quickly in this vignette, we limit our deletion
-analysis to chromosome 15. 
+So that the examples run very quickly in this vignette, we limit our analyses to
+three chromosomes.
 
 ```{r segments}
-data(segments, package="svcnvs")
-segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
-region.of.interest <- GRanges("chr15", IRanges(63201003-10e3, 63209243+10e3))
-seqinfo(region.of.interest) <- seqinfo(segs)
-segs <- segs[overlapsAny(segs, region.of.interest)]
-segs
+path <- system.file("extdata", package="svcnvs")
+segments <- readRDS(file.path(path, "cgov44t_segments.rds"))
 ```
 
 # Deletions
 
-The deletion analysis uses improperly paired reads as well as the segmented
-normalized coverage. We use two additional 'views' objects to faciliate these
-analyses: (i) a views object for the BAM files (`BamViews`) and (ii) a views
-object for the improperly paired reads (`AlignmentViews`). We instantiate these
-views in the following code chunk:
+In additition to the segmented $\log_2$ ratios, the deletion analysis requires
+improperly paired reads. Below, we specify the complete file path to a BAM file
+provided by the `svbams` package and extract improperly paired reads from the
+entire genome and an initial set of properly paired reads.
 
 ```{r views}
 extdata <- system.file("extdata", package="svbams")
-id <- "CGOV44T.bam"
-bamfile <- file.path(extdata, id)
+bam.file <- file.path(extdata, "cgov44t_revised.bam")
+iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
+improper_rp <- getImproperAlignmentPairs(bam.file,
+                                         param=iparams)
+segs <- segments
+del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
+                 min.gapwidth=2000)
+proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam())
+read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
 ```
 
+Finally, we collect the bin-level summaries, the segmentation data, and the read
+pair data  in a single list object:
 
-Next, we extract improperly paired reads from this region by passing `segs` to
-the `which` argument of the `improperAlignmentParams` function.
 
-```{r improper_pairs}
-segs2 <- expandGRanges(segs, 10e3)
-iparams <- improperAlignmentParams(which=reduce(segs2), mapqFilter=30)
-## TODO mapq_thr should be part of iparams.  Don't need use.mcols
-irp <- getImproperAlignmentPairs(bamfile, iparams)
-pdata <- preprocessData(bam.file=bamfile,
-                        genome="hg19",
+```{r preprocess_data}
+pdata <- preprocessData(bam.file=bam.file, genome="hg19",
                         bins=bins1kb,
-                        segments=segments,
-                        improper_rp=irp)
-##length(irp)
-##irp.file <- tempfile()
-##saveRDS(irp, file=irp.file)
-##aview <- AlignmentViews2(bview, path=irp.file)
+                        segments=segments, read_pairs=read_pairs)
 ```
+
+Below, we call segments as homozygous deletion (homozygous), homozygous deletion
+supported by improperly paired reads (homozygous+), and hemizygous deletion
+supported by improperly paired reads. For the purpose of identifying somatic
+deletions without a matched normal, we exclude hemizygous deletions that are not
+supported by improperly paired reads. With this toy dataset, we identify two
+homozygous deletions and the calls are both `homozygous`.
 
 ```{r sv_deletions}
-dparam <- DeletionParam()
-deletion <- sv_deletions(preprocess=pdata, param=dparam)
+deletions <- sv_deletions(preprocess=pdata)
+variant(deletions)
+calls(deletions)
+```
+
+The improperly-paired reads supporting the `homozygous+` call can be extracted
+as a `GAlignmentPairs` object from the second element of the `StructuralVariant` object.
+
+```{r structural_variant}
+improper(deletions[2])
 ```
 
 # Amplicons
 
-To illustrate how amplicons are identified and linked by improperly paired
-reads, we load segmentation results from chromosomes 5 and 8.
+Amplicons can be identified using the same list data structure for the
+preprocessed data.
 
 ```{r amplified_segments}
-bview <- BamViews(bamPaths=bamfile, bamRanges=bins1kb)
-cv.extdata <- system.file("extdata", package="svcnvs")
-segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-aparams <- ampliconParams()
-ag <- sv_amplicons(bview=bview,
-                   segs=segs,
-                   amplicon_filters=germline_filters,
-                   params=aparams,
-                   transcripts=transcripts)
-ag
+params <- ampliconParams()
+ag <- svcnvs:::sv_amplicons2(pdata, params=params)
 ```
+
+Note the object returned by `sv_amplicons` is a graph where the nodes are the
+individual amplicons and the edges are links between amplicons given by
+improperly paired reads. By default, with 30x coverage we require at least 5
+improperly paired reads to support an edge. See `?ampliconParams` for customing
+these settings.
 
 # Plotting deletions
 
@@ -154,12 +157,11 @@ the segments for this particular chromosome and sample and a data.frame
 containing the preprocessed coverage.
 
 ```{r dataframes}
-pview <- PreprocessViews2(bview)
-pview2 <- pview[queryHits(findOverlaps(rowRanges(pview), roi2)), ]
 segs <- keepSeqlevels(segments, seqlevels(roi), pruning.mode="coarse")
 segs.df <- as(segs, "data.frame")
-df <- data.frame(logr=assays(pview2)[, 1],
-                 start=start(rowRanges(pview2)))
+hom.plus <- subsetByOverlaps(bins1kb, roi2)
+df <- data.frame(logr=hom.plus$log_ratio,
+                 start=start(hom.plus))
 ```
 
 We restrict the y-axis limits to a suitable range for visualizing the log
@@ -170,7 +172,7 @@ the next section).
 
 ```{r plot_logratios}
 ylim <- c(-9, 2)
-df$logr <- threshold(df$logr, ylim)
+df$logr <- svpreprocess::threshold(df$logr, ylim)
 brks <- pretty(df$start, n=8)
 region <- subsetByOverlaps(segs, roi)
 region <- region[region$seg.mean < -1]
@@ -214,7 +216,7 @@ rps <- svcnvs:::meltReadPairs(rps)
 
 We again use *ggplot* to plot the data. Note the vertical dashed lines depict
 the more precise boundaries of the deletion made possible by the improperly
-paired (rearranged) reads.
+paired (rearranged) reads. 
 
 ```{r plot_rearranged_reads}
 colors <- c("#0072B2", "#009E73")
@@ -240,9 +242,12 @@ B <- ggplotGrob(p)
 ```
 
 
-Finally, we make a composite graphic of the log ratios and rearranged reads:
+Finally, we make a composite graphic of the log ratios and rearranged reads.
+Note, the vertical dashed lines show the revised deletion boundaries using the
+improperly-paired reads that flank the new sequence junction formed as a result
+of the deletion.
 
-```{r compoisite}
+```{r composite}
 grid.arrange(A1, B, ncol=1)
 ```
 
