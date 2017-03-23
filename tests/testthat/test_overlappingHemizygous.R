@@ -30,6 +30,9 @@ cgov10t_preprocess <- function(){
   bins$log_ratio <- lr/1000
   segments <- readRDS(cbsfile)
   segments <- subsetByOverlaps(segments, bed)
+  segs <- segments
+  param <- DeletionParam()
+  segments <- segs[segs$seg.mean < hemizygousThr(param)]
   read_pairs <- listReadPairs(bamfile, segments)
   pdat <- preprocessData(bam.file=bamfile,
                          genome=genome(bins)[[1]],
@@ -42,92 +45,32 @@ test_that("overlappingHemizgyous", {
   library(Rsamtools)
   library(svbams)
   pdat <- cgov10t_preprocess()
+  set.seed(123)
   sv1 <- sv_deletions(pdat)
-  if(FALSE){
-    df <- data.frame(start=start(bins),
-                     lr=bins$log_ratios/1000)
-    library(ggplot2)
-    ggplot(df, aes(start, lr)) + geom_point(size=0.5) +
-      coord_cartesian(xlim=c(60244000, 60697000))
-    irp1 <- improper(expected.sv[1])
-    fst <- as(granges(first(irp1)), "data.frame")
-    lst <- as(granges(last(irp1)), "data.frame")
-    fst$start2 <- lst$start
-    fst$end2 <- lst$end
-    starts <- apply(fst[, c("start", "start2")], 1, min)
-    ends <- apply(fst[, c("end", "end2")], 1, max)
-    df2 <- data.frame(start=starts, end=ends, y=seq_along(starts))
-    ggplot(df, aes(start, lr)) + geom_point(size=0.5) +
-      coord_cartesian(xlim=c(60244000, 60697000))   +
-      geom_segment(data=df2, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE)
-  }
+  param <- DeletionParam()
+  gr_filters <- genomeFilters("hg19")
+  segs <- pdat$segments
+  pdat$segments <- segs[segs$seg.mean < hemizygousThr(param)]
   sv <- deletion_call(pdat)
   param <- DeletionParam()
-  calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
+  calls(sv) <- rpSupportedDeletions(sv, param=param, bins=pdat$bins)
   sv <- removeHemizygous(sv)
   improper_rp <- pdat$read_pairs[["improper"]]
+  mapq <- mcols(first(improper_rp))$mapq >= 30 & mcols(last(improper_rp))$mapq >= 30
+  improper_rp <- improper_rp[mapq]
   sv <- reviseEachJunction(sv, pdat$bins, improper_rp, param)
-  ##pdat$improper_rp, param)
-  sv.revise <- revise(sv, pdat$bins, param)
-  if(FALSE){
-    df3 <- data.frame(start=start(variant(sv)),
-                      end=end(variant(sv)),
-                      y=variant(sv)$seg.mean)
-    ggplot(df, aes(start, lr)) + geom_point(size=0.5) +
-      coord_cartesian(xlim=c(60244000, 60697000))   +
-      geom_segment(data=df2, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE) +
-      geom_segment(data=df3, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE)
-  }
-  copynumber(sv) <- granges_copynumber2(variant(sv), pdat$bins)
-  calls(sv) <- rpSupportedDeletions(sv, param=param, pdat$bins)
-  indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
-  calls(sv) <- rpSupportedDeletions(sv, param, pdat$bins)
-  sv2 <- leftHemizygousHomolog(sv, pdat$bins, param)
-  sv3 <- rightHemizygousHomolog(sv2, pdat$bins, param)
-  calls(sv3) <- rpSupportedDeletions(sv3, param, pdat$bins)
-  message("Refining homozygous boundaries by spanning hemizygous+")
-  sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
-  sv6 <- callOverlappingHemizygous(sv5)
-  sv7 <- removeSameStateOverlapping2(sv6)
-  sv <- removeHemizygous(sv7)
-  expect_identical(sv, sv.revise)
-
-  sv2 <- rename(sort(sv))
-  ##expected <- rename(sort(expected.sv))
-  g <- granges(variant(sv2))
-  ##g.expected <- granges(variant(expected))
-  ##expect_identical(start(g), start(g.expected))
-  ##expect_identical(end(g), end(g.expected))
-  ##expect_identical(calls(sv2), calls(expected))
-  gr_filters <- genomeFilters("hg19")
-  sv.finalize <- finalize_deletions(sv, pdat, gr_filters, param)
-  expect_identical(variant(sv.finalize),
-                   variant(sv1))
-  if(FALSE){
-    df3 <- data.frame(start=start(variant(sv)),
-                      end=end(variant(sv)),
-                      y=variant(sv)$seg.mean)
-    ggplot(df, aes(start, lr)) + geom_point(size=0.5) +
-      coord_cartesian(xlim=c(60244000, 60697000))   +
-      geom_segment(data=df2, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE) +
-      geom_segment(data=df3, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE)
-
-    df4 <- data.frame(start=start(variant(expected.sv)),
-                      end=end(variant(expected.sv)),
-                      y=copynumber(expected.sv))
-    ggplot(df, aes(start, lr)) + geom_point(size=0.5) +
-      coord_cartesian(xlim=c(60244000, 60697000))   +
-      geom_segment(data=df2, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE) +
-      geom_segment(data=df4, aes(x=start, xend=end, y=y, yend=y),
-                   inherit.aes=FALSE, color="blue")
-  }
+  sv <- removeHemizygous(sv)
+  sv <- revise(sv, bins=pdat$bins, param=param)
+  ## requires bam file
+  sv <- finalize_deletions(sv=sv, pdat,
+                           gr_filters=gr_filters,
+                           param=param)
+  expect_identical(calls(sv1), calls(sv))
+  expect_identical(calls(sv1), c("OverlappingHemizygous+", "homozygous",
+                                 "OverlappingHemizygous+", "homozygous",
+                                 "OverlappingHemizygous+"))
 })
+
 
 .test_that <- function(name, expr) NULL
 .test_that("scratch", {
