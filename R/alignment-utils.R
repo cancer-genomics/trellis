@@ -478,17 +478,13 @@ ga2gr <- function(ga, is.improper=FALSE){
 #'
 #'   bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
 #'
-#'   iparams <- improperAlignmentParams()
-#'   pparams <- properAlignmentParams()
+#'   iparams <- improperAlignmentParams(mapqFilter=30)
+#'   pparams <- properAlignmentParams(mapqFilter=30)
 #'   irp <- getImproperAlignmentPairs(bampath,
-#'                                    iparams,
-#'                                    mapq_thr=30,
-#'                                    use.mcols=TRUE)
+#'                                    iparams)
 #'   g.irp <- ga2gr(irp, is.improper=TRUE)
 #'   prp <- getProperAlignmentPairs(bampath,
-#'                                  pparams,
-#'                                  mapq_thr=30,
-#'                                  use.mcols=TRUE)
+#'                                  pparams)
 #'   g.prp <- ga2gr(prp, is.improper=FALSE)
 #'   gr <- c(g.irp, g.prp)
 #'   gr <- sortByRead1(gr)
