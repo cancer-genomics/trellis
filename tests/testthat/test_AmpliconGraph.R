@@ -16,6 +16,7 @@ test_that("AmpliconGraph", {
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   ##

@@ -22,6 +22,7 @@ cgov44t_preprocess<- function(){
 
   path <- system.file("extdata", package="svcnvs")
   segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   ##amp.gr <- segs[segs$seg.mean < ampliconParams()$AMP_THR]
   ##proper.amp <- properReadPairs(bamfile,
   ##                              gr=reduce(amp.gr, min.gapwidth=2000))
@@ -41,6 +42,7 @@ test_that("sv_amplicons", {
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   params <- ampliconParams()
@@ -76,6 +78,7 @@ test_that("initialize_graph", {
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   ag <- readRDS("setDrivers.4adcc78.rds")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
@@ -167,6 +170,7 @@ test_that("makeAGraph", {
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   ag <- readRDS("setDrivers.4adcc78.rds")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
@@ -433,6 +437,7 @@ test_that("no germline filter", {
   ##
   cv.extdata <- system.file("extdata", package="svcnvs")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   params <- ampliconParams()
