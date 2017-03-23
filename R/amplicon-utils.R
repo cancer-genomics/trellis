@@ -1088,13 +1088,7 @@ makeAGraph2 <- function(segs, af, params){
 #' @param params a list of parameters for the amplicon analysis
 #' @param transcripts a \code{GRanges} object of transcripts
 sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
-  ag <- makeAGraph(segs, amplicon_filters, params)
-  merged <- joinNearGRanges(ranges(ag), params)
-  names(merged) <- ampliconNames(merged)
-  ## the names of the nodes no longer correspond to the range names
-  ## stopifnot(nodes(ag) %in% names(tmp)), and so
-  ## setAmpliconGroups fails
-  ranges(ag) <- merged
+  ag <- initialize_graph(segs, amplicon_filters, params)
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")
   ##
@@ -1123,13 +1117,25 @@ sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
   ag
 }
 
-sv_amplicons2 <- function(preprocess, amplicon_filters,
-                          params=ampliconParams()){
-  if(missing(amplicon_filters)){
-    pkg <- paste0("svfilters.", preprocess$genome)
-    data(germline_filters, package=pkg, envir=environment())
-    amplicon_filters <- germline_filters
-  }
+initialize_graph <- function(segs, amplicon_filters, params){
+  ag <- makeAGraph(segs, amplicon_filters, params)
+  merged <- joinNearGRanges(ranges(ag), params)
+  names(merged) <- ampliconNames(merged)
+  ## the names of the nodes no longer correspond to the range names
+  ## stopifnot(nodes(ag) %in% names(tmp)), and so
+  ## setAmpliconGroups fails
+  ranges(ag) <- merged
+  ag
+}
+
+
+ampliconFilters <- function(genome){
+  pkg <- paste0("svfilters.", genome)
+  data(germline_filters, package=pkg, envir=environment())
+  germline_filters
+}
+
+initialize_graph2 <- function(preprocess, filters, params){
   segs <- preprocess$segments
   segs$is_amplicon <- segs$seg.mean > params$AMP_THR
   preprocess$segments <- segs
