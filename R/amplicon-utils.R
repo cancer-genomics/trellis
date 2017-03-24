@@ -1135,10 +1135,12 @@ ampliconFilters <- function(genome){
   germline_filters
 }
 
+amplified_segments <- function(segments, params){
+  segments$is_amplicon <- segments$seg.mean > params$AMP_THR
+  segments
+}
+
 initialize_graph2 <- function(preprocess, filters, params){
-  segs <- preprocess$segments
-  segs$is_amplicon <- segs$seg.mean > params$AMP_THR
-  preprocess$segments <- segs
   ag <- makeAGraph2(preprocess$segments, filters, params)
   merged <- joinNearGRanges(ranges(ag), params)
   names(merged) <- ampliconNames(merged)
@@ -1192,6 +1194,7 @@ sv_amplicons2 <- function(preprocess, amplicon_filters,
   if(missing(amplicon_filters)){
     amplicon_filters <- ampliconFilters(preprocess$genome)
   }
+  preprocess$segments <- amplified_segments(preprocess$segments, params)
   ag <- initialize_graph2(preprocess, amplicon_filters, params)
   ##
   ## Requires bam file -- can not work remotely

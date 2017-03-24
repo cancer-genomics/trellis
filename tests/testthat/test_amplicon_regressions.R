@@ -93,6 +93,7 @@ test_that("initialize_graph", {
   expect_identical(ag, ag.a4d7744)
   ## proposed
   pdat <- cgov44t_preprocess()
+  pdat$segments <- amplified_segments(pdat$segments, params)
   ag2 <- initialize_graph2(pdat, ampliconFilters(pdat$genome),
                            ampliconParams())
   expect_identical(ag, ag2)
