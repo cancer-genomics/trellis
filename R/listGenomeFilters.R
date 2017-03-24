@@ -25,8 +25,8 @@ listGenomeFilters <- function(genome=c("hg19", "hg18")){
   ##if(ucsc_build != "hg19") stop("Only available for build hg19")
   genome <- match.arg(genome)
   pkg <- paste0("svfilters.", genome)
-  data(transcripts, package=pkg, envir=environment())
-  transcripts <- get("transcripts")
+  ##data(transcripts, package=pkg, envir=environment())
+  ##transcripts <- get("transcripts")
   data(assembly_gaps, package=pkg, envir=environment())
   assembly_gaps <- get("assembly_gaps")
   data(gaps, package=pkg, envir=environment())
@@ -41,9 +41,10 @@ listGenomeFilters <- function(genome=c("hg19", "hg18")){
   list(centromeres=centromeres,
        assembly_gaps=assembly_gaps,
        germline_cnv=cnv,
-       outliers=out,
-       transcripts=transcripts)
+       outliers=out)
+       ##transcripts=transcripts)
 }
+
 
 #' Create a reduced set of germline and sequence filters
 #'
