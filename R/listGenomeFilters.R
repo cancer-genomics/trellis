@@ -10,8 +10,9 @@
 #' spaced linked bins could indicate a new junction in the lymphoblast
 #' cell line or a sequencing artifact.
 #'
-#' REFACTORING: Separate filters from the parameter list. Create a
-#' single filter object for both the amplicon and deletion analyses.
+#' REFACTORING: Separate filters from the parameter list. Create a single filter
+#' object for both the amplicon and deletion analyses. * See germline_filters.
+#' Do we still need this? *
 #'
 #' @param genome length-one character vector specifying UCSC genome build
 #' @return a named list
@@ -20,7 +21,7 @@
 #' filters <- listGenomeFilters("hg19")
 #'
 #' @export
-#'
+#' @seealso \code{germline_filters}  
 listGenomeFilters <- function(genome=c("hg19", "hg18")){
   ##if(ucsc_build != "hg19") stop("Only available for build hg19")
   genome <- match.arg(genome)
