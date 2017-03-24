@@ -28,5 +28,6 @@ read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
 pdata <- preprocessData(bam.file=bam.file, genome="hg19",
                         bins=bins1kb,
                         segments=segments, read_pairs=read_pairs)
-deletions2 <- sv_deletions(preprocess=pdata)
-save(deletions2, file="../data/deletions2.rda")
+params <- ampliconParams()
+amplicon_graph <- svcnvs:::sv_amplicons2(pdata, params=params)
+save(amplicon_graph, file="../data/amplicon_graph.rda")
