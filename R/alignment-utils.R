@@ -531,6 +531,35 @@ thinProperPairs <- function(gr, thin=10){
   df
 }
 
+#' Assesses whether two reads in a pair are aberrantly separated with respect to the reference genome
+#'
+#' Determines whether separation between first and last read in a
+#' GAlignmentPairs is greater than some distance.
+#'
+#' Evaluates to TRUE if
+#' @param gpairs a \code{GAlignmentPairs} object
+#' @return logical vector of the same length as \code{gpairs}
+#' @export
+aberrantSep <- function(gpairs, distance=10e3){
+  abs((start(first(gpairs)) - start(last(gpairs)))) > distance
+}
+
+#' Assesses whether any read pairs are duplicates in a GAlignmentPairs object
+#'
+#' @param aln.pairs a \code{GAlignmentPairs} object
+#' @return logical vector of same length as the \code{aln.pairs}
+#' @export
+isDuplicate <- function(aln.pairs){
+  chr1 <- chromosome(first(aln.pairs))
+  chr2 <- chromosome(last(aln.pairs))
+  x1 <- start(first(aln.pairs))
+  x2 <- end(last(aln.pairs))
+  string <- paste(chr1, x1, chr2, x2, sep="_")
+  duplicated(string)
+}
+
+#' Remove duplicates paired r
+#' @export
 filterPairedReads <- function(gpairs, bins, params){
   gpairs <- gpairs[ aberrantSep(gpairs, rpSeparation(params)) ]
   gpairs <- gpairs [ !isDuplicate(gpairs) ]
