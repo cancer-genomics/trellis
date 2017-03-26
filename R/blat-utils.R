@@ -347,19 +347,20 @@ multipleAlignmentRecords <- function(records){
 #' Identify rearranged reads -- initiallly unmapped reads that can be
 #' aligned by blat to span a novel sequence junction.
 #'
-#' @return a list of blat records that map to both sides of a sequence
-#'   junction.  Each list element corresponds to one read that is
-#'   aligned to two locations.
+#' @return a `GRangesList` of blat records that map to both sides of a
+#' sequence  junction. Each list element corresponds to one read that is
+#'  aligned to two  locations (i.e., each element of the list consists of the
+#'  vector of reads that supports one rearrangement). 
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 #' @export
-#' 
+#'
 #' @param r a \code{RearrangementList} object
-#' 
+#'
 #' @param blat a data.frame of blat alignment records
-#' 
+#'
 #' @param maxgap this maximum gap between the mapped read and the
 #'   genomic intervals of the improper read clusters
 rearrangedReads <- function(r, blat, maxgap=500){
