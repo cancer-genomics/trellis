@@ -42,5 +42,4 @@
     .isLastSegment.matrix(bamFlagAsBitMatrix(flag, bitnames=bitnames))
 }
 
-.isLastSegment.GAlignments <- function(x)
-    .isLastSegment.integer(mcols(x)$flag)
+.isLastSegment.GAlignments <- function(x) .isLastSegment.integer(mcols(x)$flag)
