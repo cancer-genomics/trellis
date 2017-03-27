@@ -5,7 +5,6 @@ TODO.org
 man/
 /svcnvs.Rproj
 /vignettes/svcnvs.md
-/vignettes/svcnvs.pdf
 /vignettes/amplicons.pdf
 tests/testthat/*.rds
 /tests/testthat/tmp.R
