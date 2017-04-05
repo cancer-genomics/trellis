@@ -9,7 +9,7 @@ NULL
 #' @rdname ClippedTranscripts-class
 #' @export
 setGeneric("ClippedTranscripts", function(transcripts, i, left=GRangesList(),
-                                          right=GRangesList())
+                                          right=GRangesList(), names=c("5prime", "3prime"))
   standardGeneric("ClippedTranscripts"))
 
 #' @export
@@ -127,7 +127,8 @@ setClass("TranscriptsFusion", representation(fusions="list"),
 #' @slot right a \code{GRangesList}
 #' @rdname ClippedTranscripts-class
 #' @export
-setClass("ClippedTranscripts", representation(left="GRangesList", right="GRangesList"))
+setClass("ClippedTranscripts", representation(left="GRangesList", right="GRangesList",
+                                              names="character"))
 
 #' @examples
 #' Transcripts()
@@ -160,83 +161,18 @@ TranscriptsFusion <- function(object, fusions=list()){
 #' @rdname ClippedTranscripts-class
 #' @export
 setMethod("ClippedTranscripts", c("missing", "missing"),
-          function(transcripts, i, left=GRangesList(), right=GRangesList()){
-            new("ClippedTranscripts", left=left, right=right)
+          function(transcripts, i, left=GRangesList(), right=GRangesList(),
+                   names=c("5prime", "3prime")){
+            new("ClippedTranscripts", left=left, right=right,
+                names=names)
           })
 
-anyLengthZero <- function(x)  length(left(x)) == 0 || length(right(x)) == 0
-
-logicalList <- function(x) x@fusions
-
-#' Select CDS involved in a fusion
-#'
-#' A list of \code{GRangesList} objects, formalized as a
-#' \code{Transcripts} class, is subset to return an instance of the
-#' same class containing only the CDS believed to be involved in the
-#' fusion.
-#'
-#' @seealso \code{\link{fuse}}
-#' 
-#' @examples
-#'   data(rear_cds)
-#'   clip(rear_cds)
-#'   ## One of the possible fused transcripts is gene B and gene C, or "BC"
-#'   ## There are four possible refseq transcripts associated with gene 'B'
-#'   full_refseqs <- txB(rear_cds)
-#'   elementNROWS(full_refseqs)
-#' 
-#'   ## We exclude CDS from the four refseq transcripts that are not
-#'   ## involved in the fusion using the clip function:
-#'   clipped_tx <- clip(rear_cds)
-#'   ## The clipped refseq transcripts for gene B are give by
-#'   names(left(clipped_tx))
-#'   clipped_refseqs <- left(clipped_tx)
-#'   elementNROWS(clipped_refseqs)
-#'   ##
-#'   ## One transcript on the "right" side
-#'   ##
-#'   names(right(clipped_tx))
-#'   length(right(clipped_tx)[[1]])
-#'   ## Note the above exluced 9 CDS that appear in the unclipped refseq transcript
-#'   length(txC(rear_cds)[[1]])
-#' 
-#'   ## The exon ranks of the clipped transcripts shows that the 
-#'   ## first 9 CDS are excluded in the fused transcript:
-#' 
-#'   right(clipped_tx)[[1]]$exon_rank
-#' @return A \code{ClippedTranscripts} object
-#' @export
-#' @param transcripts A \code{TranscriptsFusion} object
-#' @param i a length-one integer vector
-clip <- function(transcripts, i) {
-  logical.list1 <- logicalList(transcripts)[[1]]
-  logical.list2 <- logicalList(transcripts)[[2]]
-  if(!missing(i)){
-    result <- transcripts[logicalList(transcripts)[[i]]]
-    return(result)
-  }
-  nms <- names(fusions(transcripts))
-  cl.tx1 <- transcripts[logical.list1]
-  cl.tx2 <- transcripts[logical.list2]
-  if(anyLengthZero(cl.tx1)){
-    return(cl.tx2)
-  }
-  if(anyLengthZero(cl.tx2)){
-    return(cl.tx1)
-  }
-  stop("Chimeric proteins on both strands. Didn't expect to see this.")
-}
+setMethod("names", "ClippedTranscripts", function(x) x@names)
 
 setMethod("elementNROWS", "Transcripts", function(x){
   c(length(txA(x)), length(txB(x)), length(txC(x)), length(txD(x)))
 })
 
-#' @aliases fuse,TranscriptsFusion-method
-#' @rdname fuse-methods
-#' @export
-setMethod("fuse", "TranscriptsFusion", function(object, nms){
-  fuse(clip(object, nms))
-})
 
 #' @aliases fusions,TranscriptsFusion-method
 #' @rdname TranscriptsFusion-class
@@ -251,69 +187,8 @@ setReplaceMethod("fusions", c("TranscriptsFusion", "list"), function(object, val
   object
 })
 
-.getFusedTx <- function(object){
-  lt <- left(object)
-  rt <- right(object)
-  joined <- list()
-  it <- 1
-  ## if either lt or rt has length zero, joined is an empty list
-  ## RS: 12/13/2016  Why should joined be an empty list??
-  ## e.g., the promoter of the left transcript fused with the right transcript
-  if(length(lt) == 0){
-    for(j in seq_along(rt)){
-      R <- rt[[j]]
-      nm.rt <- names(rt)[j]
-      R$orientation <- "right"
-      ##J <- c(L, R)
-      J <- R
-      joined[[it]] <- J
-      names(joined)[it] <- paste("promoter", nm.rt, sep="::")
-      it <- it+1
-    }
-    joined <- GRangesList(joined)
-    return(joined)
-  }
-  for(i in seq_along(lt)){
-    L <- lt[[i]]
-    nm.lt <- names(lt)[i]
-    L$orientation <- "left"
-    for(j in seq_along(rt)){
-      R <- rt[[j]]
-      nm.rt <- names(rt)[j]
-      R$orientation <- "right"
-      J <- c(L, R)
-      joined[[it]] <- J
-      names(joined)[it] <- paste(nm.lt, nm.rt, sep="::")
-      it <- it+1
-    }
-  }
-  joined <- GRangesList(joined)
-}
 
-#' Join two clipped transcripts as a GRangesList object
-#'
-#' If there are only two transcripts to join, the GRangesList object
-#' has length one.  In general, the GRangesList object returned has
-#' length R x C where R is the number of transcripts from the gene
-#' 5-prime of the fusion and C is the number of transcripts from the
-#' gene 3' of the fusion.
-#'
-#' @seealso \code{link{clip}}
-#' @return A \code{GRangesList} 
-#' @examples
-#'   data(rear_cds)
-#'   clipped <- clip(rear_cds)
-#'   ## The fused transcript contains exon ranks 2-9 of NM_001288715 and exon
-#'   ## ranks 10-57 of NM_007118 
-#'   fused <- fuse(clipped)
-#' @rdname fuse-methods
-#' @export
-setMethod("fuse", "ClippedTranscripts", function(object, nms){
-  joined <- .getFusedTx(object)
-  joined
-})
-
-#' @rdname TranscriptsFusion-class 
+#' @rdname TranscriptsFusion-class
 #' @aliases fusionNames,TranscriptsFusion-method
 #' @export
 setMethod("fusionNames", "TranscriptsFusion", function(object) names(fusions(object)))
@@ -470,30 +345,6 @@ setReplaceMethod("[[", c("Transcripts", "ANY", "ANY", "GRangesList"),
                    }
                    return(x)
                  })
-
-## subsetting by one of the fusions produces a ClippedTranscripts object
-#' @rdname TranscriptsFusion-class
-#' @param x a \code{TranscriptsFusion} object
-#' @param i an integer-vector
-#' @param j ignored
-#' @param ... ignored
-#' @param drop ignored
-#' @return a \code{ClippedTranscripts} object
-setMethod("[", c("TranscriptsFusion", "ExonSubset"), function(x, i, j, ..., drop=FALSE){
-  grl1 <- x[[name.left(i)]] ## GRangesList
-  ##gr1 <- grl1[[tx1(i)]]  ## GRanges
-  grl1 <- grl1[inRearrangement.left(i)]
-  grl1 <- grl1[elementNROWS(grl1) > 0]
-
-  grl2 <-x[[name.right(i)]] ## GRangesList
-  grl2 <- grl2[inRearrangement.right(i)]  ## GRanges
-  grl2 <- grl2[elementNROWS(grl2) > 0]
-
-  x[[name.left(i)]] <- grl1
-  x[[name.right(i)]] <- grl2
-  ClippedTranscripts(left=grl1, right=grl2)
-})
-
 
 setMethod("show", "Transcripts", function(object){
   cat("An object of class 'Transcripts'\n")

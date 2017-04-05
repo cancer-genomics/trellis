@@ -14,7 +14,6 @@
 \alias{fusions,TranscriptsFusion,list-method}
 \alias{fusionNames,TranscriptsFusion-method}
 \alias{numberFusions,TranscriptsFusion-method}
-\alias{[,TranscriptsFusion,ExonSubset,ANY,ANY-method}
 \title{A container for fused transcripts}
 \usage{
 fusions(object)
@@ -36,26 +35,11 @@ TranscriptsFusion(object, fusions = list())
 \S4method{fusionNames}{TranscriptsFusion}(object)
 
 \S4method{numberFusions}{TranscriptsFusion}(object)
-
-\S4method{[}{TranscriptsFusion,ExonSubset,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{value}{}
 
-\item{x}{a \code{TranscriptsFusion} object}
-
-\item{i}{an integer-vector}
-
-\item{j}{ignored}
-
-\item{...}{ignored}
-
-\item{drop}{ignored}
-
 \item{value}{character string}
-}
-\value{
-a \code{ClippedTranscripts} object
 }
 \description{
 Container for fused transcripts.

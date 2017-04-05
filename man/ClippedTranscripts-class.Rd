@@ -10,10 +10,11 @@
 \title{A container for clipped transcripts}
 \usage{
 ClippedTranscripts(transcripts, i, left = GRangesList(),
-  right = GRangesList())
+  right = GRangesList(), names = c("5prime", "3prime"))
 
 \S4method{ClippedTranscripts}{missing,missing}(transcripts, i,
-  left = GRangesList(), right = GRangesList())
+  left = GRangesList(), right = GRangesList(), names = c("5prime",
+  "3prime"))
 
 \S4method{left}{ClippedTranscripts}(x, ...)
 
