@@ -55,8 +55,33 @@ three chromosomes.
 
 ```{r segments}
 path <- system.file("extdata", package="svcnvs")
-segments <- readRDS(file.path(path, "cgov44t_segments.rds"))
+data(segments, package="svcnvs")
 ```
+
+## Plotting the genome
+
+Plot the entire genome overlaying the segmentation data.
+
+```{r genome, fig.width=8, fig.height=3}
+bins1kb <- sort(bins1kb)
+lrr.df <- as.data.frame(bins1kb[seq(1, length(bins1kb), 50)])
+seg.df <- as.data.frame(segments)
+library(ggplot2)
+chromlabels <- setNames(c(1:22, "X"), seqlevels(bins1kb))
+ggplot(lrr.df, aes(start, log_ratio)) +
+  geom_point(size=0.1, color="gray") +
+  geom_segment(data=seg.df,
+               aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
+               color="black", inherit.aes=FALSE) +
+  facet_grid(~seqnames, space="free", scales="free_x",
+             labeller=as_labeller(chromlabels)) +
+  theme(axis.text.x=element_blank(),
+        panel.grid=element_blank(),
+        panel.background=element_rect(fill="white"),
+        axis.ticks.x=element_blank()) + xlab("") +
+  ylab(expression(log[2](r)))
+```
+
 
 # Deletions
 
@@ -71,7 +96,7 @@ bam.file <- file.path(extdata, "cgov44t_revised.bam")
 iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
 improper_rp <- getImproperAlignmentPairs(bam.file,
                                          param=iparams)
-segs <- segments
+segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
 del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
                  min.gapwidth=2000)
 proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam())
