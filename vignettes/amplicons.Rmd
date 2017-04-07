@@ -16,9 +16,9 @@ This vignette illustrates the workflow for identifying linked amplicons.
 # Workflow
 
 ```{r packages}
-library(Rsamtools)
-library(svpreprocess)
-library(svcnvs)
+suppressPackageStartupMessages(library(Rsamtools))
+suppressPackageStartupMessages(library(svpreprocess))
+suppressPackageStartupMessages(library(svcnvs))
 ```
 
 We assume the bin-level estimates of coverage have been normalized, transformed
@@ -116,12 +116,12 @@ wrapper for plotting the graphs.
 
 ```{r plotfun}
 library(ggplot2)
-library(gridExtra)
+suppressPackageStartupMessages(library(gridExtra))
 library(grid)
 library(GGally)
-library(network)
-library(sna)
-library(svplots)
+suppressPackageStartupMessages(library(network))
+suppressPackageStartupMessages(library(sna))
+suppressPackageStartupMessages(library(svplots))
 plotAmpGraph <- function(ag, transcripts, color.guide=FALSE){
   B <- svplots:::plot_amplicons(ag)
   B1 <- as(B, "graphAM")
