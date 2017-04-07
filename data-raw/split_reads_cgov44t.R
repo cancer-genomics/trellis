@@ -54,3 +54,7 @@ outfile <- tempfile()
 cmd <- paste(blatpath, refgenome, mapped_unmapped.fa, outfile)
 system(cmd)
 file.copy(outfile, "../inst/extdata/blat_unmapped.txt")
+
+blat <- readBlat("../inst/extdata/blat_unmapped.txt")
+rearranged_reads <- rearrangedReads(rlist, blat, 500)
+saveRDS(rearranged_reads, file="../inst/extdata/cgov44t_split_reads.rds")
