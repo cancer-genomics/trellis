@@ -9,7 +9,6 @@ test_that("rearrangedReads2", {
   names(lb) <- "test.rid"
   test <- rearrangedReads2(lb, blat)
 
-
   blat_gr <- blat_to_granges(blat)
   expect_true("tStarts" %in% colnames(mcols(blat_gr)))
   expect_is(blat_gr, "GRanges")
@@ -97,6 +96,7 @@ test_that("rearrangedReads", {
   extdata <- system.file("extdata", package="svalignments")
   unmap.file <- file.path(extdata, "blat_unmapped.txt")
   blat_unmap <- readBlat(unmap.file)
+  rlist <- readRDS(file.path(extdata, "rlist_cgov44t.rds"))
   ##trace(rearrangedReads, browser)
   split_reads <- rearrangedReads(rlist, blat_unmap, 500)
   expect_identical(names(split_reads), c("1-2", "3-4"))
