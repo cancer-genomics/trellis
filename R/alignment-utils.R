@@ -154,8 +154,9 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 }
 
 
-#' Function used by rearrangement analysis to extract the sequence of
-#' read pairs near a rearrangement
+#' Extract all improperly paired reads from a bam file as a GAlignmentPairs object
+#'
+#' This function is a wrapper for readGAlignments. At the time this function was created, one could not create a GAlignmentPairs object of improperly paired reads using existing infrastructure in the GenomicAlignments package.  This function may be deprecated in the future.
 #'
 #' @return a \code{GAlignmentPairs} object
 #' @keywords internal
@@ -169,9 +170,6 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   path <- system.file("extdata", package="svbams")
 #'   bam.file <- file.path(path, "cgov10t.bam")
 #'   irp <- getImproperAlignmentPairs(bam.file)
-#'
-#' @details TODO: mapqFilter is set to 0 by default for historical reasons.
-#'   Should provide better default (e.g., mapqFilter=30).
 #'
 #' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
 #'   for details regarding \code{use.mcols} argument.  See
