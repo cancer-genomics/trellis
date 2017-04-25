@@ -392,39 +392,41 @@ numberAlignmentRecords <- function(blat.gr){
   widths <- integer_vector(g$blockSizes)
   qstarts <- integer_vector(g$qStarts)
   bsizes <- integer_vector(g$blockSizes)
-  chrom <- chromosome(g)
-  if(length(chrom) == 1) {
-    chrom <- rep(chrom, L)
-  }
+  chrom <- rep(chromosome(g), g$blockcount)
+  bmatch <- rep(g$match, g$blockcount)
+  gapbases <- rep(g$gapbases, g$blockcount)
   g2 <- GRanges(chrom,
                 IRanges(starts, width=widths),
                 qStarts=qstarts,
-                blockSizes=bsizes)
+                blockSizes=bsizes,
+                gapbases=gapbases,
+                match=bmatch)
   gr <- reduce(g2, with.revmap=TRUE)
   revmap <- mcols(gr)$revmap
   tmp <- relist(g2$qStarts[unlist(revmap)], revmap)
   qstarts <- sapply(tmp, min)
   tmp <- relist(g2$blockSizes[unlist(revmap)], revmap)
   bsizes <- sapply(tmp, sum)
+  tmp <- relist(g2$match[unlist(revmap)], revmap)
+  bmatch <- sapply(tmp, mean)
+  tmp <- relist(g2$gapbases[unlist(revmap)], revmap)
+  gapbases <- sapply(tmp, min)
   L <- length(gr)
   gr$qStarts <- qstarts
   gr$blockSizes <- bsizes
-  score <- g$match
-  if(length(score) == 1){
-    score <- rep(score, L)
-  } 
-  gr$match <- score
+  gr$match <- bmatch
   gr$rear.id <- rep(g$rear.id[1], L)
   gr$qname <- rep(g$qname[1], L)
-  if(length(g$gapbases)==1){
-    gapbases <- rep(g$gapbases, L)
-  } else gapbases <- g$gapbases
   gr$gapbases <- gapbases
   gr$Qsize <- rep(g$Qsize[1], L)
   gr
 }
 
 eachBlockAsGRanges <- function(blat.grl){
+##  browser()
+##  for(i in seq_along(blat.grl)){
+##    .each_block_granges(blat.grl[[i]])
+##  }
   blat.grl2 <- lapply(blat.grl, .each_block_granges)
   GRangesList(blat.grl2)
 }
@@ -634,6 +636,13 @@ rearrangedReads2 <- function(linked_bins, blat, maxgap=500){
   ## And the number of records for a given rearrangement should be 2
   ##
   blat.grl <- eachBlockAsGRanges(records_qname)
+  overlapFun <- function(g1, lb, ...){
+    o1 <- any(overlapsAny(g1, lb, ...))
+    o2 <- any(overlapsAny(g1, lb$linked.to, ...))
+    o1 && o2
+  }
+  is.overlap <- sapply(blat.grl, overlapFun, lb=lb, maxgap=500)
+  blat.grl <- blat.grl[is.overlap]
   blat.grl <- blat.grl [ elementNROWS(blat.grl) == 2 ]
   ##
   ## The split should involve nearly non-overlapping subsequences of
