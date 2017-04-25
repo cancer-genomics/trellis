@@ -102,7 +102,7 @@ test_that("consensus", {
 ##
 ## - this unit test check for unmapped reads with a mapped mate near the putative sequence junction can be aligned via a split-read with blat
 ##
-test_that("unmapped_reads_near_consensus"{
+test_that("unmapped_reads_near_consensus", {
   extdata <- system.file("extdata", package="svalignments")
   unmap.file <- file.path(extdata, "blat_mapped-unmapped-oralcleft.txt")
   blat <- readBlat(unmap.file)
@@ -111,13 +111,13 @@ test_that("unmapped_reads_near_consensus"{
   ##
   ## - the linked bin region is not big enough for findings reads with unmapped mates
   ##
-
   linked_bins <- readRDS(file.path(extdata, "consensus_linkedbins.rds"))
   lb <- linked_bins[1]
   lb$linked.to <- linked_bins[2]
   names(lb) <- "test.rid"
-  trace(rearrangedReads2, browser)
+  ## there are no split reads in this blat file
   split_reads <- rearrangedReads2(lb, blat)
+  expect_identical(length(split_reads), 0L)
 })
 
 test_that("rearrangedReads", {
