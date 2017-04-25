@@ -1,6 +1,11 @@
 context("rearrangedReads")
 
-test_that("rearrangedReads2", {
+##
+## A consensus sequence for a rearrangement obtained from Delly
+##
+## - this unit test checks the consensus sequnce by BLAT against the hg19 reference genome
+##
+test_that("consensus", {
   extdata <- system.file("extdata", package="svalignments")
   blat <- readBlat(file.path(extdata, "consensus.txt"))
   linked_bins <- readRDS(file.path(extdata, "consensus_linkedbins.rds"))
@@ -90,6 +95,29 @@ test_that("rearrangedReads2", {
   records_rear <- split(records, records$rear.id)
   expect_identical(length(records_rear[[1]]), 2L)
   expect_identical(records_rear, test)
+})
+
+##
+## A denovo deletion from paired end reads was identified on chr1
+##
+## - this unit test check for unmapped reads with a mapped mate near the putative sequence junction can be aligned via a split-read with blat
+##
+test_that("unmapped_reads_near_consensus"{
+  extdata <- system.file("extdata", package="svalignments")
+  unmap.file <- file.path(extdata, "blat_mapped-unmapped-oralcleft.txt")
+  blat <- readBlat(unmap.file)
+  ##
+  ## - the split reads might have been mapped by gatk
+  ##
+  ## - the linked bin region is not big enough for findings reads with unmapped mates
+  ##
+
+  linked_bins <- readRDS(file.path(extdata, "consensus_linkedbins.rds"))
+  lb <- linked_bins[1]
+  lb$linked.to <- linked_bins[2]
+  names(lb) <- "test.rid"
+  trace(rearrangedReads2, browser)
+  split_reads <- rearrangedReads2(lb, blat)
 })
 
 test_that("rearrangedReads", {
