@@ -209,44 +209,44 @@ getProperAlignmentPairs <- function(bam.file,
   irp2
 }
 
-#' Parse improper read pairs from a bam file
-#'
-#' Parses improper read pairs from a bam file and saves the result as
-#' a serialized R object.  The file paths to the improper read pairs
-#' are given by accessors defined from the \code{AlignmentViews2}
-#' class.
-#'
-#' @examples
-#'   library(Rsamtools)
-#'   require(TestBams)
-#'   extdata <- system.file("extdata", package="TestBams")
-#'   bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
-#'   bv <- BamViews(bam.file)
-#'   dp <- DataPaths(tempdir())
-#'   aviews <- AlignmentViews2(bv, dp)
-#'   \dontrun{
-#'     writeImproperAlignments2(aviews)
-#'     gps <- readRDS(file.path(dp["alignments/0improper"], rdsId(aviews)[1]))
-#'   }
-#' 
-#' @rdname AlignmentViews2
-#' @export
-#' @param bam.file complete path to BAM file
-#' @param param a \code{ScanBamParam} object
-#' @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
-#' @param use.mcols length-one logical vector
-writeImproperAlignments2 <- function(bam.file,
-                                     param=improperAlignmentParams(mapqFilter=0)){
-  .Deprecated()
-  if(file.exists(bam.file)){
-    return(invisible())
-  }
-  ##aln_path <- improperPaths(aview)
-  irp <- getImproperAlignmentPairs(bam.file, param)
-  out.file <- improperPaths(aview)
-  saveRDS(irp, file=out.file)
-  invisible()
-}
+# Parse improper read pairs from a bam file
+# 
+# Parses improper read pairs from a bam file and saves the result as
+# a serialized R object.  The file paths to the improper read pairs
+# are given by accessors defined from the \code{AlignmentViews2}
+# class.
+# 
+# @examples
+#   library(Rsamtools)
+#   require(TestBams)
+#   extdata <- system.file("extdata", package="TestBams")
+#   bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
+#   bv <- BamViews(bam.file)
+#   dp <- DataPaths(tempdir())
+#   aviews <- AlignmentViews2(bv, dp)
+#   \dontrun{
+#     writeImproperAlignments2(aviews)
+#     gps <- readRDS(file.path(dp["alignments/0improper"], rdsId(aviews)[1]))
+#   }
+# 
+# @rdname AlignmentViews2
+# @export
+# @param bam.file complete path to BAM file
+# @param param a \code{ScanBamParam} object
+# @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
+# @param use.mcols length-one logical vector
+# writeImproperAlignments2 <- function(bam.file,
+#                                      param=improperAlignmentParams(mapqFilter=0)){
+#   .Deprecated()
+#   if(file.exists(bam.file)){
+#     return(invisible())
+#   }
+#   ##aln_path <- improperPaths(aview)
+#   irp <- getImproperAlignmentPairs(bam.file, param)
+#   out.file <- improperPaths(aview)
+#   saveRDS(irp, file=out.file)
+#   invisible()
+# }
 
 
 thinReadPairQuery <- function(g, zoom.out=1){
