@@ -563,6 +563,9 @@ isDuplicate <- function(aln.pairs){
 
 #' Remove duplicates paired r
 #' @export
+#' @param gpairs TODO
+#' @param bins TODO
+#' @param params TODO
 filterPairedReads <- function(gpairs, bins, params){
   gpairs <- gpairs[ aberrantSep(gpairs, rpSeparation(params)) ]
   gpairs <- gpairs [ !isDuplicate(gpairs) ]
