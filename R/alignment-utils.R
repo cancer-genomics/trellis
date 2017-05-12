@@ -539,6 +539,8 @@ thinProperPairs <- function(gr, thin=10){
 #'
 #' Evaluates to TRUE if
 #' @param gpairs a \code{GAlignmentPairs} object
+#' @param distance the minimum distance in base pairs between two reads in 
+#' order to call them aberrantly separated
 #' @return logical vector of the same length as \code{gpairs}
 #' @export
 aberrantSep <- function(gpairs, distance=10e3){
