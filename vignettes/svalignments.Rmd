@@ -24,7 +24,7 @@ a specific genomic region of interest (e.g., a possible deletion). In the
 following code chunk, we load the `svbams` package which contains a small
 bam files for a region of chr15.
 
-```{r svbams}
+```{r svbams, message = F}
 library(GenomicAlignments)
 library(Rsamtools)
 library(svbams)
@@ -121,7 +121,7 @@ ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
 DEPRECATE: duplicates can be marked in a way that is barcode-aware. Downstream
 processing would be identical.
 
-```{r targeted_bam}
+```{r targeted_bam, message = F}
 targeted.bam <- file.path(path, "PGDX5881P_PS_Seq_novo.sorted_nofa.bam")
 library(dplyr)
 ### Read in GAlignmentPairs
