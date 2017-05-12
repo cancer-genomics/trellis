@@ -476,7 +476,8 @@ ga2gr <- function(ga, is.improper=FALSE){
 #'   si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
 #'   seqinfo(region) <- si["chr15", ]
 #'
-#'   bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
+#'   path <-system.file("extdata", package="svbams")
+#'   bampath <- list.files(path, pattern="cgov44t_revised.bam$", full.names=TRUE)
 #'
 #'   iparams <- improperAlignmentParams(mapqFilter=30)
 #'   pparams <- properAlignmentParams(mapqFilter=30)
