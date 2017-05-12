@@ -55,7 +55,7 @@ seqinfo(region.expand) <- seqinfo(region)
 Next, we create a BamViews object that will contain metadata on the bamfiles.
 
 ```{r bamviews}
-bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
+bampath <- list.files(path, pattern="cgov44t_revised.bam$", full.names=TRUE)
 bview <- BamViews(bamPaths=bampath)
 ```
 
