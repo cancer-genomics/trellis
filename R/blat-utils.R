@@ -352,7 +352,6 @@ multipleAlignmentRecords <- function(records){
 #'  aligned to two  locations (i.e., each element of the list consists of the
 #'  vector of reads that supports one rearrangement). 
 #'
-#' @examples
 #'
 #'
 #' @export
