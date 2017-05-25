@@ -350,7 +350,7 @@ readPairsNearVariant <- function(object, bam.file){
 }
 
 
-
+# Made get_readpairs a generic -- commented out
 
 #' Parse BAM file for improper read pairs near a set of GRanges
 #'
@@ -371,17 +371,16 @@ readPairsNearVariant <- function(object, bam.file){
 #' @export
 get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
   g <- queryRanges(object)
-  get_readpairs2(g, bam.file, flags)
+  .get_readpairs2(g, bam.file, flags)
 }
 
-#' @export
-get_readpairs2 <- function(g, bam.file, flags=scanBamFlag()){
-  galp <- .scan_all_readpairs(g, bam.file, flags)
-  validR1 <- overlapsAny(first(galp), g)
-  validR2 <- overlapsAny(last(galp), g)
-  galp <- galp[validR1 & validR2]
-  galp
-}
+ .get_readpairs2 <- function(g, bam.file, flags=scanBamFlag()){
+   galp <- .scan_all_readpairs(g, bam.file, flags)
+   validR1 <- overlapsAny(first(galp), g)
+   validR2 <- overlapsAny(last(galp), g)
+   galp <- galp[validR1 & validR2]
+   galp
+ }
 
 #' Extract all improperly paired reads from an object with queryRanges defined
 #'
