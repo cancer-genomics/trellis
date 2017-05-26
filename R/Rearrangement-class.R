@@ -10,32 +10,35 @@ NULL
 #' \code{mcols}.  All improper reads belonging to a cluster,
 #' irrespective of whether they link two clusters, are included and
 #' indexed to facilitate subsetting operations.
-#' 
+#'
 #' @slot linkedBins a \code{GRanges} object with 'linked.to' in the
 #'   element metadata (\code{mcols})
 #'
 #' @slot modal_rearrangement character string indicating type of rearrangement
-#' 
+#'
 #' @slot improper a \code{GAlignmentPairs} object of the improper read pairs
-#' 
+#'
 #' @slot partitioning integer vector
 #' @slot link1id character string label for first read cluster
 #' @slot link2id character string label for second read cluster
 #' @slot tags a \code{GRanges} object of single tags
-#' 
+#'
 #' @slot tag_map_to_linked_bin an integer vector keeping track of
 #'   which tags belong to a linked bin
 #'
 #' @slot modal_rearrangement charactering string of the modal
 #'   rearrangemnt type
-#' 
+#'
 #' @slot percent_rearrangement length-one numeric vector indicating
 #'   the percentage of improper read pairs for a linked bin that
 #'   belong to the modal rearrangement
-#' 
+#'
 #' @slot fraction_linking_tags the fraction of all tags for a linked
 #'   bin that link the two tag clusters
-#' 
+#'
+#' @slot split_reads a \code{GRanges} object of the split read alignments
+#'
+#'
 #' @export
 #' @rdname Rearrangement-class
 setClass("Rearrangement", representation(linkedBins="GRanges",
@@ -47,7 +50,8 @@ setClass("Rearrangement", representation(linkedBins="GRanges",
                                          tag_map_to_linked_bin="character",
                                          modal_rearrangement="character",
                                          percent_rearrangement="numeric",
-                                         fraction_linking_tags="numeric"))
+                                         fraction_linking_tags="numeric",
+                                         split_reads="GRanges"))
 
 
 conciseGRangeSummary <- function(g, type){
@@ -183,6 +187,26 @@ setGeneric("percentRearrangement", function(object) standardGeneric("percentRear
 setGeneric("percentRearrangement<-",
            function(object, value) standardGeneric("percentRearrangement<-"))
 
+
+#' Accessor for split read alignments
+#'
+#' @rdname splitReads
+#'
+#' @param object a \code{Rearrangement} object
+#'
+#' @export
+setGeneric("splitReads",
+           function(object) standardGeneric("splitReads"))
+
+#' @rdname splitReads
+#'
+#' @param value a \code{GRanges} object of split read alignments
+#'
+#' @export
+setGeneric("splitReads<-",
+           function(object, value) standardGeneric("splitReads<-"))
+
+
 #' Accessor for all the improper reads
 #'
 #' Accessor for improper reads belonging to one of the linked
@@ -284,6 +308,18 @@ setReplaceMethod("percentRearrangement", "Rearrangement", function(object,value)
   object
 })
 
+
+#' @rdname splitReads
+#' @aliases splitReads,Rearrangement-method
+setMethod("splitReads", "Rearrangement", function(object) object@split_reads)
+
+#' @aliases splitReads,Rearrangement,GRanges-method
+#' @rdname splitReads
+setReplaceMethod("splitReads", c("Rearrangement", "GRanges"),
+                 function(object, value){
+                   object@split_reads <- value
+                   object
+                 })
 
 #' @aliases tags,Rearrangement-method
 #' @rdname tags-methods

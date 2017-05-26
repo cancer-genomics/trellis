@@ -73,6 +73,8 @@ belong to the modal rearrangement}
 
 \item{\code{fraction_linking_tags}}{the fraction of all tags for a linked
 bin that link the two tag clusters}
+
+\item{\code{split_reads}}{a \code{GRanges} object of the split read alignments}
 }}
 
 \keyword{internal}

@@ -1,10 +1,23 @@
-extdata <- system.file("extdata", package="StructuralVariants")
-rlist <- readRDS(file.path(extdata, "cgovt_filtered_rearrangements.rds"))
-cl <- attributes(rlist)$class
-attributes(cl)$package <- "svclasses"
-attributes(rlist)$class <- cl
+##extdata <- system.file("extdata", package="StructuralVariants")
+updateAttributes <- function(x){
+  cl <- attributes(x)$class
+  attributes(cl)$package <- "svclasses"
+  attributes(x)$class <- cl
+  x
+}
+path <- "~/Software/StructuralVariants/inst/extdata"
+fname <- file.path(path, "cgovt_filtered_rearrangements.rds")
+rlist <- readRDS(fname)
+rlist <- updateAttributes(rlist)
+for(i in seq_along(rlist)){
+  r <- rlist[[i]]
+  r <- updateAttributes(r)
+  r <- updateObject(r)
+  rlist[[i]] <- r
+}
 rear_list <- rlist
 save(rear_list, file="~/Software/svpackages/svclasses/data/rear_list.rda")
+
 
 library(TxDb.Hsapiens.UCSC.hg19.refGene)
 library(BSgenome.Hsapiens.UCSC.hg19)
