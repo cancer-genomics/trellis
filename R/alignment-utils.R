@@ -543,7 +543,7 @@ sortByRead1 <- function(gr){
 #' subsample a \code{GRanges} object of properly paired
 #' reads to reduce overplotting. 
 #'
-#' @param gr a \code{GRanges} object of read pairs
+#' @param gr a \code{GRanges} object instantiated from a GAlignmentPairs \object{}
 #' @param thin integer indicating how much to thin the properly paired reads.
 #' @details Setting the parameter \code{thin} to 10 (default) will 
 #' return a \code{GRanges} object with 1/10 the original number of 
