@@ -168,9 +168,10 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
   ScanBamParam(flag=flag, what=what, ...)
 }
 
-
+#' Extract improperly paired reads from a bam file
+#'
 #' Function used by rearrangement analysis to extract the sequence of
-#' read pairs near a rearrangement
+#' improper read pairs near a rearrangement.
 #'
 #' @return a \code{GAlignmentPairs} object
 #' @keywords internal
@@ -202,8 +203,10 @@ getImproperAlignmentPairs <- function(bam.file,
   irp2
 }
 
+#' Extract properly paired reads from a bam file
+#'
 #' Function used by rearrangement analysis to extract the sequence of
-#' properly paired reads
+#' properly paired reads from a bam file.
 #'
 #' @return a \code{GAlignmentPairs} object
 #' @keywords internal
@@ -211,11 +214,15 @@ getImproperAlignmentPairs <- function(bam.file,
 #' @param bam.file a \code{BamViews} object
 #' @param param a \code{ScanBamParam} object.
 #'
-#' @seealso See \code{\link{improperAlignmentParams}} for creating a
-#'   \code{ScanBamParam} object with the appropriate flags for extracting
-#'   improper read pairs.
-#'   @examples 
+#' @examples 
+#' library(svbams)
+#' path <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(path, "cgov10t.bam")
+#' irp <- getProperAlignmentPairs(bam.file)
 #'   
+#' @seealso See \code{\link{properAlignmentParams}} for creating a
+#'   \code{ScanBamParam} object with the appropriate flags for extracting
+#'   proper read pairs.
 getProperAlignmentPairs <- function(bam.file,
                                     param=properAlignmentParams(mapqFilter=0)){
   ##bam.file <- bamPaths(object)
