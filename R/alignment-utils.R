@@ -76,22 +76,24 @@ makeGAlignmentPairs2 <- function(x, use.names=FALSE, use.mcols=FALSE, strandMode
 
 #' Creates a default set of flags for reading improperly paired alignments
 #'
-#' This function is a wrapper to \code{scanBamFlag} in \code{Rsamtools}.
+#' These functions are wrappers for \code{scanBamFlag} and
+#' \code{ScanBamParam} in the \code{Rsamtools} package.
 #'
-#' @seealso \code{\link[Rsamtools]{scanBamFlag}} for complete details
+#' @seealso See \code{\link[Rsamtools]{scanBamFlag}} for complete details
 #'   and \code{\link{improperAlignmentParams}} for a wrapper of this
 #'   function that generates a \code{ScanBamParam} object using these
 #'   flags.
 #' 
 #' @examples
 #' require(Rsamtools)
+#' 
 #' flags <- scanBamFlag(isDuplicate=FALSE,
 #'                      isPaired=TRUE,
 #'                      isUnmappedQuery=FALSE,
 #'                      hasUnmappedMate=FALSE,
 #'                      isProperPair=FALSE)
 #' flags2 <- improperAlignmentFlags()
-#' identical(flags, flags2)
+#' identical(flags, flags2) #TRUE
 #' print(flags)
 #' @rdname alignment-flags
 #' @export
@@ -106,6 +108,16 @@ improperAlignmentFlags <- function(){
 
 #' @rdname alignment-flags
 #' @export
+#' @examples
+#'  
+#' flags <- scanBamFlag(isDuplicate=FALSE,
+#'                      isPaired=TRUE,
+#'                      isUnmappedQuery=FALSE,
+#'                      hasUnmappedMate=FALSE,
+#'                      isProperPair=TRUE)
+#' flags2 <- properAlignmentFlags()
+#' identical(flags, flags2) #TRUE
+#' print(flags)
 properAlignmentFlags <- function(){
   flags <- scanBamFlag(isDuplicate=FALSE,
                        isPaired=TRUE,
@@ -115,25 +127,21 @@ properAlignmentFlags <- function(){
 }
 
 
-#' Helper function for specifying flags for reading properly or improperly paired reads
-#'
-#' This is a wrapper to \code{ScanBamParam}
-#'
-#' @seealso \code{\link[Rsamtools]{ScanBamParam}} and
-#'   \code{\link[Rsamtools]{bamFlag}} for full documentation in
-#'   \code{Rsamtools}.  See \code{improperAlignmentFlags} for the
+#' @seealso See \code{\link[Rsamtools]{ScanBamParam}} and
+#'   \code{\link[Rsamtools]{bamFlag}} in
+#'   \code{Rsamtools} for full documentation.  See \code{improperAlignmentFlags} for the
 #'   default set of flags.
 #'
 #' @examples
-#' require(Rsamtools)
+#' 
 #' flags <- improperAlignmentFlags()
 #' print(flags)
 #' params <- ScanBamParam(flag = flags, what=c("flag", "mrnm", "mpos", "mapq"))
 #' params2 <- improperAlignmentParams()
 #' print(params2)
-#' identical(params, params2)
+#' identical(params, params2) #TRUE
 #'
-#' @param what character vector.  See \code{ScanBamParam}
+#' @param what A character vector (see \code{ScanBamParam} for details)
 #' @param ... additional arguments to \code{ScanBamParam} such as \code{mapqFilter}
 #' @param flag A length-two integer vector as provided by \code{improperAlignmentFlags}
 #' @export
@@ -147,6 +155,13 @@ improperAlignmentParams <- function(flag=improperAlignmentFlags(),
 
 #' @export
 #' @rdname alignment-flags
+#' @examples 
+#' flags <- properAlignmentFlags()
+#' print(flags)
+#' params <- ScanBamParam(flag = flags, what=c("flag", "mrnm", "mpos", "mapq"))
+#' params2 <- properAlignmentParams()
+#' identical(params, params2) #TRUE
+#' print(params2)
 properAlignmentParams <- function(flag=properAlignmentFlags(),
                                   what=c("flag", "mrnm", "mpos", "mapq"),
                                   ...){
@@ -199,6 +214,8 @@ getImproperAlignmentPairs <- function(bam.file,
 #' @seealso See \code{\link{improperAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for extracting
 #'   improper read pairs.
+#'   @examples 
+#'   
 getProperAlignmentPairs <- function(bam.file,
                                     param=properAlignmentParams(mapqFilter=0)){
   ##bam.file <- bamPaths(object)
