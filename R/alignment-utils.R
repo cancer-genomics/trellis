@@ -501,11 +501,12 @@ ga2gr <- function(ga, is.improper=FALSE){
 #' In order to plot the read pairs as position versus read pair index,
 #' information on the mates needs to be kept intact and the visualization is
 #' more clear if the reads are sorted by the first read in the pair. This
-#' functions turns the read tag in the 'id' field of the GRanges object to an
+#' function turns the read tag in the 'id' field of the GRanges object to an
 #' ordered factor. The levels of the factor are determined by the start position
 #' of the first read (R1) in the pair.
 #'
 #' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs}
+#' @return a \code{GRanges} object 
 #' @examples
 #'   library(svbams)
 #'   library(TxDb.Hsapiens.UCSC.hg19.refGene)
@@ -543,7 +544,7 @@ sortByRead1 <- function(gr){
 #' subsample a \code{GRanges} object of properly paired
 #' reads to reduce overplotting. 
 #'
-#' @param gr a \code{GRanges} object instantiated from a GAlignmentPairs \object{}
+#' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs} object
 #' @param thin integer indicating how much to thin the properly paired reads.
 #' @details Setting the parameter \code{thin} to 10 (default) will 
 #' return a \code{GRanges} object with 1/10 the original number of 
