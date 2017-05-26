@@ -537,10 +537,27 @@ sortByRead1 <- function(gr){
   gr
 }
 
-#' Thin the proper read pairs to reduce overplotting
+#' Thin proper read pairs to reduce overplotting
+#'
+#' This function provides a simple interface to
+#' subsample a \code{GRanges} object of properly paired
+#' reads to reduce overplotting. 
 #'
 #' @param gr a \code{GRanges} object of read pairs
 #' @param thin integer indicating how much to thin the properly paired reads.
+#' @details Setting the parameter \code{thin} to 10 (default) will 
+#' return a \code{GRanges} object with 1/10 the original number of 
+#' properly paired reads in \code{gr}.
+#' @return A \code{GRanges} object  
+#' @examples 
+#' library(svbams)
+#' path <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(path, "cgov10t.bam")
+#' prp <- getProperAlignmentPairs(bam.file)
+#' pgr <- ga2gr(prp, is.improper=FALSE)
+#' length(pgr)
+#' pgr2 <- thinProperPairs(pgr, 10)
+#' length(pgr2)
 #' @export
 thinProperPairs <- function(gr, thin=10){
   is.proper <- !gr$is.improper
