@@ -464,10 +464,24 @@ get_improper_readpairs2 <- function(g, bam.file){
   galp
 }
 
-#' Convert GAlignments to GRanges with is.improper and pair.index fields
+#' Convert GAlignmentPairs to GRanges while maintaining read pair information
+#' 
+#' Melts \code{GAlignmentPairs} objects to \code{GRanges} objects.
 #'
 #' @param ga a \code{GAlignments} object
-#' @param is.improper length-one logical vector.  Are the reads improperly paired?
+#' @param is.improper a length-one logical vector.  \code{TRUE} if the reads are improperly paired, \code{FALSE} otherwise.
+#' 
+#' @examples
+#' library(svbams)
+#' path <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(path, "cgov10t.bam")
+#' irp <- getImproperAlignmentPairs(bam.file)
+#' igr <- ga2gr(irp, is.improper=TRUE)
+#' prp <- getProperAlignmentPairs(bam.file)
+#' pgr <- ga2gr(prp, is.improper=FALSE)
+#'  
+#' @return A \code{GRanges} object with metadata columns containing read pair information.
+#' 
 #' @export
 ga2gr <- function(ga, is.improper=FALSE){
   id <- names(ga)
