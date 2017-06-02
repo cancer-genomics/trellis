@@ -1401,13 +1401,17 @@ sv_deletions <- function(preprocess,
   improper_rp <- preprocess$read_pairs[["improper"]]
   mapq <- mcols(first(improper_rp))$mapq > 30 & mcols(last(improper_rp))$mapq > 30
   improper_rp <- improper_rp[mapq]
-  sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
-  sv <- removeHemizygous(sv)
-  sv <- revise(sv, bins=preprocess$bins, param=param)
+  if(length(variant(sv)) > 0){
+    sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
+    sv <- removeHemizygous(sv)
+  }
+  if(length(variant(sv)) > 0){
+    sv <- revise(sv, bins=preprocess$bins, param=param)
+    sv <- finalize_deletions(sv=sv, preprocess,
+                             gr_filters=gr_filters,
+                             param=param)
+  }
   ## requires bam file
-  sv <- finalize_deletions(sv=sv, preprocess,
-                           gr_filters=gr_filters,
-                           param=param)
   sv
 }
 
@@ -1426,6 +1430,7 @@ setMethod("rename", "StructuralVariant", function(x, ...){
 
 finalize_deletions <- function(sv, preprocess, gr_filters,
                                param=DeletionParam()){
+  if(length(sv) == 0) return(sv)
   if(missing(gr_filters)){
     gr_filters <- genomeFilters(preprocess$genome)
   }
