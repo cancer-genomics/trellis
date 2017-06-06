@@ -477,6 +477,7 @@ get_improper_readpairs2 <- function(g, bam.file){
 #'
 #' @param ga a \code{GAlignments} object
 #' @param is.improper a length-one logical vector.  \code{TRUE} if the reads are improperly paired, \code{FALSE} otherwise.
+#' @param use.mcols logical for whether to keep the metadata columns of the \code{GAlignment} objects
 #' 
 #' @examples
 #' library(svbams)
@@ -490,10 +491,10 @@ get_improper_readpairs2 <- function(g, bam.file){
 #' @return A \code{GRanges} object with metadata columns containing read pair information.
 #' 
 #' @export
-ga2gr <- function(ga, is.improper=FALSE){
+ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
   id <- names(ga)
-  r1.ga <- granges(first(ga))
-  r2.ga <- granges(last(ga))
+  r1.ga <- granges(first(ga), use.mcols=use.mcols)
+  r2.ga <- granges(last(ga), use.mcols=use.mcols)
   names(r1.ga) <- names(r2.ga) <- NULL
   r1.ga$read <- rep("R1", length(r1.ga))
   r2.ga$read <- rep("R2", length(r2.ga))
