@@ -131,9 +131,9 @@ test_that("rearrangedReads", {
   qnms1 <- unique(split_reads[[1]]$qname)
   if(FALSE){
     saveRDS(qnms1, file="rearrangedReads.fbb19b6.rds")
+    expected <- readRDS("rearrangedReads.fbb19b6.rds")
+    expect_true(all(qnms1 %in% expected))
   }
-  expected <- readRDS("rearrangedReads.fbb19b6.rds")
-  expect_true(all(qnms1 %in% expected))
   if(FALSE){
     load_all()
     split_reads2 <- rearrangedReadsFromRlist(rlist, blat_unmap, 500)
