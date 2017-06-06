@@ -20,3 +20,44 @@ setGeneric("getSequenceOfReads", function(object, bam.file,
                                           params=RearrangementParams(),
                                           MAX=25L)
   standardGeneric("getSequenceOfReads"))
+
+
+# #' Parse BAM file for improper read pairs near a set of GRanges
+# #'
+# #' All reads aligned to the intervals given by
+# #' \code{queryRanges(object)} are identified by the low-level function
+# #' \code{.scan_all_readpairs}.  This function reads alignments by
+# #' \code{readGAlignments} and then makes pairs of the alignments by
+# #' \code{makeGAlignmentPairs2}.  The latter function is an adaption of
+# #' the function \code{makeGAlignmentPairs} implemented in the
+# #' \code{GenomeAlignments} package but allows for the read pairs to be
+# #' improper.
+# #'
+# #' @param object Typically an \code{AmpliconGraph}, though the only
+# #'   requirement is that the method \code{queryRanges} is defined
+# #' @param bam.file character-vector providing valid complete path to a
+# #'   bam file
+# #' @param flags length-two integer vector as given by \code{scanBamFlags}
+# #' @export
+# setGeneric(name = "get_readpairs", def = function(object, bam.file, flags=scanBamFlag()) {standardGeneric("get_readpairs")})
+# setMethod(
+#   f = "get_readpairs",
+#   signature = "AmpliconGraph",
+#   definition = function(object, bam.file, flags=scanBamFlag()) {
+#     g <- queryRanges(object)
+#     .get_readpairs2(g, bam.file, flags)
+#   }
+# )
+# setMethod(
+#   f = "get_readpairs",
+#   signature = "GRanges",
+#   definition = function(object, bam.file, flags=scanBamFlag()) {
+#     .get_readpairs2(g, bam.file, flags)
+#   }
+# )
+
+
+
+
+
+

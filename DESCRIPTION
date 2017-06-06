@@ -20,7 +20,10 @@ Suggests:
     testthat,
     svbams,
     data.table,
-    TxDb.Hsapiens.UCSC.hg19.refGene
+    TxDb.Hsapiens.UCSC.hg19.refGene,
+    knitr, 
+    ggplot2, 
+    scales
 RoxygenNote: 6.0.1
 Collate: 
     'help.R'
@@ -29,3 +32,4 @@ Collate:
     'blat-utils.R'
     'data.R'
     'galignment-utils.R'
+VignetteBuilder: knitr
