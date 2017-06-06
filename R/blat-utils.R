@@ -555,7 +555,7 @@ rearrangedReads <- function(r, blat, maxgap=500){
 
 
 
-blat_to_granges <- function(blat){
+blat_to_granges <- function(blat, lb){
   GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
           match=blat$match, qname=blat$Qname,
           qstart=blat$Qstart,
@@ -594,7 +594,7 @@ rearrangedReads2 <- function(linked_bins, blat, maxgap=500){
   }
   ##lb <- linkedBins(r)
   blat <- blat[blat$Tname %in% seqlevels(lb), ]
-  blat_gr <- blat_to_granges(blat)
+  blat_gr <- blat_to_granges(blat, lb)
   ##
   ## A blat record must overlap one of the intervals in a linked bin
   ##
