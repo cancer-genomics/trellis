@@ -551,6 +551,7 @@ isHemizygousDeletion <- function(object, param, bins){
 #'   with mcols value 'log_ratio'
 rpSupportedDeletions <- function(sv, param, bins){
   ## NA means that there were no queryRanges in the view -- i.e., all bins were masked
+  sv <- sv[overlapsAny(variant(sv), bins)]
   is_hemizygous <- isHemizygousDeletion(sv, param, bins)
   cncalls <- ifelse(is_hemizygous, "hemizygous", "homozygous")
   number_improper <- elementNROWS(sapply(sv, improper))

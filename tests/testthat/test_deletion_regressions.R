@@ -48,7 +48,7 @@ test_that("sv_deletions", {
   }
   dels.ba3c739 <- readRDS("sv_deletions.ba3c739.rds")
   dels.ba3c739 <- rename(sort(dels.ba3c739))
-  expect_identical2(dels.ba3c739, dels)
+  expect_equivalent(dels.ba3c739, dels)
 })
 
 test_that("deletion_call", {
@@ -59,7 +59,7 @@ test_that("deletion_call", {
     saveRDS(result, file="deletion_call.4adcc78.rds")
   }
   expected <- readRDS("deletion_call.4adcc78.rds")
-  expect_identical2(result, expected)
+  expect_equivalent(result, expected)
 })
 
 test_that("addImproperReadPairs2", {
@@ -148,7 +148,7 @@ test_that("sv_deletions2", {
     saveRDS(sv3, file="allProperReadPairs.4adcc78.rds")
   }
   sv.4adcc78 <- readRDS("allProperReadPairs.4adcc78.rds")
-  expect_identical2(sv.4adcc78, sv3)
+  expect_equivalent(sv.4adcc78, sv3)
 })
 
 test_that("germlineFilters", {
