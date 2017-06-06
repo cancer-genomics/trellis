@@ -387,12 +387,23 @@ readPairsNearVariant <- function(object, bam.file){
 #' @param bam.file character-vector providing valid complete path to a
 #'   bam file
 #' @param flags length-two integer vector as given by \code{scanBamFlags}
+#' @return A \code{GAlignmentPairs} object 
+#' 
 #' @export
 get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
   g <- queryRanges(object)
   get_readpairs2(g, bam.file, flags)
 }
 
+#' Extract reads from a bam file
+#' 
+#' Parses a BAM file for read pairs near intervals specified by a \code{GRanges} object and 
+#' returns the read pairs in a \code{GAlignmentPairs} object.
+#' @param g A \code{GRanges} object
+#' @param bam.file A character vector of the path to a bam file
+#' @param flags A length-two integer vector as given by \code{scanBamFlags}
+#' @seealso get_readpairs
+#' @return A \code{GAlignmentPairs} object
 #' @export
  get_readpairs2 <- function(g, bam.file, flags=scanBamFlag()){
    galp <- .scan_all_readpairs(g, bam.file, flags)
