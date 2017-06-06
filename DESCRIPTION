@@ -1,7 +1,7 @@
 Package: svalignments
 Title: Methods for extracting and viewing improper alignments
-Version: 0.0.19
-Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
+Version: 0.0.20
+Authors@R: c(person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre")), person("Daniel", "Bruhm", email = "danielbruhm@gmail.com", role = "aut"))
 Description: Methods for extracting and viewing improper alignments.
 Depends:
     R (>= 3.2.0),
@@ -20,7 +20,10 @@ Suggests:
     testthat,
     svbams,
     data.table,
-    TxDb.Hsapiens.UCSC.hg19.refGene
+    TxDb.Hsapiens.UCSC.hg19.refGene,
+    knitr, 
+    ggplot2, 
+    scales
 RoxygenNote: 6.0.1
 Collate: 
     'help.R'
@@ -29,3 +32,4 @@ Collate:
     'blat-utils.R'
     'data.R'
     'galignment-utils.R'
+VignetteBuilder: knitr

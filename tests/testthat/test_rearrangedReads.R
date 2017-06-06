@@ -1,5 +1,7 @@
 context("rearrangedReads")
 
+
+
 ##
 ## A consensus sequence for a rearrangement obtained from Delly
 ##
@@ -12,9 +14,9 @@ test_that("consensus", {
   lb <- linked_bins[1]
   lb$linked.to <- linked_bins[2]
   names(lb) <- "test.rid"
+  expect_is(lb, "GRanges")
   test <- rearrangedReads2(lb, blat)
-
-  blat_gr <- blat_to_granges(blat)
+  blat_gr <- blat_to_granges(blat, lb)
   expect_true("tStarts" %in% colnames(mcols(blat_gr)))
   expect_is(blat_gr, "GRanges")
   ##
@@ -114,13 +116,14 @@ test_that("unmapped_reads_near_consensus", {
   linked_bins <- readRDS(file.path(extdata, "consensus_linkedbins.rds"))
   lb <- linked_bins[1]
   lb$linked.to <- linked_bins[2]
+  expect_is(lb, "GRanges")
   names(lb) <- "test.rid"
   ## there are no split reads in this blat file
   split_reads <- rearrangedReads2(lb, blat)
   expect_identical(length(split_reads), 0L)
 })
 
-test_that("rearrangedReads", {
+test_that("rearrangedReadsFun", {
   extdata <- system.file("extdata", package="svalignments")
   unmap.file <- file.path(extdata, "blat_unmapped.txt")
   blat_unmap <- readBlat(unmap.file)
@@ -131,11 +134,10 @@ test_that("rearrangedReads", {
   qnms1 <- unique(split_reads[[1]]$qname)
   if(FALSE){
     saveRDS(qnms1, file="rearrangedReads.fbb19b6.rds")
+    expected <- readRDS("rearrangedReads.fbb19b6.rds")
+    expect_true(all(qnms1 %in% expected))
   }
-  expected <- readRDS("rearrangedReads.fbb19b6.rds")
-  expect_true(all(qnms1 %in% expected))
   if(FALSE){
-    load_all()
     split_reads2 <- rearrangedReadsFromRlist(rlist, blat_unmap, 500)
     expect_identical(names(split_reads2), names(split_reads))
     qnms2 <- unique(split_reads2[[1]]$qname)

@@ -76,22 +76,24 @@ makeGAlignmentPairs2 <- function(x, use.names=FALSE, use.mcols=FALSE, strandMode
 
 #' Creates a default set of flags for reading improperly paired alignments
 #'
-#' This function is a wrapper to \code{scanBamFlag} in \code{Rsamtools}.
+#' These functions are wrappers for \code{scanBamFlag} and
+#' \code{ScanBamParam} in the \code{Rsamtools} package.
 #'
-#' @seealso \code{\link[Rsamtools]{scanBamFlag}} for complete details
+#' @seealso See \code{\link[Rsamtools]{scanBamFlag}} for complete details
 #'   and \code{\link{improperAlignmentParams}} for a wrapper of this
 #'   function that generates a \code{ScanBamParam} object using these
 #'   flags.
 #' 
 #' @examples
 #' require(Rsamtools)
+#' 
 #' flags <- scanBamFlag(isDuplicate=FALSE,
 #'                      isPaired=TRUE,
 #'                      isUnmappedQuery=FALSE,
 #'                      hasUnmappedMate=FALSE,
 #'                      isProperPair=FALSE)
 #' flags2 <- improperAlignmentFlags()
-#' identical(flags, flags2)
+#' identical(flags, flags2) #TRUE
 #' print(flags)
 #' @rdname alignment-flags
 #' @export
@@ -106,6 +108,16 @@ improperAlignmentFlags <- function(){
 
 #' @rdname alignment-flags
 #' @export
+#' @examples
+#'  
+#' flags <- scanBamFlag(isDuplicate=FALSE,
+#'                      isPaired=TRUE,
+#'                      isUnmappedQuery=FALSE,
+#'                      hasUnmappedMate=FALSE,
+#'                      isProperPair=TRUE)
+#' flags2 <- properAlignmentFlags()
+#' identical(flags, flags2) #TRUE
+#' print(flags)
 properAlignmentFlags <- function(){
   flags <- scanBamFlag(isDuplicate=FALSE,
                        isPaired=TRUE,
@@ -115,25 +127,21 @@ properAlignmentFlags <- function(){
 }
 
 
-#' Helper function for specifying flags for reading properly or improperly paired reads
-#'
-#' This is a wrapper to \code{ScanBamParam}
-#'
-#' @seealso \code{\link[Rsamtools]{ScanBamParam}} and
-#'   \code{\link[Rsamtools]{bamFlag}} for full documentation in
-#'   \code{Rsamtools}.  See \code{improperAlignmentFlags} for the
+#' @seealso See \code{\link[Rsamtools]{ScanBamParam}} and
+#'   \code{\link[Rsamtools]{bamFlag}} in
+#'   \code{Rsamtools} for full documentation.  See \code{improperAlignmentFlags} for the
 #'   default set of flags.
 #'
 #' @examples
-#' require(Rsamtools)
+#' 
 #' flags <- improperAlignmentFlags()
 #' print(flags)
 #' params <- ScanBamParam(flag = flags, what=c("flag", "mrnm", "mpos", "mapq"))
 #' params2 <- improperAlignmentParams()
 #' print(params2)
-#' identical(params, params2)
+#' identical(params, params2) #TRUE
 #'
-#' @param what character vector.  See \code{ScanBamParam}
+#' @param what A character vector (see \code{ScanBamParam} for details)
 #' @param ... additional arguments to \code{ScanBamParam} such as \code{mapqFilter}
 #' @param flag A length-two integer vector as provided by \code{improperAlignmentFlags}
 #' @export
@@ -147,6 +155,13 @@ improperAlignmentParams <- function(flag=improperAlignmentFlags(),
 
 #' @export
 #' @rdname alignment-flags
+#' @examples 
+#' flags <- properAlignmentFlags()
+#' print(flags)
+#' params <- ScanBamParam(flag = flags, what=c("flag", "mrnm", "mpos", "mapq"))
+#' params2 <- properAlignmentParams()
+#' identical(params, params2) #TRUE
+#' print(params2)
 properAlignmentParams <- function(flag=properAlignmentFlags(),
                                   what=c("flag", "mrnm", "mpos", "mapq"),
                                   ...){
@@ -185,8 +200,10 @@ getImproperAlignmentPairs <- function(bam.file,
   irp2
 }
 
+#' Extract properly paired reads from a bam file
+#'
 #' Function used by rearrangement analysis to extract the sequence of
-#' properly paired reads
+#' properly paired reads from a bam file.
 #'
 #' @return a \code{GAlignmentPairs} object
 #' @keywords internal
@@ -194,9 +211,15 @@ getImproperAlignmentPairs <- function(bam.file,
 #' @param bam.file a \code{BamViews} object
 #' @param param a \code{ScanBamParam} object.
 #'
-#' @seealso See \code{\link{improperAlignmentParams}} for creating a
+#' @examples 
+#' library(svbams)
+#' path <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(path, "cgov10t.bam")
+#' irp <- getProperAlignmentPairs(bam.file)
+#'   
+#' @seealso See \code{\link{properAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for extracting
-#'   improper read pairs.
+#'   proper read pairs.
 getProperAlignmentPairs <- function(bam.file,
                                     param=properAlignmentParams(mapqFilter=0)){
   ##bam.file <- bamPaths(object)
@@ -207,44 +230,44 @@ getProperAlignmentPairs <- function(bam.file,
   irp2
 }
 
-#' Parse improper read pairs from a bam file
-#'
-#' Parses improper read pairs from a bam file and saves the result as
-#' a serialized R object.  The file paths to the improper read pairs
-#' are given by accessors defined from the \code{AlignmentViews2}
-#' class.
-#'
-#' @examples
-#'   library(Rsamtools)
-#'   require(TestBams)
-#'   extdata <- system.file("extdata", package="TestBams")
-#'   bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
-#'   bv <- BamViews(bam.file)
-#'   dp <- DataPaths(tempdir())
-#'   aviews <- AlignmentViews2(bv, dp)
-#'   \dontrun{
-#'     writeImproperAlignments2(aviews)
-#'     gps <- readRDS(file.path(dp["alignments/0improper"], rdsId(aviews)[1]))
-#'   }
-#' 
-#' @rdname AlignmentViews2
-#' @export
-#' @param bam.file complete path to BAM file
-#' @param param a \code{ScanBamParam} object
-#' @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
-#' @param use.mcols length-one logical vector
-writeImproperAlignments2 <- function(bam.file,
-                                     param=improperAlignmentParams(mapqFilter=0)){
-  .Deprecated()
-  if(file.exists(bam.file)){
-    return(invisible())
-  }
-  ##aln_path <- improperPaths(aview)
-  irp <- getImproperAlignmentPairs(bam.file, param)
-  out.file <- improperPaths(aview)
-  saveRDS(irp, file=out.file)
-  invisible()
-}
+# Parse improper read pairs from a bam file
+# 
+# Parses improper read pairs from a bam file and saves the result as
+# a serialized R object.  The file paths to the improper read pairs
+# are given by accessors defined from the \code{AlignmentViews2}
+# class.
+# 
+# @examples
+#   library(Rsamtools)
+#   require(TestBams)
+#   extdata <- system.file("extdata", package="TestBams")
+#   bam.file <- list.files(extdata, pattern="\\.bam$", full.name=TRUE)
+#   bv <- BamViews(bam.file)
+#   dp <- DataPaths(tempdir())
+#   aviews <- AlignmentViews2(bv, dp)
+#   \dontrun{
+#     writeImproperAlignments2(aviews)
+#     gps <- readRDS(file.path(dp["alignments/0improper"], rdsId(aviews)[1]))
+#   }
+# 
+# @rdname AlignmentViews2
+# @export
+# @param bam.file complete path to BAM file
+# @param param a \code{ScanBamParam} object
+# @param mapq_thr  length-one numeric vector indicating lower limit of MAPQ score
+# @param use.mcols length-one logical vector
+# writeImproperAlignments2 <- function(bam.file,
+#                                      param=improperAlignmentParams(mapqFilter=0)){
+#   .Deprecated()
+#   if(file.exists(bam.file)){
+#     return(invisible())
+#   }
+#   ##aln_path <- improperPaths(aview)
+#   irp <- getImproperAlignmentPairs(bam.file, param)
+#   out.file <- improperPaths(aview)
+#   saveRDS(irp, file=out.file)
+#   invisible()
+# }
 
 
 thinReadPairQuery <- function(g, zoom.out=1){
@@ -348,8 +371,6 @@ readPairsNearVariant <- function(object, bam.file){
 }
 
 
-
-
 #' Parse BAM file for improper read pairs near a set of GRanges
 #'
 #' All reads aligned to the intervals given by
@@ -366,20 +387,31 @@ readPairsNearVariant <- function(object, bam.file){
 #' @param bam.file character-vector providing valid complete path to a
 #'   bam file
 #' @param flags length-two integer vector as given by \code{scanBamFlags}
+#' @return A \code{GAlignmentPairs} object 
+#' 
 #' @export
 get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
   g <- queryRanges(object)
   get_readpairs2(g, bam.file, flags)
 }
 
+#' Extract reads from a bam file
+#' 
+#' Parses a BAM file for read pairs near intervals specified by a \code{GRanges} object and 
+#' returns the read pairs in a \code{GAlignmentPairs} object.
+#' @param g A \code{GRanges} object
+#' @param bam.file A character vector of the path to a bam file
+#' @param flags A length-two integer vector as given by \code{scanBamFlags}
+#' @seealso get_readpairs
+#' @return A \code{GAlignmentPairs} object
 #' @export
-get_readpairs2 <- function(g, bam.file, flags=scanBamFlag()){
-  galp <- .scan_all_readpairs(g, bam.file, flags)
-  validR1 <- overlapsAny(first(galp), g)
-  validR2 <- overlapsAny(last(galp), g)
-  galp <- galp[validR1 & validR2]
-  galp
-}
+ get_readpairs2 <- function(g, bam.file, flags=scanBamFlag()){
+   galp <- .scan_all_readpairs(g, bam.file, flags)
+   validR1 <- overlapsAny(first(galp), g)
+   validR2 <- overlapsAny(last(galp), g)
+   galp <- galp[validR1 & validR2]
+   galp
+ }
 
 #' Extract all improperly paired reads from an object with queryRanges defined
 #'
@@ -439,11 +471,25 @@ get_improper_readpairs2 <- function(g, bam.file){
   galp
 }
 
-#' Convert GAlignments to GRanges with is.improper and pair.index fields
+#' Convert GAlignmentPairs to GRanges while maintaining read pair information
+#' 
+#' Melts \code{GAlignmentPairs} objects to \code{GRanges} objects.
 #'
 #' @param ga a \code{GAlignments} object
-#' @param is.improper length-one logical vector.  Are the reads improperly paired?
+#' @param is.improper a length-one logical vector.  \code{TRUE} if the reads are improperly paired, \code{FALSE} otherwise.
 #' @param use.mcols logical for whether to keep the metadata columns of the \code{GAlignment} objects
+#' 
+#' @examples
+#' library(svbams)
+#' path <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(path, "cgov10t.bam")
+#' irp <- getImproperAlignmentPairs(bam.file)
+#' igr <- ga2gr(irp, is.improper=TRUE)
+#' prp <- getProperAlignmentPairs(bam.file)
+#' pgr <- ga2gr(prp, is.improper=FALSE)
+#'  
+#' @return A \code{GRanges} object with metadata columns containing read pair information.
+#' 
 #' @export
 ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
   id <- names(ga)
@@ -463,11 +509,12 @@ ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
 #' In order to plot the read pairs as position versus read pair index,
 #' information on the mates needs to be kept intact and the visualization is
 #' more clear if the reads are sorted by the first read in the pair. This
-#' functions turns the read tag in the 'id' field of the GRanges object to an
+#' function turns the read tag in the 'id' field of the GRanges object to an
 #' ordered factor. The levels of the factor are determined by the start position
 #' of the first read (R1) in the pair.
 #'
 #' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs}
+#' @return a \code{GRanges} object 
 #' @examples
 #'   library(svbams)
 #'   library(TxDb.Hsapiens.UCSC.hg19.refGene)
@@ -475,7 +522,8 @@ ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
 #'   si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
 #'   seqinfo(region) <- si["chr15", ]
 #'
-#'   bampath <- list.files(path, pattern="cgov44t.bam$", full.names=TRUE)
+#'   path <-system.file("extdata", package="svbams")
+#'   bampath <- list.files(path, pattern="cgov44t_revised.bam$", full.names=TRUE)
 #'
 #'   iparams <- improperAlignmentParams(mapqFilter=30)
 #'   pparams <- properAlignmentParams(mapqFilter=30)
@@ -498,10 +546,27 @@ sortByRead1 <- function(gr){
   gr
 }
 
-#' Thin the proper read pairs to reduce overplotting
+#' Thin proper read pairs to reduce overplotting
 #'
-#' @param gr a \code{GRanges} object of read pairs
+#' This function provides a simple interface to
+#' subsample a \code{GRanges} object of properly paired
+#' reads to reduce overplotting. 
+#'
+#' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs} object
 #' @param thin integer indicating how much to thin the properly paired reads.
+#' @details Setting the parameter \code{thin} to 10 (default) will 
+#' return a \code{GRanges} object with 1/10 the original number of 
+#' properly paired reads in \code{gr}.
+#' @return A \code{GRanges} object  
+#' @examples 
+#' library(svbams)
+#' path <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(path, "cgov10t.bam")
+#' prp <- getProperAlignmentPairs(bam.file)
+#' pgr <- ga2gr(prp, is.improper=FALSE)
+#' length(pgr)
+#' pgr2 <- thinProperPairs(pgr, 10)
+#' length(pgr2)
 #' @export
 thinProperPairs <- function(gr, thin=10){
   is.proper <- !gr$is.improper
@@ -537,6 +602,8 @@ thinProperPairs <- function(gr, thin=10){
 #'
 #' Evaluates to TRUE if
 #' @param gpairs a \code{GAlignmentPairs} object
+#' @param distance the minimum distance in base pairs between two reads in 
+#' order to call them aberrantly separated
 #' @return logical vector of the same length as \code{gpairs}
 #' @export
 aberrantSep <- function(gpairs, distance=10e3){
@@ -559,6 +626,9 @@ isDuplicate <- function(aln.pairs){
 
 #' Remove duplicates paired r
 #' @export
+#' @param gpairs TODO
+#' @param bins TODO
+#' @param params TODO
 filterPairedReads <- function(gpairs, bins, params){
   gpairs <- gpairs[ aberrantSep(gpairs, rpSeparation(params)) ]
   gpairs <- gpairs [ !isDuplicate(gpairs) ]
