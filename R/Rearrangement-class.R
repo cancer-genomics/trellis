@@ -379,6 +379,7 @@ setMethod("[", "Rearrangement", function(x, i, j, ..., drop=FALSE){
     irp <- improper(x)
     rpid <- names(irp)
     irp <- irp [ rpid %in% names(lb) ]
+
     x@linkedBins <- lb
     x@partitioning <- p
     x@improper <- irp
