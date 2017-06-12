@@ -100,18 +100,18 @@ intOverWidth <- function(query, subject){
 #'
 #' @return a \code{GRanges} object
 #' @export
-#' 
+#'
 #' @param linked_bins a \code{GRanges} representation of two genomic
-#'   intervals that are linked. 
+#'   intervals that are linked.
 uncouple <- function(linked_bins){
-  gr <- c(granges(linked_bins), linked_bins$linked.to)
+  gr <- c(granges(linked_bins), granges(linked_bins$linked.to))
   ## order by rearrangement
   L <- seq(1, length(linked_bins)*2, 2)
   R <- seq(2, length(linked_bins)*2, 2)
   gr <- gr[c(L, R)]
   if(!is.null(names(linked_bins))){
     names(gr)[L] <- names(linked_bins)
-  } 
+  }
   if(!is.null(names(linked_bins$linked.to))){
     names(gr)[R] <- names(linked_bins$linked.to)
   }
