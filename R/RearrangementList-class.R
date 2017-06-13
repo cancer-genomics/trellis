@@ -291,3 +291,17 @@ setReplaceMethod("splitReads", c("RearrangementList", "GRangesList"),
                    }
                    object
                  })
+
+
+#' @rdname splitReads
+#' @aliases splitReads,RearrangementList-method
+setMethod("splitReads", "RearrangementList", 
+          function(object){
+            split_reads <- vector("list", length(object))
+            for(i in seq_along(object)){
+              split_reads[[i]] <- splitReads(object[[i]])
+            }
+            grl <- GRangesList(split_reads)
+            names(grl) <- names(object)
+            grl
+          })
