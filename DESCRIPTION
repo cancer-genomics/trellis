@@ -24,7 +24,9 @@ Suggests:
     testthat,
     svbams,
     BSgenome.Hsapiens.UCSC.hg19,
-    TxDb.Hsapiens.UCSC.hg19.refGene
+    TxDb.Hsapiens.UCSC.hg19.refGene,
+    svfilters.hg18,
+    svfilters.hg19
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
