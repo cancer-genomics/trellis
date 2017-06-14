@@ -1,6 +1,6 @@
 Package: svclasses
 Title: Classes for somatic structural variation analyses
-Version: 0.0.23
+Version: 0.0.24
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
 Description: This package contains classes and methods used for structural
     variant analyses.
@@ -32,7 +32,7 @@ LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 6.0.1
-Collate:
+Collate: 
     'help.R'
     'DataPaths-class.R'
     'Preprocess-class.R'
@@ -51,6 +51,7 @@ Collate:
     'SegmentParam-class.R'
     'Transcripts-class.R'
     'copynumber-methods.R'
+    'data-utils.R'
     'data.R'
     'improper-methods.R'
     'seqinfo-utils.R'
