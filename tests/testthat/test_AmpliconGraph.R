@@ -31,7 +31,8 @@ test_that("AmpliconGraph", {
   if(FALSE){
     saveRDS(ag, file="AmpliconGraph0ada417.rds")
   }
-  ag.100362c <- readRDS("AmpliconGraph100362c.rds")
+  path <- system.file("extdata", package = "svcnvs")
+  ag.100362c <- readRDS(file.path(path, "AmpliconGraph100362c.rds"))
   expect_identical(ag, ag.100362c)
 
   ag <- makeAGraph(segs, germline_filters, params)
