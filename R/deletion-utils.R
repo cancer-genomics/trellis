@@ -1582,14 +1582,45 @@ meltReadPairs <- function(rps){
   df
 }
 
-#' Collect preprocessed bin-level data, segmentation, and improperly paired
-#' reads in a list
+#' Create a list of relevant information for calling deletions 
 #'
+#' Collects preprocessed bin-level data, segmentation, proper read 
+#' pairs surrounding deletions, improper read pairs supporting deletions,
+#' a path to the bam file, and the reference genome build of the bam file into
+#' a comprehensive \code{list} that can be used as input to the 
+#' \code{sv_deletions} function.    
+#' 
 #' @param bam.file length-one character vector providing path to BAM file
 #' @param genome length-one character vector providing genome build (hg18 or hg19)
 #' @param bins a \code{GRanges} object with \code{log_ratio} in the \code{mcols}
 #' @param segments a \code{GRanges} object with \code{seg.mean} in the \code{mcols}
-#' @param improper_rp a \code{GAlignmentPairs} object with improperly paired reads
+#' @param read_pairs a length 2 \code{list} of \code{GAlignmentPairs} objects.
+#' One \code{GAlignmentPairs} object should have the name \code{proper_del}
+#' and contain proper read pairs that surround putative deletions obtained
+#' from the \code{properReadPairs} function.  The 
+#' second \code{GAlignmentPairs} object should have the name \code{improper}
+#' and contain improper reads supporting putative deletions obtained from
+#' the \code{getImproperAlignmentPairs} function.  
+#' @return a \code{list} object
+#' @examples
+#' library(svbams)
+#' library(svalignments) 
+#' library(svfilters.hg19)
+#' data(bins1kb)
+#' data(segments, package="svcnvs")
+#' extdata <- system.file("extdata", package="svbams")
+#' bam.file <- file.path(extdata, "cgov44t_revised.bam")
+#' iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq")) 
+#' improper_rp <- getImproperAlignmentPairs(bam.file, param = iparams)
+#' segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
+#' del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())], 
+#'                  min.gapwidth=2000)
+#' proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam()) 
+#' read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
+#' pdata <- preprocessData(bam.file=bam.file, genome="hg19",
+#'                         bins=bins1kb,
+#'                         segments=segments,
+#'                         read_pairs=read_pairs) 
 #' @export
 preprocessData <- function(bam.file=NULL,
                            genome,
