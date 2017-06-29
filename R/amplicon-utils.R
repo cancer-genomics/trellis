@@ -1010,7 +1010,7 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 #' @param params a list of parameters
 #' @param af a list of germline filters
 #' @param segs a \code{GRanges} object from the segmentation of the normalized coverage
-#' @seealso \code{\link[svfilters.hg19]{germline_filters}} \code{\link{ampliconParams}}
+#' @seealso \code{\link{ampliconParams}}
 #' @export
 #' @examples
 #'   library(svfilters.hg19)

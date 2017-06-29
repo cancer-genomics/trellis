@@ -82,7 +82,7 @@ not_in_filters <- function(x, filters){
 #'   segmentation and references therein; see
 #'   \code{\link[svclasses]{SegmentParam-class}} for a description of the
 #'   default parameters settings passed to the \code{segment} function. See
-#'   \code{\link[svpreprocess]{sv_preprocess}} for obtaining normalized counts
+#'   \code{\link[svpreprocess]{binNormalize}} for obtaining normalized counts
 #'   for segmentation.
 #' @export
 segmentBins <- function(bins, param=SegmentParam(), ...){

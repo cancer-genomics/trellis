@@ -104,7 +104,6 @@ summarizeGeneFreq <- function(grl){
 #' @param grl a \code{GRangesList} of deletions -- each element is a sample
 #' @param maxgap length-one integer vector passed to \code{findOverlaps}
 #' @export
-#' @seealso \code{\link{summarizeGeneFreq}}
 #' @examples
 #'   genes <- GRanges("chr1", IRanges(5, 10))
 #'   genes$gene_name <- "a"
