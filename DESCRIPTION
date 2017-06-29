@@ -37,6 +37,7 @@ RoxygenNote: 6.0.1
 Collate: 
     'help.R'
     'amplicon-utils.R'
+    'data.R'
     'deletion-utils.R'
     'germlineOutliers.R'
     'listCNVs.R'
