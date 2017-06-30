@@ -1,6 +1,6 @@
 ---
 title: "Overview of svcnvs package"
-author: "Robert Scharpf"
+author: "Robert Scharpf, Daniel Bruhm"
 date: \today
 output: BiocStyle::pdf_document
 vignette: >
@@ -11,19 +11,18 @@ vignette: >
 
 # Introduction
 
-This package is used to segment normalized coverage by circular binary
-segmentation and to identify deletions and amplicons through a combination of
-changes in normalized coverage and read pairs with aberrant spacing or
-orientation. *Segmentation should probably be extracted into a separate package.*
+This package is used to identify deletions and amplicons from Whole Genome Sequencing (WGS) data through a combination of changes in normalized coverage and read pairs with aberrant spacing or orientation.
+
+Additional packages required for this vignette are the `svfilters.hg19` package
+that contains various sequence filters for structural variant analyses and the
+`svalignments` package that contains wrappers for extracting properly- and
+improperly-paired reads from a BAM file.  We also employ functions from `RSamtools` and `Genomic Ranges`.
+
+This package requires that normalized coverage is calculated for a set of bins in the package `svfilters.hg19` (or `svfilters.hg18`).  See the `svpreprocess` vignette for comprehensive documentaion on generating normalized coverage.  This process can take some time on large bam files so for the purpose of this tutorial we've distributed sample preprocessed coverage data from the `svpreprocess` package.
 
 # Preprocessing
 
-
-Additional packages required for this vignette are the `svfilter.hg19` package
-that contains various sequence filters for structural variant analyses and the
-`svalignments` package that contains wrappers for extracting properly- and
-improperly-paired reads from a BAM file.
-
+Loading packages required for this analysis.
 
 ```{r packages}
 library(GenomicRanges)
@@ -33,43 +32,44 @@ library(svfilters.hg19)
 library(svalignments)
 ```
 
-Next, we load an object containg the normalized and $\log_2$-transformed
-coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the
-genome. The $\log_2$ ratios were multipled by 1000, rounded to the nearest
-integer, and saved as integers in a serialized R object to reduce the memory
-footpring.
+We first load an object from the `svpreprocess` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `svpreprocess` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38.
 
 ```{r views_filepath}
 ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
 cov.file <- file.path(ddir, "preprocessed_coverage.rds")
 log_ratio <- readRDS(cov.file)/1000
 data(bins1kb, package="svfilters.hg19")
-seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+bins1kb <- dropSeqlevels(bins1kb, "chrY", pruning.mode = "coarse") 
 bins1kb$log_ratio <- log_ratio
 ```
 
 # Segmentation
 
-So that the examples run very quickly in this vignette, we limit our analyses to
-three chromosomes.
+Next, we segment the $\log_2$ ratios using the Circular Binary Segmentation algorithm to achieve estimated copy number states across the genome. To save time we load a pre-made `GRanges` object containing the segment means.  
 
 ```{r segments}
 path <- system.file("extdata", package="svcnvs")
 data(segments, package="svcnvs")
 ```
 
+To generate this segments object on your own data use the `segmentBins` function.  
+```{r segments2, eval=FALSE}
+segments <- segmentBins(bins1kb)
+```
+
+
 ## Plotting the genome
 
-Plot the entire genome overlaying the segmentation data.
+We routinely visualize the segmented $\log_2$ ratios of the entire genome to get an overview of the data.  An example using the `ggplot2` library follows.
 
-```{r genome, fig.width=8, fig.height=3}
+```{r genome, fig.width=8, fig.height=4, warning=FALSE}
 bins1kb <- sort(bins1kb)
 lrr.df <- as.data.frame(bins1kb[seq(1, length(bins1kb), 50)])
 seg.df <- as.data.frame(segments)
 library(ggplot2)
 chromlabels <- setNames(c(1:22, "X"), seqlevels(bins1kb))
 ggplot(lrr.df, aes(start, log_ratio)) +
-  geom_point(size=0.1, color="gray") +
+  geom_point(size=0.1, color="steelblue", alpha = 0.1) +
   geom_segment(data=seg.df,
                aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
                color="black", inherit.aes=FALSE) +
@@ -78,17 +78,21 @@ ggplot(lrr.df, aes(start, log_ratio)) +
   theme(axis.text.x=element_blank(),
         panel.grid=element_blank(),
         panel.background=element_rect(fill="white"),
-        axis.ticks.x=element_blank()) + xlab("") +
-  ylab(expression(log[2](r)))
+        axis.ticks.x=element_blank(), 
+        strip.text.x = element_text(size = 3)) + 
+  xlab("") +
+  ylab(expression(log[2](r))) + 
+  ylim(c(-3, 3))
 ```
+
+It is evident from visual inspection that this sample has numerous structural alterations.  We will proceed to integrate read pair information with these segmented $\log_2$ ratios to identify true CNVs.         
 
 
 # Deletions
 
 In additition to the segmented $\log_2$ ratios, the deletion analysis requires
-improperly paired reads. Below, we specify the complete file path to a BAM file
-provided by the `svbams` package and extract improperly paired reads from the
-entire genome and an initial set of properly paired reads.
+improperly paired reads. Below, we specify the complete file path to the BAM file
+used for this analysis that is provided by the `svbams` package. We extract improperly paired reads from the entire genome and an initial set of properly paired reads.
 
 ```{r views}
 extdata <- system.file("extdata", package="svbams")
