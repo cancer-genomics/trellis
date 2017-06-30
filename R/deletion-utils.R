@@ -1472,7 +1472,7 @@ listDeletions <- function(path="data/segment/1deletions", ids){
   grl
 }
 
-#' @export
+
 reduceTranscripts <- function(tx, grl, maxgap=5e3){
   ## tx is big.  Make this smaller as a first step
   if(!missing(grl)){
@@ -1523,7 +1523,7 @@ numberOverlappingDeletions <- function(tx, grl, maxgap=5e3){
   frequency
 }
 
-#' @export
+
 numberSpanningAmplicons <- function(tx, grl, maxgap=5e3){
   ## ensure that 2 deletions for a subject hitting a gene are only counted once
   is_overlap_list <- lapply(grl, function(gr, tx, maxgap) {

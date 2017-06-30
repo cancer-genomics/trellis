@@ -1286,7 +1286,7 @@ sv_amplicon_exp <- function(dirs, bviews, grl, amplicon_filters,
 
 
 
-#' @export
+
 recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   ## tx is big.  Make this smaller as a first step
   tx <- subsetByOverlaps(tx, reduce(unlist(grl), min.gapwidth=maxgap))
