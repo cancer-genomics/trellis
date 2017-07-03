@@ -1185,9 +1185,17 @@ add_amplicons <- function(ag, bam.file, params){
 #'   experiment.
 #'
 #' @export
-#' @param preprocess a list of the preprocessed data (TODO)
-#' @param amplicon_filters a \code{list} of filters
-#' @param params a list of parameters for the amplicon analysis
+#' @param preprocess a list of the preprocessed data (see \code{preprocessData})
+#' @param amplicon_filters a \code{GRanges} object of germline filters.  If this
+#' argument is not specified then a default set of germline filters will be used 
+#' from the \code{svfilters.hg19} package if the \code{genome} slot in \code{preprocess} is 
+#' set to "hg19" or from the \code{svfilters.hg18} package if it's set to "hg18".
+#' @param params a list of parameters for the amplicon analysis.  Default parameters 
+#' are given by \code{AmpliconParams()}.
+#' @return an \code{AmpliconGraph} object
+#' @examples 
+#' data(pdata)
+#' sv_amplicons2(pdata)
 #' @export
 sv_amplicons2 <- function(preprocess, amplicon_filters,
                           params=ampliconParams()){

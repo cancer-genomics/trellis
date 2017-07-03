@@ -21,3 +21,9 @@ NULL
 #' @name segments
 #' @docType data
 NULL
+
+#' A list of preprocess data for calling deletion/amplification
+#'
+#' @name pdata
+#' @docType data
+NULL

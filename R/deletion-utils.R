@@ -120,9 +120,8 @@ granges_copynumber2 <- function(gr, bins){
   hits <- findOverlaps(gr, bins)
   if (!any(duplicated(names(gr))) && !is.null(names(gr))) {
     split_by <- factor(names(gr)[queryHits(hits)], levels = names(gr))
-  }
-  else {
-    split_by <- queryHits(hits)
+  } else {
+      split_by <- queryHits(hits)
   }
   fc_context <- tapply(bins$log_ratio[subjectHits(hits)], queryHits(hits), median)
   as.numeric(fc_context)
@@ -1368,7 +1367,7 @@ revise <- function(sv, bins, param){
   sv7
 }
 
-#' Creates a StructuralVariant object for a sample
+#' Creates a StructuralVariant object 
 #'
 #' Creates a \code{StructuralVariant} object encapsulating information
 #' on deletions, including the genomic intervals, proper and improper
@@ -1381,9 +1380,16 @@ revise <- function(sv, bins, param){
 #' running this function.
 #'
 #' @param preprocess a list of preprocessing summaries (see \code{preprocessData})
-#' @param gr_filters a \code{GRanges} object of germline filters
+#' @param gr_filters a \code{GRanges} object of germline filters.  If the function is
+#' called without specifying this argument then a default set of germline filters 
+#' will be applied from \code{svfilters.hg19} if the \code{genome} slot in \code{preprocess}
+#' is set to "hg19" or \code{svfilters.hg18} if \code{genome} is set to "hg18".
 #' @param param a \code{DeletionParam} object
+#' @return a \code{StructuralVariant} object
 #' @seealso \code{\link{preprocessData}}
+#' @examples 
+#' data(pdata)
+#' sv_deletions(pdata)
 #' @export
 sv_deletions <- function(preprocess,
                          gr_filters,
@@ -1580,13 +1586,13 @@ meltReadPairs <- function(rps){
   df
 }
 
-#' Create a list of relevant information for calling deletions 
+#' Create a list of relevant information for calling deletions/amplifications 
 #'
-#' Collects preprocessed bin-level data, segmentation, proper read 
+#' Collects preprocessed bin-level log2 ratios, segmentation, proper read 
 #' pairs surrounding deletions, improper read pairs supporting deletions,
 #' a path to the bam file, and the reference genome build of the bam file into
 #' a comprehensive \code{list} that can be used as input to the 
-#' \code{sv_deletions} function.    
+#' \code{sv_deletions} and \code{sv_amplicons2} functions.    
 #' 
 #' @param bam.file length-one character vector providing path to BAM file
 #' @param genome length-one character vector providing genome build (hg18 or hg19)
