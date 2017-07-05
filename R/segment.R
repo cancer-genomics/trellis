@@ -49,8 +49,8 @@ not_in_filters <- function(x, filters){
 }
 
 .segmentBins <- function(bins, param, ...){
-  bins <- bins[!is.na(bins$adjusted)]
-  adjusted <- bins$adjusted
+  bins <- bins[!is.na(bins$log_ratio)]
+  adjusted <- bins$log_ratio
   cnaobj <- CNA(as.matrix(adjusted),
                 chrom=as.character(seqnames(bins)),
                 maploc=start(bins),
@@ -99,12 +99,13 @@ not_in_filters <- function(x, filters){
 #'   library(GenomeInfoDb)
 #'   library(DNAcopy)
 #'   bins1kb <- keepSeqlevels(bins1kb, "chr22", pruning.mode = "coarse")
-#'   bins1kb$adjusted <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4), 
+#'   bins1kb$log_ratio <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4), 
 #'                         rnorm(floor(length(bins1kb)/2), mean = -1, sd = 0.4))
 #'   segmentBins(bins1kb) # Using default segmentation parameters
 #'   segmentBins(bins1kb, param = SegmentParam(alpha = 0.01, undo.splits = "sdundo", 
 #'                                             undo.SD = 5, verbose = 1))
-#'   segmentBins(bins1kb, param = SegmentParam(), weights = abs(rnorm(length(bins1kb))))                                         
+#'   segmentBins(bins1kb, param = SegmentParam(), 
+#'               weights = abs(rnorm(length(bins1kb))))                                         
 #'   
 #' @export
 segmentBins <- function(bins, param=SegmentParam(), ...){
