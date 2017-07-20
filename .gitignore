@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 /.Rbuildignore
-man/
 /svalignments.Rproj
 data/*
 /TODO.org
