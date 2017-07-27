@@ -45,13 +45,24 @@ cov.file <- file.path(ddir, "preprocessed_coverage.rds")
 log_ratio <- readRDS(cov.file)/1000
 data(bins1kb, package="svfilters.hg19")
 seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+## !requires column to be named log_ratio!
 bins1kb$log_ratio <- log_ratio
 ```
 
 # Segmentation
 
-So that the examples run very quickly in this vignette, we limit our analyses to
-three chromosomes.
+So that our segmentation example runs quickly, we limit our analyses to
+two chromosomes and sample every 10th bin.  Note, additional arguments can be passed to the `segment` function in the `DNAcopy` package.
+
+```{r segment}
+bins_subset <- bins1kb
+seqlevels(bins_subset, pruning.mode="coarse") <- c("chr1", "chr2")
+bins_subset <- bins_subset[ seq(1, length(bins_subset), 50) ]
+g <- segmentBins(bins_subset)
+g
+```
+
+The result is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.  Here, we load previously computed segments from the full dataset.
 
 ```{r segments}
 path <- system.file("extdata", package="svcnvs")
@@ -108,9 +119,11 @@ pair data  in a single list object:
 
 
 ```{r preprocess_data}
-pdata <- preprocessData(bam.file=bam.file, genome="hg19",
+pdata <- preprocessData(bam.file=bam.file,
+                        genome="hg19",
                         bins=bins1kb,
-                        segments=segments, read_pairs=read_pairs)
+                        segments=segments,
+                        read_pairs=read_pairs)
 ```
 
 Below, we call segments as homozygous deletion (homozygous), homozygous deletion
