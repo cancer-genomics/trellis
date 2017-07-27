@@ -118,12 +118,6 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
 
 granges_copynumber2 <- function(gr, bins){
   hits <- findOverlaps(gr, bins)
-  if (!any(duplicated(names(gr))) && !is.null(names(gr))) {
-    split_by <- factor(names(gr)[queryHits(hits)], levels = names(gr))
-  }
-  else {
-    split_by <- queryHits(hits)
-  }
   fc_context <- tapply(bins$log_ratio[subjectHits(hits)], queryHits(hits), median)
   as.numeric(fc_context)
 }
