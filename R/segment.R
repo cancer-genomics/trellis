@@ -49,8 +49,10 @@ not_in_filters <- function(x, filters){
 }
 
 .segmentBins <- function(bins, param, ...){
-  bins <- bins[!is.na(bins$adjusted)]
-  adjusted <- bins$adjusted
+  ##bins <- bins[!is.na(bins$adjusted)]
+  ##adjusted <- bins$adjusted
+  bins <- bins[!is.na(bins$log_ratio)]
+  adjusted <- bins$log_ratio
   cnaobj <- CNA(as.matrix(adjusted),
                 chrom=as.character(seqnames(bins)),
                 maploc=start(bins),
