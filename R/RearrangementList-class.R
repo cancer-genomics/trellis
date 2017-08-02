@@ -285,15 +285,17 @@ setReplaceMethod("[[", "RearrangementList", function(x, i, j, ..., drop=FALSE, v
 #' @aliases splitReads,RearrangementList,GRangesList-method
 setReplaceMethod("splitReads", c("RearrangementList", "GRangesList"),
                  function(object, value){
-                   for (i in 1:length(object)) {
-                    ind <- which(names(value) %in% names(object[[i]]))
-                    if (length(ind) == 0) {
-                       splitReads(object[[i]]) <- GRanges()
-                    } else {
-                       splitReads(object[[i]]) <- unlist(value[ind])
-                    }
-                  }
-                  object
+                   ##browser()
+                   orig_order <- names(object)
+                   object2 <- object[ names(object) %in% names(value) ]
+                   object2 <- object2 [ names(value) ]
+                   for (i in 1:length(object2)) {
+                     splitReads(object2[[i]]) <- value[[i]]
+                   }
+                   notchanged <- object [ !names(object) %in% names(object2) ]
+                   object3 <- c(notchanged, object2)
+                   object3 <- object3[ orig_order ]
+                   object3
                  })
 
 
