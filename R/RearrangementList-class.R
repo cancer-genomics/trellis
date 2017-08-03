@@ -34,7 +34,7 @@ setGeneric("RearrangementList", function(object,
 #'
 #' @examples
 #' RearrangementList()
-#' 
+#'
 #' @export
 #' @slot data a list of \code{Rearrangement} objects
 #' @slot elementType a character vector
@@ -216,6 +216,36 @@ setMethod("lapply", "RearrangementList", function(X, FUN, ...){
   results
 })
 
+#' @rdname splitReads
+#' @aliases splitReads,RearrangementList,GRangesList-method
+setReplaceMethod("splitReads", c("RearrangementList", "GRangesList"),
+                 function(object, value){
+                   orig_order <- names(object)
+                   object2 <- object[ names(object) %in% names(value) ]
+                   object2 <- object2 [ names(value) ]
+                   for (i in 1:length(object2)) {
+                     splitReads(object2[[i]]) <- value[[i]]
+                   }
+                   notchanged <- object [ !names(object) %in% names(object2) ]
+                   object3 <- c(notchanged, object2)
+                   object3 <- object3[ orig_order ]
+                   object3
+                 })
+
+
+#' @rdname splitReads
+#' @aliases splitReads,RearrangementList-method
+setMethod("splitReads", "RearrangementList", 
+          function(object){
+            split_reads <- vector("list", length(object))
+            for(i in seq_along(object)){
+              split_reads[[i]] <- splitReads(object[[i]])
+            }
+            grl <- GRangesList(split_reads)
+            names(grl) <- names(object)
+            grl
+          })
+
 ##--------------------------------------------------
 ##
 ## Subsetting
@@ -281,33 +311,26 @@ setReplaceMethod("[[", "RearrangementList", function(x, i, j, ..., drop=FALSE, v
   x
 })
 
-#' @rdname splitReads
-#' @aliases splitReads,RearrangementList,GRangesList-method
-setReplaceMethod("splitReads", c("RearrangementList", "GRangesList"),
-                 function(object, value){
-                   ##browser()
-                   orig_order <- names(object)
-                   object2 <- object[ names(object) %in% names(value) ]
-                   object2 <- object2 [ names(value) ]
-                   for (i in 1:length(object2)) {
-                     splitReads(object2[[i]]) <- value[[i]]
-                   }
-                   notchanged <- object [ !names(object) %in% names(object2) ]
-                   object3 <- c(notchanged, object2)
-                   object3 <- object3[ orig_order ]
-                   object3
-                 })
-
-
-#' @rdname splitReads
-#' @aliases splitReads,RearrangementList-method
-setMethod("splitReads", "RearrangementList", 
-          function(object){
-            split_reads <- vector("list", length(object))
-            for(i in seq_along(object)){
-              split_reads[[i]] <- splitReads(object[[i]])
-            }
-            grl <- GRangesList(split_reads)
-            names(grl) <- names(object)
-            grl
+##--------------------------------------------------
+##
+## combining
+##
+##--------------------------------------------------
+setMethod("c", "RearrangementList",
+          function(x, ..., recursive=FALSE){
+            args <- list(x, ...)
+            if(all(lengths(args) == 0)) return(RearrangementList())
+            rear.list <- lapply(args, function(x) x@data)
+            rear.list2 <- do.call("c", rear.list)
+            nms <- names(rear.list2)
+            coldat.list <- lapply(args, colData)
+            ## this does not work for some reason
+            ##coldat <- do.call(rbind, coldat.list)
+            coldat.list <- lapply(coldat.list, as.data.frame)
+            coldat <- as(do.call(rbind, coldat.list), "DataFrame")
+            new("RearrangementList",
+                data=rear.list2,
+                names=nms,
+                elementType="Rearrangement",
+                colData=coldat)
           })

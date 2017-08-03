@@ -41,3 +41,41 @@ test_that("RearrangementList", {
   expect_identical(nrow(colData(rl)), 0L)
   expect_identical(ncol(colData(rl)), 1L)
 })
+
+test_that("rbind", {
+  library(S4Vectors)
+  df1 <- DataFrame(a=letters)
+  df2 <- DataFrame(a=letters)
+  result <- rbind(df1, df2)
+  expect_is(result, "DataFrame")
+})
+
+test_that("c", {
+  tmp <- c(RearrangementList(), RearrangementList())
+  expect_is(tmp, "RearrangementList")
+  data(rear_list)
+  tmp <- c(rear_list[1:2], rear_list[3:4])
+  expect_is(tmp, "RearrangementList")
+  expect_equivalent(tmp, rear_list[1:4])
+  ##
+  ## NOTE: for some reason do.call(rbind, list_of_DataFrames) does not work
+  ##  - had to coerce to data.frame and then back to DataFrame
+  ##  - this causes the colData slot not to be identical
+})
+
+test_that("splitReads<-", {
+  data(rear_list)
+  nms <- names(rear_list)
+  g <- replicate(4, GRanges())
+  grl <- GRangesList(g)
+  names(grl) <- head(nms, 4)
+  splitReads(rear_list) <- grl
+
+  ##
+  ## accessor
+  ##
+  sr <- head(splitReads(rear_list), 4)
+  expect_equivalent(sr, grl)
+})
+
+
