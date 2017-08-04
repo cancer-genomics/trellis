@@ -43,3 +43,12 @@ setReplaceMethod("improper", c("StructuralVariant","GAlignmentPairs"),
                    indexImproper(object) <- index
                    object
                  })
+
+#' @rdname improper-methods
+#' @aliases improper,Rearrangement,GAlignmentPairs-method
+#' @param value a \code{GAlignmentPairs} object
+setReplaceMethod("improper", c("Rearrangement", "GAlignmentPairs"),
+                 function(object, value) {
+                   object@improper <- value
+                   object
+                 })
