@@ -41,6 +41,7 @@ NULL
 #'
 #' @export
 #' @rdname Rearrangement-class
+#' @aliases Rearrangement
 setClass("Rearrangement", representation(linkedBins="GRanges",
                                          improper="GAlignmentPairs",
                                          partitioning="integer",
@@ -392,6 +393,3 @@ setMethod("[", "Rearrangement", function(x, i, j, ..., drop=FALSE){
   }
   x
 })
-
-
-         
