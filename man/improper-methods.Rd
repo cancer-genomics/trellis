@@ -7,6 +7,8 @@
 \alias{improper,Rearrangement-method}
 \alias{improper<-,StructuralVariant,GAlignmentPairs-method}
 \alias{improper,StructuralVariant,GAlignmentPairs-method}
+\alias{improper<-,Rearrangement,GAlignmentPairs-method}
+\alias{improper,Rearrangement,GAlignmentPairs-method}
 \title{Accessor for improper read pairs}
 \usage{
 improper(object)
@@ -16,9 +18,13 @@ improper(object) <- value
 \S4method{improper}{Rearrangement}(object)
 
 \S4method{improper}{StructuralVariant,GAlignmentPairs}(object) <- value
+
+\S4method{improper}{Rearrangement,GAlignmentPairs}(object) <- value
 }
 \arguments{
 \item{object}{a \code{Rearrangement} or \code{StructuralVariant} object}
+
+\item{value}{a \code{GAlignmentPairs} object}
 
 \item{value}{a \code{GAlignmentPairs} object}
 }

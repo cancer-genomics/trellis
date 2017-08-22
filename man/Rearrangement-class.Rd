@@ -3,6 +3,7 @@
 \docType{class}
 \name{Rearrangement-class}
 \alias{Rearrangement-class}
+\alias{Rearrangement}
 \alias{partitioning}
 \alias{partitioning,Rearrangement-method}
 \alias{length,Rearrangement-method}
