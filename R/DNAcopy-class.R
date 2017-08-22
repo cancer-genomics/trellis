@@ -40,13 +40,13 @@ setAs("DNAcopy", "GRanges", function(from, to){
 #' Coerce a DNAcopy object to GRanges
 #'
 #' @return a \code{GRanges} object
-#' 
+#'
 #' @export
 #' @param x a \code{DNAcopy} object
 #' @param seq_info a \code{Seqinfo} object
 cbs2granges <- function(x, seq_info){
   gr <- as(x, "GRanges")
+  seq_info <- keepSeqlevels(seq_info, unique(chromosome(gr)))
   gr <- keepSeqlevels(gr, seqlevels(seq_info))
-  seqinfo(gr) <- seq_info
   gr
 }
