@@ -63,7 +63,8 @@ not_in_filters <- function(x, filters){
                  undo.splits=undo.splits(param),
                  undo.SD=undo.SD(param),
                  verbose=param@verbose, ...)
-  g <- cbs2granges(seg, seqinfo(bins))
+  g <- tryCatch(cbs2granges(seg, seqinfo(bins)), error=function(e) NULL)
+  if(is.null(g)) browser()
   g
 }
 
@@ -88,11 +89,29 @@ not_in_filters <- function(x, filters){
 #'   for segmentation.
 #' @export
 segmentBins <- function(bins, param=SegmentParam(), ...){
-  chroms <- seqlevels(bins)
-  results <- vector("list", length(chroms))
-  for(i in seq_along(chroms)){
-    chr <- chroms[i]
-    chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
+  gen <- genome(bins)[[1]]
+  data(gaps, package=paste("svfilters", gen, sep="."),
+       envir=environment())
+  gaps <- gaps[gaps$type=="centromere", ]
+  seqlevels(gaps, pruning.mode="coarse") <- seqlevels(bins)
+  parms <- GRanges(seqnames(gaps), IRanges(rep(1, length(gaps)), start(gaps)))
+  parms$arm <- paste0(chromosome(parms), "p")
+  qarms <- GRanges(seqnames(gaps), IRanges(end(gaps), seqlengths(gaps)))
+  qarms$arm <- paste0(chromosome(qarms), "q")
+  arms <- sort(c(parms, qarms))
+  bins$arm <- NA
+  hits <- findOverlaps(bins, arms)
+  bins$arm[queryHits(hits)] <- arms$arm[subjectHits(hits)]
+  bins$arm <- factor(bins$arm, levels=arms$arm)
+  bins_grl <- split(bins, bins$arm)
+  ##  chroms <- seqlevels(bins)
+  results <- vector("list", length(bins_grl))
+  for(i in seq_along(bins_grl)){
+    ##chr <- chroms[i]
+    ##chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
+    chrbins <- bins_grl[[i]]
+    ##chr <- unique(chromosome(chrbins))
+    ##chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
     if(length(chrbins) < 2) next()
     results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }
