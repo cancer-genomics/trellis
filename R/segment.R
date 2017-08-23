@@ -63,8 +63,9 @@ not_in_filters <- function(x, filters){
                  undo.splits=undo.splits(param),
                  undo.SD=undo.SD(param),
                  verbose=param@verbose, ...)
-  g <- tryCatch(cbs2granges(seg, seqinfo(bins)), error=function(e) NULL)
-  if(is.null(g)) browser()
+  g <- cbs2granges(seg, seqinfo(bins))
+  ## g <- tryCatch(cbs2granges(seg, seqinfo(bins)), error=function(e) NULL)
+  ## if(is.null(g)) browser()
   g
 }
 
@@ -115,6 +116,7 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
     if(length(chrbins) < 2) next()
     results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }
+  results <- results[ !sapply(results, is.null) ]
   g <- unlist(GRangesList(results))
   seqlevels(g, pruning.mode="coarse") <- seqlevels(bins)
   seqinfo(g) <- seqinfo(bins)
