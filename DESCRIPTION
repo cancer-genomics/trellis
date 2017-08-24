@@ -1,6 +1,6 @@
 Package: svalignments
 Title: Methods for extracting and viewing improper alignments
-Version: 0.0.21
+Version: 0.0.22
 Authors@R: c(person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre")), person("Daniel", "Bruhm", email = "danielbruhm@gmail.com", role = "aut"))
 Description: Methods for extracting and viewing improper alignments.
 Depends:

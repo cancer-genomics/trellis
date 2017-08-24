@@ -469,20 +469,20 @@ splitreadIntersection <- function(g){
 #'
 #' @param maxgap this maximum gap between the mapped read and the
 #'   genomic intervals of the improper read clusters
-rearrangedReads <- function(rlist, blat, maxgap=500){
-  lb <- linkedBins(rlist)
+rearrangedReads <- function(linked_bins, blat, maxgap=500){
+  ##lb <- linkedBins(rlist)
   ## filter blat alignments
   is_na <- is.na(blat$Tstart)
   if(any(is_na)){
     blat <- blat[!is_na, ]
   }
-  blat <- blat[blat$Tname %in% seqlevels(lb), ]
-  blat_gr <- blat_to_granges(blat, lb)
-  genome(blat_gr) <- genome(lb)
+  blat <- blat[blat$Tname %in% seqlevels(linked_bins), ]
+  blat_gr <- blat_to_granges(blat, linked_bins)
+  genome(blat_gr) <- genome(linked_bins)
   ##
   ## A blat record must overlap one of the intervals in a linked bin
   ##
-  is.overlap <- overlapsLinkedBins(blat_gr, lb, maxgap=maxgap)
+  is.overlap <- overlapsLinkedBins(blat_gr, linked_bins, maxgap=maxgap)
   blat_gr <- blat_gr[ is.overlap ]
   ## We are looking for split read alignments--a read must have at
   ## least 2 alignments.  Get rid of all reads with only a single
@@ -492,12 +492,12 @@ rearrangedReads <- function(rlist, blat, maxgap=500){
   ##
   ## Both intervals in a linked bin must overlap a blat record
   ##
-  overlaps_both <- overlapsBlatRecord(lb, blat_gr, maxgap)
-  sr_list <- vector("list", length(rlist))
-  names(sr_list) <- names(rlist)
-  for(i in seq_along(lb)){
+  overlaps_both <- overlapsBlatRecord(linked_bins, blat_gr, maxgap)
+  sr_list <- vector("list", length(linked_bins))
+  names(sr_list) <- names(linked_bins)
+  for(i in seq_along(linked_bins)){
     if(!overlaps_both[i]) sr_list[[i]] <- empty_record()
-    sr_list[[i]] <-   rearrangedReads2(lb[i], blat_gr, maxgap)
+    sr_list[[i]] <-   rearrangedReads2(linked_bins[i], blat_gr, maxgap)
   }
   sr.grl <- GRangesList(sr_list)
   sr.grl
