@@ -4,12 +4,15 @@
 \alias{getImproperAlignmentPairs}
 \title{Extract all improperly paired reads from a bam file as a GAlignmentPairs object}
 \usage{
-getImproperAlignmentPairs(bam.file, param = improperAlignmentParams())
+getImproperAlignmentPairs(bam.file, param = improperAlignmentParams(), build)
 }
 \arguments{
 \item{bam.file}{complete path to BAM file}
 
 \item{param}{a \code{ScanBamParam} object.}
+
+\item{build}{the reference genome buld that reads were aligned to.  Currently
+supported builds include "hg19" and "hg18".}
 
 \item{use.mcols}{logical}
 }

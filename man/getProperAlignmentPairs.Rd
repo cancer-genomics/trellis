@@ -5,12 +5,15 @@
 \title{Extract properly paired reads from a bam file}
 \usage{
 getProperAlignmentPairs(bam.file, param = properAlignmentParams(mapqFilter =
-  0))
+  0), build)
 }
 \arguments{
 \item{bam.file}{a \code{BamViews} object}
 
 \item{param}{a \code{ScanBamParam} object.}
+
+\item{build}{the reference genome buld that reads were aligned to.  Currently
+supported builds include "hg19" and "hg18".}
 }
 \value{
 a \code{GAlignmentPairs} object
