@@ -74,9 +74,11 @@ and properly paired reads in this region.
 
 ```{r GAlignmentPairs}
 irp <- getImproperAlignmentPairs(bampath,
-                                 iparams)
+                                 iparams, 
+                                 build="hg19")
 prp <- getProperAlignmentPairs(bampath,
-                               pparams)
+                               pparams, 
+                               build="hg19")
 ```
 
 For visualization, we melt the `GAlignmentPairs` to `GRanges` and coerce to a
