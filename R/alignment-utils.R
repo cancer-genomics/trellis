@@ -178,6 +178,8 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #' @export
 #' @param bam.file complete path to BAM file
 #' @param param a \code{ScanBamParam} object.
+#' @param build the reference genome buld that reads were aligned to.  Currently
+#' supported builds include "hg19" and "hg18".
 #' @param use.mcols logical
 #'
 #' @examples
@@ -192,11 +194,13 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(bam.file,
-                                      param=improperAlignmentParams()){
+                                      param=improperAlignmentParams(), 
+                                      build){
   flags <- improperAlignmentFlags()
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
   irp2 <- makeGAlignmentPairs2(irp, use.mcols=TRUE, use.names=TRUE)
+  genome(seqinfo(irp2)) <- build
   irp2
 }
 
@@ -210,6 +214,8 @@ getImproperAlignmentPairs <- function(bam.file,
 #' @export
 #' @param bam.file a \code{BamViews} object
 #' @param param a \code{ScanBamParam} object.
+#' @param build the reference genome buld that reads were aligned to.  Currently
+#' supported builds include "hg19" and "hg18".
 #'
 #' @examples 
 #' library(svbams)
@@ -221,12 +227,14 @@ getImproperAlignmentPairs <- function(bam.file,
 #'   \code{ScanBamParam} object with the appropriate flags for extracting
 #'   proper read pairs.
 getProperAlignmentPairs <- function(bam.file,
-                                    param=properAlignmentParams(mapqFilter=0)){
+                                    param=properAlignmentParams(mapqFilter=0), 
+                                    build){
   ##bam.file <- bamPaths(object)
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
   irp <- .trimInvalidReadsGAlign(irp)
   mapq_thr <- bamMapqFilter(param)
   irp2 <- makeGAlignmentPairs2(irp, use.mcols=TRUE, use.names=TRUE)
+  genome(seqinfo(irp2)) <- build
   irp2
 }
 
