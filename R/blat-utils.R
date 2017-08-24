@@ -463,97 +463,58 @@ splitreadIntersection <- function(g){
 #'
 #' @export
 #'
-#' @param r a \code{RearrangementList} object
+#' @param linked_bins a \code{GRanges} of linked bins (e.g., gotten by \code{linkedBins(rearrangement.list)})
 #'
 #' @param blat a data.frame of blat alignment records
 #'
 #' @param maxgap this maximum gap between the mapped read and the
 #'   genomic intervals of the improper read clusters
-rearrangedReads <- function(r, blat, maxgap=500){
-  rearrangedReads2(linkedBins(r), blat, maxgap)
+rearrangedReads <- function(linked_bins, blat, maxgap=500){
+  ##lb <- linkedBins(rlist)
+  ## filter blat alignments
+  is_na <- is.na(blat$Tstart)
+  if(any(is_na)){
+    blat <- blat[!is_na, ]
+  }
+  blat <- blat[blat$Tname %in% seqlevels(linked_bins), ]
+  blat_gr <- blat_to_granges(blat, linked_bins)
+  genome(blat_gr) <- genome(linked_bins)
+  ##
+  ## A blat record must overlap one of the intervals in a linked bin
+  ##
+  is.overlap <- overlapsLinkedBins(blat_gr, linked_bins, maxgap=maxgap)
+  blat_gr <- blat_gr[ is.overlap ]
+  ## We are looking for split read alignments--a read must have at
+  ## least 2 alignments.  Get rid of all reads with only a single
+  ## alignment, and all alignments that have a match score greater
+  ## than 95.
+  blat_gr <- multipleAlignmentRecords2(blat_gr)
+  ##
+  ## Both intervals in a linked bin must overlap a blat record
+  ##
+  overlaps_both <- overlapsBlatRecord(linked_bins, blat_gr, maxgap)
+  sr_list <- vector("list", length(linked_bins))
+  names(sr_list) <- names(linked_bins)
+  for(i in seq_along(linked_bins)){
+    if(!overlaps_both[i]) sr_list[[i]] <- empty_record()
+    sr_list[[i]] <-   rearrangedReads2(linked_bins[i], blat_gr, maxgap)
+  }
+  sr.grl <- GRangesList(sr_list)
+  sr.grl
 }
 
-## rearrangedReads <- function(r, blat, maxgap=500){
-##   is_na <- is.na(blat$Tstart)
-##   if(any(is_na)){
-##     blat <- blat[!is_na, ]
-##   }
-##   lb <- linkedBins(r)
-##   blat <- blat[blat$Tname %in% seqlevels(lb), ]
-##   blat_gr <- GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
-##                      match=blat$match, qname=blat$Qname,
-##                      qstart=blat$Qstart, qend=blat$Qend,
-##                      seqinfo=seqinfo(lb))
-##   ##
-##   ## A blat record must overlap one of the intervals in a linked bin
-##   ##
-##   record_overlaps <- overlapsAny(blat_gr, lb, maxgap=maxgap) |
-##     overlapsAny(blat_gr, lb$linked.to, maxgap=maxgap)
-##   records <- blat_gr[record_overlaps]
-##   ## We are looking for split read alignments--a read must have at
-##   ## least 2 alignments.  Get rid of all reads with only a single
-##   ## alignment, and all alignments that have a match score greater
-##   ## than 95.
-##   records <- multipleAlignmentRecords(records)
-##   ##
-##   ## Both intervals in a linked bin must overlap a blat record
-##   ##
-##   overlaps_both <- overlapsBlatRecord(lb, records, maxgap)
-##   lb <- lb[overlaps_both]
-##   ## Repeat filter on the records
-##   record_overlaps <- overlapsAny(records, lb, maxgap=maxgap) |
-##     overlapsAny(records, lb$linked.to, maxgap=maxgap)
-##   records <- records[record_overlaps]
-##   if(length(records) == 0){
-##     return(GRangesList())
-##   }
-##   ##
-##   ## Assign each sequence (qname) to a rearrangement
-##   ##
-##   records$rear.id <- NA
-##   h1 <- findOverlaps(records, lb, maxgap=maxgap)
-##   records$rear.id[queryHits(h1)] <- names(lb)[subjectHits(h1)]
-##   h2 <- findOverlaps(records, lb$linked.to, maxgap=maxgap)
-##   records$rear.id[queryHits(h2)] <- names(lb)[subjectHits(h2)]
-##   ##
-##   ## split records by qname
-##   ##
-##   records_qname <- split(records, records$qname)  
-##   ##
-##   ## Each sequence should have a unique rearrangement
-##   ##
-##   n.rear <- sapply(records_qname, function(x) length(unique(x$rear.id)))
-##   records_qname <- records_qname [ n.rear == 1 ]
-##   ##
-##   ## And the number of records for a given rearrangement should be 2
-##   ##
-##   records_qname <- records_qname [ elementNROWS(records_qname) == 2 ]
-##   ##
-##   ## The split should involve nearly non-overlapping subsequences of
-##   ## the read, and the total match score should be high (near 100)
-##   ##
-##   splitread_ranges <- lapply(records_qname, sequenceRanges)
-##   ## intersection
-##   splitread_int <- as.integer(sapply(splitread_ranges, function(x) {
-##     w <- width(intersect(x[1], x[2]))
-##     ## return 0 if no overlap
-##     if(length(w) == 0) w <- 0L 
-##     w
-##   }))
-##   ## total score should be near 100
-##   splitread_match <- as.integer(sapply(splitread_ranges, function(x) sum(x$match)))
-##   is_splitread <- splitread_int < 10 & splitread_match > 90
-##   records_qname <- records_qname[ splitread_int < 10 & splitread_match > 90 ]
-##   records_qname <- GRangesList(records_qname)
-##   records <- unlist(records_qname, use.names=FALSE)
-##   records$qname <- names(records)
-##   names(records) <- NULL
-##   ## list the split reads by rearrangement
-##   records_rear <- split(records, records$rear.id)
-##   GRangesList(records_rear)
-## }
-
-
+empty_record <- function(){
+  g <- GRanges()
+  g$revmap <- IntegerList()
+  g$qStarts <- integer()
+  g$blockSizes <- integer()
+  g$match <- numeric()
+  g$rear.id <- character()
+  g$qname <- character()
+  g$gapbases <- integer()
+  g$Qsize <- integer()
+  g
+}
 
 blat_to_granges <- function(blat, lb){
   GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
@@ -584,34 +545,9 @@ get_rearrangement_id <- function(records, lb, maxgap=500){
 }
 
 
-rearrangedReads2 <- function(linked_bins, blat, maxgap=500){
-  B <- blat
+rearrangedReads2 <- function(linked_bins, blat_gr, maxgap=500){
   lb <- linked_bins
   if(is.null(names(lb))) stop("Expect linked bins to be named by rearrangement id")
-  is_na <- is.na(blat$Tstart)
-  if(any(is_na)){
-    blat <- blat[!is_na, ]
-  }
-  ##lb <- linkedBins(r)
-  blat <- blat[blat$Tname %in% seqlevels(lb), ]
-  blat_gr <- blat_to_granges(blat, lb)
-  ##
-  ## A blat record must overlap one of the intervals in a linked bin
-  ##
-  is.overlap <- overlapsLinkedBins(blat_gr, lb, maxgap=maxgap)
-  blat_gr <- blat_gr[ is.overlap ]
-  ## We are looking for split read alignments--a read must have at
-  ## least 2 alignments.  Get rid of all reads with only a single
-  ## alignment, and all alignments that have a match score greater
-  ## than 95.
-  blat_gr <- multipleAlignmentRecords2(blat_gr)
-  ##recordlist <- split(records, records$qname)
-  ##
-  ## Both intervals in a linked bin must overlap a blat record
-  ##
-  overlaps_both <- overlapsBlatRecord(lb, blat_gr, maxgap)
-  lb <- lb[ overlaps_both ]
-  ## Repeat filter on the records
   record_overlaps <- overlapsAny(blat_gr, lb, maxgap=maxgap) |
     overlapsAny(blat_gr, lb$linked.to, maxgap=maxgap)
   records <- blat_gr[ record_overlaps ]
@@ -641,7 +577,7 @@ rearrangedReads2 <- function(linked_bins, blat, maxgap=500){
     o1 && o2
   }
   is.overlap <- sapply(blat.grl, overlapFun, lb=lb, maxgap=500)
-  blat.grl <- blat.grl[is.overlap]
+  blat.grl <- blat.grl[ is.overlap ]
   blat.grl <- blat.grl [ elementNROWS(blat.grl) == 2 ]
   ##
   ## The split should involve nearly non-overlapping subsequences of
@@ -656,8 +592,9 @@ rearrangedReads2 <- function(linked_bins, blat, maxgap=500){
   is_splitread <- splitread_int < 10 & p > 90
   records <- unlist(blat.grl)
   names(records) <- NULL
-  records_rear <- split(records, records$rear.id)
-  GRangesList(records_rear)
+  ##records_rear <- split(records, records$rear.id)
+  ##GRangesList(records_rear)
+  records
 }
 
 

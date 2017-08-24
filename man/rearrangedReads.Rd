@@ -5,10 +5,10 @@
 \title{Identify rearranged reads -- initiallly unmapped reads that can be
 aligned by blat to span a novel sequence junction.}
 \usage{
-rearrangedReads(r, blat, maxgap = 500)
+rearrangedReads(linked_bins, blat, maxgap = 500)
 }
 \arguments{
-\item{r}{a \code{RearrangementList} object}
+\item{linked_bins}{a \code{GRanges} of linked bins (e.g., gotten by \code{linkedBins(rearrangement.list)})}
 
 \item{blat}{a data.frame of blat alignment records}
 
