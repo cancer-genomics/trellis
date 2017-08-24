@@ -4,12 +4,14 @@
 \alias{ga2gr}
 \title{Convert GAlignmentPairs to GRanges while maintaining read pair information}
 \usage{
-ga2gr(ga, is.improper = FALSE)
+ga2gr(ga, is.improper = FALSE, use.mcols = FALSE)
 }
 \arguments{
 \item{ga}{a \code{GAlignments} object}
 
 \item{is.improper}{a length-one logical vector.  \code{TRUE} if the reads are improperly paired, \code{FALSE} otherwise.}
+
+\item{use.mcols}{logical for whether to keep the metadata columns of the \code{GAlignment} objects}
 }
 \value{
 A \code{GRanges} object with metadata columns containing read pair information.
