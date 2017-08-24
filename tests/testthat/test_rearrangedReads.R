@@ -1,7 +1,4 @@
 context("rearrangedReads")
-
-
-
 ##
 ## A consensus sequence for a rearrangement obtained from Delly
 ##
@@ -15,7 +12,8 @@ test_that("consensus", {
   lb$linked.to <- linked_bins[2]
   names(lb) <- "test.rid"
   expect_is(lb, "GRanges")
-  test <- rearrangedReads2(lb, blat)
+  test <- rearrangedReads(lb, blat)
+
   blat_gr <- blat_to_granges(blat, lb)
   expect_true("tStarts" %in% colnames(mcols(blat_gr)))
   expect_is(blat_gr, "GRanges")
@@ -60,7 +58,7 @@ test_that("consensus", {
   ##
   ## split records by qname
   ##
-  records_qname <- split(records, records$qname)  
+  records_qname <- split(records, records$qname)
   ##
   ## Each sequence should have a unique rearrangement
   ##
@@ -119,7 +117,8 @@ test_that("unmapped_reads_near_consensus", {
   expect_is(lb, "GRanges")
   names(lb) <- "test.rid"
   ## there are no split reads in this blat file
-  split_reads <- rearrangedReads2(lb, blat)
+  blat_gr <- blat_to_granges(blat, lb)
+  split_reads <- rearrangedReads2(lb, blat_gr)
   expect_identical(length(split_reads), 0L)
 })
 
@@ -129,7 +128,7 @@ test_that("rearrangedReadsFun", {
   blat_unmap <- readBlat(unmap.file)
   rlist <- readRDS(file.path(extdata, "rlist_cgov44t.rds"))
   ##trace(rearrangedReads, browser)
-  split_reads <- rearrangedReads(rlist, blat_unmap, 500)
+  split_reads <- rearrangedReads(linkedBins(rlist), blat_unmap, 500)
   expect_identical(names(split_reads), c("1-2", "3-4"))
   qnms1 <- unique(split_reads[[1]]$qname)
   if(FALSE){
@@ -146,9 +145,6 @@ test_that("rearrangedReadsFun", {
                      c(60L, 12L))
   }
 })
-
-
-
 
 ##test_that("overlapsBoth", {
 ##  data(rearrangement_list)

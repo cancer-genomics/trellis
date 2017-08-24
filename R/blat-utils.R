@@ -463,7 +463,7 @@ splitreadIntersection <- function(g){
 #'
 #' @export
 #'
-#' @param rlist a \code{RearrangementList} object
+#' @param linked_bins a \code{GRanges} of linked bins (e.g., gotten by \code{linkedBins(rearrangement.list)})
 #'
 #' @param blat a data.frame of blat alignment records
 #'
