@@ -18,7 +18,7 @@ NULL
 #' @rdname getSequenceOfReads-methods
 setGeneric("getSequenceOfReads", function(object, bam.file,
                                           params=RearrangementParams(),
-                                          MAX=25L)
+                                          MAX=25L, build)
   standardGeneric("getSequenceOfReads"))
 
 

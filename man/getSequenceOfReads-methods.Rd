@@ -8,13 +8,13 @@
 \title{Extract sequences of reads supporting rearrangements from a bam file}
 \usage{
 getSequenceOfReads(object, bam.file, params = RearrangementParams(),
-  MAX = 25L)
+  MAX = 25L, build)
 
 \S4method{getSequenceOfReads}{Rearrangement}(object, bam.file,
-  params = RearrangementParams(), MAX = 25L)
+  params = RearrangementParams(), MAX = 25L, build)
 
 \S4method{getSequenceOfReads}{RearrangementList}(object, bam.file,
-  params = RearrangementParams(), MAX = 25L)
+  params = RearrangementParams(), MAX = 25L, build)
 }
 \arguments{
 \item{object}{a \code{Rearrangement} or \code{RearrangementList} object}
