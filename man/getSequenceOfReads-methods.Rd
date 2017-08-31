@@ -27,6 +27,9 @@ getSequenceOfReads(object, bam.file, params = RearrangementParams(),
 rearrangement.  If the number of read pairs supporting a
 rearrangement is greater than MAX, a random sample of MAX
 supporting read pairs is returned.}
+
+\item{build}{the reference genome buld that reads were aligned to.  Currently
+supported builds include "hg19" and "hg18".}
 }
 \value{
 a data.frame

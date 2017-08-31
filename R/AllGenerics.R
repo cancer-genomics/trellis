@@ -14,6 +14,9 @@ NULL
 #'   rearrangement.  If the number of read pairs supporting a
 #'   rearrangement is greater than MAX, a random sample of MAX
 #'   supporting read pairs is returned.
+#'   
+#' @param build the reference genome buld that reads were aligned to.  Currently
+#' supported builds include "hg19" and "hg18". 
 #'
 #' @rdname getSequenceOfReads-methods
 setGeneric("getSequenceOfReads", function(object, bam.file,
