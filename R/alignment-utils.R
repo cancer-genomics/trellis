@@ -645,7 +645,7 @@ filterPairedReads <- function(gpairs, bins, params){
   gpairs
 }
 
-.getReadSeqsForRear <- function(object, bam.file, param, MAX){
+.getReadSeqsForRear <- function(object, bam.file, param, MAX, build){
   irp <- improper(object)
   flags <- improperAlignmentFlags()
   lb <- linkedBins(object)
@@ -653,7 +653,8 @@ filterPairedReads <- function(gpairs, bins, params){
   what <- c("qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq")
   scan.param <- ScanBamParam(flag=flags, what=what, which=bins, mapqFilter=30)
   rps <- getImproperAlignmentPairs(bam.file,
-                                   scan.param)
+                                   scan.param, 
+                                   build = build)
   rps2 <- filterPairedReads(rps, bins, param)
   df <- .seqdataframe(rps2, MAX)
   ##df$id <- rep(names(align_view), nrow(df))
@@ -685,8 +686,9 @@ setMethod("getSequenceOfReads", "Rearrangement",
           function(object,
                    bam.file,
                    params=RearrangementParams(),
-                   MAX=25L){
-            .getReadSeqsForRear(object, bam.file, params, MAX)
+                   MAX=25L, 
+                   build){
+            .getReadSeqsForRear(object, bam.file, params, MAX, build = build)
           })
 
 #' @aliases getSequenceOfReads,RearrangementList-method
@@ -695,12 +697,14 @@ setMethod("getSequenceOfReads", "RearrangementList",
           function(object,
                    bam.file,
                    params=RearrangementParams(),
-                   MAX=25L){
+                   MAX=25L, 
+                   build){
             tag.list <- vector("list", length(object))
             for(j in seq_along(object)){
               r <- object[[j]]
               tag.list[[j]] <- .getReadSeqsForRear(r, bam.file,
-                                                   params, MAX=MAX)
+                                                   params, MAX=MAX, 
+                                                   build = build)
             }
             tags <- do.call(rbind, tag.list)
             readId <- paste(tags$qname, tags$read, sep="_")

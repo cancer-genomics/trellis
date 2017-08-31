@@ -40,7 +40,7 @@ test_that("read_pairs_from_bam", {
   library(svbams)
   library(svalignments)
   path <- system.file("extdata", package="svbams")
-
+  build <- "hg19"
   library(TxDb.Hsapiens.UCSC.hg19.refGene)
   region <- GRanges("chr15", IRanges(63201003-2000, 63209243+2000))
   si <- seqinfo(TxDb.Hsapiens.UCSC.hg19.refGene)
@@ -51,14 +51,15 @@ test_that("read_pairs_from_bam", {
 
   iparams <- improperAlignmentParams(which=region, mapqFilter=30)
   pparams <- properAlignmentParams(which=region, mapqFilter=30)
-  irp <- getImproperAlignmentPairs(bampath, iparams)
+  irp <- getImproperAlignmentPairs(bampath, iparams, build = build)
   expect_identical(length(irp), 57L)
   g.irp <- ga2gr(irp, is.improper=TRUE)
   expect_identical(length(g.irp), 57L*2L)
   expect_true(all(g.irp$is.improper))
 
   prp <- getProperAlignmentPairs(bampath,
-                                 pparams)
+                                 pparams, 
+                                 build = build)
   g.prp <- ga2gr(prp, is.improper=FALSE)
   mcol.vars <- colnames(mcols(g.prp))
   expect_identical(mcol.vars, c("read", "is.improper", "tagid"))
