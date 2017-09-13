@@ -156,7 +156,8 @@ test_that("link_amplicons", {
   iparams <- improperAlignmentParams(mapqFilter=30,
     what=c("flag", "mrnm", "mpos"))
   improper_rp3 <- getImproperAlignmentPairs(pdat$bam.file,
-                                            param=iparams)
+                                            param=iparams, 
+                                            build="hg19")
   ag3 <- link_amplicons(ag, improper_rp3, params)
   expect_lt(numEdges(ag3), numEdges(ag2))
 })

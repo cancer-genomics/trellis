@@ -33,7 +33,7 @@ cgov10t_preprocess <- function(){
   segs <- segments
   param <- DeletionParam()
   segments <- segs[segs$seg.mean < hemizygousThr(param)]
-  read_pairs <- listReadPairs(bamfile, segments)
+  read_pairs <- listReadPairs(bamfile, segments, build="hg19")
   pdat <- preprocessData(bam.file=bamfile,
                          genome=genome(bins)[[1]],
                          bins=bins,

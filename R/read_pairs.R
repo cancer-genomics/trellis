@@ -2,7 +2,7 @@
 ## functions may take a long time to run on a large BAM file
 ##
 ## 
-listReadPairs <- function(bam.file, segments){
+listReadPairs <- function(bam.file, segments, build){
   dparam <- DeletionParam()
   aparam <- ampliconParams()
   is.amp <- segments$seg.mean > aparam$AMP_THR
@@ -18,7 +18,7 @@ listReadPairs <- function(bam.file, segments){
 
 
   irp.params <- improperAlignmentParams(mapqFilter=30)
-  improper_rp <- getImproperAlignmentPairs(bam.file, irp.params)
+  improper_rp <- getImproperAlignmentPairs(bam.file, irp.params, build=build)
   read_pairs <- list(proper_del=proper.del,
                      proper_amp=proper.amp,
                      improper=improper_rp)
