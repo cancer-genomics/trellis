@@ -1,7 +1,7 @@
 Package: svcnvs
 Title: Identify somatic copy number variants
 Version: 0.0.37
-Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
+Authors@R: c(person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre")), person("Daniel", "Bruhm", email = "danielbruhm@gmail.com", role = "aut"))
 Description: Segments bin-level estimates of copy number.  Use both read
     pairs and read depth to identify focal deletions and amplicons. For
     amplicons, we use read pairs to identify grouped amplicons.
@@ -37,6 +37,7 @@ RoxygenNote: 6.0.1
 Collate: 
     'help.R'
     'amplicon-utils.R'
+    'data.R'
     'deletion-utils.R'
     'germlineOutliers.R'
     'listCNVs.R'

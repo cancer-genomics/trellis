@@ -69,25 +69,48 @@ not_in_filters <- function(x, filters){
   g
 }
 
-#' Circular binary segmentation of log2-transformed and GC-adjusted counts.
+#' Segment log2-transformed and GC-adjusted counts using Circular Binary Segmentation.
 #'
-#' Segmentation of the transformed counts is performed by the circular
-#' binary segmentation algorithm implemented in the \code{DNAcopy}
-#' package.
-#'
+#' Segmentation of the transformed counts is performed by the Circular
+#' Binary Segmentation (CBS) algorithm implemented in the \code{DNAcopy}
+#' package.  
+#' 
 #' @param param a \code{SegmentParam} object
 #'
 #' @param bins a \code{GRanges} object containing adjusted counts. Note, the
-#'   adjusted counts must be stored in a column named \code{adjusted}.
+#'   adjusted counts must be stored in a column named \code{log_ratio}.
 #'
 #' @param ... additional arguments to \code{segment} in the \code{DNAcopy} package
+#'
+#' @details A default set of segmentation parameters are provided in 
+#' \code{SegmentParam()} and can be altered by creating a new \code{SegmentParam} 
+#' object if desired.  
+#' 
+#' Some users may wish to control additional parameters to the CBS algorithm and 
+#' therefore \code{segmentBins} is designed to take any argument from \code{DNAcopy::segment}
+#' as input (see examples). 
 #'
 #' @seealso \code{\link[DNAcopy]{segment}} for description of circular binary
 #'   segmentation and references therein; see
 #'   \code{\link[svclasses]{SegmentParam-class}} for a description of the
 #'   default parameters settings passed to the \code{segment} function. See
-#'   \code{\link[svpreprocess]{sv_preprocess}} for obtaining normalized counts
+#'   \code{\link[svpreprocess]{binNormalize}} for obtaining normalized counts
 #'   for segmentation.
+#'   
+#' @examples 
+#'   library(svfilters.hg19)
+#'   data(bins1kb)
+#'   library(GenomeInfoDb)
+#'   library(DNAcopy)
+#'   bins1kb <- keepSeqlevels(bins1kb, "chr22", pruning.mode = "coarse")
+#'   bins1kb$log_ratio <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4), 
+#'                         rnorm(floor(length(bins1kb)/2), mean = -1, sd = 0.4))
+#'   segmentBins(bins1kb) # Using default segmentation parameters
+#'   segmentBins(bins1kb, param = SegmentParam(alpha = 0.01, undo.splits = "sdundo", 
+#'                                             undo.SD = 5, verbose = 1))
+#'   segmentBins(bins1kb, param = SegmentParam(), 
+#'               weights = abs(rnorm(length(bins1kb))))                                         
+#'   
 #' @export
 segmentBins <- function(bins, param=SegmentParam(), ...){
   gen <- genome(bins)[[1]]
@@ -123,7 +146,7 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
   g
 }
 
-#' @export
+
 segmentCoverage <- function(object, param=SegmentParam(), ...){
   object <- object[, 1]
   chroms <- seqlevels(object)

@@ -1,6 +1,6 @@
 ---
 title: "Overview of svcnvs package"
-author: "Robert Scharpf"
+author: "Robert Scharpf, Daniel Bruhm"
 date: \today
 output: BiocStyle::pdf_document
 vignette: >
@@ -11,19 +11,18 @@ vignette: >
 
 # Introduction
 
-This package is used to segment normalized coverage by circular binary
-segmentation and to identify deletions and amplicons through a combination of
-changes in normalized coverage and read pairs with aberrant spacing or
-orientation. *Segmentation should probably be extracted into a separate package.*
+The svcnvs package is used to identify deletions and amplicons from Whole Genome Sequencing (WGS) data through a combination of changes in normalized coverage and read pairs with aberrant spacing or orientation.
+
+Additional packages required for this vignette are the `svfilters.hg19` package
+that contains various sequence filters for structural variant analyses and the
+`svalignments` package that contains wrappers for extracting properly- and
+improperly-paired reads from a BAM file.  We also employ functions from `RSamtools` and `GenomicRanges`.
+
+This package requires that normalized coverage is calculated for a set of bins in the package `svfilters.hg19` (or `svfilters.hg18`).  See the `svpreprocess` vignette for comprehensive documentaion on generating normalized coverage.  This process can take some time on large bam files so for the purpose of this tutorial we've distributed sample preprocessed coverage data from the `svpreprocess` package.
 
 # Preprocessing
 
-
-Additional packages required for this vignette are the `svfilter.hg19` package
-that contains various sequence filters for structural variant analyses and the
-`svalignments` package that contains wrappers for extracting properly- and
-improperly-paired reads from a BAM file.
-
+Loading packages required for this analysis.
 
 ```{r packages}
 library(GenomicRanges)
@@ -33,11 +32,7 @@ library(svfilters.hg19)
 library(svalignments)
 ```
 
-Next, we load an object containg the normalized and $\log_2$-transformed
-coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the
-genome. The $\log_2$ ratios were multipled by 1000, rounded to the nearest
-integer, and saved as integers in a serialized R object to reduce the memory
-footpring.
+We first load an object from the `svpreprocess` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `svpreprocess` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38.
 
 ```{r views_filepath}
 ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
@@ -51,6 +46,8 @@ bins1kb$log_ratio <- log_ratio
 
 # Segmentation
 
+
+Next, we segment the $\log_2$ ratios using the Circular Binary Segmentation algorithm to achieve estimated copy number states across the genome. 
 So that our segmentation example runs quickly, we limit our analyses to
 two chromosomes and sample every 10th bin.  Note, additional arguments can be passed to the `segment` function in the `DNAcopy` package.
 
@@ -64,23 +61,50 @@ g
 
 The result is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.  Here, we load previously computed segments from the full dataset.
 
+
 ```{r segments}
 path <- system.file("extdata", package="svcnvs")
 data(segments, package="svcnvs")
 ```
 
+To generate this segments object on your own data use the `segmentBins` function.  
+```{r segments2, eval=FALSE}
+segments <- segmentBins(bins1kb, param = SegmentParam())
+```
+
+We've created a `SegmentParam` class (see `?SegmentParam`) as a container for a subset of the parameters for the `segment` function in the `DNAcopy package`.  Running `SegmentParam()` creates a SegmentParam obect with default values that we've found generally work well on most datasets for these following slots:
+
+``` {r segments3, eval=TRUE}
+SegmentParam()
+```
+
+If you would like to alter the CBS parameters you can easily create your own `SegmentParam` object.  For example, suppose you want to run CBS with alpha = 0.01 instead of 0.001:
+
+``` {r segments4, eval=FALSE}
+x <- SegmentParam(alpha = 0.01, undo.splits = "sdundo", undo.SD = 2, verbose = 0) 
+segments <- segmentBins(bins1kb, param = x)
+```
+
+Any additional arguments to `DNAcopy::segment` can be incorporated into `segmentBins()` by using them as arguments to `segmentBins`.  For example, a user may want to use min.with = 2 instead of the default value of 3:
+
+``` {r segments5, eval=FALSE}
+segments <- segmentBins(bins1kb, param = SegmentParam(), min.width = 2)
+```
+
+See `?DNAcopy::segment` for a complete list of parameters.
+
 ## Plotting the genome
 
-Plot the entire genome overlaying the segmentation data.
+We routinely visualize the segmented $\log_2$ ratios of the entire genome to get an overview of the data.  An example using the `ggplot2` library follows.
 
-```{r genome, fig.width=8, fig.height=3}
+```{r genome, fig.width=8, fig.height=4, warning=FALSE}
 bins1kb <- sort(bins1kb)
 lrr.df <- as.data.frame(bins1kb[seq(1, length(bins1kb), 50)])
 seg.df <- as.data.frame(segments)
 library(ggplot2)
 chromlabels <- setNames(c(1:22, "X"), seqlevels(bins1kb))
 ggplot(lrr.df, aes(start, log_ratio)) +
-  geom_point(size=0.1, color="gray") +
+  geom_point(size=0.1, color="steelblue", alpha = 0.1) +
   geom_segment(data=seg.df,
                aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
                color="black", inherit.aes=FALSE) +
@@ -89,24 +113,29 @@ ggplot(lrr.df, aes(start, log_ratio)) +
   theme(axis.text.x=element_blank(),
         panel.grid=element_blank(),
         panel.background=element_rect(fill="white"),
-        axis.ticks.x=element_blank()) + xlab("") +
-  ylab(expression(log[2](r)))
+        axis.ticks.x=element_blank(), 
+        strip.text.x = element_text(size = 3)) + 
+  xlab("") +
+  ylab(expression(log[2](r))) + 
+  ylim(c(-3, 3))
 ```
+
+It is evident from visual inspection that this sample has numerous structural alterations.  We will proceed to integrate read pair information with these segmented $\log_2$ ratios to strengthen CNV calls.         
 
 
 # Deletions
 
 In additition to the segmented $\log_2$ ratios, the deletion analysis requires
-improperly paired reads. Below, we specify the complete file path to a BAM file
-provided by the `svbams` package and extract improperly paired reads from the
-entire genome and an initial set of properly paired reads.
+improperly paired reads. Below, we specify the complete file path to the BAM file
+used for this analysis that is provided by the `svbams` package. We extract improperly paired reads from the entire genome and an initial set of properly paired reads from a region on chromosome 15.
 
 ```{r views}
 extdata <- system.file("extdata", package="svbams")
 bam.file <- file.path(extdata, "cgov44t_revised.bam")
 iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
 improper_rp <- getImproperAlignmentPairs(bam.file,
-                                         param=iparams)
+                                         param=iparams, 
+                                         build="hg19")
 segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
 del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
                  min.gapwidth=2000)
@@ -114,8 +143,8 @@ proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam())
 read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
 ```
 
-Finally, we collect the bin-level summaries, the segmentation data, and the read
-pair data  in a single list object:
+We collect the bin-level summaries ($\log_2$ ratios), the segmentation data, and the read
+pair data in a single list object:
 
 
 ```{r preprocess_data}
@@ -127,11 +156,11 @@ pdata <- preprocessData(bam.file=bam.file,
 ```
 
 Below, we call segments as homozygous deletion (homozygous), homozygous deletion
-supported by improperly paired reads (homozygous+), and hemizygous deletion
-supported by improperly paired reads. For the purpose of identifying somatic
+supported by improperly paired reads (homozygous+), hemizygous deletion (hemizygous), and hemizygous deletion
+supported by improperly paired reads (hemizygous). For the purpose of identifying somatic
 deletions without a matched normal, we exclude hemizygous deletions that are not
-supported by improperly paired reads. With this toy dataset, we identify two
-homozygous deletions and the calls are both `homozygous`.
+supported by improperly paired reads. With this toy dataset, we identify 16
+possible homozygous deletions and the calls are both `homozygous` except onw which is `homozygous+`.
 
 ```{r sv_deletions}
 deletions <- sv_deletions(preprocess=pdata)
@@ -140,20 +169,19 @@ calls(deletions)
 ```
 
 The improperly-paired reads supporting the `homozygous+` call can be extracted
-as a `GAlignmentPairs` object from the second element of the `StructuralVariant` object.
+as a `GAlignmentPairs` object from the twelth element of the `StructuralVariant` object.
 
 ```{r structural_variant}
-improper(deletions[2])
+improper(deletions[12])
 ```
 
 # Amplicons
 
 Amplicons can be identified using the same list data structure for the
-preprocessed data.
+preprocessed data we called `pdata` as was used in the *Deletions* section.  
 
 ```{r amplified_segments}
-params <- ampliconParams()
-ag <- svcnvs:::sv_amplicons2(pdata, params=params)
+ag <- sv_amplicons2(pdata, params=ampliconParams())
 ```
 
 Note the object returned by `sv_amplicons` is a graph where the nodes are the
@@ -172,16 +200,14 @@ suppressPackageStartupMessages(library(gridExtra))
 library(scales)
 ```
 
-In the following code chunk, we extract the genomic coordinates for the deletion
-stored in the *deletion* object. To view the deletion in the context of the
+In the following code chunk, we extract the genomic coordinates for a deletion
+stored in a *StructuralVariant* object distributed with this package. To view the deletion in the context of the
 surrounding region, we create a second *GRanges* object that includes 200kb of
 the flanking genome on each side of the deletion.
 
 ```{r region_of_interest}
-##
-## region of interest (roi)
-##
-roi <- variant(deletion)
+data(deletion)
+roi <- variant(deletion) # region of interest 
 seqlevels(roi, pruning.mode="coarse") <- "chr15"
 expand <- 200e3
 roi2 <- GRanges(seqnames(roi), IRanges(start(roi)-expand,

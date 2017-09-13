@@ -2,7 +2,8 @@ context("Duplication events surrounding focal amplicons")
 
 test_that("focalAmpliconDupRanges", {
   params <- ampliconParams()
-  ag <- readRDS("addFocalDups.ffab104.rds")
+  path <- system.file("extdata", package = "svcnvs")
+  ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
 
   LOW_THR <- params[["LOW_THR"]]
   MAX_SIZE <- params[["maxgap"]]
