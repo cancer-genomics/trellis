@@ -39,13 +39,28 @@ ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
 cov.file <- file.path(ddir, "preprocessed_coverage.rds")
 log_ratio <- readRDS(cov.file)/1000
 data(bins1kb, package="svfilters.hg19")
-bins1kb <- dropSeqlevels(bins1kb, "chrY", pruning.mode = "coarse") 
+seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+## !requires column to be named log_ratio!
 bins1kb$log_ratio <- log_ratio
 ```
 
 # Segmentation
 
-Next, we segment the $\log_2$ ratios using the Circular Binary Segmentation algorithm to achieve estimated copy number states across the genome. To save time we load a pre-made `GRanges` object containing the segment means.  
+
+Next, we segment the $\log_2$ ratios using the Circular Binary Segmentation algorithm to achieve estimated copy number states across the genome. 
+So that our segmentation example runs quickly, we limit our analyses to
+two chromosomes and sample every 10th bin.  Note, additional arguments can be passed to the `segment` function in the `DNAcopy` package.
+
+```{r segment}
+bins_subset <- bins1kb
+seqlevels(bins_subset, pruning.mode="coarse") <- c("chr1", "chr2")
+bins_subset <- bins_subset[ seq(1, length(bins_subset), 50) ]
+g <- segmentBins(bins_subset)
+g
+```
+
+The result is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.  Here, we load previously computed segments from the full dataset.
+
 
 ```{r segments}
 path <- system.file("extdata", package="svcnvs")
@@ -119,7 +134,8 @@ extdata <- system.file("extdata", package="svbams")
 bam.file <- file.path(extdata, "cgov44t_revised.bam")
 iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
 improper_rp <- getImproperAlignmentPairs(bam.file,
-                                         param=iparams)
+                                         param=iparams, 
+                                         build="hg19")
 segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
 del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
                  min.gapwidth=2000)
@@ -132,9 +148,11 @@ pair data in a single list object:
 
 
 ```{r preprocess_data}
-pdata <- preprocessData(bam.file=bam.file, genome="hg19",
+pdata <- preprocessData(bam.file=bam.file,
+                        genome="hg19",
                         bins=bins1kb,
-                        segments=segments, read_pairs=read_pairs)
+                        segments=segments,
+                        read_pairs=read_pairs)
 ```
 
 Below, we call segments as homozygous deletion (homozygous), homozygous deletion

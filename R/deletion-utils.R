@@ -117,13 +117,15 @@ isLargeHemizygous <- function(g, param=DeletionParam()){
 }
 
 granges_copynumber2 <- function(gr, bins){
-  hits <- findOverlaps(gr, bins)
-  if (!any(duplicated(names(gr))) && !is.null(names(gr))) {
-    split_by <- factor(names(gr)[queryHits(hits)], levels = names(gr))
-  } else {
-      split_by <- queryHits(hits)
+  if(!"log_ratio" %in% colnames(mcols(bins))){
+    stop("GRanges object must have 'log_ratio' column in the DataFrame returned by mcols")
+
   }
-  fc_context <- tapply(bins$log_ratio[subjectHits(hits)], queryHits(hits), median)
+  hits <- findOverlaps(gr, bins)
+  j <- subjectHits(hits)
+  i <- queryHits(hits)
+  tmp <- split(bins$log_ratio[j], i)
+  fc_context <- tapply(bins$log_ratio[j], i, median)
   as.numeric(fc_context)
 }
 
@@ -1631,11 +1633,18 @@ preprocessData <- function(bam.file=NULL,
                            bins,
                            segments,
                            read_pairs){
-  list(bam.file=bam.file,
-       genome=genome,
-       bins=bins,
-       segments=segments,
-       read_pairs=read_pairs)
+  if(!"log_ratio" %in% colnames(mcols(bins))){
+    stop("'log_ratio' must be a column in the 'bins' object")
+  }
+  if(!"seg.mean" %in% colnames(mcols(segments))){
+    stop("'seg.mean' must be a column in the 'segments' object")
+  }
+  pdata <- list(bam.file=bam.file,
+                genome=genome,
+                bins=bins,
+                segments=segments,
+                read_pairs=read_pairs)
+
 }
 
 
