@@ -134,8 +134,8 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
     ##chr <- chroms[i]
     ##chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
     chrbins <- bins_grl[[i]]
-    ##chr <- unique(chromosome(chrbins))
-    ##chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
+    chr <- unique(chromosome(chrbins))
+    chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
     if(length(chrbins) < 2) next()
     results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }

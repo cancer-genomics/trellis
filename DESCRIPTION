@@ -1,6 +1,6 @@
 Package: svcnvs
 Title: Identify somatic copy number variants
-Version: 0.0.38
+Version: 0.0.39
 Authors@R: c(person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre")), person("Daniel", "Bruhm", email = "danielbruhm@gmail.com", role = "aut"))
 Description: Segments bin-level estimates of copy number.  Use both read
     pairs and read depth to identify focal deletions and amplicons. For
