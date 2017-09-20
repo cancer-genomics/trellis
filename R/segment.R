@@ -73,8 +73,8 @@ not_in_filters <- function(x, filters){
 #'
 #' Segmentation of the transformed counts is performed by the Circular
 #' Binary Segmentation (CBS) algorithm implemented in the \code{DNAcopy}
-#' package.  
-#' 
+#' package.
+#'
 #' @param param a \code{SegmentParam} object
 #'
 #' @param bins a \code{GRanges} object containing adjusted counts. Note, the
@@ -82,13 +82,13 @@ not_in_filters <- function(x, filters){
 #'
 #' @param ... additional arguments to \code{segment} in the \code{DNAcopy} package
 #'
-#' @details A default set of segmentation parameters are provided in 
-#' \code{SegmentParam()} and can be altered by creating a new \code{SegmentParam} 
-#' object if desired.  
-#' 
-#' Some users may wish to control additional parameters to the CBS algorithm and 
+#' @details A default set of segmentation parameters are provided in
+#' \code{SegmentParam()} and can be altered by creating a new \code{SegmentParam}
+#' object if desired.
+#'
+#' Some users may wish to control additional parameters to the CBS algorithm and
 #' therefore \code{segmentBins} is designed to take any argument from \code{DNAcopy::segment}
-#' as input (see examples). 
+#' as input (see examples).
 #'
 #' @seealso \code{\link[DNAcopy]{segment}} for description of circular binary
 #'   segmentation and references therein; see
@@ -96,21 +96,21 @@ not_in_filters <- function(x, filters){
 #'   default parameters settings passed to the \code{segment} function. See
 #'   \code{\link[svpreprocess]{binNormalize}} for obtaining normalized counts
 #'   for segmentation.
-#'   
-#' @examples 
+#'
+#' @examples
 #'   library(svfilters.hg19)
 #'   data(bins1kb)
 #'   library(GenomeInfoDb)
 #'   library(DNAcopy)
 #'   bins1kb <- keepSeqlevels(bins1kb, "chr22", pruning.mode = "coarse")
-#'   bins1kb$log_ratio <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4), 
+#'   bins1kb$log_ratio <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4),
 #'                         rnorm(floor(length(bins1kb)/2), mean = -1, sd = 0.4))
 #'   segmentBins(bins1kb) # Using default segmentation parameters
-#'   segmentBins(bins1kb, param = SegmentParam(alpha = 0.01, undo.splits = "sdundo", 
+#'   segmentBins(bins1kb, param = SegmentParam(alpha = 0.01, undo.splits = "sdundo",
 #'                                             undo.SD = 5, verbose = 1))
-#'   segmentBins(bins1kb, param = SegmentParam(), 
-#'               weights = abs(rnorm(length(bins1kb))))                                         
-#'   
+#'   segmentBins(bins1kb, param = SegmentParam(),
+#'               weights = abs(rnorm(length(bins1kb))))
+#'
 #' @export
 segmentBins <- function(bins, param=SegmentParam(), ...){
   gen <- genome(bins)[[1]]
@@ -131,11 +131,8 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
   ##  chroms <- seqlevels(bins)
   results <- vector("list", length(bins_grl))
   for(i in seq_along(bins_grl)){
-    ##chr <- chroms[i]
-    ##chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
     chrbins <- bins_grl[[i]]
     chr <- unique(chromosome(chrbins))
-    chrbins <- keepSeqlevels(bins, chr, pruning.mode="coarse")
     if(length(chrbins) < 2) next()
     results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }
