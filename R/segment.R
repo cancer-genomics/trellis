@@ -132,7 +132,7 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
   results <- vector("list", length(bins_grl))
   for(i in seq_along(bins_grl)){
     chrbins <- bins_grl[[i]]
-    chr <- unique(chromosome(chrbins))
+    chrbins <- keepSeqlevels(chrbins, as.character(unique(seqnames(chrbins))))
     if(length(chrbins) < 2) next()
     results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }

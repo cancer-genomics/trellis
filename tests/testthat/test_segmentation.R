@@ -11,9 +11,6 @@ test_that("duplicate segments", {
   data(germline_filters, package="svfilters.hg19")
   bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode="coarse")
   bins <- bins[seq(1, length(bins), by=5)]
-
-  ##Not running this line causes the duplication behavior
-  ##bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
   bam.file <- file.path(path, "cgov10t.bam")
   bview <- BamViews(bamRanges=bins, bamPaths=bam.file)
   bins$cnt <- binCounts(bview)

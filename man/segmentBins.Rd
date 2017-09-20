@@ -20,11 +20,11 @@ Binary Segmentation (CBS) algorithm implemented in the \code{DNAcopy}
 package.
 }
 \details{
-A default set of segmentation parameters are provided in 
-\code{SegmentParam()} and can be altered by creating a new \code{SegmentParam} 
-object if desired.  
+A default set of segmentation parameters are provided in
+\code{SegmentParam()} and can be altered by creating a new \code{SegmentParam}
+object if desired.
 
-Some users may wish to control additional parameters to the CBS algorithm and 
+Some users may wish to control additional parameters to the CBS algorithm and
 therefore \code{segmentBins} is designed to take any argument from \code{DNAcopy::segment}
 as input (see examples).
 }
@@ -34,14 +34,14 @@ as input (see examples).
   library(GenomeInfoDb)
   library(DNAcopy)
   bins1kb <- keepSeqlevels(bins1kb, "chr22", pruning.mode = "coarse")
-  bins1kb$log_ratio <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4), 
+  bins1kb$log_ratio <- c(rnorm(ceiling(length(bins1kb)/2), mean = 0, sd = 0.4),
                         rnorm(floor(length(bins1kb)/2), mean = -1, sd = 0.4))
   segmentBins(bins1kb) # Using default segmentation parameters
-  segmentBins(bins1kb, param = SegmentParam(alpha = 0.01, undo.splits = "sdundo", 
+  segmentBins(bins1kb, param = SegmentParam(alpha = 0.01, undo.splits = "sdundo",
                                             undo.SD = 5, verbose = 1))
-  segmentBins(bins1kb, param = SegmentParam(), 
-              weights = abs(rnorm(length(bins1kb))))                                         
-  
+  segmentBins(bins1kb, param = SegmentParam(),
+              weights = abs(rnorm(length(bins1kb))))
+
 }
 \seealso{
 \code{\link[DNAcopy]{segment}} for description of circular binary
