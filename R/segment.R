@@ -118,6 +118,7 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
        envir=environment())
   gaps <- gaps[gaps$type=="centromere", ]
   seqlevels(gaps, pruning.mode="coarse") <- seqlevels(bins)
+  gaps <- sort(gaps)
   parms <- GRanges(seqnames(gaps), IRanges(rep(1, length(gaps)), start(gaps)))
   parms$arm <- paste0(chromosome(parms), "p")
   qarms <- GRanges(seqnames(gaps), IRanges(end(gaps), seqlengths(gaps)))
