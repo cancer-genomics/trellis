@@ -93,6 +93,13 @@ test_that("consensus", {
   records <- unlist(blat.grl)
   names(records) <- NULL
   records_rear <- split(records, records$rear.id)
+  
+  # Adding seqinfo to records_rear from records_qname because rearrangedReads now
+  # maintains proper seqInfo
+  seqlevels(records_rear) <- seqlevels(records_qname)
+  seqlengths(records_rear) <- seqlengths(records_qname)
+  genome(records_rear) <- genome(records_qname)
+  
   expect_identical(length(records_rear[[1]]), 2L)
   expect_identical(records_rear, test)
 })
