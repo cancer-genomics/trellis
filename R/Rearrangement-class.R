@@ -73,7 +73,7 @@ setMethod("show", "Rearrangement", function(object){
   cat(paste0("Object of class '", class(object), "'"), "\n")
   cat("  number of rearrangements: ", length(linkedBins(object)), "\n")
   cat("  number of linking RPs: ", length(improper(object)), "\n")
-  cat("  number of split reads: ", length(splitReads(object)), "\n")
+  cat("  number of split reads: ", length(splitReads(object))/2, "\n")
   cat("  number of tags : ", length(tags(object)), "\n")
   if(length(object)==1){
     r <- modalRearrangement(object)
