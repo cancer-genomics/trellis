@@ -571,6 +571,12 @@ rearrangedReads2 <- function(linked_bins, blat_gr, maxgap=500){
   ## And the number of records for a given rearrangement should be 2
   ##
   blat.grl <- eachBlockAsGRanges(records_qname)
+
+  # Pass along seqinfo
+  seqlevels(blat.grl) <- seqlevels(lb)
+  seqlengths(blat.grl) <- seqlengths(lb)
+  genome(blat.grl) <- genome(lb)
+
   overlapFun <- function(g1, lb, ...){
     o1 <- any(overlapsAny(g1, lb, ...))
     o2 <- any(overlapsAny(g1, lb$linked.to, ...))
