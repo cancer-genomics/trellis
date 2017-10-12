@@ -552,7 +552,7 @@ rearrangedReads2 <- function(linked_bins, blat_gr, maxgap=500){
     overlapsAny(blat_gr, lb$linked.to, maxgap=maxgap)
   records <- blat_gr[ record_overlaps ]
   if(length(records) == 0){
-    return(GRangesList())
+    return(GRanges())
   }
   ##
   ## Assign each sequence (qname) to a rearrangement
