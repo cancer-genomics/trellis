@@ -431,6 +431,19 @@ setMethod("length", "StructuralVariant", function(x) length(variant(x)))
 #' @param x a \code{StructuralVariant}
 setMethod("names", "StructuralVariant", function(x) names(variant(x)))
 
+#' Extract number of improper reads for each element in a StructuralVariant
+#'
+#'
+#' @param object a \code{StructuralVariant}
+#' @export
+#' @examples
+#' data(deletions)
+#' numberImproper(deletions)
+numberImproper <- function(object){
+  num <- rep(NA, length(object))
+  lengths(indexImproper(object))
+}
+
 #' @rdname proper-methods
 #' @aliases proper,StructuralVariant-method
 setMethod("proper", "StructuralVariant", function(object){
@@ -463,6 +476,8 @@ setMethod("readPairs", "StructuralVariant", function(object){
   rp <- rp[i]
   rp
 })
+
+
 
 #' @rdname StructuralVariant-class
 #' @export
