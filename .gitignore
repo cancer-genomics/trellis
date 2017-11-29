@@ -7,3 +7,4 @@ TODO.org
 /vignettes/amplicons.pdf
 tests/testthat/*.rds
 /tests/testthat/tmp.R
+/vignettes/deletions.pdf

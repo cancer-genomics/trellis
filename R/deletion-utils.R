@@ -1466,12 +1466,13 @@ finalize_deletions <- function(sv, preprocess, gr_filters,
 #' @return a \code{GRangesList} of deletions
 #' @export
 listDeletions <- function(path="data/segment/1deletions", ids){
-  ##files <- file.path(dp["1deletions"], paste0(ids, ".rds"))
   files <- file.path(path, paste0(ids, ".rds"))
   dels <- lapply(files, readRDS)
-  names(dels) <- ids
+  names(dels) <- gsub("\\.bam", "", ids)
   g <- lapply(dels, function(x) granges(variant(x)))
+  num.rearranged <- lapply(dels, numberImproper)
   g <- unlist(GRangesList(g))
+  g$number_rearranged <- unlist(num.rearranged)
   g$id <- sapply(strsplit(names(g), "\\."), "[", 1)
   names(g) <- NULL
   g$log_ratio <- unlist(lapply(dels, copynumber))

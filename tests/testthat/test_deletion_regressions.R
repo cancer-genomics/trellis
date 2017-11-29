@@ -6,7 +6,7 @@ expect_identical2 <- function(sv1, sv2){
   expect_equivalent(sv1, sv2)
 }
 
-cgov44t_preprocess<- function(){
+cgov44t_preprocess <- function(){
   extdata <- system.file("extdata", package="svbams")
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
