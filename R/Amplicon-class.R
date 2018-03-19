@@ -87,6 +87,7 @@ setClass("AmpliconGraph", representation(graph="graphNEL",
                                          germline_cnv="GRanges",
                                          outliers="GRanges"))
 
+
 setValidity("AmpliconGraph", function(object){
   msg <- TRUE
   if(length(ampliconRanges(object)) > 0 || length(nodes(object)) > 0){

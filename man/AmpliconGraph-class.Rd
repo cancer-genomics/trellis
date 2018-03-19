@@ -128,7 +128,8 @@ ampliconNames(amplicons)
 
 \S4method{queryRanges}{AmpliconGraph}(object) <- value
 
-\S4method{ranges}{AmpliconGraph}(x, ...)
+\S4method{ranges}{AmpliconGraph}(x, use.names = TRUE, use.mcols = FALSE,
+  ...)
 
 \S4method{ranges}{AmpliconGraph}(x) <- value
 }

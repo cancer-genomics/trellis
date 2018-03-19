@@ -41,8 +41,9 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
 
 \S4method{names}{RearrangementList}(x)
 
-\S4method{overlapsAny}{RearrangementList,GRanges}(query, subject, maxgap = 0L,
-  minoverlap = 1L, type = c("any", "start", "end", "within", "equal"), ...)
+\S4method{overlapsAny}{RearrangementList,GRanges}(query, subject,
+  maxgap = -1L, minoverlap = 0L, type = c("any", "start", "end", "within",
+  "equal"), ...)
 
 \S4method{$}{RearrangementList}(x, name) <- value
 
