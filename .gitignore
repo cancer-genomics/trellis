@@ -4,3 +4,8 @@
 /.Rbuildignore
 /svclasses.Rproj
 /#DESCRIPTION#
+/.Rbuildignore
+/svpreprocess.Rproj
+/vignettes/svpreprocess.log
+/vignettes/svpreprocess.md
+/vignettes/svpreprocess.pdf

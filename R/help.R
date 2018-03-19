@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #' Classes and methods for structural variation analyses
 #'
 #' svclass provides infrastructure for structural variant analyses of sequencing data.
@@ -26,4 +27,25 @@
 #' @importFrom graph graphNEL 
 #' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames
 #' @importFrom stats median setNames
+=======
+#' Preprocessing for whole genome structural variant analyses
+#'
+#' Preprocessing includes defining bin-level summaries of relative copy number,
+#' modeling GC content, and excluding regions of the genome that are difficult
+#' to interrogate for copy number alterations.
+#'
+#' @docType package
+#' @name svpreprocess
+#' @import methods
+#' @import svclasses
+#' @importFrom Rsamtools bamPaths bamRanges scanBamFlag
+#' @importMethodsFrom Rsamtools ScanBamParam countBam
+#' @importMethodsFrom IRanges overlapsAny findOverlaps
+#' @importFrom S4Vectors subjectHits
+#' @importMethodsFrom SummarizedExperiment rowRanges assays assays<-
+#' @import GenomicRanges
+#' @importFrom GenomeInfoDb keepSeqlevels seqlevels seqinfo<- seqinfo
+#' @importFrom DNAcopy CNA segment
+#' @importFrom stats setNames predict acf density loess mad median na.omit runif
+>>>>>>> remote_svpreprocess/master
 NULL

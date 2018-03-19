@@ -1,4 +1,3 @@
 library(testthat)
-library(svclasses)
-
-test_check("svclasses")
+library(trellis)
+test_check("trellis")

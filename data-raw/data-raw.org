@@ -1,0 +1,4 @@
+#+BEGIN_SRC sh
+  cp ~/Dropbox/OvarianCellLines/structuralvar/data/preprocess/3background_adj/CGOV44T.bam.rds ../inst/extdata/preprocess_coverage.rds
+#+END_SRC
+

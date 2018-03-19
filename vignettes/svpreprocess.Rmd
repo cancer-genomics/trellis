@@ -1,0 +1,80 @@
+---
+title: "Preprocessing for whole genome structural variant analyses"
+author: "Robert Scharpf"
+date: \today
+output: BiocStyle::pdf_document
+bibliography:
+vignette: >
+  %\VignetteIndexEntry{svpreprocess}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc} 
+---
+
+```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+# Introduction
+
+We begin by loading a bins object from the appropriate sv.filters package and
+obtaining the complete file path to the BAM file. Currently, only hg18 and hg19
+builds are available for the svfilters package.
+
+```{r svfilters}
+library(svbams)
+library(svfilters.hg19)
+bins1kb
+bins <- dropSeqlevels(bins1kb, "chrY", pruning.mode = "coarse")
+extdata <- system.file("extdata", package="svbams")
+id <- "CGOV44T.bam"
+bamfile <- file.path(extdata, id)
+```
+
+We use infrastructure provided in the Rsamtools package for counting single-end
+reads overlapping each bin.
+
+```{r lib}
+library(Rsamtools)
+library(svpreprocess)
+
+flags <- scanBamFlag(isDuplicate=FALSE,
+                     isPaired=TRUE,
+                     isUnmappedQuery=FALSE,
+                     hasUnmappedMate=FALSE,
+                     isProperPair=TRUE)
+bviews <- BamViews(bamPaths=bamfile, bamRanges=bins)
+bins$cnt <- binCounts(bviews)
+```
+
+Next, we log-transform the raw counts and correct for GC content by loess.
+
+```{r normalize}
+bins$std_cnt <- binNormalize(bins)
+set.seed(123)
+gc_adj <- binGCCorrect(bins)
+bins$gc_adj <- gc_adj
+```
+
+Plotting the bin-level summaries.
+
+```{r plot}
+library(ggplot2)
+schr <- bins[which(seqnames(bins) == "chr8")]
+df <- data.frame(chr = seqnames(schr), 
+                 start = start(ranges(schr)), 
+                 end = end(ranges(schr)), 
+                 log2 = schr$gc_adj)
+ggplot(df) + 
+  geom_segment(aes(x = start, xend = end, y = log2, yend = log2), 
+               colour = "steelblue", size = 1) + 
+  xlab("Coordinate") + 
+  ylab("log2 norrmalized counts")
+
+```
+
+# Control samples 
+
+If one or more normal controls are available, the bin-counts can be further
+corrected by the bin-wide medians from the normals. 
+
+TODO

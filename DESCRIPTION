@@ -55,3 +55,17 @@ Collate:
     'data.R'
     'improper-methods.R'
     'seqinfo-utils.R'
+    'acf.R'
+    'baf-utils.R'
+    'help.R'
+    'preprocess-utils.R'
+Suggests:
+    knitr,
+    testthat,
+    svfilters.hg19,
+    svbams, 
+    ggplot2
+VignetteBuilder: knitr
+License: Artistic-2.0
+biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
+RoxygenNote: 6.0.1
