@@ -1,4 +1,4 @@
-Package: svclasses
+Package: trellis
 Title: Classes for somatic structural variation analyses
 Version: 0.0.30
 Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
