@@ -1,4 +1,4 @@
-#' @include DataPaths-class.R
+#' @include AllGenerics.R
 NULL
 
 #' Set numeric scale for \code{PreprocessViews2} object

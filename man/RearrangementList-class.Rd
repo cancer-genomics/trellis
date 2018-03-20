@@ -20,6 +20,9 @@
 \alias{[,RearrangementList,ANY,ANY,ANY-method}
 \alias{[[,RearrangementList,ANY,ANY-method}
 \alias{[[<-,RearrangementList,ANY,ANY,ANY-method}
+\alias{c,RearrangementList-method}
+\alias{RearrangementList,}
+\alias{c-method}
 \alias{seqlevels,RearrangementList-method}
 \title{Constructor for \code{RearrangementList} class}
 \usage{
@@ -55,6 +58,8 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
 
 \S4method{[[}{RearrangementList,ANY,ANY,ANY}(x, i, j, ...,
   drop = FALSE) <- value
+
+\S4method{c}{RearrangementList}(x, ..., recursive = FALSE)
 
 \S4method{seqlevels}{RearrangementList}(x)
 }
