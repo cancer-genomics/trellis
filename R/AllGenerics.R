@@ -99,3 +99,61 @@ setGeneric("txD<-", function(object,value) standardGeneric("txD<-"))
 setGeneric("left", function(x, ...) standardGeneric("left"))
 
 setGeneric("right", function(x, ...) standardGeneric("right"))
+
+##
+## Amplicon-class generics
+##
+#' @export
+#' @rdname AmpliconGraph-class
+setGeneric("amplicons", function(object) standardGeneric("amplicons"))
+
+#' @export
+#' @rdname AmpliconGraph-class
+setGeneric("amplicons<-", function(object, value) standardGeneric("amplicons<-"))
+
+#' @export
+#' @rdname AmpliconGraph-class
+setGeneric("ampliconRanges", function(object) standardGeneric("ampliconRanges"))
+
+#' @export
+#' @rdname AmpliconGraph-class
+setGeneric("ampliconRanges<-", function(object,value) standardGeneric("ampliconRanges<-"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+#' @param object a \code{AmpliconGraph} object
+setGeneric("assemblyGaps", function(object) standardGeneric("assemblyGaps"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("driver", function(object) standardGeneric("driver"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("graph", function(object) standardGeneric("graph"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("graph<-", function(object, value) standardGeneric("graph<-"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("isAmplicon", function(object) standardGeneric("isAmplicon"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("isSomatic", function(object) standardGeneric("isSomatic"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("nonampliconRanges", function(object) standardGeneric("nonampliconRanges"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("queryRanges", function(object) standardGeneric("queryRanges"))
+
+#' @rdname AmpliconGraph-class
+#' @export
+setGeneric("queryRanges<-", function(object, value) standardGeneric("queryRanges<-"))
+
+
