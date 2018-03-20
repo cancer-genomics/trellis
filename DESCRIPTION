@@ -32,7 +32,8 @@ Suggests:
     svfilters.hg18,
     svfilters.hg19,
     ggplot2,
-    BiocStyle
+    BiocStyle,
+    data.table
 Collate: 
     'help.R'
     'AllGenerics.R'
@@ -66,6 +67,9 @@ Collate:
     'recurrent.R'
     'segment.R'
     'seqinfo-utils.R'
+    'alignment-utils.R'
+    'blat-utils.R'
+    'galignment-utils.R'
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
