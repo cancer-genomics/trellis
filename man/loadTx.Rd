@@ -14,6 +14,6 @@ Load Txdb object
 }
 \examples{
 library(svfilters.hg19)
-tx <- loadTx()
+tx <- loadTx("hg19")
 tx
 }
