@@ -2,7 +2,10 @@
 % Please edit documentation in R/baf-utils.R
 \name{svAF}
 \alias{svAF}
-\title{Compute allele frequencies at germline heterozygous positions}
+\title{Compute allele frequencies at germline heterozygous positions
+Given a set of genomic coordinates this function identifies heterozygous positions in a bam file 
+given by \code{normalBam} and retuns the minor allele frequency at these positions in a bam file 
+specified by \code{tumorBam}.}
 \usage{
 svAF(normalBam, tumorBam, genome, positions, region, n = 50000,
   minCovNormal = 20, minCovTumor = 20, max_depth = 1000,
@@ -64,6 +67,7 @@ A data.frame with the following columns:
 \strong{Tumor.MAF}: The minor allele frequency of the event in tumorBam
 }
 \description{
+Compute allele frequencies at germline heterozygous positions
 Given a set of genomic coordinates this function identifies heterozygous positions in a bam file 
 given by \code{normalBam} and retuns the minor allele frequency at these positions in a bam file 
 specified by \code{tumorBam}.
@@ -81,7 +85,7 @@ bam2 <- file.path(extdir, "cgov44t_revised.bam")
 
 data(snps, package = "svfilters.hg19")
 snps <- keepSeqlevels(snps, c("chr3", "chr5"), pruning.mode = "coarse")
-\dontrun{
+
 svAF(normalBam=bam1, 
      tumorBam=bam2, 
      genome="hg19", 
@@ -92,6 +96,5 @@ svAF(normalBam=bam1,
      max_depth = 1e3, 
      minMafNormal = 0.3, 
      minMafTumor = 0)
-}
 
 }

@@ -7,9 +7,9 @@
 #' @import methods
 #' @import BiocGenerics
 #' @importMethodsFrom Rsamtools BamViews [
-#' @importMethodsFrom Rsamtools ScanBamParam countBam
+#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup
 #' @importClassesFrom Rsamtools BamViews
-#' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag
+#' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam
 #' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame
 #' @importFrom S4Vectors queryHits subjectHits
 #' @importMethodsFrom S4Vectors elementType elementNROWS
