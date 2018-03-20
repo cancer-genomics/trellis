@@ -72,7 +72,7 @@
 #' \strong{Tumor.Coverage}: The distinct coverage of RefBase + AltBase in tumorBam \cr
 #' \strong{Tumor.MAF}: The minor allele frequency of the event in tumorBam
 #' 
-#' @import dplyr
+#' @import dplyr Rsamtools
 #' 
 #' @export
 #' 
