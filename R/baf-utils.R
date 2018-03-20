@@ -1,5 +1,5 @@
 #' Compute allele frequencies at germline heterozygous positions
-#'
+#
 #' Given a set of genomic coordinates this function identifies heterozygous positions in a bam file 
 #' given by \code{normalBam} and retuns the minor allele frequency at these positions in a bam file 
 #' specified by \code{tumorBam}.  
@@ -71,8 +71,6 @@
 #' \strong{Tumor.Mut.Count}: The coverage of AltBase in tumorBam \cr
 #' \strong{Tumor.Coverage}: The distinct coverage of RefBase + AltBase in tumorBam \cr
 #' \strong{Tumor.MAF}: The minor allele frequency of the event in tumorBam
-#' 
-#' @import dplyr Rsamtools
 #' 
 #' @export
 #' 
