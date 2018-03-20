@@ -3,43 +3,47 @@ NULL
 
 #' Parameter class for calling deletions
 #'
-#' #' @slot tag_density_homozygous_thr length-one numeric vector
+#' @slot homozygous_thr length-one numeric vector
 #'   indicating the maximum fold change expected for a homozygous
 #'   deletion
-#' 
+#'
+#' @slot hemizygous_thr length-one numeric vector
+#'   indicating the maximum fold change expected for a hemizygous
+#'   deletion
+#'
 #' @slot min_width length-one numeric vector indicating the minimum
 #'   width of a CNV segment.
-#' 
+#'
 #' @slot max_width length-one numeric vector indicating the maximum
 #'   width of a CNV segment.
-#' 
+#'
 #' @slot min_gapwidth length-one numeric vector used to reduce
 #'   deletion calls. Provided that the segment means of adjacent
 #'   deletions are qualitatively similar, two deletions less than
 #'   min_gapwidth apart will be merged into a single CNV.
-#' 
+#'
 #' @slot min_RPs_in_hemizygous length-one numeric vector indicating
 #'   the minimum number of rearranged read pairs that can be spanned
 #'   by a hemizygous deletion. [PARAMETER NOT USED]
-#' 
+#'
 #' @slot max_RPs_in_homozygous length-one numeric vector indicating
 #'   the maximum number of read pairs allowed to be spanned by a
 #'   homozygous deletion.  [PARAMETER NOT USED]
-#' 
+#'
 #' @slot nflanking_hemizygous length-one numeric vector indicating the
 #'   minimum number of rearranged RPs required for calling a
 #'   hemizygous deletion with higher confidence.  Hemizygous deletions
 #'   with rearranged RPs are given higher priority over hemizygous
 #'   deletions supported only by the tag density.
-#' 
+#'
 #' @slot nflanking_homozygous length-one numeric vector indicating the
 #'   minimum number of rearranged RPs required for calling a
 #'   homozygous deletion with higher confidence.  Homozygous deletions
 #'   with rearranged RPs are given higher priority over homozygous
 #'   deletions supported only by the tag density.
-#' 
+#'
 #' @slot maxRatioObservedToExpected length-one numeric vector [IGNORED?]
-#' 
+#'
 #' @slot max_proportion_in_filter length-one numeric vector indicating
 #'   the maximum proportion of a CNV that can be covered by one of the
 #'   filters.  The filters are germline CNV, low mappability, low GC /

@@ -9,6 +9,8 @@
 \alias{numberFusions}
 \alias{TranscriptsFusion-class}
 \alias{TranscriptsFusion}
+\alias{names,ClippedTranscripts-method}
+\alias{names,ClippedTranscripts-class}
 \alias{fusions,TranscriptsFusion-method}
 \alias{fusions<-,TranscriptsFusion,list-method}
 \alias{fusions,TranscriptsFusion,list-method}
@@ -27,6 +29,8 @@ identifier(object) <- value
 numberFusions(object)
 
 TranscriptsFusion(object, fusions = list())
+
+\S4method{names}{ClippedTranscripts}(x)
 
 \S4method{fusions}{TranscriptsFusion}(object)
 

@@ -35,6 +35,7 @@ setClass("TranscriptsFusion", representation(fusions="list"),
 #' ClippedTranscripts()
 #' @slot left a \code{GRangesList}
 #' @slot right a \code{GRangesList}
+#' @slot names a character vector of transcript names
 #' @rdname ClippedTranscripts-class
 #' @export
 setClass("ClippedTranscripts", representation(left="GRangesList", right="GRangesList",
@@ -77,6 +78,8 @@ setMethod("ClippedTranscripts", c("missing", "missing"),
                 names=names)
           })
 
+#' @rdname TranscriptsFusion-class
+#' @aliases names,ClippedTranscripts-class
 setMethod("names", "ClippedTranscripts", function(x) x@names)
 
 setMethod("elementNROWS", "Transcripts", function(x){

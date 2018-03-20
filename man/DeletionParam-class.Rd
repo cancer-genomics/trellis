@@ -111,13 +111,19 @@ or hg19)}
 a \code{DeletionParam} object
 }
 \description{
-#' @slot tag_density_homozygous_thr length-one numeric vector
-  indicating the maximum fold change expected for a homozygous
-  deletion
+Parameter class for calling deletions
 }
 \section{Slots}{
 
 \describe{
+\item{\code{homozygous_thr}}{length-one numeric vector
+indicating the maximum fold change expected for a homozygous
+deletion}
+
+\item{\code{hemizygous_thr}}{length-one numeric vector
+indicating the maximum fold change expected for a hemizygous
+deletion}
+
 \item{\code{min_width}}{length-one numeric vector indicating the minimum
 width of a CNV segment.}
 

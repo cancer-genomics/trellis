@@ -42,6 +42,8 @@ A container for clipped transcripts
 \item{\code{left}}{a \code{GRangesList}}
 
 \item{\code{right}}{a \code{GRangesList}}
+
+\item{\code{names}}{a character vector of transcript names}
 }}
 
 \examples{
