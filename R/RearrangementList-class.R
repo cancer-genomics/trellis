@@ -1,29 +1,6 @@
 #' @include Rearrangement-class.R
 NULL
 
-#' Constructor for \code{RearrangementList} class
-#'
-#' @return a \code{RearrangementList} object
-#' @rdname RearrangementList-class
-#' @export
-#' @keywords internal
-#' @param object a list of \code{Rearrangement} objects
-#'
-#' @param modal_rearrangement a character vector of the modal
-#'   rearrangement corresponding to each element in \code{object}.
-#'   Must be the same length as \code{object}.
-#'
-#' @param percent_rearrangement a numeric vector indicating the
-#'   fraction of improper read pairs supporting the modal
-#'   rearrangement type.  Must be the same length as \code{object}.
-#'
-#' @param colData a \code{DataFrame} containing metadata on the
-#'   \code{Rearrangement} objects.
-#'
-setGeneric("RearrangementList", function(object,
-                                         modal_rearrangement,
-                                         percent_rearrangement,
-                                         colData) standardGeneric("RearrangementList"))
 
 #' A container for a list of Rearrangement objects
 #'

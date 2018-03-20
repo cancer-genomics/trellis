@@ -259,6 +259,27 @@ setGeneric("variant<-", function(object,value) standardGeneric("variant<-"))
 ##
 ##--------------------------------------------------
 
+
+#' Accessor for improper read pairs
+#'
+#' Extract the improperly paired reads.  Reads are flagged as improper
+#' by the alignment algorithm.  Typically, this indicates that the
+#' separation between a read and its mate is larger than expected, the
+#' orientation of the read and its mate is different from that
+#' anticipated in the reference genome, or the reads align to
+#' different chromosomes.
+#' 
+#' 
+#' @export
+#' @rdname improper-methods
+#' @seealso \code{\linkS4class{Rearrangement}}
+#' @param object a \code{Rearrangement} or \code{StructuralVariant} object
+setGeneric("improper", function(object) standardGeneric("improper"))
+
+#' @rdname improper-methods
+#' @export
+setGeneric("improper<-", function(object, value) standardGeneric("improper<-"))
+
 #' The fraction of improper read pairs that link two clusters of improper reads
 #'
 #' For bona fide deletions, inversions, and translocations, we would
@@ -443,3 +464,175 @@ setGeneric("name.left", function(object) standardGeneric("name.left"))
 #' @keywords-internal
 #' @rdname ExonSubset-class
 setGeneric("name.right", function(object) standardGeneric("name.right"))
+
+
+#' Set numeric scale for \code{PreprocessViews2} object
+#'
+#' Exported only for internal use by other packages.
+#' 
+#' @return numeric
+#' 
+#' @export
+#' @docType methods
+#' @param x A \code{PreprocessViews2} object
+#' @param value a length-one numeric vector
+#' @rdname setScale-method
+#' @keywords internal
+setGeneric("setScale<-", function(x, value) standardGeneric("setScale<-"))
+
+##
+## Preprocess-class generics
+##
+
+#' Indexes the GRanges of a BamViews-derived class
+#'
+#' @docType methods
+#' @rdname indexRanges-method
+#' @param object a \code{BamViews}-derived object
+#' @export
+#' @keywords internal
+setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
+
+#' @param value an integer-vector 
+#' @rdname indexRanges-method
+#' @export
+#' @keywords internal
+setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
+
+#' Accessor for file paths
+#'
+#' File path to intermediate data saved to disk
+#' 
+#' @export
+#' @param object a \code{PreprocessViews2} object
+#' @rdname paths
+#' @aliases paths paths<-
+setGeneric("paths", function(object) standardGeneric("paths"))
+
+#' @param value a character-vector of file paths to intermediate data
+#' @rdname paths
+#' @aliases paths,PreprocessViews2-method  paths<-,PreprocessViews2-method
+#' @export
+setGeneric("paths<-", function(object,value) standardGeneric("paths<-"))
+
+
+##
+## RearrangementParams-class generics
+##
+
+#' @param object a \code{RearrangementParams} object
+#' @rdname RearrangementParams-class
+#' @export
+#' @keywords internal
+setGeneric("rpSeparation", function(object) standardGeneric("rpSeparation"))
+
+#' @rdname RearrangementParams-class
+#' @export
+#' @keywords internal
+setGeneric("minNumberTagsPerCluster", function(object) standardGeneric("minNumberTagsPerCluster"))
+
+#' @rdname RearrangementParams-class
+#' @export
+#' @keywords internal
+setGeneric("minClusterSize", function(object) standardGeneric("minClusterSize"))
+
+#' @rdname RearrangementParams-class
+#' @export
+#' @keywords internal
+setGeneric("maxClusterSize", function(object) standardGeneric("maxClusterSize"))
+
+#' @rdname RearrangementParams-class
+#' @export
+#' @keywords internal
+setGeneric("minGapWidth", function(object) standardGeneric("minGapWidth"))
+
+#' @rdname RearrangementParams-class
+#' @export
+setGeneric("percentModalType", function(object) standardGeneric("percentModalType"))
+
+##
+## RearrangementList-class generics
+##
+
+#' Constructor for \code{RearrangementList} class
+#'
+#' @return a \code{RearrangementList} object
+#' @rdname RearrangementList-class
+#' @export
+#' @keywords internal
+#' @param object a list of \code{Rearrangement} objects
+#'
+#' @param modal_rearrangement a character vector of the modal
+#'   rearrangement corresponding to each element in \code{object}.
+#'   Must be the same length as \code{object}.
+#'
+#' @param percent_rearrangement a numeric vector indicating the
+#'   fraction of improper read pairs supporting the modal
+#'   rearrangement type.  Must be the same length as \code{object}.
+#'
+#' @param colData a \code{DataFrame} containing metadata on the
+#'   \code{Rearrangement} objects.
+#'
+setGeneric("RearrangementList", function(object,
+                                         modal_rearrangement,
+                                         percent_rearrangement,
+                                         colData) standardGeneric("RearrangementList"))
+
+
+##
+## SegmentParam-class generics
+##
+
+#' @param x \code{SegmentParam} object
+#' @rdname SegmentParam-class
+#' @export
+setGeneric("cbs_alpha", function(x) standardGeneric("cbs_alpha"))
+
+#' @rdname SegmentParam-class
+#' @export 
+setGeneric("undo.splits", function(x) standardGeneric("undo.splits"))
+
+#' @rdname SegmentParam-class
+#' @export 
+setGeneric("undo.SD", function(x) standardGeneric("undo.SD"))
+
+
+##
+## copy number generics
+##
+
+#' Accessor for 'copy' assays
+#'
+#' Extract matrix of log2-transformed estimates of copy number
+#' relative to autosomal mode or median
+#'
+#' @export
+#' @docType methods
+#' @param object A \code{RangedSummarizedExperiment}
+#' @rdname copynumber-methods
+setGeneric("copynumber", function(object) standardGeneric("copynumber"))
+
+#' @rdname copynumber-methods
+#' @export
+setGeneric("copynumber<-", function(object, value) standardGeneric("copynumber<-"))
+
+##
+## miscellaneous generics
+##
+
+#' Extract autosomal (human) sequence levels
+#' 
+#' @export
+#' @param object a \code{GRanges} object
+#' @docType methods
+#' @rdname chromosome-methods
+setGeneric("autosomeNames", function(object) standardGeneric("autosomeNames"))
+
+#' Return seqnames of a \code{GRanges} object as a character vector
+#' 
+#' @export
+#' @docType methods
+#' @rdname chromosome-methods
+setGeneric("chromosome", function(object) standardGeneric("chromosome"))
+
+setGeneric("modev", function(x, na.rm=TRUE) standardGeneric("modev"))

@@ -39,18 +39,6 @@ SegmentParam <- function(alpha=0.001,
       undo.SD=undo.SD, verbose=verbose)
 }
 
-#' @param x \code{SegmentParam} object
-#' @rdname SegmentParam-class
-#' @export
-setGeneric("cbs_alpha", function(x) standardGeneric("cbs_alpha"))
-
-#' @rdname SegmentParam-class
-#' @export 
-setGeneric("undo.splits", function(x) standardGeneric("undo.splits"))
-
-#' @rdname SegmentParam-class
-#' @export 
-setGeneric("undo.SD", function(x) standardGeneric("undo.SD"))
 
 #' @aliases cbs_alpha,SegmentParam-method
 #' @rdname SegmentParam-class

@@ -1,51 +1,6 @@
 #' @include AllGenerics.R
 NULL
 
-#' Set numeric scale for \code{PreprocessViews2} object
-#'
-#' Exported only for internal use by other packages.
-#' 
-#' @return numeric
-#' 
-#' @export
-#' @docType methods
-#' @param x A \code{PreprocessViews2} object
-#' @param value a length-one numeric vector
-#' @rdname setScale-method
-#' @keywords internal
-setGeneric("setScale<-", function(x, value) standardGeneric("setScale<-"))
-
-#' Indexes the GRanges of a BamViews-derived class
-#'
-#' @docType methods
-#' @rdname indexRanges-method
-#' @param object a \code{BamViews}-derived object
-#' @export
-#' @keywords internal
-setGeneric("indexRanges", function(object) standardGeneric("indexRanges"))
-
-#' @param value an integer-vector 
-#' @rdname indexRanges-method
-#' @export
-#' @keywords internal
-setGeneric("indexRanges<-", function(object, value) standardGeneric("indexRanges<-"))
-
-#' Accessor for file paths
-#'
-#' File path to intermediate data saved to disk
-#' 
-#' @export
-#' @param object a \code{PreprocessViews2} object
-#' @rdname paths
-#' @aliases paths paths<-
-setGeneric("paths", function(object) standardGeneric("paths"))
-
-#' @param value a character-vector of file paths to intermediate data
-#' @rdname paths
-#' @aliases paths,PreprocessViews2-method  paths<-,PreprocessViews2-method
-#' @export
-setGeneric("paths<-", function(object,value) standardGeneric("paths<-"))
-
 #' A container for storing views of preprocessed data
 #'
 #' This class directly extends the \code{BamViews} class and provides

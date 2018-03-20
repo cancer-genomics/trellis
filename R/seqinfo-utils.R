@@ -1,17 +1,4 @@
-#' Extract autosomal (human) sequence levels
-#' 
-#' @export
-#' @param object a \code{GRanges} object
-#' @docType methods
-#' @rdname chromosome-methods
-setGeneric("autosomeNames", function(object) standardGeneric("autosomeNames"))
 
-#' Return seqnames of a \code{GRanges} object as a character vector
-#' 
-#' @export
-#' @docType methods
-#' @rdname chromosome-methods
-setGeneric("chromosome", function(object) standardGeneric("chromosome"))
 
 #' @aliases chromosome,GRanges-method
 #' @rdname chromosome-methods

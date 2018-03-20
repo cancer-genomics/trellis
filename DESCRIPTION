@@ -47,7 +47,7 @@ Collate:
     'GRanges-utils.R'
     'Preprocess-class.R'
     'RearrangementList-class.R'
-    'RearrangmentParams-class.R'
+    'RearrangementParams-class.R'
     'SegmentParam-class.R'
     'Transcripts-class.R'
     'acf.R'

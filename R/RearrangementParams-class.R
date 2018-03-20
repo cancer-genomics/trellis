@@ -1,4 +1,4 @@
-#' @include help.R
+#' @include AllGenerics.R
 NULL
 
 #' Parameter class for rearrangement analysis
@@ -90,35 +90,6 @@ RearrangementParams <- function(rp_separation=10e3,
       percent_linking=percent_linking)
 }
 
-#' @param object a \code{RearrangementParams} object
-#' @rdname RearrangementParams-class
-#' @export
-#' @keywords internal
-setGeneric("rpSeparation", function(object) standardGeneric("rpSeparation"))
-
-#' @rdname RearrangementParams-class
-#' @export
-#' @keywords internal
-setGeneric("minNumberTagsPerCluster", function(object) standardGeneric("minNumberTagsPerCluster"))
-
-#' @rdname RearrangementParams-class
-#' @export
-#' @keywords internal
-setGeneric("minClusterSize", function(object) standardGeneric("minClusterSize"))
-
-#' @rdname RearrangementParams-class
-#' @export
-#' @keywords internal
-setGeneric("maxClusterSize", function(object) standardGeneric("maxClusterSize"))
-
-#' @rdname RearrangementParams-class
-#' @export
-#' @keywords internal
-setGeneric("minGapWidth", function(object) standardGeneric("minGapWidth"))
-
-#' @rdname RearrangementParams-class
-#' @export
-setGeneric("percentModalType", function(object) standardGeneric("percentModalType"))
 
 #' @rdname RearrangementParams-class
 #' @aliases rpSeparation,RearrangementParams-method

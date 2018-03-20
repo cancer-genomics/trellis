@@ -73,7 +73,7 @@ countParam <- function(gr, flags=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=
 }
 
 
-setGeneric("modev", function(x, na.rm=TRUE) standardGeneric("modev"))
+
 
 setMethod(modev, "integer", function(x, na.rm=TRUE){
   tab <- table(x)
