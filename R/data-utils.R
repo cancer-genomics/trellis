@@ -3,7 +3,7 @@
 #' @return a \code{TxDb} object
 #' @examples
 #' library(svfilters.hg19)
-#' tx <- loadTx()
+#' tx <- loadTx("hg19")
 #' tx
 #' @export
 loadTx <- function(build){
