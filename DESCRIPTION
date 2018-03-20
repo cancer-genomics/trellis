@@ -30,7 +30,8 @@ Suggests:
     BSgenome.Hsapiens.UCSC.hg19,
     TxDb.Hsapiens.UCSC.hg19.refGene,
     svfilters.hg18,
-    svfilters.hg19
+    svfilters.hg19,
+    ggplot2
 Collate: 
     'help.R'
     'AllGenerics.R'

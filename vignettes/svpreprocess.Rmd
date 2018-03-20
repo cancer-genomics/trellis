@@ -5,7 +5,7 @@ date: \today
 output: BiocStyle::pdf_document
 bibliography:
 vignette: >
-  %\VignetteIndexEntry{svpreprocess}
+  %\VignetteIndexEntry{trellis}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc} 
 ---
@@ -35,8 +35,6 @@ reads overlapping each bin.
 
 ```{r lib}
 library(Rsamtools)
-library(svpreprocess)
-
 flags <- scanBamFlag(isDuplicate=FALSE,
                      isPaired=TRUE,
                      isUnmappedQuery=FALSE,
