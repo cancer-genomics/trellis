@@ -6,6 +6,9 @@
 \usage{
 loadTx(build)
 }
+\arguments{
+\item{build}{genome build (one of hg18, hg19, or hg38)}
+}
 \value{
 a \code{TxDb} object
 }

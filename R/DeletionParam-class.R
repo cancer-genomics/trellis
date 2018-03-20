@@ -52,7 +52,7 @@ NULL
 #'
 #' @slot bam_seqlevels_style character string indicating style of seqnames
 #'
-#' @slot tumorPurity estimated fraction of sequenced DNA that is tumor-derived
+#' @slot tumor_purity estimated fraction of sequenced DNA that is tumor-derived
 #' 
 #' @examples
 #' DeletionParam()

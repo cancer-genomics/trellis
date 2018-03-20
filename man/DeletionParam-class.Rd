@@ -165,7 +165,7 @@ normal samples.}
 
 \item{\code{bam_seqlevels_style}}{character string indicating style of seqnames}
 
-\item{\code{tumorPurity}}{estimated fraction of sequenced DNA that is tumor-derived}
+\item{\code{tumor_purity}}{estimated fraction of sequenced DNA that is tumor-derived}
 }}
 
 \examples{

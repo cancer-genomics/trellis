@@ -30,6 +30,6 @@
 #' @importFrom DNAcopy CNA segment
 #' @importFrom stats setNames predict acf loess median na.omit runif filter
 #' @importFrom utils read.table data
-#' @importFrom dplyr group_by
+#' @importFrom dplyr group_by top_n summarize mutate count
 #' @importFrom magrittr '%>%'
 NULL

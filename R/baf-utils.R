@@ -47,7 +47,7 @@
 #' 
 #' data(snps, package = "svfilters.hg19")
 #' snps <- keepSeqlevels(snps, c("chr3", "chr5"), pruning.mode = "coarse")
-#' 
+#' \dontrun{
 #' svAF(normalBam=bam1, 
 #'      tumorBam=bam2, 
 #'      genome="hg19", 
@@ -58,7 +58,7 @@
 #'      max_depth = 1e3, 
 #'      minMafNormal = 0.3, 
 #'      minMafTumor = 0)
-#'
+#'}
 #' @return
 #' A data.frame with the following columns:
 #' 
