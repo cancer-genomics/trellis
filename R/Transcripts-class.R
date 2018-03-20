@@ -150,7 +150,6 @@ setReplaceMethod("identifier", "Transcripts", function(object, value){
 #' @param x a \code{ClippedTranscripts} object
 #' @param ... ignored
 #' @rdname ClippedTranscripts-class
-#' @export
 setMethod("left", "ClippedTranscripts", function(x, ...) x@left)
 
 #' @aliases numberFusions,TranscriptsFusion-method
@@ -160,7 +159,6 @@ setMethod("numberFusions", "TranscriptsFusion", function(object) length(fusions(
 
 #' @rdname ClippedTranscripts-class
 #' @aliases right,ClippedTranscripts-method
-#'@export
 setMethod("right", "ClippedTranscripts", function(x, ...) x@right)
 
 #' @rdname transcript-accessors
