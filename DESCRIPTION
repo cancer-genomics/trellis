@@ -27,11 +27,6 @@ Suggests:
     TxDb.Hsapiens.UCSC.hg19.refGene,
     svfilters.hg18,
     svfilters.hg19
-License: Artistic-2.0
-LazyData: true
-VignetteBuilder: knitr
-biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
-RoxygenNote: 6.0.1
 Collate: 
     'help.R'
     'DataPaths-class.R'
@@ -50,22 +45,16 @@ Collate:
     'RearrangmentParams-class.R'
     'SegmentParam-class.R'
     'Transcripts-class.R'
+    'acf.R'
+    'baf-utils.R'
     'copynumber-methods.R'
     'data-utils.R'
     'data.R'
     'improper-methods.R'
-    'seqinfo-utils.R'
-    'acf.R'
-    'baf-utils.R'
-    'help.R'
     'preprocess-utils.R'
-Suggests:
-    knitr,
-    testthat,
-    svfilters.hg19,
-    svbams, 
-    ggplot2
+    'seqinfo-utils.R'
+LazyData: true
 VignetteBuilder: knitr
-License: Artistic-2.0
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 6.0.1
+License: Artistic-2.0
