@@ -316,6 +316,8 @@ setReplaceMethod("[[", "RearrangementList", function(x, i, j, ..., drop=FALSE, v
 ## combining
 ##
 ##--------------------------------------------------
+#' @rdname RearrangementList-class
+#' @aliases RearrangementList, c-method
 setMethod("c", "RearrangementList",
           function(x, ..., recursive=FALSE){
             args <- list(x, ...)
