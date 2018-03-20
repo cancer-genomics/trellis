@@ -1,7 +1,7 @@
 Package: trellis
 Title: Classes for somatic structural variation analyses
 Version: 0.0.31
-Authors@R: person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre"))
+Authors@R: c(person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre")), person("Daniel", "Bruhm", email = "danielbruhm@gmail.com", role = "aut"))
 Description: This package contains classes and methods used for structural
     variant analyses.
 Depends:
@@ -58,6 +58,14 @@ Collate:
     'improper-methods.R'
     'preprocess-utils.R'
     'seqinfo-utils.R'
+    'amplicon-utils.R'
+    'deletion-utils.R'
+    'germlineOutliers.R'
+    'listCNVs.R'
+    'listGenomeFilters.R'
+    'read_pairs.R'
+    'recurrent.R'
+    'segment.R'
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
