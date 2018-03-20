@@ -1,8 +1,7 @@
 #' Class for storing circular binary segmentation results
 #'
 #' @seealso \code{\link[DNAcopy]{segment}}
-#' 
-#' @exportClass DNAcopy
+#'
 #' @aliases DNAcopy
 #' @family DNAcopy
 #' @rdname DNAcopy-methods
