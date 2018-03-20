@@ -278,8 +278,8 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
   if (keepSingles == FALSE) {
     potentialHet <- as.data.frame(
       potentialHet %>%
-        group_by(position) %>%
-        filter(n() > 1)
+        dplyr::group_by(position) %>%
+        dplyr::filter(n() > 1)
     )
   }
   
