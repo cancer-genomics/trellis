@@ -51,6 +51,8 @@ NULL
 #'   normal samples.
 #'
 #' @slot bam_seqlevels_style character string indicating style of seqnames
+#'
+#' @slot tumorPurity estimated fraction of sequenced DNA that is tumor-derived
 #' 
 #' @examples
 #' DeletionParam()
@@ -213,4 +215,3 @@ setMethod("show", "DeletionParam", function(object){
   cat("            - hemizygous:", minFlankingHemizygous(object), "\n")
   cat("   maximum ratio of Observed/Expected:", maxRatioObservedToExpected(object), "\n")
 })
-

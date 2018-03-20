@@ -164,6 +164,8 @@ unassembled regions, and outliers observed in a bin for 2 or more
 normal samples.}
 
 \item{\code{bam_seqlevels_style}}{character string indicating style of seqnames}
+
+\item{\code{tumorPurity}}{estimated fraction of sequenced DNA that is tumor-derived}
 }}
 
 \examples{
