@@ -13,14 +13,14 @@ svAF(normalBam, tumorBam, genome, positions, region, n = 50000,
 
 \item{tumorBam}{The path to a bam file}
 
-\item{genome}{The genome build of \code{tumorBam} and \code{normalBam}.  Possible values are "hg19" and "hg18".}
+\item{genome}{The genome build of \code{tumorBam} and \code{normalBam}.  Possible values are "hg38", "hg19", and "hg18".}
 
 \item{positions}{A \code{GRanges} object consisting of the genomic regions of interest.  The default set of positions is 
-the \code{snps} object from \code{svfilters.hg19} or \code{svilters.hg18} depending on the user-specified \code{genome} argument.  The \code{snps}
+the \code{snps} object from \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svilters.hg18} depending on the user-specified \code{genome} argument.  The \code{snps}
 object contains 1,000,000 positions that are frequently seen as heterozygous, therefore fewer positions are needed to find a sufficient 
 number of heterozygous positions.  The \code{snps} object contains more than enough positions for tumor ploidy/ploidy analysis on well-covered
 WGS bam files, although for bam files genertated from targeted capture-based sequencing data it is recommended to use all or most the \code{dbsnp150_snps}
-object in \code{svfilters.hg19} or \code{svfilters.hg18} to find a sufficient number of heterozygous positions as these objects contain
+object in \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svfilters.hg18} to find a sufficient number of heterozygous positions as these objects contain
 over 12,000,000 positions.}
 
 \item{region}{If \code{region} is specified only SNPs in \code{position} that fall in \code{region} will 
@@ -30,11 +30,11 @@ regions this function avoids calculating coverage metrics and allele frequencies
 users can provide the full path to a bed file in BED format.}
 
 \item{n}{The number of positions to use for pileup in \code{normalBam}.  The \code{snps} objects 
-in \code{svfilters.hg19} and \code{svfilters.hg18} contain 1 million frequently heterozygous positions.  By specifying the \code{n} argument
+in \code{svfilters.hg38}, \code{svfilters.hg19} and \code{svfilters.hg18} contain 1 million frequently heterozygous positions.  By specifying the \code{n} argument
 a random sample of the positions object of length \code{n} will be used.  For tumor purity/ploidy
 analysis 10,000 heterozygous positions well spread across the genome is typically plenty.  The 
 default value of \code{n = 50000} is generally sufficient to achieve this on a 30X WGS bam file.  For sequencing data
-from targeted capture protocols, it is recommended to use the full set of SNPs in \code{dbsnp150_snp} in 
+from targeted capture protocols, it is recommended to use the full set of SNPs in \code{dbsnp150_snp} in \code{svfilters.hg38}, 
 \code{svfilters.hg19} or \code{svfilters.hg18} to identify a suffient number of SNPs with high enough coverage.}
 
 \item{minCovNormal}{The minimum coverage of a position in \code{normalBam} to be considered.}
