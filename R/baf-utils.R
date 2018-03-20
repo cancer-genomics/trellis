@@ -409,13 +409,13 @@ bed2gr <- function(bedPath) {
   bed <- read.table(bedPath, header = FALSE, stringsAsFactors = FALSE, sep = "\t")
   bed.gr <- NULL
   try({
-    bed.gr <- GRanges(seqnames = bed$V1, 
-                      ranges = IRanges(start = bed$V2, 
+    bed.gr <- GRanges(seqnames = bed$V1,
+                      ranges = IRanges(start = bed$V2,
                                        end = bed$V3))
   }, silent = TRUE)
-  
+
   if (is.null(bed.gr)) {
-    stop("The supplied bed file cannot be coerced to a GRanges object.  
+    stop("The supplied bed file cannot be coerced to a GRanges object.
           Check that the bed file follows BED formatting rules (see https://genome.ucsc.edu/FAQ/FAQformat.html#format1).
           Note that only the first three BED fields are required.")
   } else {
