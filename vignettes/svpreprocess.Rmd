@@ -23,6 +23,7 @@ builds are available for the svfilters package.
 ```{r svfilters}
 library(svbams)
 library(svfilters.hg19)
+library(trellis)
 bins1kb
 bins <- dropSeqlevels(bins1kb, "chrY", pruning.mode = "coarse")
 extdata <- system.file("extdata", package="svbams")
