@@ -8,6 +8,6 @@
 #' @export
 loadTx <- function(build){
   pkg <- paste0("svfilters.", build)
-  data(transcripts, envir=environment(), package=pkg)
+  data("transcripts", envir=environment(), package=pkg)
   transcripts
 }
