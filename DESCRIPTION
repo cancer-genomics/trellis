@@ -17,9 +17,13 @@ Imports:
     IRanges,
     SummarizedExperiment,
     graph,
-    stats
-Suggests:
+    stats,
     DNAcopy,
+    matrixStats,
+    utils,
+    dplyr,
+    magrittr
+Suggests:
     knitr,
     testthat,
     svbams,

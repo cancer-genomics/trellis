@@ -3,7 +3,7 @@ test_that("AlignmentViews", {
   av <-  AlignmentViews2()
   expect_true(validObject(av))
   expect_identical(rdsId(av), character())
-  
+
   library(Rsamtools)
   require(svbams)
   extdata <- system.file("extdata", package="svbams")

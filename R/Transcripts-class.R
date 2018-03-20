@@ -12,6 +12,8 @@ setGeneric("ClippedTranscripts", function(transcripts, i, left=GRangesList(),
                                           right=GRangesList(), names=c("5prime", "3prime"))
   standardGeneric("ClippedTranscripts"))
 
+#' Fuse transcripts
+#'
 #' @export
 #' @rdname fuse-methods
 #' @aliases fuse

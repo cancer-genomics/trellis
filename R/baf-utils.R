@@ -188,7 +188,11 @@ svAF <- function(normalBam,
     }
     
     message("Identifying heterozygous positions")
-    normalSNPs <- filterSNPs(pu = normalPU, SNPs = querySNPs, min.cov = minCovNormal, min.maf = minMafNormal, keepSingles = FALSE)
+    normalSNPs <- filterSNPs(pu = normalPU,
+                             SNPs = querySNPs,
+                             min.cov = minCovNormal,
+                             min.maf = minMafNormal,
+                             keepSingles = FALSE)
     
     if (length(normalSNPs) == 0) {
       warning(paste0("0 heterozygous positions were found in", normalBam), call. = FALSE)
