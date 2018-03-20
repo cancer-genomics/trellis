@@ -1,10 +1,6 @@
 #' @include help.R
 NULL
 
-setGeneric("clusterReadPairs", function(object) standardGeneric("clusterReadPairs"))
-setGeneric("reviseJunction", function(object) standardGeneric("reviseJunction"))
-setGeneric("variant<-", function(object, value) standardGeneric("variant<-"))
-
 setClass("LeftAlignmentPairs", contains="GAlignmentPairs")
 
 setValidity("LeftAlignmentPairs", function(object){

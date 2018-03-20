@@ -25,7 +25,7 @@ There must be a metadata column of integers named \code{cnt} corresponding to th
 for each bin.    
 
 The output vector from \code{binNormalize()} is generally appended back to \code{bins}
-as a metadata column named \code{std_cnt} for GC normalization by \code{svpreprocess::binGCCorrect()}.
+as a metadata column named \code{std_cnt} for GC normalization by \code{binGCCorrect()}.
 }
 \examples{
 library(Rsamtools)

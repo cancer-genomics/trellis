@@ -10,7 +10,7 @@ segmentExperiment(object, tree, param = SegmentParam(), ...)
 \item{object}{A \code{PreprocessViews2} object}
 
 \item{tree}{A directory tree for storing intermediate files. See
-\code{\link[svclasses]{DataPaths-class}}.}
+\code{\link{DataPaths-class}}.}
 
 \item{param}{An object of class \code{SegmentParam}.}
 
@@ -35,6 +35,6 @@ package.
 \seealso{
 \code{\link[DNAcopy]{segment}} for description of circular
   binary segmentation and references therein; see
-  \code{\link[svclasses]{SegmentParam-class}} for a description of the default
+  \code{\link{SegmentParam-class}} for a description of the default
   parameters settings passed to the \code{segment} function.
 }

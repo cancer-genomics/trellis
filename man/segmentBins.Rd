@@ -46,8 +46,8 @@ as input (see examples).
 \seealso{
 \code{\link[DNAcopy]{segment}} for description of circular binary
   segmentation and references therein; see
-  \code{\link[svclasses]{SegmentParam-class}} for a description of the
+  \code{\link{SegmentParam-class}} for a description of the
   default parameters settings passed to the \code{segment} function. See
-  \code{\link[svpreprocess]{binNormalize}} for obtaining normalized counts
+  \code{\link{binNormalize}} for obtaining normalized counts
   for segmentation.
 }

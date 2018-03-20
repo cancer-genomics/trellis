@@ -1,10 +1,6 @@
 #' @include help.R
 NULL
 
-setGeneric("zeroEndAnchors", function(object) standardGeneric("zeroEndAnchors"))
-setGeneric("singleEndAnchors", function(object) standardGeneric("singleEndAnchors"))
-setGeneric("bothEndAnchors", function(object) standardGeneric("bothEndAnchors"))
-
 setClass("AnchoredReadPairs",
          representation(zero_end="GAlignmentPairs",
                         single_end="GAlignmentPairs",
@@ -47,20 +43,6 @@ isDuplication <- function(object, minimum_foldchange=1){
 }
 
 
-#' Remove the genomic intervals in query that overlap with intervals
-#' in subject
-#'
-#'
-#' @param query a \code{\linkS4class{BamViews}} or \code{\linkS4class{GRanges}} instance
-#' @param subject a \code{\linkS4class{GRanges}} object
-#' @param type see \code{\link{findOverlaps}}
-#' @param ... Additional arguments passed to \code{findOverlaps}
-#' @return Returns the \code{query} with intervals that overlap \code{subject} removed
-#' @export
-#' @seealso \code{\link[GenomicRanges]{findOverlaps}}
-#' @rdname filterBy-methods
-setGeneric("filterBy", function(query, subject, type="any", ...) standardGeneric("filterBy"))
-
 #' @aliases filterBy,GRanges,GRanges-method
 #' @rdname filterBy-methods
 setMethod("filterBy", c("GRanges", "GRanges"),
@@ -81,7 +63,6 @@ node1 <- function(name, sep="-") sapply(name, function(x) strsplit(x, sep)[[1]][
 #' @export
 #'
 #' @examples
-#' library(svcnvs)
 #' params <- ampliconParams("hg19")
 #'
 #' @return Returns a list of germline filters and some of the hard

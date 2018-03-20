@@ -40,7 +40,7 @@ test_that("sv_amplicons", {
   ##
   ##  standard setup
   ##
-  cv.extdata <- system.file("extdata", package="svcnvs")
+  cv.extdata <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
@@ -54,8 +54,8 @@ test_that("sv_amplicons", {
                       amplicon_filters=germline_filters,
                       params=params,
                       transcripts=transcripts)
-  
-  path <- system.file("extdata", package="svcnvs")
+
+  path <- system.file("extdata", package="trellis")
   ag.4adcc78 <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
 
   expect_identical(ag.4adcc78, ag2)

@@ -636,3 +636,29 @@ setGeneric("autosomeNames", function(object) standardGeneric("autosomeNames"))
 setGeneric("chromosome", function(object) standardGeneric("chromosome"))
 
 setGeneric("modev", function(x, na.rm=TRUE) standardGeneric("modev"))
+
+##
+## Generics for CNVs  (svcnvs)
+##
+setGeneric("zeroEndAnchors", function(object) standardGeneric("zeroEndAnchors"))
+setGeneric("singleEndAnchors", function(object) standardGeneric("singleEndAnchors"))
+setGeneric("bothEndAnchors", function(object) standardGeneric("bothEndAnchors"))
+
+#' Remove the genomic intervals in query that overlap with intervals
+#' in subject
+#'
+#'
+#' @param query a \code{\linkS4class{BamViews}} or \code{\linkS4class{GRanges}} instance
+#' @param subject a \code{\linkS4class{GRanges}} object
+#' @param type see \code{\link{findOverlaps}}
+#' @param ... Additional arguments passed to \code{findOverlaps}
+#' @return Returns the \code{query} with intervals that overlap \code{subject} removed
+#' @export
+#' @seealso \code{\link[GenomicRanges]{findOverlaps}}
+#' @rdname filterBy-methods
+setGeneric("filterBy", function(query, subject, type="any", ...) standardGeneric("filterBy"))
+
+setGeneric("clusterReadPairs", function(object) standardGeneric("clusterReadPairs"))
+setGeneric("reviseJunction", function(object) standardGeneric("reviseJunction"))
+setGeneric("variant<-", function(object, value) standardGeneric("variant<-"))
+setGeneric("CNAObject", function(object, valuename) standardGeneric("CNAObject"))

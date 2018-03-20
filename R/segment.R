@@ -1,5 +1,3 @@
-setGeneric("CNAObject", function(object, valuename) standardGeneric("CNAObject"))
-
 setMethod("CNAObject", c("PreprocessViews2", "missing"), function(object, valuename){
   bins <- rowRanges(object)
   x <- assays(object)[, 1, drop=FALSE]
@@ -92,9 +90,9 @@ not_in_filters <- function(x, filters){
 #'
 #' @seealso \code{\link[DNAcopy]{segment}} for description of circular binary
 #'   segmentation and references therein; see
-#'   \code{\link[svclasses]{SegmentParam-class}} for a description of the
+#'   \code{\link{SegmentParam-class}} for a description of the
 #'   default parameters settings passed to the \code{segment} function. See
-#'   \code{\link[svpreprocess]{binNormalize}} for obtaining normalized counts
+#'   \code{\link{binNormalize}} for obtaining normalized counts
 #'   for segmentation.
 #'
 #' @examples
@@ -174,7 +172,7 @@ checkMcols <- function(x, id){
 #'
 #' @seealso \code{\link[DNAcopy]{segment}} for description of circular
 #'   binary segmentation and references therein; see
-#'   \code{\link[svclasses]{SegmentParam-class}} for a description of the default
+#'   \code{\link{SegmentParam-class}} for a description of the default
 #'   parameters settings passed to the \code{segment} function.
 #'
 #' @return A \code{GRangesList} object.  Each element is the set of
@@ -188,7 +186,7 @@ checkMcols <- function(x, id){
 #' 
 #' @param object A \code{PreprocessViews2} object
 #' @param tree A directory tree for storing intermediate files. See
-#'   \code{\link[svclasses]{DataPaths-class}}.
+#'   \code{\link{DataPaths-class}}.
 #' @param param An object of class \code{SegmentParam}. 
 #' @param ... Additional arguments are passed to the \code{segment}
 #'   function in the \code{DNAcopy} package.

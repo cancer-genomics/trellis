@@ -13,7 +13,6 @@
 \alias{readPairs,StructuralVariant-method}
 \alias{sort,StructuralVariant-method}
 \alias{variant,StructuralVariant-method}
-\alias{variant<-,StructuralVariant-method}
 \alias{variant<-,StructuralVariant,ANY-method}
 \alias{[,StructuralVariant,ANY,ANY,ANY-method}
 \alias{[,StructuralVariant,ANY,ANY-method}
@@ -41,7 +40,7 @@ StructuralVariant(variant = GRanges(), proper = .GAlignmentPairs(),
 
 \S4method{variant}{StructuralVariant}(object)
 
-\S4method{variant}{StructuralVariant}(object) <- value
+\S4method{variant}{StructuralVariant,ANY}(object) <- value
 
 \S4method{[}{StructuralVariant,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 

@@ -55,7 +55,6 @@ Returns a list of germline filters and some of the hard
 Lists germline filters and parameters for filtering amplicons
 }
 \examples{
-library(svcnvs)
 params <- ampliconParams("hg19")
 
 }
