@@ -259,20 +259,19 @@ svAF <- function(normalBam,
 # will be missed in a tumor-only analysis because we can't
 # distingiush it from being germline homozygous.
 filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
-  
+  position <- NULL
   pu$position <- paste(pu$seqnames, pu$pos, sep = ":")
-  
-  # If a position has more than 2 bases counted (becaue of errors, mutations, ...) then
-  # only keep the 2 most frequent alleles
+  ## If a position has more than 2 bases counted (becaue of errors, mutations,
+  ## ...) then only keep the 2 most frequent alleles
   potentialHet <- as.data.frame(
-    pu %>% 
-      group_by(position) %>% 
+    pu %>%
+      group_by(position) %>%
       top_n(2, count)
   )
-  
-  # If keepSingles == FALSE then single-allele positions are removed.  This will be the
-  # case when identifying hets in a matchedNormal, or in a tumor-only analysis to remove homozygotes.  
-  # These positions are kept in the tumor in T/N analysis because of LOH in a high purity sample
+  ## If keepSingles == FALSE then single-allele positions are removed. This will
+  ## be the case when identifying hets in a matchedNormal, or in a tumor-only
+  ## analysis to remove homozygotes. These positions are kept in the tumor in
+  ## T/N analysis because of LOH in a high purity sample
   if (keepSingles == FALSE) {
     potentialHet <- as.data.frame(
       potentialHet %>%
@@ -280,41 +279,40 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
         dplyr::filter(n() > 1)
     )
   }
-  
   if (nrow(potentialHet) == 0) {
     return(GRanges())
   }
-  
-  # Remove position with coverage < min.cov
-  # Remove positions with alt allele frequency < min.maf
+  ## Remove position with coverage < min.cov
+  ## Remove positions with alt allele frequency < min.maf
+  tot <- NULL
   summed <- potentialHet %>%
     group_by(position) %>%
     summarize(tot = sum(count)) %>%
     filter(tot < min.cov)
-  
+
   mafs <- potentialHet %>%
     group_by(position) %>%
     mutate(maf = count / sum(count)) %>%
     filter(maf < min.maf)
-  
+
   rem <- c(summed$position, mafs$position)
   potentialHet <- subset(potentialHet, !(position %in% rem))
-  
+
   if (nrow(potentialHet) == 0) {
     return(GRanges())
   }
-  
+
   ids <- as.character(unique(potentialHet$position))
   keepers <- GRanges()
   for (i in ids) {
     pos <- potentialHet[which(potentialHet$position == i),]
-    
+
     if (nrow(pos) == 2) {
       genotype <- paste(pos$nucleotide, collapse = "/")
     } else if (nrow(pos) == 1) {
       genotype <- as.character(pos$nucleotide)
     }
-    
+
     chrom <- strsplit(i, split = ":")[[1]][1]
     start <- as.integer(strsplit(i, split = ":")[[1]][2])
     end <- start
@@ -322,25 +320,28 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
                      ranges = IRanges(start = start,
                                       end = end))
     snp <- subsetByOverlaps(SNPs, coord)
-    
-    # Only include positions that match the snp database for both reference and alt alleles if 2 alleles are present
-    # If one allele is present, only that allele must match the SNP database
+
+    ## Only include positions that match the snp database for both reference and
+    ## alt alleles if 2 alleles are present. If one allele is present, only that
+    ## allele must match the SNP database
     if (nrow(pos) == 2) {
-      if ((length(grep(snp$refUCSC, genotype)) == 0) || (length(grep(gsub("/", "|", snp$altAllele), genotype)) == 0)) {
+      if ((length(grep(snp$refUCSC, genotype)) == 0) ||
+          (length(grep(gsub("/", "|", snp$altAllele), genotype)) == 0)) {
         next
       }
     } else if (nrow(pos == 1)) {
-      if ((length(grep(snp$refUCSC, genotype)) == 0) && (length(grep(snp$altAllele, genotype)) == 0)) {
+      if ((length(grep(snp$refUCSC, genotype)) == 0) &&
+          (length(grep(snp$altAllele, genotype)) == 0)) {
         next
       }
     }
-    
+
     if (length(which(pos$nucleotide == snp$refUCSC)) == 1) {
       snp$refCount <- pos$count[which(pos$nucleotide == snp$refUCSC)]
     } else {
       snp$refCount <- 0
     }
-    
+
     altAllele <- strsplit(snp$altAllele, split = "/")[[1]]
     ind <- which(pos$nucleotide %in% altAllele)
     if (length(ind) == 1) {
@@ -349,40 +350,39 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
     } else if (length(ind) == 0) {
       snp$altCount <- 0
     }
-    
+
     keepers <- c(keepers, snp)
   }
   return(keepers)
 }
 
-
-
 calcAlleleFreq <- function(tumorSNPs, normalSNPs = NULL, min.cov) {
   message("Computing allele frequencies")
-  
+
   if (!is.null(normalSNPs)) {
-    # Matching the indicies of tumorSNPs and normalSNPs 
+    ## Matching the indicies of tumorSNPs and normalSNPs
     normalSNPs <- subsetByOverlaps(normalSNPs, tumorSNPs)
     normalSNPs <- sort(normalSNPs)
   }
-  
+
   tumorSNPs <- sort(tumorSNPs)
-  
+
   maf <- tumorSNPs$refCount / (tumorSNPs$refCount + tumorSNPs$altCount)
   maf[which(maf > 0.5)] <- 1 - maf[which(maf > 0.5)]
-  
+
   if (!is.null(normalSNPs)) {
     out.df <- data.frame(Chrom = as.character(seqnames(tumorSNPs)),
                          Pos = start(ranges(tumorSNPs)),
                          RefBase = tumorSNPs$refUCSC,
                          AltBase = tumorSNPs$altAllele,
                          Normal.Mut.Count = normalSNPs$altCount,
-                         Normal.Coverage = (normalSNPs$refCount + normalSNPs$altCount),
+                         Normal.Coverage = (normalSNPs$refCount +
+                                            normalSNPs$altCount),
                          Tumor.Mut.Count = tumorSNPs$altCount,
                          Tumor.Coverage = (tumorSNPs$altCount + tumorSNPs$refCount),
-                         Tumor.MAF = round(maf, digits = 2))  
+                         Tumor.MAF = round(maf, digits = 2))
   }
-  
+
   if (is.null(normalSNPs)) {
     out.df <- data.frame(Chrom = as.character(seqnames(tumorSNPs)),
                          Pos = start(ranges(tumorSNPs)),
@@ -398,13 +398,13 @@ calcAlleleFreq <- function(tumorSNPs, normalSNPs = NULL, min.cov) {
 }
 
 
-# Input path to bed file, returns GRanges of regions
-# It is expected that bedPath points to a tab-delimited text
-# file in 3-column bed format.  If more than 3 columns are present, 
-# it is expected that:
-# Column 1: Chromosome
-# Column 2: Start Coordinate
-# Column 3 : End Coordinate
+## Input path to bed file, returns GRanges of regions
+## It is expected that bedPath points to a tab-delimited text
+## file in 3-column bed format.  If more than 3 columns are present, 
+## it is expected that:
+## Column 1: Chromosome
+## Column 2: Start Coordinate
+## Column 3 : End Coordinate
 bed2gr <- function(bedPath) {
   bed <- read.table(bedPath, header = FALSE, stringsAsFactors = FALSE, sep = "\t")
   bed.gr <- NULL
