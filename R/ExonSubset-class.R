@@ -1,31 +1,8 @@
-#' @include help.R
+#' @include AllGenerics.R
 NULL
 
-#' @export
-#' @keywords-internal
-#' @rdname ExonSubset-class
-#' @param object a \code{ExonSubset} object
-#' @return a \code{LogicalList}
-setGeneric("inRearrangement.left", function(object) standardGeneric("inRearrangement.left"))
-
-#' @export
-#' @keywords-internal
-#' @rdname ExonSubset-class
-#' @return a \code{LogicalList}
-setGeneric("inRearrangement.right", function(object) standardGeneric("inRearrangement.right"))
-
-#' @export
-#' @keywords-internal
-#' @rdname ExonSubset-class
-setGeneric("name.left", function(object) standardGeneric("name.left"))
-
-#' @export
-#' @keywords-internal
-#' @rdname ExonSubset-class
-setGeneric("name.right", function(object) standardGeneric("name.right"))
-
 #' Container for storing information to subset transcripts
-#' 
+#'
 #' @examples
 #' ExonSubset()
 #' @export

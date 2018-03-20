@@ -1,10 +1,5 @@
-#' @include Deletion-class.R
+#' @include AllGenerics.R
 NULL
-
-setGeneric("first<-", function(x, value) standardGeneric("first<-"))
-
-setGeneric("last<-", function(x, value) standardGeneric("last<-"))
-
 
 ##--------------------------------------------------
 ##
