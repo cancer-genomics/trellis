@@ -115,8 +115,8 @@ svAF <- function(normalBam,
   }
   
   if (missing(positions)) {
-    data(snps, package = paste0("svfilters.", genome), envir = environment())
-    SNPs <- snps
+    data("snps", package = paste0("svfilters.", genome), envir = environment())
+    SNPs <- get("snps")
   } else {
     SNPs <- positions
   }
@@ -290,6 +290,7 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
     summarize(tot = sum(count)) %>%
     filter(tot < min.cov)
 
+  maf <- NULL
   mafs <- potentialHet %>%
     group_by(position) %>%
     mutate(maf = count / sum(count)) %>%
