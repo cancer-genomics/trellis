@@ -1112,7 +1112,8 @@ initialize_graph <- function(segs, amplicon_filters, params){
 
 ampliconFilters <- function(genome){
   pkg <- paste0("svfilters.", genome)
-  data(germline_filters, package=pkg, envir=environment())
+  data("germline_filters", package=pkg, envir=environment())
+  germline_filters <- get("germline_filters")
   germline_filters
 }
 
