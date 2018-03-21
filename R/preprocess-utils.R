@@ -15,7 +15,7 @@ NULL
 #' the \code{BamViews} object and to ignore unmapped and duplicate reads.
 #' @return An integer-vector of counts corresponding to each interval in the \code{BamViews} object.
 #' 
-#'@examples
+#' @examples
 #' library(Rsamtools)
 #' library(svbams)
 #' library(svfilters.hg19)
@@ -28,7 +28,7 @@ NULL
 #' counts <- binCounts(bviews)
 #' head(counts)
 #' length(bamRanges(bviews)) == length(counts) #TRUE
-#' 
+#'
 #' @export
 binCounts <- function(object, scan_param){
   if(missing(scan_param)){
