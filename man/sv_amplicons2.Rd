@@ -10,11 +10,11 @@ sv_amplicons2(preprocess, amplicon_filters, params = ampliconParams())
 \item{preprocess}{a list of the preprocessed data (see \code{preprocessData})}
 
 \item{amplicon_filters}{a \code{GRanges} object of germline filters.  If this
-argument is not specified then a default set of germline filters will be used 
-from the \code{svfilters.hg19} package if the \code{genome} slot in \code{preprocess} is 
+argument is not specified then a default set of germline filters will be used
+from the \code{svfilters.hg19} package if the \code{genome} slot in \code{preprocess} is
 set to "hg19" or from the \code{svfilters.hg18} package if it's set to "hg18".}
 
-\item{params}{a list of parameters for the amplicon analysis.  Default parameters 
+\item{params}{a list of parameters for the amplicon analysis.  Default parameters
 are given by \code{AmpliconParams()}.}
 }
 \value{
@@ -41,6 +41,7 @@ junction between two amplicons.
 }
 \examples{
 data(pdata)
+pdata$bam.file <- system.file("extdata", "cgov44t.bam", package="svbams")
 sv_amplicons2(pdata)
 }
 \seealso{
