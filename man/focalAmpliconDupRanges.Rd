@@ -24,7 +24,7 @@ graph object as given in the examples.
 \examples{
   ## load a previously saved AmpliconGraph from a regression unit test
   \dontrun{
-    path <- system.file("testthat", package="svcnvs")
+    path <- system.file("testthat", package="trellis")
     ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
     params <- ampliconParams()
     focalAmpliconDupRanges(ag, params)

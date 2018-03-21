@@ -142,8 +142,7 @@ proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam())
 read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
 ```
 
-We collect the bin-level summaries ($\log_2$ ratios), the segmentation data, and the read
-pair data in a single list object:
+We collect the bin-level summaries ($\log_2$ ratios), the segmentation data, and the read pair data in a single list object:
 
 
 ```{r preprocess_data}
@@ -156,10 +155,10 @@ pdata <- preprocessData(bam.file=bam.file,
 
 Below, we call segments as homozygous deletion (homozygous), homozygous deletion
 supported by improperly paired reads (homozygous+), hemizygous deletion (hemizygous), and hemizygous deletion
-supported by improperly paired reads (hemizygous). For the purpose of identifying somatic
-deletions without a matched normal, we exclude hemizygous deletions that are not
-supported by improperly paired reads. With this toy dataset, we identify 16
-possible homozygous deletions and the calls are both `homozygous` except onw which is `homozygous+`.
+supported by improperly paired reads (hemizygous). 
+For identifying somatic deletions without a matched normal, 
+we exclude hemizygous deletions not supported by improperly paired reads. 
+With this toy dataset, we identify 16 possible homozygous deletions and the calls are both `homozygous` except one which is `homozygous+`.
 
 ```{r sv_deletions}
 deletions <- sv_deletions(preprocess=pdata)

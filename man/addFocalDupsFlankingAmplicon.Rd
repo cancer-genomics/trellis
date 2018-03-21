@@ -33,7 +33,7 @@ example to step through
 }
 \examples{
 \dontrun{
-  path <- file.path(system.file(package="svcnvs"), "tests/testthat")
+  path <- file.path(system.file(package="trellis"), "tests/testthat")
   ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
   params <- ampliconParams()
   ag <- addFocalDupsFlankingAmplicon(ag, rp, params)

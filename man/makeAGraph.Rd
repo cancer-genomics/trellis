@@ -24,7 +24,7 @@ Initialize a graph object for amplicon analyses
   ##
   ## read in some CNVs
   ##
-  cv.extdata <- system.file("extdata", package="svcnvs")
+  cv.extdata <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))

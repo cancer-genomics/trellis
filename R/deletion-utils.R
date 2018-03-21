@@ -11,70 +11,13 @@ setValidity("LeftAlignmentPairs", function(object){
   msg
 })
 
-setReplaceMethod("variant", c("StructuralVariant", "GRanges"),
-                 function(object, value){
-                   object@variant <- value
-                   object
-                 })
+
 
 setMethod("clusterReadPairs", "LeftAlignmentPairs", function(object){
   boundary_starts <- start(first(object))
   boundary_ends <- start(last(object))
   cumsum(c(0, diff(boundary_starts) > 200 | diff(boundary_ends) > 200))
 })
-
-setMethod("combine", c("StructuralVariant", "StructuralVariant"),
-          function(x, y, ...){
-            cnv <- c(variant(x), variant(y))
-            prp <- c(proper(x), proper(y))
-            irp <- c(improper(x), improper(y))
-            cn <- c(copynumber(x), copynumber(y))
-            calls <- c(calls(x), calls(y))
-
-            prp_index <- initializeProperIndex2(cnv, prp, zoom.out=1)
-            irp_index1 <- initializeImproperIndex2(cnv, irp, DeletionParam())
-            irp_index2 <- updateImproperIndex2(cnv, irp, maxgap=2e3)
-            irp_index3 <- .match_index_variant(irp_index1, cnv, irp_index2)
-            sv <- StructuralVariant(variant=cnv,
-                                    proper=prp,
-                                    improper=irp,
-                                    copynumber=cn,
-                                    calls=calls,
-                                    index_proper=prp_index,
-                                    index_improper=irp_index3)
-            sv
-          })
-
-setMethod("reviseJunction", "StructuralVariant", function(object){
-  v <- variant(object)
-  if(length(v) > 1) stop("method only defined for length-one StructuralVariant")
-  irp <- improper(object)
-  if(length(irp) < 5) return(variant(object))
-  irp2 <- leftAlwaysFirst(irp)
-  left_border <- end(first(irp2))
-  right_border <- start(last(irp2))
-  d <- right_border-left_border
-  if(any(d > 500)){
-    st <- max(left_border[d > 500])+50
-    en <- min(right_border[d > 500])-50
-    if(st > en) {
-      st <- max(left_border)
-      en <- min(right_border)
-      if(st > en){
-        ##stop("Interval for SV is too small after revision -- start
-        ##location is larger than end location")
-        ##
-        ## Keep original boundary
-        ##
-        st <- start(v)
-        en <- end(v)
-      }
-    }
-  } else return(v)
-  v <- GRanges(seqnames(v), IRanges(st, en))
-  v
-})
-
 
 #' Assess whether a region can be attributable to a germline CNV or
 #' artifact seen in germline samples
@@ -1321,8 +1264,6 @@ widthNotSpannedByFilter <- function(cnv, filters){
   w
 }
 
-
-
 groupSVs <- function(object){
   g <- variant(object)
   g2 <- expandGRanges(g, width(g)*1)
@@ -1417,19 +1358,6 @@ sv_deletions <- function(preprocess,
   ## requires bam file
   sv
 }
-
-setMethod("rename", "StructuralVariant", function(x, ...){
-  nms <- paste0("sv", seq_along(variant(x)))
-  names(variant(x)) <- nms
-  ip <- indexProper(x)
-  names(ip) <- nms
-  x@index_proper <- ip
-  ip <- indexImproper(x)
-  names(ip) <- nms
-  x@index_improper <- ip
-  names(copynumber(x)) <- nms
-  x
-})
 
 finalize_deletions <- function(sv, preprocess, gr_filters,
                                param=DeletionParam()){
