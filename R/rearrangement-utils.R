@@ -300,6 +300,7 @@ setMethod("numberLinkingRP", "Rearrangement", function(object){
 #'   Move the functions that do step 5 out of the constructor.
 #' 
 #' @examples
+#' \dontrun{
 #'   library(Rsamtools)
 #'   library(svovarian)
 #'   dirs <- projectOvarian()
@@ -317,15 +318,16 @@ setMethod("numberLinkingRP", "Rearrangement", function(object){
 #'   head(improper(r))
 #'   ## The linked tag cluster intervals
 #'   linkedBins(r)
+#' }
 #' @export
-#' 
+#'
 #' @param aln.file A length-one character vector providing the file
 #'   path to a serialized R object of improper read pairs
-#' 
+#'
 #' @param bins A \code{GRanges} object.  This should be the
 #'   \code{bamRanges} of a \code{BamViews} object -- e.g., 1kb bins
 #'   along the genome with high mappability and good GC content.
-#' 
+#'
 #' @param param A \code{RearrangementParams} object
 seqJunctionsInferredByPairedTags <- function(aln.file, bins, param){
   gp <- readRDS(aln.file)
@@ -703,95 +705,11 @@ rearrangementType <- function(object){
 #'   additional details regarding the clustering of tags from improper
 #'   pairs and the identification of linked tag clusters. See
 #'   \code{\link{rearrangementType}} for the type of rearrangement
-#'   supported by each read pair.
-#'
-#' @examples
-#'   id <- "CGOV2T"
-#'   library(svovarian)
-#'   dirs <- projectOvarian()
-#'   bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-#'   bview <- bviews[, id]
-#'   aview <- AlignmentViews2(bview, dirs)
-#'   rp <- RearrangementParams()
-#'   rlist <- findCandidates(aview, rp)
-#'
-#' @param align_view A \code{AlignmentViews2} object
-#' @param rp A \code{RearrangementParams} object
-# findCandidates <- function(align_view, rp=RearrangementParams()){
-#   ##.Deprecated("see findCandidates2")
-#   file <- improperPaths(align_view)
-#   candidates <- suppressWarnings(
-#     seqJunctionsInferredByPairedTags(file,
-#                                      bamRanges(align_view), rp)
-#   )
-#   candidateList <- RearrangementList(candidates)
-#   candidateList <- type_each(candidateList)
-#   colData(candidateList)$modal_rearrangement <- modalRearrangement(candidateList)
-#   colData(candidateList)$percent_rearrangement <- percentRearrangement(candidateList)
-#   candidateList
-# }
-
-#' Finds candidate somatic rearrangements
-#'
-#' This function identifies clusters of improper reads that are linked
-#' by the mate information in paired read sequencing platforms such as
-#' Illumina HiSeq.
-#'
-#' @details
-#' 
-#' All reads from improper read pairs  where mates are separated by
-#' at least 10kb and both reads in pair are mapped are read from the
-#' \code{AlignmentViews} object.  A cluster of reads (all involved in
-#' improper pairs) is defined as follows:
-#' \enumerate{
-#' 
-#'   \item genomic intervals demarcating improper read clusters are
-#'   gotten by applying reduce to a GRanges representation of all
-#'   improper reads
-#'
-#'   \item genomic intervals must be at least 115bp and no larger than
-#'   5000bp (default settings)
-#'
-#'   \item each cluster must contain at least 5 reads
-#'
-#' }
-#' 
-#' Non-overlapping clusters that are linked by multiple improper read
-#' pairs are suggestive of a rearrangement.  Linked tag clusters are
-#' identified by the function \code{seqJunctionsInferredByPairedTags}.
-#' The genomic intervals defined by the linked tag clusters (also
-#' referred to as linked bins) are represented as a \code{GRanges}
-#' object with a variable called \code{linked.to} in \code{mcols}.
-#' The \code{linked.to} column is also a \code{GRanges} object. The
-#' \code{GRanges} object of the linked clusters, the improper read
-#' pairs supporting the link, and the set of all tags that map to
-#' either linked genomic interval are encapsulated in a
-#' \code{Rearrangement} object.  Statistics calculated on each
-#' \code{Rearrangement} object include the fraction of all reads link
-#' the two clusters (\code{fractionLinkingTags}), the types of
-#' rearrangements supported (\code{rearrangementType}), the modal
-#' rearrangement, and the percent of read pairs supporting the modal
-#' rearrangement.  The collection of all linked clusters for a given
-#' sample is represented as a \code{RearrangementList}.
-#'
-#' @seealso See \code{\link{seqJunctionsInferredByPairedTags}} for
-#'   additional details regarding the clustering of tags from improper
-#'   pairs and the identification of linked tag clusters. See
-#'   \code{\link{rearrangementType}} for the type of rearrangement
 #'   supported by each read pair.  See \code{\link[svcnvs]{preprocessData}} for constructing a list of elemented obtained from preprocessing.
 #'
-#' @examples
-#'   id <- "CGOV2T"
-#'   library(svovarian)
-#'   dirs <- projectOvarian()
-#'   bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-#'   bview <- bviews[, id]
-#'   aview <- AlignmentViews2(bview, dirs)
-#'   rp <- RearrangementParams()
-#'   rlist <- findCandidates(aview, rp)
 #'
 #' @export
-#' @param preprocess A list of preprocessing data as constructed by \code{preprocessData} 
+#' @param preprocess A list of preprocessing data as constructed by \code{preprocessData}
 #' @param rp A \code{RearrangementParams} object
 findCandidates2 <- function(preprocess, rp=RearrangementParams()){
   ##file <- improperPaths(align_view)
@@ -897,7 +815,7 @@ typeRead <- function(gap){
 #' @param build character string indicating genome build (only hg19 and hg18 currently supported)
 #' @param maxgap the allowable distance between a split or paired end read and a transcript for assessing whether coding regions
 #' @examples
-#'   extdata <- system.file("extdata", package="svrearrange")
+#'   extdata <- system.file("extdata", package="trellis")
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
@@ -1033,7 +951,7 @@ readPairColors <- function(){
 #' @param df a \code{data.frame} as created by \code{rearDataFrame}
 #' @seealso \code{\link{rearDataFrame}}
 #' @examples
-#'   extdata <- system.file("extdata", package="svrearrange")
+#'   extdata <- system.file("extdata", package="trellis")
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
@@ -1168,7 +1086,7 @@ setMethod("type", "RearrangementList", function(object){
 #' @param x a \code{Rearrangement} or \code{RearrangementList}
 #' @export
 #' @examples
-#'   extdata <- system.file("extdata", package="svrearrange")
+#'   extdata <- system.file("extdata", package="trellis")
 #'   r <- readRDS(file.path(extdata, "cgov1t_complex_rearrangement.rds"))
 #'   s <- type(r)
 #'   print(s)
@@ -1186,7 +1104,7 @@ isComplex <- function(x){
 #' @param r a \code{Rearrangement} object
 #' @seealso \code{\link{rearDataFrame}} \code{\link{ggRearrange}}
 #' @examples
-#'   extdata <- system.file("extdata", package="svrearrange")
+#'   extdata <- system.file("extdata", package="trellis")
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
