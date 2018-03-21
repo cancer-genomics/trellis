@@ -115,7 +115,7 @@ NULL
 #' are linked by improper read pairs where both reads were mapped.  In
 #' addition, it also contains the improper reads.
 #'
-#' @seealso \code{\link[svclasses]{RearrangementList}}
+#' @seealso \code{\link{RearrangementList}}
 #'
 #' @docType data
 #' @name rearrangement_list

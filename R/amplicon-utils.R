@@ -563,7 +563,7 @@ addFlanks <- function(object, dup_granges){
 #' @seealso \code{\link{ampliconParams}}
 #' @examples
 #' \dontrun{
-#'   path <- file.path(system.file(package="svcnvs"), "tests/testthat")
+#'   path <- file.path(system.file(package="trellis"), "tests/testthat")
 #'   ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
 #'   params <- ampliconParams()
 #'   ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
@@ -800,7 +800,7 @@ germline <- function(object){
 #' @examples
 #'   ## load a previously saved AmpliconGraph from a regression unit test
 #'   \dontrun{
-#'     path <- system.file("testthat", package="svcnvs")
+#'     path <- system.file("testthat", package="trellis")
 #'     ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
 #'     params <- ampliconParams()
 #'     focalAmpliconDupRanges(ag, params)
@@ -1001,7 +1001,7 @@ setDrivers <- function(object, transcripts, clin_sign=TRUE){
 #'   ##
 #'   ## read in some CNVs
 #'   ##
-#'   cv.extdata <- system.file("extdata", package="svcnvs")
+#'   cv.extdata <- system.file("extdata", package="trellis")
 #'   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
 #'   extdata <- system.file("extdata", package="svbams")
 #'   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))

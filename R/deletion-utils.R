@@ -1610,7 +1610,7 @@ meltReadPairs <- function(rps){
 #' library(svalignments) 
 #' library(svfilters.hg19)
 #' data(bins1kb)
-#' data(segments, package="svcnvs")
+#' data(segments, package="trellis")
 #' extdata <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(extdata, "cgov44t_revised.bam")
 #' iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq")) 
