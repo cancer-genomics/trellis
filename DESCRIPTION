@@ -70,6 +70,7 @@ Collate:
     'data-utils.R'
     'data.R'
     'deletion-utils.R'
+    'fasta-utils.R'
     'galignment-utils.R'
     'germlineOutliers.R'
     'improper-methods.R'
@@ -77,20 +78,14 @@ Collate:
     'listGenomeFilters.R'
     'preprocess-utils.R'
     'read_pairs.R'
-    'recurrent.R'
-    'segment.R'
-    'seqinfo-utils.R'
-    'fasta-utils.R'
-    'help.R'
     'rear_reads.R'
     'rearrangement-utils.R'
     'rearlist-utils.R'
+    'recurrent.R'
+    'segment.R'
+    'seqinfo-utils.R'
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 6.0.1
 License: Artistic-2.0
-License: Artistic-2.0
-LazyData: true
-RoxygenNote: 6.0.1
-Collate: 

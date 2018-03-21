@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #' Somatic structural variant analysis
 #'
 #' trellis performs structural variant analyses of sequencing data.
@@ -8,7 +7,7 @@
 #' @import methods
 #' @import BiocGenerics
 #' @importMethodsFrom Rsamtools BamViews [
-#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup bamFile 
+#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup
 #' @importClassesFrom Rsamtools BamViews
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam
 #' @importFrom Rsamtools bamFlagAsBitMatrix bamMapqFilter
