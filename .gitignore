@@ -15,3 +15,6 @@ tests/testthat/*.rds
 /vignettes/svcnvs.pdf
 /TODO.org
 /vignettes/Rplots.pdf
+/vignettes/svfusions.md
+/vignettes/svfusions_v0.0.8.Rmd
+

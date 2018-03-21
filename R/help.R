@@ -15,7 +15,7 @@
 #' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE isRedundantHit isSelfHit
 #' @importMethodsFrom S4Vectors elementType elementNROWS
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths seqlengths<-
-#' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle
+#' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle seqlevelsInUse
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels seqinfo<- seqinfo
 #' @importFrom IRanges IRanges LogicalList IntegerList
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce overlapsAny subsetByOverlaps
@@ -44,4 +44,7 @@
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
 #' @importMethodsFrom GenomicFeatures transcripts cdsBy
+#' @importFrom BSgenome getBSgenome
+#' @importMethodsFrom Biostrings getSeq translate
+#' @importFrom Biostrings DNAStringSet
 NULL

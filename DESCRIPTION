@@ -28,7 +28,9 @@ Imports:
     RColorBrewer,
     AnnotationDbi,
     scales,
-    GenomicFeatures
+    GenomicFeatures,
+    BSgenome,
+    Biostrings
 Suggests:
     knitr,
     testthat,
@@ -85,6 +87,8 @@ Collate:
     'recurrent.R'
     'segment.R'
     'seqinfo-utils.R'
+    'fusion-utils.R'
+    'uniprot.R'
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants

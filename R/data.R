@@ -123,3 +123,20 @@ NULL
 #' @rdname rearrangement_list
 #' @format a \code{RearrangementList} object
 NULL
+
+##
+## From the former svfusions package
+##
+
+#' A RearrangementList from ovarian cell line CGOV7T
+#'
+#' @docType data
+#' @keywords datasets
+#' @name rear_cgov7t
+#' @name rear_cgov7t
+#' @usage data(rear_cgov7t)
+#' @aliases rear_cgov7t
+#' @format a \code{RearrangementList} object
+#' @examples
+#' data(rear_cgov7t)
+NULL
