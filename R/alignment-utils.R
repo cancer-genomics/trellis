@@ -1,5 +1,5 @@
 #' @include AllGenerics.R
-NULL 
+NULL
 
 #' Find total width of a \code{GRanges} object
 #'

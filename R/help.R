@@ -15,7 +15,7 @@
 #' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE
 #' @importMethodsFrom S4Vectors elementType elementNROWS
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths
-#' @importMethodsFrom GenomeInfoDb genome seqlevelsStyle<- seqlevelsStyle
+#' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels seqinfo<- seqinfo
 #' @importFrom IRanges IRanges LogicalList
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce overlapsAny subsetByOverlaps
