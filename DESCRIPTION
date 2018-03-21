@@ -23,7 +23,11 @@ Imports:
     utils,
     dplyr,
     RBGL,
-    magrittr
+    magrittr,
+    ggplot2,
+    RColorBrewer,
+    AnnotationDbi,
+    scales
 Suggests:
     knitr,
     testthat,
@@ -38,7 +42,6 @@ Suggests:
     svplots,  
     gridExtra,
     network,
-    scales,
     GGally,
     sna
 Collate: 
@@ -77,8 +80,17 @@ Collate:
     'recurrent.R'
     'segment.R'
     'seqinfo-utils.R'
+    'fasta-utils.R'
+    'help.R'
+    'rear_reads.R'
+    'rearrangement-utils.R'
+    'rearlist-utils.R'
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 6.0.1
 License: Artistic-2.0
+License: Artistic-2.0
+LazyData: true
+RoxygenNote: 6.0.1
+Collate: 

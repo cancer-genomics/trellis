@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #' Somatic structural variant analysis
 #'
 #' trellis performs structural variant analyses of sequencing data.
@@ -7,7 +8,7 @@
 #' @import methods
 #' @import BiocGenerics
 #' @importMethodsFrom Rsamtools BamViews [
-#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup
+#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup bamFile 
 #' @importClassesFrom Rsamtools BamViews
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam
 #' @importFrom Rsamtools bamFlagAsBitMatrix bamMapqFilter
@@ -28,7 +29,7 @@
 #' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
 #' @importMethodsFrom SummarizedExperiment SummarizedExperiment assays rowRanges
 #' @importMethodsFrom SummarizedExperiment rowRanges<- colData colData<- assays<-
-#' @importFrom matrixStats rowMedians
+#' @importFrom matrixStats rowMedians rowMins
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames
 #' @importFrom DNAcopy CNA segment
@@ -37,4 +38,10 @@
 #' @importFrom dplyr group_by top_n summarize mutate count n tbl_df
 #' @importFrom magrittr '%>%'
 #' @importFrom RBGL kCliques
+#' @importFrom ggplot2 ggplot geom_rect ylab xlab scale_fill_manual aes
+#' @importFrom ggplot2 theme scale_color_manual scale_x_continuous theme
+#' @importFrom ggplot2 element_text element_blank facet_wrap
+#' @importFrom scales trans_new pretty_breaks
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
 NULL
