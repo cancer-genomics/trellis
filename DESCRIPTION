@@ -35,7 +35,7 @@ Suggests:
     ggplot2,
     BiocStyle,
     data.table,
-    svplots,  ## should get rid of these dependencies
+    svplots,  
     gridExtra,
     network,
     scales,

@@ -10,6 +10,7 @@ NULL
 #' @param i an integer vector
 #' @param left a \code{GRangesList} for the transcripts to the left of the junction
 #' @param right a \code{GRangesList} for the transcripts to the right of the junction
+#' @param names character vector indicating strand of transcripts ('5prime' or '3prime').  
 #' @rdname ClippedTranscripts-class
 #' @export
 setGeneric("ClippedTranscripts", function(transcripts, i, left=GRangesList(),
