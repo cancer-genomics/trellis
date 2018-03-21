@@ -36,7 +36,5 @@
 #' @importFrom utils read.table data read.delim
 #' @importFrom dplyr group_by top_n summarize mutate count n tbl_df
 #' @importFrom magrittr '%>%'
-#' @importFrom svalignments properReadPairs readPairsNearVariant get_readpairs get_improper_readpairs totalWidth get_readpairs2
-#' @importFrom svalignments improperAlignmentParams getImproperAlignmentPairs
 #' @importFrom RBGL kCliques
 NULL
