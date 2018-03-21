@@ -33,6 +33,7 @@ running this function.
 }
 \examples{
 data(pdata)
+pdata$bam.file <- system.file("extdata", "cgov44t.bam", package="svbams")
 sv_deletions(pdata)
 }
 \seealso{
