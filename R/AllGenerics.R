@@ -725,4 +725,6 @@ setGeneric("getSequenceOfReads", function(object, bam.file,
 #   definition = function(object, bam.file, flags=scanBamFlag()) {
 #     .get_readpairs2(g, bam.file, flags)
 #   }
-# )
+                                        # )
+
+setGeneric("rename", function(x, ...) standardGeneric("rename"))
