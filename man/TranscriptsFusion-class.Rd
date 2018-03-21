@@ -41,7 +41,7 @@ TranscriptsFusion(object, fusions = list())
 \S4method{numberFusions}{TranscriptsFusion}(object)
 }
 \arguments{
-\item{value}{}
+\item{value}{a \code{GRanges} object}
 
 \item{value}{character string}
 }

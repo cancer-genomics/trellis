@@ -30,7 +30,7 @@ setGeneric("fuse", function(object, nms) standardGeneric("fuse"))
 setGeneric("fusions", function(object) standardGeneric("fusions"))
 
 #' @rdname TranscriptsFusion-class
-#' @param value
+#' @param value a \code{GRanges} object
 #' @export
 setGeneric("fusions<-", function(object, value) standardGeneric("fusions<-"))
 

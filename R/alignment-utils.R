@@ -222,12 +222,12 @@ getImproperAlignmentPairs <- function(bam.file,
 #' path <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(path, "cgov10t.bam")
 #' irp <- getProperAlignmentPairs(bam.file, build="hg19")
-#'   
+#'
 #' @seealso See \code{\link{properAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for extracting
 #'   proper read pairs.
 getProperAlignmentPairs <- function(bam.file,
-                                    param=properAlignmentParams(mapqFilter=0), 
+                                    param=properAlignmentParams(mapqFilter=0),
                                     build){
   ##bam.file <- bamPaths(object)
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)

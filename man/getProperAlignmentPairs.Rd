@@ -26,8 +26,8 @@ properly paired reads from a bam file.
 library(svbams)
 path <- system.file("extdata", package="svbams")
 bam.file <- file.path(path, "cgov10t.bam")
-irp <- getProperAlignmentPairs(bam.file)
-  
+irp <- getProperAlignmentPairs(bam.file, build="hg19")
+
 }
 \seealso{
 See \code{\link{properAlignmentParams}} for creating a

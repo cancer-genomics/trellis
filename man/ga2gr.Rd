@@ -23,9 +23,9 @@ Melts \code{GAlignmentPairs} objects to \code{GRanges} objects.
 library(svbams)
 path <- system.file("extdata", package="svbams")
 bam.file <- file.path(path, "cgov10t.bam")
-irp <- getImproperAlignmentPairs(bam.file)
+irp <- getImproperAlignmentPairs(bam.file, build="hg19")
 igr <- ga2gr(irp, is.improper=TRUE)
-prp <- getProperAlignmentPairs(bam.file)
+prp <- getProperAlignmentPairs(bam.file, build="hg19")
 pgr <- ga2gr(prp, is.improper=FALSE)
- 
+
 }

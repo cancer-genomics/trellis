@@ -33,10 +33,10 @@ of the first read (R1) in the pair.
   iparams <- improperAlignmentParams(mapqFilter=30)
   pparams <- properAlignmentParams(mapqFilter=30)
   irp <- getImproperAlignmentPairs(bampath,
-                                   iparams)
+                                   iparams, build="hg19")
   g.irp <- ga2gr(irp, is.improper=TRUE)
   prp <- getProperAlignmentPairs(bampath,
-                                 pparams)
+                                 pparams, build="hg19")
   g.prp <- ga2gr(prp, is.improper=FALSE)
   gr <- c(g.irp, g.prp)
   gr <- sortByRead1(gr)

@@ -26,7 +26,7 @@ This function is a wrapper for readGAlignments. At the time this function was cr
   library(svbams)
   path <- system.file("extdata", package="svbams")
   bam.file <- file.path(path, "cgov10t.bam")
-  irp <- getImproperAlignmentPairs(bam.file)
+  irp <- getImproperAlignmentPairs(bam.file, build="hg19")
 
 }
 \seealso{
