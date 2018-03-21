@@ -224,8 +224,6 @@ test_that("joinNearGRanges", {
   expect_identical(merged, merged.a4d7744)
 })
 
-
-
 test_that("get_readpairs", {
   ##
   ## standard
