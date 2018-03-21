@@ -18,9 +18,7 @@ This package is used to identify somatic rearrangements.
 ```{r packages}
 library(svbams)
 library(svfilters.hg19)
-library(svcnvs)
-library(svalignments)
-library(svrearrange)
+library(trellis)
 ```
 
 This package uses improperly paired reads to identify candidate somatic
@@ -51,8 +49,8 @@ lymphoblastoid cell lines and are provided by the
 
 
 ```{r filters}
-data(amplicon_graph, package="svcnvs")
-data(deletions2, package="svcnvs")
+data(amplicon_graph, package="trellis")
+data(deletions2, package="trellis")
 genome_filters <- reduceGenomeFilters(germline_filters,
                                       seqlevels(bins1kb))
 filters <- rFilters(amplicons=ampliconRanges(amplicon_graph),
@@ -167,7 +165,7 @@ Here, we read the previously saved BLAT alignments for this data included with
 the `svalignments` package.
 
 ```{r read_fasta}
-extdata <- system.file("extdata", package="svalignments")
+extdata <- system.file("extdata", package="trellis")
 blat.file <- file.path(extdata, "blat_alignment.txt")
 blat_aln <- readBlat(blat.file)
 ```
