@@ -360,23 +360,23 @@ improperRP <- function(gr, irp, param=DeletionParam()){
   irp  
 }
 
-addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
-  irp <- readRDS(improperPaths(aview))
-  irp <- updateObject(irp)
-  si <- seqinfo(aview)
-  sl <- seqlevels(si)
-  irp <- keepSeqlevels(irp, sl, pruning.mode="coarse")
-  d <- abs(start(first(irp)) - start(last(irp)))
-  irp <- irp[d < maximumWidth(param)]
-  seqlevelsStyle(irp) <- seqlevelsStyle(si)
-  irp <- irp[chromosome(first(irp)) == chromosome(last(irp))]
-  hits <- findOverlaps(gr, irp, minimumGapWidth(param))
-  irp <- irp[unique(subjectHits(hits))]
-  if(length(irp) > 0){
-    names(irp) <- paste0("i", seq_along(irp))
-  }
-  irp
-}
+##addImproperReadPairs2 <- function(gr, aview, param=DeletionParam()){
+##  irp <- readRDS(improperPaths(aview))
+##  irp <- updateObject(irp)
+##  si <- seqinfo(aview)
+##  sl <- seqlevels(si)
+##  irp <- keepSeqlevels(irp, sl, pruning.mode="coarse")
+##  d <- abs(start(first(irp)) - start(last(irp)))
+##  irp <- irp[d < maximumWidth(param)]
+##  seqlevelsStyle(irp) <- seqlevelsStyle(si)
+##  irp <- irp[chromosome(first(irp)) == chromosome(last(irp))]
+##  hits <- findOverlaps(gr, irp, minimumGapWidth(param))
+##  irp <- irp[unique(subjectHits(hits))]
+##  if(length(irp) > 0){
+##    names(irp) <- paste0("i", seq_along(irp))
+##  }
+##  irp
+##}
 
 .match_index_variant <- function(index_improper, gr, value){
   i <- match(names(value), names(gr))
