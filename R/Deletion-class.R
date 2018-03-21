@@ -502,7 +502,8 @@ setMethod("rename", "StructuralVariant", function(x, ...){
   x
 })
 
-#' @aliases variant,StructuralVariant,GRanges-method
+#' @rdname StructuralVariant-class
+#' @aliases variant<-,StructuralVariant,GRanges-method
 setReplaceMethod("variant", c("StructuralVariant", "GRanges"),
                  function(object, value){
                    object@variant <- value

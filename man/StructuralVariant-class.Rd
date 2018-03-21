@@ -17,6 +17,7 @@
 \alias{[,StructuralVariant,ANY,ANY,ANY-method}
 \alias{[,StructuralVariant,ANY,ANY-method}
 \alias{[[,StructuralVariant,ANY,ANY-method}
+\alias{variant<-,StructuralVariant,GRanges-method}
 \alias{improper,StructuralVariant-method}
 \alias{seqlengths,StructuralVariant-method}
 \alias{seqinfo,StructuralVariant-method}
@@ -45,6 +46,8 @@ StructuralVariant(variant = GRanges(), proper = .GAlignmentPairs(),
 \S4method{[}{StructuralVariant,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
 \S4method{[[}{StructuralVariant,ANY,ANY}(x, i)
+
+\S4method{variant}{StructuralVariant,GRanges}(object) <- value
 
 \S4method{improper}{StructuralVariant}(object)
 
