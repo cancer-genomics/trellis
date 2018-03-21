@@ -4,7 +4,7 @@
 \name{trellis}
 \alias{trellis}
 \alias{trellis-package}
-\title{Classes and methods for structural variation analyses}
+\title{Somatic structural variant analysis}
 \description{
-trellis provides infrastructure for structural variant analyses of sequencing data.
+trellis performs structural variant analyses of sequencing data.
 }

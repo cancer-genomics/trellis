@@ -91,7 +91,7 @@ NULL
 #'
 #' @name pdata
 #' @docType data
-
+NULL
 
 #' BLAT alignment of reads that were unmapped by ELAND
 #'
