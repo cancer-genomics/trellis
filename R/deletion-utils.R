@@ -1,4 +1,4 @@
-#' @include help.R
+#' @include AllGenerics.R
 NULL
 
 setClass("LeftAlignmentPairs", contains="GAlignmentPairs")
@@ -10,8 +10,6 @@ setValidity("LeftAlignmentPairs", function(object){
 ##  if(!identical(index, seq_along(object))) return("left reads must be ordered by physical position")
   msg
 })
-
-
 
 setMethod("clusterReadPairs", "LeftAlignmentPairs", function(object){
   boundary_starts <- start(first(object))
