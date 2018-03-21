@@ -185,9 +185,8 @@ checkMcols <- function(x, id){
 #'   \code{SegmentParam} class.
 #' 
 #' @param object A \code{PreprocessViews2} object
-#' @param tree A directory tree for storing intermediate files. See
-#'   \code{\link{DataPaths-class}}.
-#' @param param An object of class \code{SegmentParam}. 
+#' @param tree A directory tree for storing intermediate files. 
+#' @param param An object of class \code{SegmentParam}.
 #' @param ... Additional arguments are passed to the \code{segment}
 #'   function in the \code{DNAcopy} package.
 segmentExperiment <- function(object, tree, param=SegmentParam(), ...){
