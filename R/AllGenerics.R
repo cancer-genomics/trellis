@@ -103,9 +103,11 @@ setGeneric("right", function(x, ...) standardGeneric("right"))
 ##
 ## Amplicon-class generics
 ##
+
 #' @export
 #' @rdname AmpliconGraph-class
 setGeneric("amplicons", function(object) standardGeneric("amplicons"))
+
 
 #' @export
 #' @rdname AmpliconGraph-class

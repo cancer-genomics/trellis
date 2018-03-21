@@ -41,7 +41,7 @@ data(segments, package="trellis")
 extdata <- system.file("extdata", package="svbams")
 bam.file <- file.path(extdata, "cgov44t_revised.bam")
 iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq")) 
-improper_rp <- getImproperAlignmentPairs(bam.file, param = iparams)
+improper_rp <- getImproperAlignmentPairs(bam.file, param = iparams, build="hg19")
 segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
 del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())], 
                  min.gapwidth=2000)
