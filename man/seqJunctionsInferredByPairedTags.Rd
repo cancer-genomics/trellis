@@ -74,6 +74,7 @@ REFACTORING: Rearrangement should do nothing and should be able to
   Move the functions that do step 5 out of the constructor.
 }
 \examples{
+\dontrun{
   library(Rsamtools)
   library(svovarian)
   dirs <- projectOvarian()
@@ -91,4 +92,5 @@ REFACTORING: Rearrangement should do nothing and should be able to
   head(improper(r))
   ## The linked tag cluster intervals
   linkedBins(r)
+}
 }

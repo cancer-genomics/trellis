@@ -9,15 +9,6 @@ findCandidates2(preprocess, rp = RearrangementParams())
 \arguments{
 \item{preprocess}{A list of preprocessing data as constructed by \code{preprocessData}}
 
-\item{rp}{A \code{RearrangementParams} object
-Finds candidate somatic rearrangements
-
-This function identifies clusters of improper reads that are linked
-by the mate information in paired read sequencing platforms such as
-Illumina HiSeq.}
-
-\item{align_view}{A \code{AlignmentViews2} object}
-
 \item{rp}{A \code{RearrangementParams} object}
 }
 \description{
@@ -60,69 +51,8 @@ rearrangements supported (\code{rearrangementType}), the modal
 rearrangement, and the percent of read pairs supporting the modal
 rearrangement.  The collection of all linked clusters for a given
 sample is represented as a \code{RearrangementList}.
-
-All reads from improper read pairs  where mates are separated by
-at least 10kb and both reads in pair are mapped are read from the
-\code{AlignmentViews} object.  A cluster of reads (all involved in
-improper pairs) is defined as follows:
-\enumerate{
-
-  \item genomic intervals demarcating improper read clusters are
-  gotten by applying reduce to a GRanges representation of all
-  improper reads
-
-  \item genomic intervals must be at least 115bp and no larger than
-  5000bp (default settings)
-
-  \item each cluster must contain at least 5 reads
-
-}
-
-Non-overlapping clusters that are linked by multiple improper read
-pairs are suggestive of a rearrangement.  Linked tag clusters are
-identified by the function \code{seqJunctionsInferredByPairedTags}.
-The genomic intervals defined by the linked tag clusters (also
-referred to as linked bins) are represented as a \code{GRanges}
-object with a variable called \code{linked.to} in \code{mcols}.
-The \code{linked.to} column is also a \code{GRanges} object. The
-\code{GRanges} object of the linked clusters, the improper read
-pairs supporting the link, and the set of all tags that map to
-either linked genomic interval are encapsulated in a
-\code{Rearrangement} object.  Statistics calculated on each
-\code{Rearrangement} object include the fraction of all reads link
-the two clusters (\code{fractionLinkingTags}), the types of
-rearrangements supported (\code{rearrangementType}), the modal
-rearrangement, and the percent of read pairs supporting the modal
-rearrangement.  The collection of all linked clusters for a given
-sample is represented as a \code{RearrangementList}.
-}
-\examples{
-  id <- "CGOV2T"
-  library(svovarian)
-  dirs <- projectOvarian()
-  bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-  bview <- bviews[, id]
-  aview <- AlignmentViews2(bview, dirs)
-  rp <- RearrangementParams()
-  rlist <- findCandidates(aview, rp)
-
-  id <- "CGOV2T"
-  library(svovarian)
-  dirs <- projectOvarian()
-  bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-  bview <- bviews[, id]
-  aview <- AlignmentViews2(bview, dirs)
-  rp <- RearrangementParams()
-  rlist <- findCandidates(aview, rp)
-
 }
 \seealso{
-See \code{\link{seqJunctionsInferredByPairedTags}} for
-  additional details regarding the clustering of tags from improper
-  pairs and the identification of linked tag clusters. See
-  \code{\link{rearrangementType}} for the type of rearrangement
-  supported by each read pair.
-
 See \code{\link{seqJunctionsInferredByPairedTags}} for
   additional details regarding the clustering of tags from improper
   pairs and the identification of linked tag clusters. See

@@ -13,7 +13,7 @@ fiveTo3Prime(r, build, maxgap = 5000)
 Put the linked genomic intervals in 5-prime to 3-prime order with respect to the rearranged genome
 }
 \examples{
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]

@@ -707,8 +707,8 @@ seqJunctionNearTx <- function(rlist, build){
 #' @return a \code{RearrangementList}
 #' @export
 #' @examples
-#'  library(svrearrange)
-#'  extdata <- system.file("extdata", package="svrearrange")
+#'  library(trellis)
+#'  extdata <- system.file("extdata", package="trellis")
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
 #'  near.coding <- seqJunctionNearTx(rlist, tx)
@@ -791,8 +791,8 @@ seqJunction <- function(r, maxgap=50){
 #' @return a \code{GRanges} object of the 5-prime and 3-prime sequence junctions.  The 3-prime junctions are included in the '3p' field of the \code{GRanges} object
 #' @export
 #' @examples
-#'  library(svrearrange)
-#'  extdata <- system.file("extdata", package="svrearrange")
+#'  library(trellis)
+#'  extdata <- system.file("extdata", package="trellis")
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
 #'  near.coding <- seqJunctionNearTx(rlist, tx)
@@ -835,7 +835,5 @@ is_invalid_splits <- function(rlist, maxgap=100){
 #' @param rlist a \code{RearrangementList}
 #' @param maxgap length-one numeric vector passed to \code{subsetByOverlaps}
 #' @return logical vector of the same length as \code{rlist}
-#' @examples
-#' 
 #' @export
 is_valid_splits <- function(rlist, maxgap=100) !is_invalid_splits(rlist, maxgap)

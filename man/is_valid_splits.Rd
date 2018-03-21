@@ -17,6 +17,3 @@ logical vector of the same length as \code{rlist}
 \description{
 Check that the split reads available for each rearrangement span both sides of the sequence junction
 }
-\examples{
-
-}

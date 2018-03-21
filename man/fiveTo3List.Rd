@@ -18,8 +18,8 @@ a \code{RearrangementList}
 Reorders each rearrangement as two 5-prime to 3-prime orientations
 }
 \examples{
- library(svrearrange)
- extdata <- system.file("extdata", package="svrearrange")
+ library(trellis)
+ extdata <- system.file("extdata", package="trellis")
  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
  rlist <- readRDS(rfile)
  near.coding <- seqJunctionNearTx(rlist, tx)

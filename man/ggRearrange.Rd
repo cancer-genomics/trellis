@@ -13,7 +13,7 @@ ggRearrange(df)
 gg-style plot of reads supporting a rearrangement
 }
 \examples{
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]

@@ -17,7 +17,7 @@ rearDataFrame(r, build, maxgap = 5000)
 This function is useful for converting a Rearrangement object to a data.frame for subsequent visualization by ggplot.
 }
 \examples{
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
