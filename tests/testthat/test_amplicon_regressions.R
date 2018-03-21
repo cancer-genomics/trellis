@@ -7,7 +7,7 @@ test_that("AmpliconGraph", {
 
 
 
-cgov44t_preprocess<- function(){
+cgov44t_preprocess <- function(){
   extdata <- system.file("extdata", package="svbams")
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
@@ -46,6 +46,7 @@ test_that("sv_amplicons", {
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   params <- ampliconParams()
+  tx <- loadTx("hg19")
   ##
   ## call sv_amplicons with a bunch of arguments
   ##
@@ -53,7 +54,7 @@ test_that("sv_amplicons", {
                       segs=segs,
                       amplicon_filters=germline_filters,
                       params=params,
-                      transcripts=transcripts)
+                      transcripts=tx)
 
   path <- system.file("extdata", package="trellis")
   ag.4adcc78 <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
@@ -302,7 +303,8 @@ test_that("setGenes", {
   library(svfilters.hg19)
   path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "setAmpliconGroups.4adcc78.rds"))
-  ag <- setGenes (ag, transcripts)
+  tx <- loadTx("hg19")
+  ag <- setGenes (ag, tx)
   if(FALSE){
     saveRDS(ag, file="setAmpliconGenes.4adcc78.rds")
   }
@@ -315,8 +317,9 @@ test_that("setDrivers", {
   library(svfilters.hg19)
   path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "setAmpliconGenes.4adcc78.rds"))
-  ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
-  ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
+  tx <- loadTx("hg19")
+  ag <- setDrivers (ag, tx, clin_sign=TRUE)
+  ag <- setDrivers (ag, tx, clin_sign=FALSE)
   if(FALSE){
     saveRDS(ag, file="setDrivers.4adcc78.rds")
   }
@@ -359,13 +362,14 @@ test_that("no germline filter", {
   ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   ag <- filterSmallAmplicons (ag)
   ag <- setAmpliconGroups (ag)
-  ag <- setGenes (ag, transcripts)
-  ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
-  ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
+  tx <- loadTx("hg19")
+  ag <- setGenes (ag, tx)
+  ag <- setDrivers (ag, tx, clin_sign=TRUE)
+  ag <- setDrivers (ag, tx, clin_sign=FALSE)
 
   ag2 <- sv_amplicons(bview, segs,
                       germline_filters,
-                      params, transcripts)
+                      params, tx)
   expect_identical(ag, ag2)
   if(FALSE){
     saveRDS(ag2, file="sv_deletion.4adcc78.rds")
