@@ -34,7 +34,13 @@ Suggests:
     svfilters.hg19,
     ggplot2,
     BiocStyle,
-    data.table
+    data.table,
+    svplots,  ## should get rid of these dependencies
+    gridExtra,
+    network,
+    scales,
+    GGally,
+    sna
 Collate: 
     'help.R'
     'AllGenerics.R'
