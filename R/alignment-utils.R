@@ -186,7 +186,7 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   library(svbams)
 #'   path <- system.file("extdata", package="svbams")
 #'   bam.file <- file.path(path, "cgov10t.bam")
-#'   irp <- getImproperAlignmentPairs(bam.file)
+#'   irp <- getImproperAlignmentPairs(bam.file, build="hg19")
 #'
 #' @seealso See \code{\link[GenomicAlignments]{makeGAlignmentPairs}}
 #'   for details regarding \code{use.mcols} argument.  See
@@ -194,7 +194,7 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #'   \code{ScanBamParam} object with the appropriate flags for
 #'   extracting improper read pairs.
 getImproperAlignmentPairs <- function(bam.file,
-                                      param=improperAlignmentParams(), 
+                                      param=improperAlignmentParams(),
                                       build){
   flags <- improperAlignmentFlags()
   irp <- readGAlignments(bam.file, use.names=TRUE, param=param)
@@ -221,7 +221,7 @@ getImproperAlignmentPairs <- function(bam.file,
 #' library(svbams)
 #' path <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(path, "cgov10t.bam")
-#' irp <- getProperAlignmentPairs(bam.file)
+#' irp <- getProperAlignmentPairs(bam.file, build="hg19")
 #'   
 #' @seealso See \code{\link{properAlignmentParams}} for creating a
 #'   \code{ScanBamParam} object with the appropriate flags for extracting
@@ -271,7 +271,7 @@ getProperAlignmentPairs <- function(bam.file,
 #     return(invisible())
 #   }
 #   ##aln_path <- improperPaths(aview)
-#   irp <- getImproperAlignmentPairs(bam.file, param)
+#   irp <- getImproperAlignmentPairs(bam.file, param, build='hg19')
 #   out.file <- improperPaths(aview)
 #   saveRDS(irp, file=out.file)
 #   invisible()
@@ -491,13 +491,13 @@ get_improper_readpairs2 <- function(g, bam.file){
 #' library(svbams)
 #' path <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(path, "cgov10t.bam")
-#' irp <- getImproperAlignmentPairs(bam.file)
+#' irp <- getImproperAlignmentPairs(bam.file, build="hg19")
 #' igr <- ga2gr(irp, is.improper=TRUE)
-#' prp <- getProperAlignmentPairs(bam.file)
+#' prp <- getProperAlignmentPairs(bam.file, build="hg19")
 #' pgr <- ga2gr(prp, is.improper=FALSE)
-#'  
+#'
 #' @return A \code{GRanges} object with metadata columns containing read pair information.
-#' 
+#'
 #' @export
 ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
   id <- names(ga)
@@ -536,10 +536,10 @@ ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
 #'   iparams <- improperAlignmentParams(mapqFilter=30)
 #'   pparams <- properAlignmentParams(mapqFilter=30)
 #'   irp <- getImproperAlignmentPairs(bampath,
-#'                                    iparams)
+#'                                    iparams, build="hg19")
 #'   g.irp <- ga2gr(irp, is.improper=TRUE)
 #'   prp <- getProperAlignmentPairs(bampath,
-#'                                  pparams)
+#'                                  pparams, build="hg19")
 #'   g.prp <- ga2gr(prp, is.improper=FALSE)
 #'   gr <- c(g.irp, g.prp)
 #'   gr <- sortByRead1(gr)
@@ -570,7 +570,7 @@ sortByRead1 <- function(gr){
 #' library(svbams)
 #' path <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(path, "cgov10t.bam")
-#' prp <- getProperAlignmentPairs(bam.file)
+#' prp <- getProperAlignmentPairs(bam.file, build="hg19")
 #' pgr <- ga2gr(prp, is.improper=FALSE)
 #' length(pgr)
 #' pgr2 <- thinProperPairs(pgr, 10)
