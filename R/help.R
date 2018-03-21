@@ -17,7 +17,7 @@
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths seqlengths<-
 #' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle seqlevelsInUse
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels seqinfo<- seqinfo
-#' @importFrom IRanges IRanges LogicalList IntegerList
+#' @importFrom IRanges IRanges LogicalList IntegerList %in%
 #' @importMethodsFrom IRanges findOverlaps pintersect reduce overlapsAny subsetByOverlaps
 #' @importMethodsFrom IRanges width disjoin pintersect unlist
 #' @importFrom GenomicAlignments GAlignmentPairs GAlignments

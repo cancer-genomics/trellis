@@ -121,7 +121,8 @@ rpclustNames <- function(gpairs){
   paste0(rpidF, "-", rpidL)
 }
 
-Rearrangement <- function(linkedBins=GRanges(linked.to=GRanges(), partition=integer()),
+Rearrangement <- function(linkedBins=GRanges(linked.to=GRanges(),
+                                             partition=integer()),
                           improper=.GAlignmentPairs(),
                           partitioning=integer(),
                           unlinked_clusters=GRanges(),
@@ -143,7 +144,8 @@ Rearrangement <- function(linkedBins=GRanges(linked.to=GRanges(), partition=inte
     ## Many of the clusers are not linked to any other cluster.
     ## Because the unlinked_clusters are non-overlapping, these can be
     ## safely removed.
-    is_true <- unlinked_clusters %in% linkedBins | unlinked_clusters %in% linkedBins$linked.to
+    is_true <- unlinked_clusters %in% linkedBins |
+      unlinked_clusters %in% linkedBins$linked.to
     unfiltered_clusters <- unlinked_clusters[ is_true ]
     ##
     ## the first partitioning of the improper read pairs is by those
@@ -357,7 +359,6 @@ seqJunctionsInferredByPairedTags2 <- function(preprocess, param){
   gp <- keepSeqlevels(gp, seqlevels(bins), pruning.mode="coarse")
   ## gp <- .trimInvalidReads(gp)
   gp2 <- filterPairedReads(gp, bins, param)
-
   ctags <- clusterTags(gp2, param)
   ##
   ## Note, the Rearrangement constructor does additional work

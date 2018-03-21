@@ -498,7 +498,7 @@ isInFrame <- function(query, ref){
 #' @param fused.proteins the rearranged protein sequence
 #' @param ref.protein the unrearranged (reference) protein sequence
 #' @param fused.txlist a \code{GRangesList} of the fused transcripts
-#' 
+#'
 #' @seealso See \code{\link{referenceProtein}} and \code{\link{tumorProtein}}
 #'   for extracting the unrearranged and rearranged protein sequences,
 #'   respectively. See \code{\link{clip}} and
