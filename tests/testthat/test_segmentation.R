@@ -1,11 +1,10 @@
 context("Segmentation")
 
 test_that("duplicate segments", {
-  library(svcnvs)
+  library(trellis)
   library(svbams)
   library(svfilters.hg19)
   library(Rsamtools)
-  library(svpreprocess)
   path <- system.file("extdata", package="svbams", mustWork=TRUE)
   data(bins1kb)
   data(germline_filters, package="svfilters.hg19")

@@ -126,10 +126,9 @@ A <- ggplot(df, aes(start, logr)) +
   annotate("text", x=xlim[1] + 15e3, y=-8, label="chr15", size=3)
 A1 <- ggplotGrob(A)
 
-  rps <- thinReadPairs(sv.delta[1])
-  library(svfilters.hg19)
-  ##trace(svcnvs:::meltReadPairs, browser)
-  rps <- svcnvs:::meltReadPairs(rps)
+rps <- thinReadPairs(sv.delta[1])
+library(svfilters.hg19)
+rps <- meltReadPairs(rps)
 colors <- c("#0072B2", "#009E73")
 p <- ggplot(rps, aes(ymin=readpair-0.2, ymax=readpair+0.2,
                 xmin=start/1e6, xmax=end/1e6, color=read,

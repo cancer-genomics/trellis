@@ -2,7 +2,7 @@ id <- "n_PGDX4500T3_WGS_Ex.bam"
 id.rds <- paste0(id, ".rds")
 bamDir <- "/dcl01/scharpf/data/rscharpf/Dorothy_Ovarian2/hg18/eland/standard_header"
 
-library(svcnvs)
+library(trellis)
 library(svalignments)
 library(Rsamtools)
 library(svfilters.hg18)
@@ -35,7 +35,7 @@ pdata <- preprocessData(bam.file=bam.file,
                         bins=bins, segments=segs,
                         read_pairs=read_pairs)
 saveRDS(pdata, file="~/pdata.rds")
-untrace(svcnvs:::updateImproperIndex2, browser)
+untrace(trellis:::updateImproperIndex2, browser)
 trace(sv_deletions, browser)
 
 pdata <- readRDS("pdata.rds")

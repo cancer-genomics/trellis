@@ -20,7 +20,7 @@ cgov44t_preprocess<- function(){
   seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
   bins1kb$log_ratio <- lr
 
-  path <- system.file("extdata", package="svcnvs")
+  path <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   ##amp.gr <- segs[segs$seg.mean < ampliconParams()$AMP_THR]
@@ -79,10 +79,10 @@ test_that("initialize_graph", {
   ##
   ## standard
   ##
-  cv.extdata <- system.file("extdata", package="svcnvs")
+  cv.extdata <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
@@ -93,7 +93,7 @@ test_that("initialize_graph", {
   if(FALSE){
     saveRDS(ag, file="initialize_graph.a4d7744.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.a4d7744 <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   expect_identical(ag, ag.a4d7744)
   ## proposed
@@ -105,15 +105,15 @@ test_that("initialize_graph", {
 })
 
 test_that("add_amplicons", {
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   query.ranges <- readRDS(file.path(path, "focalAmpliconDupRanges.a4d7744.rds"))
   queryRanges(ag) <- query.ranges
   expected <- ag
   ## proposed
   pdat <- cgov44t_preprocess()
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   ag2 <- add_amplicons(ag, pdat$bam.file, ampliconParams())
   if(FALSE){
@@ -130,7 +130,7 @@ test_that("link_amplicons", {
   ##
   extdata <- system.file("extdata", package="svbams")
   bam.file <- file.path(extdata, "cgov44t_revised.bam")
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "add_amplicons.a4d7744.rds"))
   irp <- get_improper_readpairs(ag, bam.file)
   params <- ampliconParams()
@@ -138,7 +138,7 @@ test_that("link_amplicons", {
   if(FALSE){
     saveRDS(ag1, file="link_amplicons.a4d744.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.a4d744 <- readRDS(file.path(path, "link_amplicons.a4d744.rds"))
   expect_identical(ag1, ag.a4d744)
   ##
@@ -163,9 +163,9 @@ test_that("link_amplicons", {
 })
 
 test_that("annotate_amplicons", {
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   expected <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "link_amplicons.a4d744.rds"))
   tx <- getTranscripts("hg19")
   ag <- annotate_amplicons(ag, tx)
@@ -181,10 +181,10 @@ test_that("makeAGraph", {
   ##
   ##  standard setup
   ##
-  cv.extdata <- system.file("extdata", package="svcnvs")
+  cv.extdata <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
@@ -195,7 +195,7 @@ test_that("makeAGraph", {
   ## Begin testing internals of sv_amplicons
   ##
   ag <- makeAGraph(segs, amplicon_filters, params)
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.ffab104 <- readRDS(file.path(path, "makeAGraphffab104.rds"))
   expect_identical(ag, ag.ffab104)
   expect_true(validObject(ag))
@@ -215,13 +215,13 @@ test_that("joinNearGRanges", {
   ##
   ##  standard setup
   ##
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "makeAGraphffab104.rds"))
   merged <- joinNearGRanges(ranges(ag), ampliconParams())
   if(FALSE){
     saveRDS(merged, file="merged.a4d7744.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   merged.a4d7744 <- readRDS(file.path(path, "merged.a4d7744.rds"))
   expect_identical(merged, merged.a4d7744)
 })
@@ -232,7 +232,7 @@ test_that("get_readpairs", {
   ##
   ## standard
   ##
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   extdata <- system.file("extdata", package="svbams")
   bam.file <- file.path(extdata, "cgov44t_revised.bam")
@@ -246,21 +246,21 @@ test_that("get_readpairs", {
 
 test_that("addFocalDups", {
   library(svalignments)
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   ## standard and proposed are the same
   extdata <- system.file("extdata", package="svbams")
   bam.file <- file.path(extdata, "cgov44t_revised.bam")
   rp <- get_readpairs(ag, bam.file)
   ag <- addFocalDupsFlankingAmplicon(ag, rp, ampliconParams())
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.ffab104 <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
   expect_identical(ag, ag.ffab104)
   query.ranges <- focalAmpliconDupRanges(ag, ampliconParams())
   if(FALSE){
     saveRDS(query.ranges, file="focalAmpliconDupRanges.a4d7744.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   query.a4d7744 <- readRDS(file.path(path, "focalAmpliconDupRanges.a4d7744.rds"))
   expect_identical(query.ranges, query.a4d7744)
 })
@@ -281,7 +281,7 @@ test_that("addFocalDups", {
 ##  ##
 ##  ## read in some CNVs
 ##  ##
-##  cv.extdata <- system.file("extdata", package="svcnvs")
+##  cv.extdata <- system.file("extdata", package="trellis")
 ##  segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
 ##  extdata <- system.file("extdata", package="svbams")
 ##  bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
@@ -393,64 +393,64 @@ test_that("addFocalDups", {
 ##
 test_that("linkNearAmplicons", {
   params <- ampliconParams()
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "linkAmplicons.4adcc78.rds"))
   ag <- linkNearAmplicons(ag, maxgap=params[["maxgap"]])
   if(FALSE){
     saveRDS(ag, file="linkNearAmplicons.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "linkNearAmplicons.4adcc78.rds"))
   expect_identical(ag.4adcc78, ag)
 })
 
 test_that("filterSmallAmplicons", {
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "linkNearAmplicons.4adcc78.rds"))
   ag <- filterSmallAmplicons (ag)
   if(FALSE){
     saveRDS(ag, file="filterSmallAmplicons.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "filterSmallAmplicons.4adcc78.rds"))
   expect_identical(ag.4adcc78, ag)
 })
 
 test_that("setAmpliconGroups", {
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "filterSmallAmplicons.4adcc78.rds"))
   ag <- setAmpliconGroups (ag)
   if(FALSE){
     saveRDS(ag, file="setAmpliconGroups.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "setAmpliconGroups.4adcc78.rds"))
   expect_identical(ag.4adcc78, ag)
 })
 
 test_that("setGenes", {
   library(svfilters.hg19)
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "setAmpliconGroups.4adcc78.rds"))
   ag <- setGenes (ag, transcripts)
   if(FALSE){
     saveRDS(ag, file="setAmpliconGenes.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "setAmpliconGenes.4adcc78.rds"))
   expect_identical(ag.4adcc78, ag)
 })
 
 test_that("setDrivers", {
   library(svfilters.hg19)
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "setAmpliconGenes.4adcc78.rds"))
   ag <- setDrivers (ag, transcripts, clin_sign=TRUE)
   ag <- setDrivers (ag, transcripts, clin_sign=FALSE)
   if(FALSE){
     saveRDS(ag, file="setDrivers.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   expect_identical(ag.4adcc78, ag)
 })
@@ -466,7 +466,7 @@ test_that("no germline filter", {
   ##
   ## read in some CNVs
   ##
-  cv.extdata <- system.file("extdata", package="svcnvs")
+  cv.extdata <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
@@ -501,7 +501,7 @@ test_that("no germline filter", {
   if(FALSE){
     saveRDS(ag2, file="sv_deletion.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "sv_deletion.4adcc78.rds"))
   expect_identical(ag2, ag.4adcc78)
 })
@@ -519,7 +519,7 @@ test_that("no germline filter", {
   ##library(rtracklayer)
   library(graph)
   library(svovarian)
-  library(svcnvs)
+  library(trellis)
   data(germline_filters)
   data(bviews_hg19)
   id <- "CGOV44T.bam"

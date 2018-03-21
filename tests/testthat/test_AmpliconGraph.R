@@ -14,7 +14,7 @@ test_that("AmpliconGraph", {
   ##
   ## read in some CNVs
   ##
-  cv.extdata <- system.file("extdata", package="svcnvs")
+  cv.extdata <- system.file("extdata", package="trellis")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
@@ -31,7 +31,7 @@ test_that("AmpliconGraph", {
   if(FALSE){
     saveRDS(ag, file="AmpliconGraph0ada417.rds")
   }
-  path <- system.file("extdata", package = "svcnvs")
+  path <- system.file("extdata", package = "trellis")
   ag.100362c <- readRDS(file.path(path, "AmpliconGraph100362c.rds"))
   expect_identical(ag, ag.100362c)
 
