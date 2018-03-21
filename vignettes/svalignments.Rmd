@@ -28,7 +28,7 @@ bam files for a region of chr15.
 library(GenomicAlignments)
 library(Rsamtools)
 library(svbams)
-library(svalignments)
+library(trellis)
 path <- system.file("extdata", package="svbams")
 ```
 

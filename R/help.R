@@ -1,6 +1,6 @@
-#' Classes and methods for structural variation analyses
+#' Somatic structural variant analysis
 #'
-#' trellis provides infrastructure for structural variant analyses of sequencing data.
+#' trellis performs structural variant analyses of sequencing data.
 #'
 #' @docType package
 #' @name trellis

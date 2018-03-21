@@ -26,8 +26,7 @@ adjustments for tumor purity.
 
 ```{r packages}
 library(Rsamtools)
-library(svpreprocess)
-library(svcnvs)
+library(trellis)
 ```
 
 
@@ -37,7 +36,7 @@ instance. Here, we load segemented data from whole genome sequencing of an
 ovarian cell line CGOV44T.
 
 ```{r segments}
-data(segments, package="svcnvs")
+data(segments, package="trellis")
 ```
 
 In the following code chunk, we identify candidate deletions using a

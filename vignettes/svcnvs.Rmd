@@ -27,9 +27,8 @@ Loading packages required for this analysis.
 ```{r packages}
 library(GenomicRanges)
 library(Rsamtools)
-library(svcnvs)
+library(trellis)
 library(svfilters.hg19)
-library(svalignments)
 ```
 
 We first load an object from the `svpreprocess` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `svpreprocess` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38.

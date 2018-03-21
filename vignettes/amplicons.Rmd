@@ -17,8 +17,7 @@ This vignette illustrates the workflow for identifying linked amplicons.
 
 ```{r packages}
 suppressPackageStartupMessages(library(Rsamtools))
-suppressPackageStartupMessages(library(svpreprocess))
-suppressPackageStartupMessages(library(svcnvs))
+suppressPackageStartupMessages(library(trellis))
 ```
 
 We assume the bin-level estimates of coverage have been normalized, transformed
@@ -26,9 +25,9 @@ to the log-scale, and segmented. We load the segmented log ratios from the
 ovarian cell CGOV44T and the corresponding BamView.
 
 ```{r load_data}
-cv.extdata <- system.file("extdata", package="svcnvs")
+cv.extdata <- system.file("extdata", package="trellis")
 segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-extdata <- system.file("extdata", package="svbams")
+extdata <- system.file("extdata", package="trellis")
 bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
 ```
 
@@ -80,7 +79,6 @@ the adjacent segments to have mean log ratios consistent with a duplication
 (see ```LOW_THR```).
 
 ```{r properly_paired}
-library(svalignments)
 params[["LOW_THR"]]
 rp <- get_readpairs(ag, bamPaths(bview))
 ag <- addFocalDupsFlankingAmplicon(ag, rp, params)
