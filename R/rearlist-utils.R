@@ -312,7 +312,7 @@ applyFilters <- function(rlist, filters, params){
   is.consistent <- rlist$prop_modal_call >= percentModalType(params)
   is.minsize <- rlist$min_bin_size >= minClusterSize(params)
   overlaps.rear <- overlapsAny(rlist, filters$rear)
-  rlist$overlaps_cnv_filter <- overlapsGermline(rlist, filters$germline)
+  rlist$overlaps_cnv_filter <- overlapsGermlineRear(rlist, filters$germline)
   rlist[is.consistent & is.minsize & !overlaps.rear]
 }
 
@@ -334,7 +334,7 @@ filterRear <- function(rdata, params=RearrangementParams()){
   rlist
 }
 
-overlapsGermline <- function(rlist, germline_filters){
+overlapsGermlineRear <- function(rlist, germline_filters){
   lb <- linkedBins(rlist)
   overlaps_other1 <- overlapsAny(lb, germline_filters)
   overlaps_other2 <- overlapsAny(lb$linked.to, germline_filters)
