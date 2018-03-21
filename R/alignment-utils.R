@@ -663,21 +663,21 @@ filterPairedReads <- function(gpairs, bins, params){
   df
 }
 
-.getReadSeqsForRear2 <- function(irp, bam.file, param, MAX){
-  flags <- improperAlignmentFlags()
-  ##lb <- linkedBins(object)
-  bins <- c(granges(lb), granges(lb$linked.to))
-  what <- c("qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq")
-  scan.param <- ScanBamParam(flag=flags, what=what, which=bins, mapqFilter=30)
-  rps <- getImproperAlignmentPairs(bam.file,
-                                   scan.param)
-  rps2 <- filterPairedReads(rps, bins, param)
-  df <- .seqdataframe(rps2, MAX)
-  ##df$id <- rep(names(align_view), nrow(df))
-  df$id <- rep(basename(bam.file), nrow(df))
-  df$rearrangement.id <- rep(names(linkedBins(object)), nrow(df))
-  df
-}
+##.getReadSeqsForRear2 <- function(irp, bam.file, param, MAX){
+##  flags <- improperAlignmentFlags()
+##  ##lb <- linkedBins(object)
+##  bins <- c(granges(lb), granges(lb$linked.to))
+##  what <- c("qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq")
+##  scan.param <- ScanBamParam(flag=flags, what=what, which=bins, mapqFilter=30)
+##  rps <- getImproperAlignmentPairs(bam.file,
+##                                   scan.param)
+##  rps2 <- filterPairedReads(rps, bins, param)
+##  df <- .seqdataframe(rps2, MAX)
+##  ##df$id <- rep(names(align_view), nrow(df))
+##  df$id <- rep(basename(bam.file), nrow(df))
+##  df$rearrangement.id <- rep(names(linkedBins(object)), nrow(df))
+##  df
+##}
 
 
 #' @aliases getSequenceOfReads,Rearrangement-method
