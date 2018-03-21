@@ -34,21 +34,29 @@ a comprehensive \code{list} that can be used as input to the
 \code{sv_deletions} and \code{sv_amplicons2} functions.
 }
 \examples{
+\dontrun{
 library(svbams)
 library(svfilters.hg19)
 data(bins1kb)
+bins1kb <- keepSeqlevels(bins1kb, paste0("chr", c(1:22, "X")),
+                         pruning.mode="coarse")
 data(segments, package="trellis")
 extdata <- system.file("extdata", package="svbams")
 bam.file <- file.path(extdata, "cgov44t_revised.bam")
-iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq")) 
+bviews <- BamViews(bamRanges=bins1kb, bamPaths=bam.file)
+bins1kb$counts <- binCounts(bviews)
+bins1kb$std_cnt <- binNormalize(bins)
+bins1kb$log_ratio <- binGCCorrect(bins)
+iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
 improper_rp <- getImproperAlignmentPairs(bam.file, param = iparams, build="hg19")
 segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
-del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())], 
+del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
                  min.gapwidth=2000)
-proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam()) 
+proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam())
 read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
 pdata <- preprocessData(bam.file=bam.file, genome="hg19",
                         bins=bins1kb,
                         segments=segments,
-                        read_pairs=read_pairs) 
+                        read_pairs=read_pairs)
+}
 }
