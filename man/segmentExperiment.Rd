@@ -9,8 +9,7 @@ segmentExperiment(object, tree, param = SegmentParam(), ...)
 \arguments{
 \item{object}{A \code{PreprocessViews2} object}
 
-\item{tree}{A directory tree for storing intermediate files. See
-\code{\link{DataPaths-class}}.}
+\item{tree}{A directory tree for storing intermediate files.}
 
 \item{param}{An object of class \code{SegmentParam}.}
 

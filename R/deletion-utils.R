@@ -1533,7 +1533,6 @@ meltReadPairs <- function(rps){
 #' @return a \code{list} object
 #' @examples
 #' library(svbams)
-#' library(svalignments) 
 #' library(svfilters.hg19)
 #' data(bins1kb)
 #' data(segments, package="trellis")

@@ -35,7 +35,6 @@ a comprehensive \code{list} that can be used as input to the
 }
 \examples{
 library(svbams)
-library(svalignments) 
 library(svfilters.hg19)
 data(bins1kb)
 data(segments, package="trellis")

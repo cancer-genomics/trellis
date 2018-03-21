@@ -241,7 +241,7 @@ blatStatsPerTag <- function(blat.records, tag_length){
 #'  ## For each tag, calculate the number of near-perfect matches of the
 #'  ## right size that overlap with eland.  If the number is 0 or more
 #'  ## than 1, then the tag 'fails'.
-#'  blat <- svalignments:::annotateBlatRecords(sblat, stags)
+#'  blat <- annotateBlatRecords(sblat, stags)
 #'  nrow(blat) == 20
 #'  s <- blatScores(sblat, stags, "SOME_ID")
 #'  head(s)
