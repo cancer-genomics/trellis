@@ -21,7 +21,7 @@
 #' filters <- listGenomeFilters("hg19")
 #'
 #' @export
-#' @seealso \code{germline_filters}  
+#' @seealso \code{germline_filters}
 listGenomeFilters <- function(genome=c("hg19", "hg18")){
   ##if(ucsc_build != "hg19") stop("Only available for build hg19")
   genome <- match.arg(genome)
@@ -80,8 +80,9 @@ reduceGenomeFilters <- function(filters, seqlev){
 genomeFilters <- function(build=c("hg19", "hg18")){
   build <- match.arg(build)
   svfilters <- paste0("svfilters.", build)
-  data(germline_filters, package=svfilters,
+  data("germline_filters", package=svfilters,
        envir=environment())
+  germline_filters <- get("germline_filters")
   reduceGenomeFilters(germline_filters)
 }
 
