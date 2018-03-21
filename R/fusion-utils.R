@@ -1,15 +1,19 @@
-#' @include help.R
+#' @include AllGenerics.R
 NULL
 
 getExonsAmp2_4 <- function(left, right, transcripts){
   fusion.list <- list(ExonSubset(name.left="C",
-                                 inRearrangement.left=end(txC(transcripts)) < start(right),
+                                 inRearrangement.left=end(txC(transcripts)) <
+                                   start(right),
                                  name.right="A",
-                                 inRearrangement.right=start(txA(transcripts)) > end(left)),
+                                 inRearrangement.right=start(txA(transcripts)) >
+                                   end(left)),
                       ExonSubset(name.left="B",
-                                 inRearrangement.left=start(txB(transcripts)) > end(left),
+                                 inRearrangement.left=start(txB(transcripts)) >
+                                   end(left),
                                  name.right="D",
-                                 inRearrangement.right=end(txD(transcripts)) < start(right)))
+                                 inRearrangement.right=end(txD(transcripts)) <
+                                   start(right)))
   names(fusion.list) <- sapply(fusion.list, names)
   tx <- TranscriptsFusion(transcripts, fusions=fusion.list)
   tx
@@ -17,13 +21,17 @@ getExonsAmp2_4 <- function(left, right, transcripts){
 
 getExonsDel1_2 <- function(left, right, transcripts){
   fusion.list <- list(ExonSubset(name.left="A",
-                                 inRearrangement.left=start(txA(transcripts)) < start(left),
+                                 inRearrangement.left=start(txA(transcripts)) <
+                                   start(left),
                                  name.right="C",
-                                 inRearrangement.right=start(txC(transcripts)) > end(right)),
+                                 inRearrangement.right=start(txC(transcripts)) >
+                                   end(right)),
                       ExonSubset(name.left="D",
-                                 inRearrangement.left=start(txD(transcripts)) > end(right),
+                                 inRearrangement.left=start(txD(transcripts)) >
+                                   end(right),
                                  name.right="B",
-                                 inRearrangement.right=start(txB(transcripts)) < start(left)))
+                                 inRearrangement.right=start(txB(transcripts)) <
+                                   start(left)))
   names(fusion.list) <- sapply(fusion.list, names)
   tx <- TranscriptsFusion(transcripts, fusions=fusion.list)
   tx
@@ -31,21 +39,29 @@ getExonsDel1_2 <- function(left, right, transcripts){
 
 getExonsInversionBalanced <- function(left, right, transcripts){
   fusion.list <- list(ExonSubset(name.left="A",
-                                 inRearrangement.left=end(txA(transcripts)) < start(left),
+                                 inRearrangement.left=end(txA(transcripts)) <
+                                   start(left),
                                  name.right="D",
-                                 inRearrangement.right=end(txD(transcripts)) < start(right)),
+                                 inRearrangement.right=end(txD(transcripts)) <
+                                   start(right)),
                       ExonSubset(name.left="C",
-                                 inRearrangement.left=start(txC(transcripts)) < start(right),
+                                 inRearrangement.left=start(txC(transcripts)) <
+                                   start(right),
                                  name.right="B",
-                                 inRearrangement.right=end(txB(transcripts)) < start(left)),
+                                 inRearrangement.right=end(txB(transcripts)) <
+                                   start(left)),
                       ExonSubset(name.left="D",
-                                 inRearrangement.left=end(txD(transcripts)) > end(right),
+                                 inRearrangement.left=end(txD(transcripts)) >
+                                   end(right),
                                  name.right="A",
-                                 inRearrangement.right=start(txA(transcripts)) > end(left)),
+                                 inRearrangement.right=start(txA(transcripts)) >
+                                   end(left)),
                       ExonSubset(name.left="B",
-                                 inRearrangement.left=start(txB(transcripts)) > end(left),
+                                 inRearrangement.left=start(txB(transcripts)) >
+                                   end(left),
                                  name.right="C",
-                                 inRearrangement.right=end(txC(transcripts)) > end(right)))
+                                 inRearrangement.right=end(txC(transcripts)) >
+                                   end(right)))
   names(fusion.list) <- sapply(fusion.list, names)
   tx <- TranscriptsFusion(transcripts, fusions=fusion.list)
   tx
@@ -268,9 +284,9 @@ rearrangementTranscripts2 <- function(gr, tx, cds){
 #'   txdb <- TxDb.Hsapiens.UCSC.hg19.refGene
 #'   tx <- transcripts(txdb)
 #'   cds.all <- cdsBy(txdb, "tx", use.names=TRUE)
-#'   data(rear_list, package="svclasses")
+#'   data(rear_list, package="trellis")
 #'   r <- rear_list[["18557-18736"]]
-#'   ##data(rear_cds, package="svclasses")
+#'   ##data(rear_cds, package="trellis")
 #'   ##trace(getCDS, browser)
 #'   rear_cds <- getCDS(r, tx, cds.all)
 #'   fusions(rear_cds)
@@ -357,7 +373,7 @@ extractTranscriptSeqs2 <- function(genome, fused.txlist){
 #' Translate the sequence of a rearranged DNA sequence
 #'
 #' @examples
-#' data(rear_cds, package="svclasses")
+#' data(rear_cds, package="trellis")
 #' library(BSgenome.Hsapiens.UCSC.hg19)
 #' genome <- BSgenome.Hsapiens.UCSC.hg19
 #' fused_tx <- fuse(clip(rear_cds))
@@ -384,7 +400,7 @@ tumorProtein <- function(genome, fused.txlist){
 #' @examples
 #' library(BSgenome.Hsapiens.UCSC.hg19)
 #' genome <- BSgenome.Hsapiens.UCSC.hg19
-#' data(rear_cds, package="svclasses")
+#' data(rear_cds, package="trellis")
 #' unrear_cds <- fullTranscripts(rear_cds)
 #' ##
 #' ## referenceProtein
@@ -415,7 +431,7 @@ referenceProtein <- function(genome, cds, nms){
 #' @param object a \code{Transcripts} object
 #' @return a \code{GRangesList}
 #' @examples
-#' data(rear_cds, package="svclasses")
+#' data(rear_cds, package="trellis")
 #' fullTranscripts(rear_cds)
 #' @export
 #' @seealso \code{\link{inFrameFusions}}
@@ -469,7 +485,7 @@ isInFrame <- function(query, ref){
 #' @examples
 #'   library(BSgenome.Hsapiens.UCSC.hg19)
 #'   genome <- BSgenome.Hsapiens.UCSC.hg19
-#'   data(rear_cds, package="svclasses")
+#'   data(rear_cds, package="trellis")
 #'   unrear_cds <- fullTranscripts(rear_cds)
 #'   ##
 #'   ## referenceProtein
@@ -485,8 +501,8 @@ isInFrame <- function(query, ref){
 #' 
 #' @seealso See \code{\link{referenceProtein}} and \code{\link{tumorProtein}}
 #'   for extracting the unrearranged and rearranged protein sequences,
-#'   respectively. See \code{\link[svclasses]{clip}} and
-#'   \code{\link[svclasses]{fuse}} for extracting the fused, clipped transcript
+#'   respectively. See \code{\link{clip}} and
+#'   \code{\link{fuse}} for extracting the fused, clipped transcript
 #'   sequence as a \code{GRangesList} object. See \code{\link{fullTranscripts}}
 #'   for extracting the full transcripts as a \code{GRangesList}.
 inFrameFusions <- function(fused.proteins, ref.protein, fused.txlist){
@@ -986,12 +1002,12 @@ setMethod("fuse", "ClippedTranscripts", function(object, nms){
 isFusion <- function(tx.fusion){
   x <- fusions(tx.fusion)
   x1 <- x[[1]]
-  lt1 <- svclasses:::inRearrangement.left(x1)
-  rt1 <- svclasses:::inRearrangement.right(x1)
+  lt1 <- inRearrangement.left(x1)
+  rt1 <- inRearrangement.right(x1)
 
   x2 <- x[[2]]
-  lt2 <- svclasses:::inRearrangement.left(x2)
-  rt2 <- svclasses:::inRearrangement.right(x2)
+  lt2 <- inRearrangement.left(x2)
+  rt2 <- inRearrangement.right(x2)
 
   (length(lt1) > 0 && length(rt1) > 0) ||
     (length(lt2) > 0 && length(rt2) > 0)
@@ -1007,16 +1023,16 @@ isFusion <- function(tx.fusion){
 #' @param drop ignored
 #' @return a \code{ClippedTranscripts} object
 setMethod("[", c("TranscriptsFusion", "ExonSubset"), function(x, i, j, ..., drop=FALSE){
-  name.left <- svclasses:::name.left
-  name.right <- svclasses:::name.right
+  name.left <- name.left
+  name.right <- name.right
   grl1 <- x[[name.left(i)]] ## GRangesList
   ##gr1 <- grl1[[tx1(i)]]  ## GRanges
-  grl1 <- grl1[svclasses:::inRearrangement.left(i)]
+  grl1 <- grl1[inRearrangement.left(i)]
   ## this way we keep the names of promoters
   ##grl1 <- grl1[elementNROWS(grl1) > 0]
 
   grl2 <-x[[name.right(i)]] ## GRangesList
-  grl2 <- grl2[svclasses:::inRearrangement.right(i)]  ## GRanges
+  grl2 <- grl2[inRearrangement.right(i)]  ## GRanges
   grl2 <- grl2[elementNROWS(grl2) > 0]
   x[[name.left(i)]] <- grl1
   x[[name.right(i)]] <- grl2
@@ -1967,7 +1983,7 @@ loadGenomeData <- function(build="hg19"){
 #' Convert tabled amino acid ranges to a GRanges object to facilitate the overlap with protein domains from Uniprot database.
 #' @param tab a \code{DataFrame} of fusions as obtained from \code{fusionTable2}
 #' @examples
-#'   extdata <- system.file("extdata", package="svfusions")
+#'  extdata <- system.file("extdata", package="trellis")
 #'  fusions <- readRDS(file.path(extdata, "valid_fusions.rds"))
 #'  tab <- fusionTable2(fusions)
 #'  up <- readRDS(file.path(extdata, "uniprot.rds"))
@@ -1982,7 +1998,7 @@ loadGenomeData <- function(build="hg19"){
 #'  ## -- it is one smaller than the length we've recorded
 #'  ## coerce to GRanges
 #'  tumor_aa_ranges <- aa_granges(tab)
-#'  expect_identical(as.character(seqnames(aa.gr)),
+#'  expect_identical(as.character(seqnames(tumor_aa_ranges)),
 #'                   rep(c("ERBB4", "IKZF2"), each=2))
 #'  domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),
 #'                              chromosome=up2$seqnames,

@@ -74,6 +74,7 @@ Collate:
     'data.R'
     'deletion-utils.R'
     'fasta-utils.R'
+    'fusion-utils.R'
     'galignment-utils.R'
     'germlineOutliers.R'
     'improper-methods.R'
@@ -87,7 +88,6 @@ Collate:
     'recurrent.R'
     'segment.R'
     'seqinfo-utils.R'
-    'fusion-utils.R'
     'uniprot.R'
 LazyData: true
 VignetteBuilder: knitr
