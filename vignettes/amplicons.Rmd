@@ -98,14 +98,14 @@ TODO: Explain the steps below.
 
 ```{r improperly_paired}
 irp <- get_improper_readpairs(ag, bamPaths(bview))
-ag <- svcnvs:::linkFocalDups(ag, irp, params)
-ag <- svcnvs:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
-ag <- svcnvs:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
-ag <- svcnvs:::filterSmallAmplicons (ag)
-ag <- svcnvs:::setAmpliconGroups (ag)
-ag <- svcnvs:::setGenes (ag, transcripts)
-ag <- svcnvs:::setDrivers (ag, transcripts, clin_sign=TRUE)
-ag <- svcnvs:::setDrivers (ag, transcripts, clin_sign=FALSE)
+ag <- trellis:::linkFocalDups(ag, irp, params)
+ag <- trellis:::linkAmplicons(ag, irp, edgeParam=params[["edge"]])
+ag <- trellis:::linkNearAmplicons(ag, maxgap=params[["maxgap"]])
+ag <- trellis:::filterSmallAmplicons (ag)
+ag <- trellis:::setAmpliconGroups (ag)
+ag <- trellis:::setGenes (ag, transcripts)
+ag <- trellis:::setDrivers (ag, transcripts, clin_sign=TRUE)
+ag <- trellis:::setDrivers (ag, transcripts, clin_sign=FALSE)
 ```
 
 In order to plot the linked amplicons as a graph, we load several supporting

@@ -1,17 +1,17 @@
 ---
-title: "Overview of svalignments package"
+title: "Overview of alignment utilities"
 author: "Robert Scharpf"
 date: \today
 output: BiocStyle::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Overview of svcnvs package}
+  %\VignetteIndexEntry{Overview of alignment utilities}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc}
 ---
 
 # Introduction
 
-The main use-cases of the `svalignments` package are (1) to identify rearranged
+The main use-cases of the alignment utilities in `trellis` are (1) to identify rearranged
 read pairs that support structural variants, (2) assess BLAT realignment of
 selected reads for consistency with putative rearrangements and the whole-genome
 aligner. Most use-cases require a BAM file. For the purpose of illustrating
