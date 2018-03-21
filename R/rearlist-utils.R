@@ -788,8 +788,7 @@ seqJunction <- function(r, maxgap=50){
 #'  extdata <- system.file("extdata", package="trellis")
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
-#'  tx <- loadTx("hg19")
-#'  near.coding <- seqJunctionNearTx(rlist, tx)
+#'  near.coding <- seqJunctionNearTx(rlist, "hg19")
 #'  rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
 #'  jxns <- seqJunctions_Rlist(rlist2)
 #'  jxns
