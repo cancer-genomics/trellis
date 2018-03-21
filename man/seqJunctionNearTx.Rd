@@ -18,9 +18,8 @@ a logical vector of the same length as the \code{rlist} object
 Only rearrangements where both sides of the sequence junction are near a transcript are evaluated as candidate in-frame fusions.
 }
 \examples{
-loadGenomeData()
- extdata <- system.file("extdata", package="svrearrange")
+ extdata <- system.file("extdata", package="trellis")
  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
  rlist <- readRDS(rfile)
- seqJunctionNearTx(rlist, tx)
+ head(seqJunctionNearTx(rlist, "hg19"))
 }
