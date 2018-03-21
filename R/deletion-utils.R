@@ -612,10 +612,10 @@ gapsInHemiDel <- function(proper.readpairs, deletion.gr){
   gaps.in.hemi.del
 }
 
-spansHomozygousDel <- function(sv){
-  hits <- homozygousHits(sv)
-  length(hits > 0)
-}
+##spansHomozygousDel <- function(sv){
+##  hits <- homozygousHits(sv)
+##  length(hits > 0)
+##}
 
 addVariant2 <- function(v, object, cn, cncall, param){
   v$seg.mean <- cn
