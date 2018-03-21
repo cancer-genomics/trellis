@@ -1,4 +1,4 @@
-#' @include AllGenerics.R
+#' @include Deletion-class.R
 NULL
 
 setClass("LeftAlignmentPairs", contains="GAlignmentPairs")
