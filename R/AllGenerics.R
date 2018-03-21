@@ -728,3 +728,18 @@ setGeneric("getSequenceOfReads", function(object, bam.file,
                                         # )
 
 setGeneric("rename", function(x, ...) standardGeneric("rename"))
+
+#' Accessor for the combination of strands involved in a rearrangement
+#'
+#' @rdname Rearrangement-class
+#' @aliases type
+#' @export
+setGeneric("type", function(object) standardGeneric("type"))
+setGeneric("last<-", function(x, value) standardGeneric("last<-"))
+setGeneric("numberLinkingRP", function(object) standardGeneric("numberLinkingRP"))
+
+#' A region linked by improperly paired reads
+#'
+#' @param g a \code{GRanges} object with value `linked.to` in the `mcols`
+#' @export
+setGeneric("linkedTo", function(x) standardGeneric("linkedTo"))

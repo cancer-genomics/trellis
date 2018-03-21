@@ -6,11 +6,6 @@ NULL
 ## accessors  [ should any be moved to svclasses? ]
 ##
 ##--------------------------------------------------
-## generics for replacement methods have not been defined
-##setGeneric("first<-", function(x, value) standardGeneric("first<-"))
-setGeneric("last<-", function(x, value) standardGeneric("last<-"))
-setGeneric("numberLinkingRP", function(object) standardGeneric("numberLinkingRP"))
-
 setMethod("chromosome", "GAlignments", function(object) as.character(seqnames(object)))
 setMethod("first", "GAlignmentsList", function(x) x[[1]])
 setMethod("last", "GAlignmentsList", function(x) x[[2]])
@@ -1060,7 +1055,7 @@ list_orientations <- function(r1, r2){
   orientations
 }
 
-setGeneric("type", function(object) standardGeneric("type"))
+
 
 .type_rear <- function(object){
   ss <- strands(object)
@@ -1070,10 +1065,12 @@ setGeneric("type", function(object) standardGeneric("type"))
   ss
 }
 
+#' @aliases type,Rearrangement-method
 setMethod("type", "Rearrangement", function(object){
   .type_rear(object)
 })
 
+#' @aliases type,RearrangementList-method
 setMethod("type", "RearrangementList", function(object){
   x <- sapply(object, type)
   x
@@ -1108,8 +1105,9 @@ isComplex <- function(x){
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
-#'   r2 <- fiveTo3Prime(r)
-#'   ggRearrange(r2[[1]])
+#'   r2 <- fiveTo3Prime(r, "hg19")
+#'   df <- rearDataFrame(r2[[1]], "hg19")
+#'   ggRearrange(df)
 #' @export
 fiveTo3Prime <- function(r, build, maxgap=5000){
   s <- strands(r)

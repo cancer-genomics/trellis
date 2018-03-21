@@ -43,4 +43,5 @@
 #' @importFrom scales trans_new pretty_breaks
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
+#' @importMethodsFrom GenomicFeatures transcripts cdsBy
 NULL

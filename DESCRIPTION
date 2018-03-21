@@ -27,7 +27,8 @@ Imports:
     ggplot2,
     RColorBrewer,
     AnnotationDbi,
-    scales
+    scales,
+    GenomicFeatures
 Suggests:
     knitr,
     testthat,

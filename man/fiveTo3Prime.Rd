@@ -17,8 +17,9 @@ Put the linked genomic intervals in 5-prime to 3-prime order with respect to the
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
-  r2 <- fiveTo3Prime(r)
-  ggRearrange(r2[[1]])
+  r2 <- fiveTo3Prime(r, "hg19")
+  df <- rearDataFrame(r2[[1]], "hg19")
+  ggRearrange(df)
 }
 \seealso{
 \code{\link{rearDataFrame}} \code{\link{ggRearrange}}

@@ -7,12 +7,6 @@ setMethod("numberLinkingRP", "RearrangementList", function(object){
 })
 
 
-#' A region linked by improperly paired reads
-#'
-#' @param g a \code{GRanges} object with value `linked.to` in the `mcols`
-#' @export
-setGeneric("linkedTo", function(x) standardGeneric("linkedTo"))
-
 setMethod("linkedTo", "GRanges", function(x)  x$linked.to)
 
 setMethod("linkedTo", "Rearrangement", function(x)  linkedBins(x)$linked.to)
@@ -711,7 +705,7 @@ seqJunctionNearTx <- function(rlist, build){
 #'  extdata <- system.file("extdata", package="trellis")
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
-#'  near.coding <- seqJunctionNearTx(rlist, tx)
+#'  near.coding <- seqJunctionNearTx(rlist, "hg19")
 #'  rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
 #'  rlist2
 fiveTo3List <- function(rlist, build){
@@ -795,6 +789,7 @@ seqJunction <- function(r, maxgap=50){
 #'  extdata <- system.file("extdata", package="trellis")
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
+#'  tx <- loadTx("hg19")
 #'  near.coding <- seqJunctionNearTx(rlist, tx)
 #'  rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
 #'  jxns <- seqJunctions_Rlist(rlist2)

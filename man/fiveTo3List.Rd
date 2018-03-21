@@ -22,7 +22,7 @@ Reorders each rearrangement as two 5-prime to 3-prime orientations
  extdata <- system.file("extdata", package="trellis")
  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
  rlist <- readRDS(rfile)
- near.coding <- seqJunctionNearTx(rlist, tx)
+ near.coding <- seqJunctionNearTx(rlist, "hg19")
  rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
  rlist2
 }

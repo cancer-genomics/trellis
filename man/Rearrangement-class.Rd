@@ -3,15 +3,18 @@
 \docType{class}
 \name{partitioning}
 \alias{partitioning}
+\alias{type}
 \alias{Rearrangement-class}
 \alias{Rearrangement}
 \alias{partitioning,Rearrangement-method}
 \alias{length,Rearrangement-method}
 \alias{names,Rearrangement-method}
 \alias{[,Rearrangement,ANY,ANY,ANY-method}
-\title{A class for storing rearrangement data}
+\title{Accessor for the combination of strands involved in a rearrangement}
 \usage{
 partitioning(object)
+
+type(object)
 
 \S4method{partitioning}{Rearrangement}(object)
 
@@ -36,6 +39,8 @@ partitioning(object)
 a \code{Rearrangement} object
 }
 \description{
+Accessor for the combination of strands involved in a rearrangement
+
 This class contains the genomic intervals corresponding to improper
 read clusters.  Improper read clusters that are linked are
 candidate rearrangements.  The linking is represented by a
