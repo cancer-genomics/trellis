@@ -14,7 +14,7 @@ A \code{RearrangementList} object.
 }
 \examples{
 data(rear_list)
-modalRearrangement(rear_list)
+head(modalRearrangement(rear_list))
 linkedBins(rear_list)
 }
 \keyword{datasets}

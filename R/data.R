@@ -47,7 +47,7 @@ NULL
 #' @aliases rear_list
 #' @examples
 #' data(rear_list)
-#' modalRearrangement(rear_list)
+#' head(modalRearrangement(rear_list))
 #' linkedBins(rear_list)
 NULL
 

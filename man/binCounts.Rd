@@ -34,7 +34,7 @@ bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode = "coarse")
 bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
 counts <- binCounts(bviews)
-counts
+head(counts)
 length(bamRanges(bviews)) == length(counts) #TRUE
 
 }

@@ -33,5 +33,5 @@ bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
 bins$cnt <- binCounts(bviews)
 std_cnt <- binNormalize(bins)
 bins$std_cnt <- std_cnt
-binGCCorrect(bins)
+head(binGCCorrect(bins))
 }

@@ -26,7 +26,7 @@ NULL
 #' bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 #' bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
 #' counts <- binCounts(bviews)
-#' counts
+#' head(counts)
 #' length(bamRanges(bviews)) == length(counts) #TRUE
 #' 
 #' @export
@@ -131,7 +131,7 @@ transformCounts <- function(cnt, i, centerby=c("mode", "median")){
 #' bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 #' bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
 #' bins$cnt <- binCounts(bviews)
-#' binNormalize(bins)
+#' head(binNormalize(bins))
 #' std_cnt <- binNormalize(bins)
 #' bins$std_cnt <- std_cnt
 #' @export
@@ -237,7 +237,7 @@ modelGC2 <- function(object, gc_model=.gc_model()){
 #' bins$cnt <- binCounts(bviews)
 #' std_cnt <- binNormalize(bins)
 #' bins$std_cnt <- std_cnt
-#' binGCCorrect(bins)
+#' head(binGCCorrect(bins))
 #' @export
 binGCCorrect <- function(bins){
   std_count <- bins$std_cnt
