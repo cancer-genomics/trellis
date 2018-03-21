@@ -94,7 +94,7 @@ Given a pass / fail designation for each read by the above
  ## For each tag, calculate the number of near-perfect matches of the
  ## right size that overlap with eland.  If the number is 0 or more
  ## than 1, then the tag 'fails'.
- blat <- annotateBlatRecords(sblat, stags)
+ blat <- trellis:::annotateBlatRecords(sblat, stags)
  nrow(blat) == 20
  s <- blatScores(sblat, stags, "SOME_ID")
  head(s)

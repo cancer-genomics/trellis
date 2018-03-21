@@ -4,13 +4,12 @@ NULL
 ##
 ## Transcripts-class generics
 ##
-
 #' @aliases ClippedTranscripts
 #' @param transcripts a \code{Transcripts} object
 #' @param i an integer vector
 #' @param left a \code{GRangesList} for the transcripts to the left of the junction
 #' @param right a \code{GRangesList} for the transcripts to the right of the junction
-#' @param names character vector indicating strand of transcripts ('5prime' or '3prime').  
+#' @param names character vector indicating strand of transcripts ('5prime' or '3prime').
 #' @rdname ClippedTranscripts-class
 #' @export
 setGeneric("ClippedTranscripts", function(transcripts, i, left=GRangesList(),
@@ -31,7 +30,7 @@ setGeneric("fuse", function(object, nms) standardGeneric("fuse"))
 setGeneric("fusions", function(object) standardGeneric("fusions"))
 
 #' @rdname TranscriptsFusion-class
-#' @param value 
+#' @param value
 #' @export
 setGeneric("fusions<-", function(object, value) standardGeneric("fusions<-"))
 

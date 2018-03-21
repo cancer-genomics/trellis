@@ -29,6 +29,8 @@ ClippedTranscripts(transcripts, i, left = GRangesList(),
 
 \item{right}{a \code{GRangesList} for the transcripts to the right of the junction}
 
+\item{names}{character vector indicating strand of transcripts ('5prime' or '3prime').}
+
 \item{x}{a \code{ClippedTranscripts} object}
 
 \item{...}{ignored}
