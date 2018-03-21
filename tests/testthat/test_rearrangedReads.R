@@ -5,7 +5,7 @@ context("rearrangedReads")
 ## - this unit test checks the consensus sequnce by BLAT against the hg19 reference genome
 ##
 test_that("consensus", {
-  extdata <- system.file("extdata", package="svalignments")
+  extdata <- system.file("extdata", package="trellis")
   blat <- readBlat(file.path(extdata, "consensus.txt"))
   linked_bins <- readRDS(file.path(extdata, "consensus_linkedbins.rds"))
   lb <- linked_bins[1]
@@ -110,7 +110,7 @@ test_that("consensus", {
 ## - this unit test check for unmapped reads with a mapped mate near the putative sequence junction can be aligned via a split-read with blat
 ##
 test_that("unmapped_reads_near_consensus", {
-  extdata <- system.file("extdata", package="svalignments")
+  extdata <- system.file("extdata", package="trellis")
   unmap.file <- file.path(extdata, "blat_mapped-unmapped-oralcleft.txt")
   blat <- readBlat(unmap.file)
   ##
@@ -130,7 +130,7 @@ test_that("unmapped_reads_near_consensus", {
 })
 
 test_that("rearrangedReadsFun", {
-  extdata <- system.file("extdata", package="svalignments")
+  extdata <- system.file("extdata", package="trellis")
   unmap.file <- file.path(extdata, "blat_unmapped.txt")
   blat_unmap <- readBlat(unmap.file)
   rlist <- readRDS(file.path(extdata, "rlist_cgov44t.rds"))

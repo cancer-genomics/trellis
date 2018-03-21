@@ -66,7 +66,6 @@ test_that("deletion_call", {
 })
 
 test_that("addImproperReadPairs2", {
-  library(svalignments)
   pdat <- cgov44t_preprocess()
   improper_rp <- pdat$read_pairs[["improper"]]
   mapq <- mcols(first(improper_rp))$mapq > 30 & mcols(last(improper_rp))$mapq > 30

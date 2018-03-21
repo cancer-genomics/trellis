@@ -38,7 +38,6 @@ test_that("improper alignment parameters", {
 test_that("read_pairs_from_bam", {
   library(Rsamtools)
   library(svbams)
-  library(svalignments)
   path <- system.file("extdata", package="svbams")
   build <- "hg19"
   library(TxDb.Hsapiens.UCSC.hg19.refGene)

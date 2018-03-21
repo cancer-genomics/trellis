@@ -3,7 +3,6 @@ id.rds <- paste0(id, ".rds")
 bamDir <- "/dcl01/scharpf/data/rscharpf/Dorothy_Ovarian2/hg18/eland/standard_header"
 
 library(trellis)
-library(svalignments)
 library(Rsamtools)
 library(svfilters.hg18)
 devtools::load_all("/dcl01/scharpf1/data/rscharpf/dorothy/ovarian/ovariantn", export_all = FALSE)

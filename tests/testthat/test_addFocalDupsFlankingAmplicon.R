@@ -17,7 +17,7 @@ test_that("addFocalDupsFlankingAmplicon", {
   ## stopifnot(nodes(ag) %in% names(tmp)), and so
   ## setAmpliconGroups fails
   ranges(ag) <- merged
-  rp <- svalignments::get_readpairs(ag, bamfile)
+  rp <- get_readpairs(ag, bamfile)
   flanks <- flankingDuplications(ag, minimum_foldchange=params[["LOW_THR"]])
   ## these are two segments that are amplified to a lesser extent than the most
   ## amplified amplicon on chr8
@@ -64,7 +64,6 @@ test_that("addFocalDupsFlankingAmplicon", {
                    inherit.aes=FALSE, color="black",
                    size=2)
   }
-  ## this function is defined in svclasses
   rpsegs <- readPairsAsSegments(rp)
   ##
   ## linkedDuplicatedRanges

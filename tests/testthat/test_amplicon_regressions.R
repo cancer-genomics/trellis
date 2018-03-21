@@ -75,7 +75,6 @@ test_that("sv_amplicons", {
 })
 
 test_that("initialize_graph", {
-  library(svalignments)
   ##
   ## standard
   ##
@@ -124,7 +123,6 @@ test_that("add_amplicons", {
 
 
 test_that("link_amplicons", {
-  library(svalignments)
   ##
   ## standard
   ##
@@ -245,7 +243,6 @@ test_that("get_readpairs", {
 })
 
 test_that("addFocalDups", {
-  library(svalignments)
   path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   ## standard and proposed are the same
@@ -335,7 +332,6 @@ test_that("no germline filter", {
   library(svbams)
   library(Rsamtools)
   library(graph)
-  library(svalignments)
   data(germline_filters)
   data(transcripts)
   ##
