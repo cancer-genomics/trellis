@@ -1193,15 +1193,9 @@ sv_amplicons2 <- function(preprocess, amplicon_filters,
   ag <- add_amplicons(ag, preprocess$bam.file, params)
   improper_rp <- preprocess$read_pairs[["improper"]]
   ag <- link_amplicons(ag, improper_rp, params)
-  tx <- getTranscripts(preprocess$genome)
+  tx <- loadTx(preprocess$genome)
   ag <- annotate_amplicons(ag, tx)
   ag
-}
-
-getTranscripts <- function(genome){
-  pkg <- paste0("svfilters.", genome)
-  data(transcripts, package=pkg, envir=environment())
-  transcripts
 }
 
 link_amplicons <- function(ag, improper_rp, params){

@@ -165,7 +165,7 @@ test_that("annotate_amplicons", {
   expected <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   path <- system.file("extdata", package = "trellis")
   ag <- readRDS(file.path(path, "link_amplicons.a4d744.rds"))
-  tx <- getTranscripts("hg19")
+  tx <- loadTx("hg19")
   ag <- annotate_amplicons(ag, tx)
   expect_identical(ag, expected)
 })
