@@ -2,7 +2,7 @@ test_that("CNAObject", {
   library(svbams)
   library(svfilters.hg19)
   library(Rsamtools)
-  library(svpreprocess)
+  library(trellis)
   path <- system.file("extdata", package="svbams", mustWork=TRUE)
   data(bins1kb)
   data(germline_filters, package="svfilters.hg19")

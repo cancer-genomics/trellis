@@ -18,7 +18,7 @@ that contains various sequence filters for structural variant analyses and the
 `svalignments` package that contains wrappers for extracting properly- and
 improperly-paired reads from a BAM file.  We also employ functions from `RSamtools` and `GenomicRanges`.
 
-This package requires that normalized coverage is calculated for a set of bins in the package `svfilters.hg19` (or `svfilters.hg18`).  See the `svpreprocess` vignette for comprehensive documentaion on generating normalized coverage.  This process can take some time on large bam files so for the purpose of this tutorial we've distributed sample preprocessed coverage data from the `svpreprocess` package.
+This package requires that normalized coverage is calculated for a set of bins in the package `svfilters.hg19` (or `svfilters.hg18`).  See the `svpreprocess` vignette for comprehensive documentation on generating normalized coverage.  This process can take considerable time on large bam files, so for the purpose of this tutorial we've distributed sample preprocessed coverage data.
 
 # Preprocessing
 
@@ -31,10 +31,10 @@ library(trellis)
 library(svfilters.hg19)
 ```
 
-We first load an object from the `svpreprocess` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `svpreprocess` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38.
+We first load an object from the `trellis` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `trellis` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38.
 
 ```{r views_filepath}
-ddir <- system.file("extdata", package="svpreprocess", mustWork=TRUE)
+ddir <- system.file("extdata", package="trellis", mustWork=TRUE)
 cov.file <- file.path(ddir, "preprocessed_coverage.rds")
 log_ratio <- readRDS(cov.file)/1000
 data(bins1kb, package="svfilters.hg19")
@@ -62,8 +62,8 @@ The result is a `GRanges` object with segment means of log-normalized coverage i
 
 
 ```{r segments}
-path <- system.file("extdata", package="svcnvs")
-data(segments, package="svcnvs")
+path <- system.file("extdata", package="trellis")
+data(segments, package="trellis")
 ```
 
 To generate this segments object on your own data use the `segmentBins` function.  
@@ -235,7 +235,7 @@ the next section).
 
 ```{r plot_logratios}
 ylim <- c(-9, 2)
-df$logr <- svpreprocess::threshold(df$logr, ylim)
+df$logr <- threshold(df$logr, ylim)
 brks <- pretty(df$start, n=8)
 region <- subsetByOverlaps(segs, roi)
 region <- region[region$seg.mean < -1]
@@ -274,7 +274,7 @@ Next, we melt these reads into a *data.frame* useful for plotting.
 
 ```{r rearranged_reads}
 rps <- thinReadPairs(deletion)
-rps <- svcnvs:::meltReadPairs(rps)
+rps <- trellis:::meltReadPairs(rps)
 ```
 
 We again use *ggplot* to plot the data. Note the vertical dashed lines depict

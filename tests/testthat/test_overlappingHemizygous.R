@@ -101,7 +101,7 @@ test_that("overlappingHemizgyous", {
   df <- data.frame(logr=assays(pview2)[, 1],
                    start=start(rowRanges(pview2)))
 ylim <- c(-9, 2)
-df$logr <- svpreprocess::threshold(df$logr, ylim)
+df$logr <- threshold(df$logr, ylim)
 brks <- pretty(df$start, n=8)
 region <- subsetByOverlaps(segs, roi)
 region <- region[region$seg.mean < -1]

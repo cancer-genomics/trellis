@@ -14,7 +14,7 @@ cgov44t_preprocess<- function(){
 
   irp.file <- file.path(extdata, "cgov44t_improper.rds")
   irp <- readRDS(irp.file)
-  ddir <- system.file("extdata", package="svpreprocess",
+  ddir <- system.file("extdata", package="trellis",
                       mustWork=TRUE)
   lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
   seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
