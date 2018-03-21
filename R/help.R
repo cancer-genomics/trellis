@@ -12,7 +12,7 @@
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam
 #' @importFrom Rsamtools bamFlagAsBitMatrix bamMapqFilter
 #' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame
-#' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE
+#' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE isRedundantHit isSelfHit
 #' @importMethodsFrom S4Vectors elementType elementNROWS
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths seqlengths<-
 #' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle
