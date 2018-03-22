@@ -37,35 +37,6 @@ fastaFiles <- function(dirs, ids){
   file.path(path, paste0(ids, ".fa"))
 }
 
-# Creates a fasta file from a data.frame containing read sequences
-#
-# @examples
-#   library(svovarian)
-#   dirs <- projectOvarian(rootname="OvarianData2")
-#   if(FALSE){
-#     tag_list <- readRDS(file.path(dirs[["unit_test"]], "tag_seqs.rds"))
-#     dirs2 <- dirs
-#     dirs2[["fasta"]] <- tempdir()
-#     fastaExperiment(dirs2, tag_list)
-#     fasta_files <- fastaFiles(dirs2, names(tag_list))
-#     file.exists(fasta_files)
-#   }
-#
-# @param dirs a \code{DataPaths} object
-#
-# @param tag_list a \code{data.frame} containing read sequences
-#
-# fastaExperiment <- function(dirs, tag_list){
-#   files <- fastaFiles(dirs, names(tag_list))
-#   for(i in seq_along(tag_list)){
-#     fafile <- files[i]
-#     if(file.exists(fafile)) next()
-#     tags <- tag_list[[i]]
-#     tag.list <- seqsByRearrangement(tags)
-#     writeToFasta(tag.list, fafile, force=TRUE)
-#   }
-#   invisible()
-# }
 
 # Extract unmapped reads with a mapped mate from a bam file
 #
