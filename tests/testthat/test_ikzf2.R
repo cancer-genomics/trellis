@@ -42,12 +42,13 @@ test_that("ikaros_fusion", {
   rid <- coding_jxns$rid
   rlist <- rlist[rid]
 
-  tx.cds <- loadTxdbTranscripts(build)
+  tx.cds <- loadTxdbTranscripts("hg19")
   tx <- tx.cds[["transcripts"]]
   cds <- tx.cds[["cds"]]
   txdb <- tx.cds[["txdb"]]
 
   orgdb <- loadOrgDb()
+  build <- "hg19"
   bs.pkg <- paste0("BSgenome.Hsapiens.UCSC.", build)
   genome <- getBSgenome(bs.pkg)
   ##loadGenomeData()
