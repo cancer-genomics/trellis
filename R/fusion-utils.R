@@ -1998,8 +1998,8 @@ loadGenomeData <- function(build="hg19"){
 #'  ## -- it is one smaller than the length we've recorded
 #'  ## coerce to GRanges
 #'  tumor_aa_ranges <- aa_granges(tab)
-#'  expect_identical(as.character(seqnames(tumor_aa_ranges)),
-#'                   rep(c("ERBB4", "IKZF2"), each=2))
+#'  identical(as.character(seqnames(tumor_aa_ranges)),
+#'            rep(c("ERBB4", "IKZF2"), each=2))
 #'  domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),
 #'                              chromosome=up2$seqnames,
 #'                              description=up2$description,
