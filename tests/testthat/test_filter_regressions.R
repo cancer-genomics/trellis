@@ -12,7 +12,7 @@ getBamView <- function(){
 }
 
 improper.path <- function(){
-  extdata <- system.file("extdata", package="svalignments")
+  extdata <- system.file("extdata", package="trellis")
   file.path(extdata, "improper_cgov44t.bam.rds")
 }
 
@@ -21,13 +21,11 @@ test_that("filterRearrangementList", {
   library(svbams)
   if(FALSE){
     library(Rsamtools)
-    library(svalignments)
     data(germline_filters)
     bview <- getBamView()
     rlist <- readRDS("findCandidates.fe9b1f6.rds")
     rparams <- RearrangementParams()
     sl <- seqlevels(bamRanges(bview))
-    library(svcnvs) ## should reduceGenomeFilters be located in svcnvs
     gf <- reduceGenomeFilters(germline_filters, sl)
     rlist2 <- filterRearrangementList2(rlist,
                                        params=rparams,
@@ -47,12 +45,10 @@ test_that("filterRearrangementList", {
 ##  x[[1]] <- x1
 ##  x[[2]] <- x2
 ##  saveRDS(x, file=file.path(path, "filterRearrangementList.37be188.rds"))
-
-
   ##expect_identical(rlist.37be188, rlist2)
   rlist <- readRDS(file.path(path, "findCandidates.fe9b1f6.rds"))
   sl <- paste0("chr", c(1:22, "X"))
-  gf <- svcnvs::reduceGenomeFilters(germline_filters, sl)
+  gf <- reduceGenomeFilters(germline_filters, sl)
   rf <- rFilters(germline=gf)
   expect_identical(names(rf), c("germline", "rear", "deletions", "amplicons"))
   expect_identical(length(rf$amplicons), 0L)
