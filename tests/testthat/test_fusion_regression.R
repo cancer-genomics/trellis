@@ -3,7 +3,7 @@ context("Regression tests")
 .test_that <- function(nm, expr) NULL
 
 test_that("overlapsAnyTranscript", {
-  data(rear_cgov7t, package="svfusions")
+  data(rear_cgov7t, package="trellis")
   overlaps.tx <- overlapsAnyTranscript(rear_cgov7t, "hg19", maxgap=5000)
   expect_true(sum(overlaps.tx) == 24)
   if(FALSE){
@@ -14,12 +14,12 @@ test_that("overlapsAnyTranscript", {
 })
 
 .test_that("fusionList", {
-  data(rear_cgov7t, package="svfusions")
+  data(rear_cgov7t, package="trellis")
   test <- fusionList(rear_cgov7t, "CGOV7T")
   if(FALSE){
     saveRDS(test, file="fusionList.641eb81.rds")
   }
-  extdata <- system.file("extdata", package="svfusions")
+  extdata <- system.file("extdata", package="trellis")
   expected <- readRDS(file.path(extdata, "fusionList.641eb81.rds"))
   expect_identical(test, expected)
 })
@@ -42,7 +42,7 @@ test_that("fusionTable", {
                      genome=genome,
                      orgdb=orgdb,
                      id="CGOV7T")
-  extdata <- system.file("extdata", package="svfusions")
+  extdata <- system.file("extdata", package="trellis")
   expected <- readRDS(file.path(extdata, "fusionList.641eb81.rds"))
   expected <- expected[expected$rearrangement.id == rid, ]
   expect_equivalent(tab, expected)

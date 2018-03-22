@@ -32,8 +32,8 @@
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames
 #' @importFrom DNAcopy CNA segment
-#' @importFrom stats setNames predict acf loess median na.omit runif filter setNames
-#' @importFrom utils read.table data read.delim head
+#' @importFrom stats setNames predict acf loess median na.omit runif filter setNames kmeans
+#' @importFrom utils read.table data read.delim head read.csv
 #' @importFrom dplyr group_by top_n summarize mutate count n tbl_df
 #' @importFrom magrittr '%>%'
 #' @importFrom RBGL kCliques

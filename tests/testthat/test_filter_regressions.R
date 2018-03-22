@@ -36,8 +36,19 @@ test_that("filterRearrangementList", {
       saveRDS(rlist2, file="filterRearrangementList.37be188.rds")
     }
   }
-  path <- system.file("extdata", package = "svrearrange")
+  path <- system.file("extdata", package = "trellis")
   expected <- readRDS(file.path(path, "filterRearrangementList.37be188.rds"))
+##  x <- expected
+##  attributes(class(x))$package <- "trellis"
+##  x1 <- x[[1]]
+##  x2 <- x[[2]]
+##  attributes(class(x1))$package <- "trellis"
+##  attributes(class(x2))$package <- "trellis"
+##  x[[1]] <- x1
+##  x[[2]] <- x2
+##  saveRDS(x, file=file.path(path, "filterRearrangementList.37be188.rds"))
+
+
   ##expect_identical(rlist.37be188, rlist2)
   rlist <- readRDS(file.path(path, "findCandidates.fe9b1f6.rds"))
   sl <- paste0("chr", c(1:22, "X"))
@@ -56,7 +67,7 @@ test_that("filterRearrangementList", {
 
 ## this should be tested in svalignments
 ##test_that("getSequenceOfReads", {
-##  path <- system.file("extdata", package = "svrearrange")
+##  path <- system.file("extdata", package = "trellis")
 ##  rlist <- readRDS(file.path(path, "filterRearrangementList.37be188.rds"))
 ##  extdata <- system.file("extdata", package="svbams")
 ##  bam.file <- file.path(extdata, "cgov44t_revised.bam")
@@ -64,7 +75,7 @@ test_that("filterRearrangementList", {
 ##  if(FALSE){
 ##    saveRDS(tags, file="tags.34bd277.rds")
 ##  }
-##  path <- system.file("extdata", package = "svrearrange")
+##  path <- system.file("extdata", package = "trellis")
 ##  expected <- readRDS(file.path(path, "tags.34bd277.rds"))
 ##  tags <- tags[order(rownames(tags)), ]
 ##  expected <- expected[order(rownames(expected)), ]

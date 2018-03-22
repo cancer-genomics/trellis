@@ -82,7 +82,7 @@ test_that("seqJunctionsInferredByPairedTags", {
 })
 
 test_that("RearrangementList", {
-  path <- system.file("extdata", package = "svrearrange")
+  path <- system.file("extdata", package = "trellis")
   candidates <- readRDS(file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds"))
   ##attributes(class(candidates))$package <- "trellis"
   ##saveRDS(candidates, file=file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds"))

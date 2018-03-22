@@ -2,9 +2,9 @@
 
 test_that("fuseCDS_Rlist", {
   loadGenomeData()
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
-  extdata2 <- system.file("extdata", package="svfusions")
+  extdata2 <- system.file("extdata", package="trellis")
   coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
   rid <- coding_jxns$rid
   rlist <- rlist[rid]
@@ -26,8 +26,8 @@ test_that("fuseCDS_Rlist", {
 ## this takes too long
 .test_that("translateCDS", {
   loadGenomeData()
-  extdata <- system.file("extdata", package="svrearrange")
-  extdata2 <- system.file("extdata", package="svfusions")
+  extdata <- system.file("extdata", package="trellis")
+  extdata2 <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
   coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
   coding_jxns <- coding_jxns[-grep("NR_", coding_jxns$tx_name)]
@@ -73,9 +73,9 @@ test_that("fuseCDS_Rlist", {
 
 test_that("pipeline", {
   loadGenomeData()
-  library(svrearrange)
-  extdata <- system.file("extdata", package="svrearrange")
-  extdata2 <- system.file("extdata", package="svfusions")
+  library(trellis)
+  extdata <- system.file("extdata", package="trellis")
+  extdata2 <- system.file("extdata", package="trellis")
   build <- "hg19"
   if(FALSE){
     rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
@@ -99,7 +99,7 @@ test_that("pipeline", {
     proteins <- translateCDS(cds.list)
   }
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
-  extdata2 <- system.file("extdata", package="svfusions")
+  extdata2 <- system.file("extdata", package="trellis")
   coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
   rlist <- rlist[coding_jxns$rid]
   cds.list <- readRDS(file.path(extdata2, "cds_list.rds"))
@@ -161,7 +161,7 @@ test_that("pipeline", {
                                 inframe.nostop,
                                 ref.frames)
   if(FALSE){
-    extdata2 <- system.file("extdata", package="svfusions")
+    extdata2 <- system.file("extdata", package="trellis")
     saveRDS(valid.fusions, file=file.path(extdata2, "valid_fusions.rds"))
   }
   expected <- readRDS(file.path(extdata2, "valid_fusions.rds"))

@@ -5,7 +5,7 @@ test_that("getSequenceOfReads", {
   id <- "cgov44t_revised.bam"
   bam.file <- file.path(extdata, id)
   build <- "hg19"
-  data(rlist, package="svrearrange")
+  data(rlist, package="trellis")
   improper_rp <- improper(rlist[[1]])
 
   with_seq <- DataFrame(getSequenceOfReads(rlist, bam.file, MAX=5L, build = build))

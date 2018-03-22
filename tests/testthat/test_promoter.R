@@ -12,11 +12,11 @@ promoterFusion <- function(){
   yap1 <- reduce(tx[is.yap1])
   tx.yap1 <- subsetByOverlaps(tx, yap1)[1]
   yap1.promoter <- promoters(tx.yap1, upstream=5000, downstream=0)
-  library(svrearrange)
+  library(trellis)
   library(TxDb.Hsapiens.UCSC.hg19.refGene)
   txdb <- TxDb.Hsapiens.UCSC.hg19.refGene
   tx <- transcripts(txdb)
-  data(rear_cgov7t, package="svfusions")
+  data(rear_cgov7t, package="trellis")
   rear.id <- "16978-17458"
   rear <- rear_cgov7t[[rear.id]]
 
@@ -47,7 +47,7 @@ promoterFusion <- function(){
 }
 
 test_that("promoter", {
-  library(svrearrange)
+  library(trellis)
   rear <- promoterFusion()
   txdb <- loadTxDb("hg19")
   tx <- transcripts(txdb)
@@ -95,7 +95,7 @@ test_that("promoter", {
 
 test_that("promoter2", {
   ## The second gene is not necessarily in-frame
-  data(rear_cgov7t, package="svfusions")
+  data(rear_cgov7t, package="trellis")
   rid <- "16350-16406"
   tab <- fusionList(rear_cgov7t[rid])
   expect_true(!tab$inframe)

@@ -1,5 +1,5 @@
 test_that("organizeReads", {
-  data(rlist, package="svrearrange")
+  data(rlist, package="trellis")
   df.list <- organizeReads(rlist)
   expect_is(df.list, "list")
   expect_is(df.list[[1]], "data.frame")

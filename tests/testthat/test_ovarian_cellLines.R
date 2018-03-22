@@ -5,9 +5,9 @@ context("Ovarian cell line fusions")
 ##
 ## fusion in CGOV44T
 test_that("cgov44t", {
-  library(svrearrange)
+  library(trellis)
   library(svalignments)
-  data(rlist, package="svrearrange")
+  data(rlist, package="trellis")
   test <- fusionList(rlist, id="CGOV44T")
   ## check that we've recovered the correct orientation'
   gene1.coords <- GRanges(test$chr.gene1, IRanges(test$cdsStart.gene1,

@@ -45,7 +45,8 @@ Suggests:
     gridExtra,
     network,
     GGally,
-    sna
+    sna,
+    org.Hs.eg.db
 Collate: 
     'help.R'
     'AllGenerics.R'

@@ -1,7 +1,7 @@
 context("Protein domains")
 
 test_that("protein_domains", {
-  extdata <- system.file("extdata", package="svfusions")
+  extdata <- system.file("extdata", package="trellis")
   fusions <- readRDS(file.path(extdata, "valid_fusions.rds"))
   tab <- fusionTable2(fusions)
   up <- readRDS(file.path(extdata, "uniprot.rds"))
@@ -94,8 +94,8 @@ test_that("protein_domains", {
 
 
 .test_that("protein domains", {
-  data(rear_cgov7t, package="svfusions")
-  extdata <- system.file("extdata", package="svfusions")
+  data(rear_cgov7t, package="trellis")
+  extdata <- system.file("extdata", package="trellis")
   x <- readRDS(file.path(extdata, "fusionList.641eb81.rds"))
   flist <- listFusionData(rlist=rear_cgov7t, fusions=x[1, ])
   dat <- fusionData(data.list=flist)

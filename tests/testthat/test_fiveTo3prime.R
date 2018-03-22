@@ -1,7 +1,7 @@
 context("5 to 3-prime")
 
 test_that("fiveTo3Prime", {
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
@@ -66,7 +66,7 @@ test_that("fiveTo3Prime", {
 })
 
 test_that("noncoding", {
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[5]]
@@ -81,7 +81,7 @@ test_that("noncoding", {
 })
 
 test_that("inversions", {
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   ##
@@ -126,16 +126,16 @@ test_that("inversions", {
 })
 
 test_that("seqJunctionNearCoding", {
-  library(svrearrange)
+  library(trellis)
   library(BSgenome)
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   ##rl <- rlist[ikaros.rid]
   near.coding <- seqJunctionNearTx(rlist, "hg19")
   expect_identical(sum(near.coding), 26L)
   if(FALSE){
-    extdata <- system.file("extdata", package="svrearrange")
+    extdata <- system.file("extdata", package="trellis")
     saveRDS(near.coding, file=file.path(extdata, "near_coding.rds"))
   }
   ikaros.rid <- "9136-9181"
@@ -143,9 +143,9 @@ test_that("seqJunctionNearCoding", {
 })
 
 test_that("five_to_three", {
-  library(svrearrange)
+  library(trellis)
   library(BSgenome)
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   near.coding <- readRDS(file.path(extdata, "near_coding.rds"))
@@ -163,9 +163,9 @@ test_that("five_to_three", {
 })
 
 test_that("seqJunctions_Rlist", {
-  library(svrearrange)
+  library(trellis)
   library(BSgenome)
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
   jxns <- seqJunctions_Rlist(rlist)
   expect_is(jxns, "GRanges")
@@ -181,7 +181,7 @@ test_that("seqJunctions_Rlist", {
   rlist <- readRDS(rfile)
   is.complex <- isComplex(rlist)
   rlist <- rlist[ !is.complex ]
-  n.sr <- svrearrange:::numberSplitReads(rlist)
+  n.sr <- numberSplitReads(rlist)
   rlist <- rlist[ n.sr >= 1 ]
   near.coding <- seqJunctionNearTx(rlist, build)
   rlist <- rlist[ near.coding ]

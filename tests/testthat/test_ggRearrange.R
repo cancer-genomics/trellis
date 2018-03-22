@@ -1,7 +1,7 @@
 context("ggplot for Rearrangement class")
 
 test_that("ggRearrange", {
-  extdata <- system.file("extdata", package="svrearrange")
+  extdata <- system.file("extdata", package="trellis")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
