@@ -863,7 +863,7 @@ logicalList <- function(x) x@fusions
 #' CDS believed to be involved in the fusion.
 #'
 #' @seealso \code{\link{fuse}}
-#' 
+#'
 #' @examples
 #'   data(rear_cds)
 #'   clip(rear_cds)
@@ -871,7 +871,7 @@ logicalList <- function(x) x@fusions
 #'   ## There are four possible refseq transcripts associated with gene 'B'
 #'   full_refseqs <- txB(rear_cds)
 #'   elementNROWS(full_refseqs)
-#' 
+#'
 #'   ## We exclude CDS from the four refseq transcripts that are not
 #'   ## involved in the fusion using the clip function:
 #'   clipped_tx <- clip(rear_cds)

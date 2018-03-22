@@ -13,6 +13,8 @@
 \alias{txB<-}
 \alias{txC<-}
 \alias{txD<-}
+\alias{left}
+\alias{right}
 \alias{txA,Transcripts-method}
 \alias{txB,Transcripts-method}
 \alias{txC,Transcripts-method}
@@ -43,6 +45,10 @@ txC(object) <- value
 
 txD(object) <- value
 
+left(x, ...)
+
+right(x, ...)
+
 \S4method{txA}{Transcripts}(object)
 
 \S4method{txB}{Transcripts}(object)
@@ -63,6 +69,10 @@ txD(object) <- value
 \item{object}{a \code{Transcripts}-derived object}
 
 \item{value}{a \code{GRangesList}}
+
+\item{x}{a \code{Transcripts}-derived object}
+
+\item{...}{ignored}
 }
 \description{
 Accessor for transcript from Transcripts-derived class

@@ -96,8 +96,14 @@ setGeneric("txC<-", function(object,value) standardGeneric("txC<-"))
 #' @export
 setGeneric("txD<-", function(object,value) standardGeneric("txD<-"))
 
+#' @export
+#' @param x a \code{Transcripts}-derived object
+#' @param ... ignored
+#' @rdname transcript-accessors
 setGeneric("left", function(x, ...) standardGeneric("left"))
 
+#' @export
+#' @rdname transcript-accessors
 setGeneric("right", function(x, ...) standardGeneric("right"))
 
 ##
