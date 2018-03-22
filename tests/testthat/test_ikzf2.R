@@ -13,7 +13,7 @@ test_that("sequenceJunctions", {
   expect_identical(length(coding_jxns), 44L)
   expect_true(all(coding_jxns$tx_name != ""))
   expect_true(all(coding_jxns$"3p"$tx_name != ""))
-  extdata2 <- system.file("extdata", package="svfusions")
+  extdata2 <- system.file("extdata", package="trellis")
   if(FALSE){
     saveRDS(coding_jxns, file=file.path(extdata2, "coding_jxns.rds"))
   }
