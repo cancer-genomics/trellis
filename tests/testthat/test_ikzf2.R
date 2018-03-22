@@ -7,17 +7,26 @@ test_that("sequenceJunctions", {
   library(BSgenome)
   extdata <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
+##  x=rlist
+##  fun <- function(x){
+##    attributes(class(x))$package <- "trellis"
+##    x
+##  }
+##  for(i in seq_along(x)){
+##    x[[i]] <- fun(x[[i]])
+##  }
+##  xx <- fun(x)
+##  saveRDS(xx, file=file.path(extdata, "rlist_5to3p.rds"))
   jxns <- readRDS(file.path(extdata, "rlist_jxns.rds"))
   coding_jxns <- codingJunctions(jxns, "hg19")
   expect_identical(genome(coding_jxns)[[1]], "hg19")
   expect_identical(length(coding_jxns), 44L)
   expect_true(all(coding_jxns$tx_name != ""))
   expect_true(all(coding_jxns$"3p"$tx_name != ""))
-  extdata2 <- system.file("extdata", package="trellis")
   if(FALSE){
-    saveRDS(coding_jxns, file=file.path(extdata2, "coding_jxns.rds"))
+    saveRDS(coding_jxns, file=file.path(extdata, "coding_jxns.rds"))
   }
-  expected <- readRDS(file.path(extdata2, "coding_jxns.rds"))
+  expected <- readRDS(file.path(extdata, "coding_jxns.rds"))
   expect_equivalent(coding_jxns, expected)
   ikaros.rid <- "9136-9181"
   expect_true(ikaros.rid %in% coding_jxns$rid)
