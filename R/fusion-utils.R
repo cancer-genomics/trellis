@@ -1953,29 +1953,29 @@ validFusions <- function(fusion.list, cds.list, inframe.nostop, ref.frames){
        coding_junctions=cds.list[["coding_junctions"]])
 }
 
-#' Puts txdb, BSgenome, transcripts, and CDS in global environment
-#'
-#' @param build genome build -- only 'hg19' and 'hg18' supported
-#' @export
-#' @examples
-#' rm(list=ls())
-#' loadGenomeData()
-#' exists(c("cds", "txdb", "tx", "genome"))
-loadGenomeData <- function(build="hg19"){
-  tx.cds <- loadTxdbTranscripts(build)
-  tx <- tx.cds[["transcripts"]]
-  cds <- tx.cds[["cds"]]
-  txdb <- tx.cds[["txdb"]]
-
-  orgdb <- loadOrgDb()
-  bs.pkg <- paste0("BSgenome.Hsapiens.UCSC.", build)
-  genome <- getBSgenome(bs.pkg)
-
-  assign("cds", cds, envir=globalenv())
-  assign("genome", genome, envir=globalenv())
-  assign("txdb", txdb, envir=globalenv())
-  assign("tx", tx, envir=globalenv())
-}
+## #' Puts txdb, BSgenome, transcripts, and CDS in global environment
+## #'
+## #' @param build genome build -- only 'hg19' and 'hg18' supported
+## #' @export
+## #' @examples
+## #' rm(list=ls())
+## #' loadGenomeData()
+## #' exists(c("cds", "txdb", "tx", "genome"))
+## loadGenomeData <- function(build="hg19"){
+##   tx.cds <- loadTxdbTranscripts(build)
+##   tx <- tx.cds[["transcripts"]]
+##   cds <- tx.cds[["cds"]]
+##   txdb <- tx.cds[["txdb"]]
+## 
+##   orgdb <- loadOrgDb()
+##   bs.pkg <- paste0("BSgenome.Hsapiens.UCSC.", build)
+##   genome <- getBSgenome(bs.pkg)
+## 
+##   assign("cds", cds, envir=globalenv())
+##   assign("genome", genome, envir=globalenv())
+##   assign("txdb", txdb, envir=globalenv())
+##   assign("tx", tx, envir=globalenv())
+## }
 
 
 #' Convert tumor amino acid ranges to a GRanges object
