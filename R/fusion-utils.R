@@ -814,41 +814,41 @@ fusionList <- function(rlist, id="", build=c("hg19", "hg18")){
   tab
 }
 
-#' Evaluates rearrangements for in-frame fusions
-#'
-#' Saves the results of fusionTable to disk.  If file already exists,
-#' only read in the file and return a list of \code{tbl_df} objects.
-#'
-#' @seealso \code{fusionTable}
-#'
-#' @export
-#' @return a list of \code{tbl_df} objects
-#' @param file file path
-#' @param rlist a \code{RearrangementList}
-#' @param dirs a \code{DataPaths} object
-#' @param txdb a \code{TxDb} object
-#' @param orgdb an \code{OrgDb} object
-#' @param genome aa \code{BSgenome} object
-#' @param id sample id (character string)
-fusionExperiment <- function(file, id, rlist, dirs, txdb, orgdb, genome) {
-  if(length(rlist)==0){
-    return(NULL)
-  }
-  if(missing(txdb)) stop("missing txdb")
-  if(file.exists(file)){
-    z <- readRDS(file)
-    if(!is.null(z)){
-      z <- tbl_df(z)
-    }
-    return(z)
-  }
-  tab <- fusionList(rlist, txdb=txdb,
-                    genome=genome,
-                    orgdb=orgdb,
-                    id=id)
-  saveRDS(tab, file=file)
-  tbl_df(tab)
-}
+## #' Evaluates rearrangements for in-frame fusions
+## #'
+## #' Saves the results of fusionTable to disk.  If file already exists,
+## #' only read in the file and return a list of \code{tbl_df} objects.
+## #'
+## #' @seealso \code{fusionTable}
+## #'
+## #' @export
+## #' @return a list of \code{tbl_df} objects
+## #' @param file file path
+## #' @param rlist a \code{RearrangementList}
+## #' @param dirs a \code{DataPaths} object
+## #' @param txdb a \code{TxDb} object
+## #' @param orgdb an \code{OrgDb} object
+## #' @param genome aa \code{BSgenome} object
+## #' @param id sample id (character string)
+## fusionExperiment <- function(file, id, rlist, dirs, txdb, orgdb, genome) {
+##   if(length(rlist)==0){
+##     return(NULL)
+##   }
+##   if(missing(txdb)) stop("missing txdb")
+##   if(file.exists(file)){
+##     z <- readRDS(file)
+##     if(!is.null(z)){
+##       z <- tbl_df(z)
+##     }
+##     return(z)
+##   }
+##   tab <- fusionList(rlist, txdb=txdb,
+##                     genome=genome,
+##                     orgdb=orgdb,
+##                     id=id)
+##   saveRDS(tab, file=file)
+##   tbl_df(tab)
+## }
 
 anyLengthZero <- function(x)  length(left(x)) == 0 || length(right(x)) == 0
 

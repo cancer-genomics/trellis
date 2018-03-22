@@ -6,15 +6,15 @@ NULL
 #' Utilizes the \code{countBam()} function in the \code{Rsamtools} package to 
 #' count number of reads mapped to ranges determined by 
 #' a \code{ScanBamParams()} object.
-#' 
+#'
 #' @param object A \code{BamViews} object
 #' @param scan_param An optional \code{ScanBamParam} object specifying any
-#' parameters to consider when importing reads from bam files included in the 
-#' \code{BamViews} object.  If omitted, a \code{scanBamParams} object 
-#' will automatically be created to include all ranges from 
+#' parameters to consider when importing reads from bam files included in the
+#' \code{BamViews} object.  If omitted, a \code{scanBamParams} object
+#' will automatically be created to include all ranges from
 #' the \code{BamViews} object and to ignore unmapped and duplicate reads.
 #' @return An integer-vector of counts corresponding to each interval in the \code{BamViews} object.
-#' 
+#'
 #' @examples
 #' library(Rsamtools)
 #' library(svbams)
@@ -44,7 +44,7 @@ binCounts <- function(object, scan_param){
 #'
 #' This function counts the number of reads mapped to each interval
 #' given by \code{bamRanges(object)}.
-#' 
+#'
 #' @param object A \code{BamViews} object
 #' @param scan_param a \code{ScanBamParams} object
 #' @export
@@ -52,7 +52,7 @@ countReads2 <- binCounts
 
 
 #' Generate parameters that specify which reads in a bam file to import
-#' 
+#'
 #' A wrapper function for \code{Rsamtools::ScanBamParam()}.
 #'
 #' @return A \code{\link[Rsamtools]{ScanBamParam}} object
@@ -60,15 +60,16 @@ countReads2 <- binCounts
 #' @param gr A \code{GRanges} object
 #' @param flags An integer vector as returned by \code{Rsamtools::scanBamFlag()}.
 #' Unmapped and duplicate reads are omitted by default.
-#' 
-#' @examples 
+#'
+#' @examples
 #' library(Rsamtools)
 #' library(svfilters.hg19)
 #' data(bins1kb)
 #' scan_param <- countParam(bins1kb)
 #' scan_param
 #' class(scan_param) #ScanBamParam
-countParam <- function(gr, flags=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE)){
+countParam <- function(gr, flags=scanBamFlag(isUnmappedQuery=FALSE,
+                                             isDuplicate=FALSE)){
   scan_param=ScanBamParam(flag=flags, which=gr)
 }
 

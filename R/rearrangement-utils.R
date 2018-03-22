@@ -1,4 +1,4 @@
-#' @include help.R
+#' @include AllGenerics.R
 NULL
 
 ##--------------------------------------------------
@@ -452,7 +452,7 @@ R1pos <- function(gpairs) as.logical(R1strand(gpairs)=="+")
 R2neg <- function(gpairs) as.logical(R2strand(gpairs)=="-")
 
 typeGAPairs <- function(gpairs){
-  extdir <- system.file("extdata", package="svrearrange")
+  extdir <- system.file("extdata", package="trellis")
   rear_type <- read.csv(file.path(extdir, "rearrangement_types.csv"), nrows=20,
                         stringsAsFactors=FALSE)
   ##rear_type <- rear_type2

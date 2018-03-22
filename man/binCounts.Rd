@@ -10,9 +10,9 @@ binCounts(object, scan_param)
 \item{object}{A \code{BamViews} object}
 
 \item{scan_param}{An optional \code{ScanBamParam} object specifying any
-parameters to consider when importing reads from bam files included in the 
-\code{BamViews} object.  If omitted, a \code{scanBamParams} object 
-will automatically be created to include all ranges from 
+parameters to consider when importing reads from bam files included in the
+\code{BamViews} object.  If omitted, a \code{scanBamParams} object
+will automatically be created to include all ranges from
 the \code{BamViews} object and to ignore unmapped and duplicate reads.}
 }
 \value{
