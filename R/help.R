@@ -7,9 +7,9 @@
 #' @import methods
 #' @import BiocGenerics
 #' @importMethodsFrom Rsamtools BamViews [
-#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup
+#' @importMethodsFrom Rsamtools ScanBamParam countBam pileup scanBam
 #' @importClassesFrom Rsamtools BamViews
-#' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam
+#' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam scanBamWhat BamFile
 #' @importFrom Rsamtools bamFlagAsBitMatrix bamMapqFilter
 #' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame List
 #' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE isRedundantHit isSelfHit
@@ -45,6 +45,6 @@
 #' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
 #' @importMethodsFrom GenomicFeatures transcripts cdsBy exonsBy
 #' @importFrom BSgenome getBSgenome
-#' @importMethodsFrom Biostrings getSeq translate
+#' @importMethodsFrom Biostrings getSeq translate subseq
 #' @importFrom Biostrings DNAStringSet
 NULL

@@ -964,6 +964,7 @@ ggRearrange <- function(df){
     nr <- 2;
   } else nr <- 1;
   absoluteNum <- function(x, ...) abs(x)
+  read_type <- tagid <- NULL
   ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
                  xmin=start/1e6, xmax=end/1e6,
                  color=read_type,
