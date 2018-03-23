@@ -9,7 +9,7 @@ promoterCDS(coding_jxns, build)
 \arguments{
 \item{coding_jxns}{a \code{GRanges} representation of the sequence junctions that occur in transcripts, possibly intronic.}
 
-\item{cds}{a \code{GRangesList} of all CDS created by \code{cdsBy}}
+\item{build}{genome build}
 }
 \value{
 \code{GRangesList}

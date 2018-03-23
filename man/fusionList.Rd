@@ -9,9 +9,9 @@ fusionList(rlist, id = "", build = c("hg19", "hg18"))
 \arguments{
 \item{rlist}{a \code{RearrangementList}}
 
-\item{txdb}{a \code{TxDb} object}
+\item{id}{character string providing identifier for RearrangementList}
 
-\item{orgdb}{a \code{OrgDb} object}
+\item{build}{genome build ('hg18', 'hg19', or 'hg38')}
 }
 \description{
 A title

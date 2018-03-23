@@ -6,11 +6,16 @@ setMethod("numberLinkingRP", "RearrangementList", function(object){
   as.integer(nrp)
 })
 
-
+#' @aliases linkedTo,GRanges-method
+#' @rdname linkedTo
 setMethod("linkedTo", "GRanges", function(x)  x$linked.to)
 
+#' @aliases linkedTo,Rearrangement-method
+#' @rdname linkedTo
 setMethod("linkedTo", "Rearrangement", function(x)  linkedBins(x)$linked.to)
 
+#' @aliases linkedTo,RearrangementList-method
+#' @rdname linkedTo
 setMethod("linkedTo", "RearrangementList", function(x)  linkedBins(x)$linked.to )
 
 
@@ -461,6 +466,7 @@ rFilters <- function(germline=GRanges(),
 #' Creates a list object of data required to identify rearrangements
 #'
 #' @param bins a \code{GRanges} object of non-overlapping (typically 1kb) bins
+#' @param read_pairs a \code{GAlignmentPairs}-representation of paired reads
 #' @param rlist a \code{RearrangementList}
 #' @param filters a \code{GRangesList} of sequence- and germline-based filters
 #' @return a list
@@ -609,6 +615,9 @@ scale_x_kb <- function(...){
   scale_x_continuous(..., trans=kb_trans())
 }
 
+#' Use MB scale in gg-style plots
+#'
+#' @param ... additional arguments to scale_x_continuous
 #' @export
 scale_x_mb <- function(...){
   scale_x_continuous(..., trans=mb_trans())
@@ -634,6 +643,7 @@ fiveTo3PrimeList <- function(rlist, build, maxgap=5000){
 #' Loads TxDb object from TxDb.Hsapiens.UCSC.<build>.refGene
 #'
 #' @return A \code{TxDb} object
+#' @param build genome build
 #' @export
 #' @examples
 #' txdb <- loadTxDb("hg19")
@@ -652,6 +662,7 @@ loadTxDb <- function(build){
 #'
 #' @export
 #' @param build character string providing genome build. Currently only hg19 and hg18 are supported.
+#' @param seq_levels allowed seqnames
 #' @return a named list with elements `transcripts` (\code{GRanges} of transcripts), `cds` (\code{GRangesList} of CDS listed by transcript), and `txdb` (a \code{txdb} object).
 #' @examples
 #' tx.cds <- loadTxdbTranscripts("hg19")
@@ -673,8 +684,8 @@ loadTxdbTranscripts <- function(build, seq_levels){
 #'
 #' Only rearrangements where both sides of the sequence junction are near a transcript are evaluated as candidate in-frame fusions.
 #'
-#' @param tx a \code{GRanges} object
 #' @param rlist a \code{RearrangementList}
+#' @param build genome build
 #' @export
 #' @return a logical vector of the same length as the \code{rlist} object
 #' @examples
@@ -780,7 +791,7 @@ seqJunction <- function(r, maxgap=50){
 #'
 #' This function constructs a \code{GRanges} object of the 5-prime and 3-prime sequence junctions for a \code{RearrangementList} that has already been ordered by its two 5-prime to 3-prime orientation.
 #'
-#' @param a \code{RearrangementList}
+#' @param rlist a \code{RearrangementList}
 #' @return a \code{GRanges} object of the 5-prime and 3-prime sequence junctions.  The 3-prime junctions are included in the '3p' field of the \code{GRanges} object
 #' @export
 #' @examples

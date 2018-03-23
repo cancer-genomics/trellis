@@ -8,8 +8,6 @@ fusionTable2(fusions)
 }
 \arguments{
 \item{fusions}{a \code{List} created by \code{validFusions}}
-
-\item{jxns}{a \code{GRanges} object of the sequence junctions indicating the 5-prime and 3-prime genomic regions}
 }
 \description{
 Create a table of in-frame fusions

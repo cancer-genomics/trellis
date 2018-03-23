@@ -10,6 +10,8 @@ rearrangementData(bins = GRanges(), read_pairs, rlist = RearrangementList(),
 \arguments{
 \item{bins}{a \code{GRanges} object of non-overlapping (typically 1kb) bins}
 
+\item{read_pairs}{a \code{GAlignmentPairs}-representation of paired reads}
+
 \item{rlist}{a \code{RearrangementList}}
 
 \item{filters}{a \code{GRangesList} of sequence- and germline-based filters}

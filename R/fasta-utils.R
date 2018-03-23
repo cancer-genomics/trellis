@@ -7,7 +7,13 @@
   }
 }
 
+#' Helper function to write tags to FASTA files
+#'
+#' @param tags a data.frame of reads or tags to re-align by BLAT
+#' @param fasta.file character string providing complete path to a FASTA file
 #' @export
+#'
+#' @rdname fasta
 writeUnmappedToFasta <- function(tags, fasta.file){
   unlink(fasta.file)
   .writefasta(tags, fasta.file)
@@ -15,6 +21,7 @@ writeUnmappedToFasta <- function(tags, fasta.file){
 
 
 #' @export
+#' @rdname fasta
 writeToFasta <- function(tags, fasta.file){
   unlink(fasta.file)
   tag.list <- seqsByRearrangement(tags)

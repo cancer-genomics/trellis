@@ -3,6 +3,7 @@
 \docType{data}
 \name{rearrangement_list}
 \alias{rearrangement_list}
+\alias{rlist}
 \title{An example RearrangementList object}
 \format{a \code{RearrangementList} object}
 \description{

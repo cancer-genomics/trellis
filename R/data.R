@@ -124,6 +124,13 @@ NULL
 #' @format a \code{RearrangementList} object
 NULL
 
+
+#' @name rlist
+#' @aliases rlist
+#' @rdname rearrangement_list
+#' @format a \code{RearrangementList} object
+NULL
+
 ##
 ## From the former svfusions package
 ##

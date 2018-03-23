@@ -2,9 +2,9 @@
 NULL
 
 #' Counts reads mapped to genomic intervals
-#' 
-#' Utilizes the \code{countBam()} function in the \code{Rsamtools} package to 
-#' count number of reads mapped to ranges determined by 
+#'
+#' Utilizes the \code{countBam()} function in the \code{Rsamtools} package to
+#' count number of reads mapped to ranges determined by
 #' a \code{ScanBamParams()} object.
 #'
 #' @param object A \code{BamViews} object
@@ -229,16 +229,17 @@ modelGC2 <- function(object, gc_model=.gc_model()){
 #' library(Rsamtools)
 #' library(svbams)
 #' library(svfilters.hg19)
+#' library(trellis)
 #' data(bins1kb)
 #' extdir <- system.file("extdata", package="svbams", mustWork=TRUE)
 #' bamfile <- file.path(extdir, "cgov10t.bam")
 #' bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode = "coarse")
 #' bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 #' bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
-#' bins$cnt <- binCounts(bviews)
+#' bins$cnt <- trellis::binCounts(bviews)
 #' std_cnt <- binNormalize(bins)
 #' bins$std_cnt <- std_cnt
-#' head(binGCCorrect(bins))
+#' head(trellis::binGCCorrect(bins))
 #' @export
 binGCCorrect <- function(bins){
   std_count <- bins$std_cnt

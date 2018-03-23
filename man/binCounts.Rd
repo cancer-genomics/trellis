@@ -19,8 +19,8 @@ the \code{BamViews} object and to ignore unmapped and duplicate reads.}
 An integer-vector of counts corresponding to each interval in the \code{BamViews} object.
 }
 \description{
-Utilizes the \code{countBam()} function in the \code{Rsamtools} package to 
-count number of reads mapped to ranges determined by 
+Utilizes the \code{countBam()} function in the \code{Rsamtools} package to
+count number of reads mapped to ranges determined by
 a \code{ScanBamParams()} object.
 }
 \examples{

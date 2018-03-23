@@ -746,6 +746,6 @@ setGeneric("numberLinkingRP", function(object) standardGeneric("numberLinkingRP"
 
 #' A region linked by improperly paired reads
 #'
-#' @param g a \code{GRanges} object with value `linked.to` in the `mcols`
+#' @param x a \code{GRanges} object with value `linked.to` in the `mcols`
 #' @export
 setGeneric("linkedTo", function(x) standardGeneric("linkedTo"))

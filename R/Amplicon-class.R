@@ -233,7 +233,9 @@ setReplaceMethod("queryRanges", "AmpliconGraph", function(object, value) {
 
 #' @rdname AmpliconGraph-class
 #' @aliases ranges,AmpliconGraph-method
-setMethod("ranges", "AmpliconGraph", function(x, ...) x@ranges)
+#' @param use.names logical
+#' @param use.mcols logical
+setMethod("ranges", "AmpliconGraph", function(x, use.names=TRUE, use.mcols=FALSE, ...) x@ranges)
 
 #' @rdname AmpliconGraph-class
 #' @aliases ranges,AmpliconGraph,ANY-method

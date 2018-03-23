@@ -149,6 +149,10 @@ ampliconNames(amplicons)
 \item{...}{ignored}
 
 \item{x}{a \code{AmpliconGraph}}
+
+\item{use.names}{logical}
+
+\item{use.mcols}{logical}
 }
 \description{
 Somatic amplicons are often grouped by a bridge-breakage-fusion

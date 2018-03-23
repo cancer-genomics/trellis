@@ -7,7 +7,7 @@
 seqJunctions_Rlist(rlist)
 }
 \arguments{
-\item{a}{\code{RearrangementList}}
+\item{rlist}{a \code{RearrangementList}}
 }
 \value{
 a \code{GRanges} object of the 5-prime and 3-prime sequence junctions.  The 3-prime junctions are included in the '3p' field of the \code{GRanges} object

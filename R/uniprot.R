@@ -36,7 +36,14 @@ removeOverlapsWithNullShortDesc <- function(gup, strwrap.width){
 }
 
 
+#' Extract features from uniprot database
+#'
+#' @param up uniprot features
+#' @param fusions table of fusions with gene.5prime and gene.3prime columns
+#' @param strwrap.width integer indicating how to wrap text for highly descriptive features in uniprot
 #' @export
+#' @examples
+#' ## See fusions vignette
 uniprotFeatures <- function(up, fusions, strwrap.width=30){
   up$feature.id <- seq_len(nrow(up))
   ## select features to plot

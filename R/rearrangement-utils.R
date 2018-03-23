@@ -748,10 +748,10 @@ overlappingTranscripts <- function(r, build, maxgap=5000){
   pkgname <- paste0("svfilters.", build)
   data(transcripts, package=pkgname, envir=environment())
   g <- uncouple(linkedBins(r))
-  tx <- subsetByOverlaps(transcripts, g, maxgap=5000)
-  if(!all(overlapsAny(g, transcripts, maxgap=5000))){
+  tx <- subsetByOverlaps(transcripts, g, maxgap=maxgap)
+  if(!all(overlapsAny(g, transcripts, maxgap=maxgap))){
     ## one or both regions do not overlap a transcript
-    no.overlap <- !overlapsAny(g, transcripts, maxgap=5000)
+    no.overlap <- !overlapsAny(g, transcripts, maxgap=maxgap)
     noncoding <- g[no.overlap]
     noncoding$tx_id <- ""
     noncoding$tx_name <- ""
@@ -760,7 +760,7 @@ overlappingTranscripts <- function(r, build, maxgap=5000){
     noncoding$biol_sign <- FALSE
     tx <- c(tx, noncoding)
   }
-  hits <- findOverlaps(g, tx, maxgap=5000)
+  hits <- findOverlaps(g, tx, maxgap=maxgap)
   tx <- tx[subjectHits(hits)]
   txlist <- split(tx, queryHits(hits))
   txlist <- lapply(txlist, function(g){
@@ -769,7 +769,7 @@ overlappingTranscripts <- function(r, build, maxgap=5000){
       rgr$gene_name <- g$gene_name
       return(rgr)
     }
-    rgr <- reduce(g, ignore.strand=TRUE, min.gapwidth=5000)
+    rgr <- reduce(g, ignore.strand=TRUE, min.gapwidth=maxgap)
     rgr$gene_name <- paste(unique(g$gene_name), collapse=",")
     rgr
   })
@@ -1068,10 +1068,12 @@ list_orientations <- function(r1, r2){
 }
 
 #' @aliases type,Rearrangement-method
+#' @rdname Rearrangement-class
 setMethod("type", "Rearrangement", function(object){
   .type_rear(object)
 })
 
+#' @rdname Rearrangement-class
 #' @aliases type,RearrangementList-method
 setMethod("type", "RearrangementList", function(object){
   x <- sapply(object, type)
@@ -1101,6 +1103,8 @@ isComplex <- function(x){
 #'
 #'
 #' @param r a \code{Rearrangement} object
+#' @param build string providing build of reference genome ('hg18', 'hg19', or 'hg38')
+#' @param maxgap maximum distance between read and transcript for transcript to be considered overlapping
 #' @seealso \code{\link{rearDataFrame}} \code{\link{ggRearrange}}
 #' @examples
 #'   extdata <- system.file("extdata", package="trellis")

@@ -13,8 +13,6 @@ getImproperAlignmentPairs(bam.file, param = improperAlignmentParams(), build)
 
 \item{build}{the reference genome buld that reads were aligned to.  Currently
 supported builds include "hg19" and "hg18".}
-
-\item{use.mcols}{logical}
 }
 \value{
 a \code{GAlignmentPairs} object

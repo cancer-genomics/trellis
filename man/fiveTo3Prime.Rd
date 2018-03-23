@@ -8,6 +8,10 @@ fiveTo3Prime(r, build, maxgap = 5000)
 }
 \arguments{
 \item{r}{a \code{Rearrangement} object}
+
+\item{build}{string providing build of reference genome ('hg18', 'hg19', or 'hg38')}
+
+\item{maxgap}{maximum distance between read and transcript for transcript to be considered overlapping}
 }
 \description{
 Put the linked genomic intervals in 5-prime to 3-prime order with respect to the rearranged genome

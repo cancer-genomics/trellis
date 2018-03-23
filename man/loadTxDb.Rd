@@ -6,6 +6,9 @@
 \usage{
 loadTxDb(build)
 }
+\arguments{
+\item{build}{genome build}
+}
 \value{
 A \code{TxDb} object
 }

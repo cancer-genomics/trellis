@@ -780,8 +780,8 @@ fTable2 <- function(robj, build, id){
 #' A title
 #'
 #' @param rlist a \code{RearrangementList}
-#' @param txdb a \code{TxDb} object
-#' @param orgdb a \code{OrgDb} object
+#' @param id character string providing identifier for RearrangementList
+#' @param build genome build ('hg18', 'hg19', or 'hg38')
 #' @export
 fusionList <- function(rlist, id="", build=c("hg19", "hg18")){
   build <- match.arg(build)
@@ -1555,7 +1555,7 @@ aaFivePrime <- function(tprotein, fiveprimeCount){
 #' Rearrangements in which the 5-prime genomic region involves only the promoter are named promoter_TX_NAME, where TX_NAME is the name of a transcript. This function returns a GRangesList of CDS, including CDS with name promoter_TX_NAME.
 #'
 #' @param coding_jxns a \code{GRanges} representation of the sequence junctions that occur in transcripts, possibly intronic.
-#' @param cds a \code{GRangesList} of all CDS created by \code{cdsBy}
+#' @param build genome build
 #' @seealso \code{\link{codingJunctions}} \code{\link[GenomicFeatures]{cdsBy}}
 #' @return \code{GRangesList}
 promoterCDS <- function(coding_jxns, build){
@@ -1762,7 +1762,6 @@ organizeReferenceByFrame <- function(proteins){
 #' Create a table of in-frame fusions
 #'
 #' @param fusions a \code{List} created by \code{validFusions}
-#' @param jxns a \code{GRanges} object of the sequence junctions indicating the 5-prime and 3-prime genomic regions
 #' @seealso \code{\link{validFusions}}
 #' @export
 fusionTable2 <- function(fusions){

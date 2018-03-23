@@ -9,7 +9,7 @@ seqJunctionNearTx(rlist, build)
 \arguments{
 \item{rlist}{a \code{RearrangementList}}
 
-\item{tx}{a \code{GRanges} object}
+\item{build}{genome build}
 }
 \value{
 a logical vector of the same length as the \code{rlist} object

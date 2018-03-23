@@ -8,6 +8,8 @@ loadTxdbTranscripts(build, seq_levels)
 }
 \arguments{
 \item{build}{character string providing genome build. Currently only hg19 and hg18 are supported.}
+
+\item{seq_levels}{allowed seqnames}
 }
 \value{
 a named list with elements `transcripts` (\code{GRanges} of transcripts), `cds` (\code{GRangesList} of CDS listed by transcript), and `txdb` (a \code{txdb} object).

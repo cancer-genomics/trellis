@@ -13,8 +13,10 @@ NULL
 #' @param object a \code{GRanges} object
 totalWidth <- function(object) sum(as.numeric(width(object)))
 
+
 ## Adapted from makeGAlignmentPairs in GenomicAlignments
-makeGAlignmentPairs2 <- function(x, use.names=FALSE, use.mcols=FALSE, strandMode=1){
+makeGAlignmentPairs2 <- function(x, use.names=FALSE,
+                                 use.mcols=FALSE, strandMode=1){
   if (!isTRUEorFALSE(use.names))
     stop("'use.names' must be TRUE or FALSE")
   if (!isTRUEorFALSE(use.mcols)) {
@@ -180,7 +182,6 @@ properAlignmentParams <- function(flag=properAlignmentFlags(),
 #' @param param a \code{ScanBamParam} object.
 #' @param build the reference genome buld that reads were aligned to.  Currently
 #' supported builds include "hg19" and "hg18".
-#' @param use.mcols logical
 #'
 #' @examples
 #'   library(svbams)
