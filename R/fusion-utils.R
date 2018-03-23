@@ -735,30 +735,30 @@ overlapsAnyTranscript <- function(rlist, build=c("hg19", "hg18"), ...){
 }
 
 
-.ftable <- function(robj, id=""){
-  cds.fusions <- getCDS(robj, tx, cds)
-  is.fusion <- isFusion(cds.fusions)
-  if(!is.fusion){
-    return(NULL)
-  }
-  if(sum(elementNROWS(cds.fusions)) <= 1) return(NULL)
-  if(is.null(clip(cds.fusions))) return(NULL)
-  fused.txlist <- fuse(clip(cds.fusions))
-  if(length(fused.txlist) == 0) return(NULL)
-  fused.proteins <- tumorProtein(genome, fused.txlist)
-  tx.nms <- unique(unlist(strsplit(names(fused.proteins), "::")))
-  cds <- fullTranscripts(cds.fusions)
-  ref.proteins <- referenceProtein(genome, cds, tx.nms)
-  in_frame <- inFrameFusions(fused.proteins, ref.proteins, fused.txlist)
-  tab <- .fusionTable(fused.txlist=fused.txlist,
-                      fused.proteins=fused.proteins,
-                      in_frame=in_frame,
-                      org.db=orgdb,
-                      txdb=txdb,
-                      linkedbin.id=names(robj),
-                      id=id)
-  tab
-}
+## .ftable <- function(robj, id=""){
+##   cds.fusions <- getCDS(robj, tx, cds)
+##   is.fusion <- isFusion(cds.fusions)
+##   if(!is.fusion){
+##     return(NULL)
+##   }
+##   if(sum(elementNROWS(cds.fusions)) <= 1) return(NULL)
+##   if(is.null(clip(cds.fusions))) return(NULL)
+##   fused.txlist <- fuse(clip(cds.fusions))
+##   if(length(fused.txlist) == 0) return(NULL)
+##   fused.proteins <- tumorProtein(genome, fused.txlist)
+##   tx.nms <- unique(unlist(strsplit(names(fused.proteins), "::")))
+##   cds <- fullTranscripts(cds.fusions)
+##   ref.proteins <- referenceProtein(genome, cds, tx.nms)
+##   in_frame <- inFrameFusions(fused.proteins, ref.proteins, fused.txlist)
+##   tab <- .fusionTable(fused.txlist=fused.txlist,
+##                       fused.proteins=fused.proteins,
+##                       in_frame=in_frame,
+##                       org.db=orgdb,
+##                       txdb=txdb,
+##                       linkedbin.id=names(robj),
+##                       id=id)
+##   tab
+## }
 
 ## try using with lexical scope
 fTable2 <- function(robj, build, id){
