@@ -11,9 +11,9 @@
 #' @importClassesFrom Rsamtools BamViews
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam
 #' @importFrom Rsamtools bamFlagAsBitMatrix bamMapqFilter
-#' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame
+#' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame List
 #' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE isRedundantHit isSelfHit
-#' @importMethodsFrom S4Vectors elementType elementNROWS
+#' @importMethodsFrom S4Vectors elementType elementNROWS endoapply
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths seqlengths<-
 #' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle seqlevelsInUse
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels seqinfo<- seqinfo
@@ -43,7 +43,7 @@
 #' @importFrom scales trans_new pretty_breaks
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
-#' @importMethodsFrom GenomicFeatures transcripts cdsBy
+#' @importMethodsFrom GenomicFeatures transcripts cdsBy exonsBy
 #' @importFrom BSgenome getBSgenome
 #' @importMethodsFrom Biostrings getSeq translate
 #' @importFrom Biostrings DNAStringSet

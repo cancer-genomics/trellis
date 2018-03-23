@@ -48,7 +48,8 @@ The \code{GRanges} object returned by this function includes the
 \examples{
 extdata <- system.file("extdata", package="svbams")
 bam <- file.path(extdata, "cgov44t_revised.bam")
-region <- GRanges(seqnames = "chr8", ranges = IRanges(start = 128691748, end = 128692097))
+region <- GRanges(seqnames = "chr8",
+ranges = IRanges(start = 128691748, end = 128692097))
 unmapped_read(bam.file = bam, query = region, yield_size = 1e6)
 }
 \seealso{
