@@ -1,10 +1,10 @@
 ---
-title: "Overview of svfusions package"
+title: "Overview of fusion analysis"
 author: "Robert Scharpf"
 date: \today
 output: BiocStyle::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Overview of svfusions package}
+  %\VignetteIndexEntry{Overview of fusion analyses}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc} 
 ---
@@ -18,10 +18,8 @@ Our analysis to identify in-frame fusions begin with a `RearrangementList` for o
 # Analysis pipeline
 
 ```{r RearrangementList}
-suppressPackageStartupMessages(library(svrearrange))
-##load_all("svrearrange")
-##suppressPackageStartupMessages(library(svfusions))
-extdata <- system.file("extdata", package="svrearrange")
+suppressPackageStartupMessages(library(trellis))
+extdata <- system.file("extdata", package="trellis")
 rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 rlist <- readRDS(rfile)
 rlist
@@ -37,7 +35,7 @@ rlist <- rlist[ near.coding ]
 length(rlist)
 ```
 
-As discussed in the vignette for the `svrearrange` package, each candidate rearrangement has two possible 5-prime to 3-prime orientations that can be inferred by the orientation of the rearranged read pairs (RRPs) and split reads (SRs).  We use the function `fiveTo3List` to order each rearrangement in the `rlist` object by these two orientations.  In doing so, the length of the `rlist` object doubles.
+As discussed in the vignette for rearrangements, each candidate rearrangement has two possible 5-prime to 3-prime orientations that can be inferred by the orientation of the rearranged read pairs (RRPs) and split reads (SRs).  We use the function `fiveTo3List` to order each rearrangement in the `rlist` object by these two orientations.  In doing so, the length of the `rlist` object doubles.
 
 ```{r fiveToThree}
 rlist2 <- fiveTo3List(rlist, build)
@@ -134,7 +132,7 @@ Note, this table provides both the genomic coordinates of the fusion (junction.5
 
 ```{r protein_domains}
   tumor_aa_ranges <- aa_granges(tab)
-  extdata2 <- system.file("extdata", package="svfusions")
+  extdata2 <- system.file("extdata", package="trellis")
   up <- readRDS(file.path(extdata2, "uniprot.rds"))
   up2 <- uniprotFeatures(up, tab, strwrap.width=20)
   domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),
