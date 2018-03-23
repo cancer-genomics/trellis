@@ -924,7 +924,7 @@ clip <- function(transcripts) {
 #' @rdname fuse-methods
 #' @export
 setMethod("fuse", "TranscriptsFusion", function(object, nms){
-  fuse(clip(object, nms))
+  fuse(clip(object), nms)
 })
 
 .getFusedTx <- function(object){
