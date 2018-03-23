@@ -606,92 +606,92 @@ geneParams <- function(roi){
 ## }
 
 
-fusionData2 <- function(data.list, build=c("hg19", "hg18")){
-  x <- data.list[["fusions"]]
-  rlist <- data.list[["rlist"]]
-  uniprot <- data.list[["uniprot"]]
-
-  transcripts <- loadTx(build)
-  roi <- selectTx(transcripts, x)
-  chroms <- as.character(seqnames(roi))
-
-  rid <- x$rearrangement.id
-  if(length(rid) > 1) stop("no rearrangements")
-  r <- rlist[[rid]]
-
-  txdb <- loadTxDb(match.arg(build))
-  cds.all <-   suppressWarnings(cdsBy(txdb, "tx",
-                                      use.names=TRUE))
-  exons.txdb <- suppressWarnings(exonsBy(txdb, "tx", use.names=TRUE))
-
-  genes <- c(x$gene1, x$gene2)
-  exons <- exonsByTx(exons.txdb, x)
-
-  reads <- meltReadPairs2(r, exons$transcripts)
-  readclusters <- exons$transcripts
-
-  build <- "hg19"
-  bs.pkg <- paste0("BSgenome.Hsapiens.UCSC.", build)
-  bs.genome <- getBSgenome(bs.pkg)
-
-  reads <- meltReadPairs2(r, exons$transcripts)
-  readclusters <- exons$transcripts
-
-  r.reads <- sr[[rid]]
-  ix <- findOverlaps(r.reads, readclusters, select="first", maxgap=5000)
-  r.reads$transcript <- readclusters$genes[ix]
-  rreads <- harmonizeReadMcols(r.reads, reads)
-  bp.jxn <- basepairJunction(rreads, roi)
-  if(is.null(bp.jxn)){
-    reverse.roi <- TRUE
-    bp.jxn <- basepairJunction(rreads, roi[2:1])
-  } else reverse.roi <- FALSE
-
-  rreads <- bp.jxn[["rearranged.reads"]]
-  bp.jxn <- bp.jxn[["junction"]]
-  roi$bp.jxn <- bp.jxn[names(roi)]
-  exon.tracks <- exonTracks2(exons, rreads, roi)
-  fusion.dat <- .list_fusion_data(x, exon.tracks, rreads)
-
-  strands <- as.character(strand(roi))
-  strands <- paste(strands, collapse="")
-  fused.transcripts <- fuseExonTracks(fusion.dat, bp.jxn, roi)
-  if(strands=="+-"){
-    fused.transcripts <- fuseExonTracksPM(fusion.dat, bp.jxn, roi)
-  }
-
-  p1 <- proteinFeatures(uniprot, genes[1])
-  p2 <- proteinFeatures(uniprot, genes[2])
-  p1.params <- proteinParams(genes[1], TRUE, description.size=2)
-  p2.params <- proteinParams(genes[2], FALSE, description.size=2)
-  g.params <- geneParams(roi)
-
-  cds.roi <- getCDS(r, roi, cds.all)
-  aa.jxns <- aaJunction(r, roi, cds.roi, bs.genome)
-  roi$aa.jxn <- aa.jxns
-
-  p1.clipped <- clippedProtein(p1, p1.params, aa.jxns["5'"])
-  p2.clipped <- clippedProtein(p2, p2.params, aa.jxns["3'"])
-  clip.list <- list(p1.clipped, p2.clipped)
-  names(clip.list) <- genes
-  p.fusions <- fuseProteinTracks(clip.list)
-
-  rreads.df <- as.data.frame(rreads)
-  list(chroms=chroms,
-       roi=roi,
-       fusion.dat=fusion.dat,
-       g.params=g.params,
-       fused.transcripts=fused.transcripts,
-       rreads=rreads.df,
-       reverse.roi=reverse.roi,
-       protein1=p1,
-       protein2=p2,
-       protein1.clipped=p1.clipped,
-       protein2.clipped=p2.clipped,
-       protein1.params=p1.params,
-       protein2.params=p2.params,
-       protein.fusion=p.fusions)
-}
+## fusionData2 <- function(data.list, build=c("hg19", "hg18")){
+##   x <- data.list[["fusions"]]
+##   rlist <- data.list[["rlist"]]
+##   uniprot <- data.list[["uniprot"]]
+## 
+##   transcripts <- loadTx(build)
+##   roi <- selectTx(transcripts, x)
+##   chroms <- as.character(seqnames(roi))
+## 
+##   rid <- x$rearrangement.id
+##   if(length(rid) > 1) stop("no rearrangements")
+##   r <- rlist[[rid]]
+## 
+##   txdb <- loadTxDb(match.arg(build))
+##   cds.all <-   suppressWarnings(cdsBy(txdb, "tx",
+##                                       use.names=TRUE))
+##   exons.txdb <- suppressWarnings(exonsBy(txdb, "tx", use.names=TRUE))
+## 
+##   genes <- c(x$gene1, x$gene2)
+##   exons <- exonsByTx(exons.txdb, x)
+## 
+##   reads <- meltReadPairs2(r, exons$transcripts)
+##   readclusters <- exons$transcripts
+## 
+##   build <- "hg19"
+##   bs.pkg <- paste0("BSgenome.Hsapiens.UCSC.", build)
+##   bs.genome <- getBSgenome(bs.pkg)
+## 
+##   reads <- meltReadPairs2(r, exons$transcripts)
+##   readclusters <- exons$transcripts
+## 
+##   r.reads <- sr[[rid]]
+##   ix <- findOverlaps(r.reads, readclusters, select="first", maxgap=5000)
+##   r.reads$transcript <- readclusters$genes[ix]
+##   rreads <- harmonizeReadMcols(r.reads, reads)
+##   bp.jxn <- basepairJunction(rreads, roi)
+##   if(is.null(bp.jxn)){
+##     reverse.roi <- TRUE
+##     bp.jxn <- basepairJunction(rreads, roi[2:1])
+##   } else reverse.roi <- FALSE
+## 
+##   rreads <- bp.jxn[["rearranged.reads"]]
+##   bp.jxn <- bp.jxn[["junction"]]
+##   roi$bp.jxn <- bp.jxn[names(roi)]
+##   exon.tracks <- exonTracks2(exons, rreads, roi)
+##   fusion.dat <- .list_fusion_data(x, exon.tracks, rreads)
+## 
+##   strands <- as.character(strand(roi))
+##   strands <- paste(strands, collapse="")
+##   fused.transcripts <- fuseExonTracks(fusion.dat, bp.jxn, roi)
+##   if(strands=="+-"){
+##     fused.transcripts <- fuseExonTracksPM(fusion.dat, bp.jxn, roi)
+##   }
+## 
+##   p1 <- proteinFeatures(uniprot, genes[1])
+##   p2 <- proteinFeatures(uniprot, genes[2])
+##   p1.params <- proteinParams(genes[1], TRUE, description.size=2)
+##   p2.params <- proteinParams(genes[2], FALSE, description.size=2)
+##   g.params <- geneParams(roi)
+## 
+##   cds.roi <- getCDS(r, roi, cds.all)
+##   aa.jxns <- aaJunction(r, roi, cds.roi, bs.genome)
+##   roi$aa.jxn <- aa.jxns
+## 
+##   p1.clipped <- clippedProtein(p1, p1.params, aa.jxns["5'"])
+##   p2.clipped <- clippedProtein(p2, p2.params, aa.jxns["3'"])
+##   clip.list <- list(p1.clipped, p2.clipped)
+##   names(clip.list) <- genes
+##   p.fusions <- fuseProteinTracks(clip.list)
+## 
+##   rreads.df <- as.data.frame(rreads)
+##   list(chroms=chroms,
+##        roi=roi,
+##        fusion.dat=fusion.dat,
+##        g.params=g.params,
+##        fused.transcripts=fused.transcripts,
+##        rreads=rreads.df,
+##        reverse.roi=reverse.roi,
+##        protein1=p1,
+##        protein2=p2,
+##        protein1.clipped=p1.clipped,
+##        protein2.clipped=p2.clipped,
+##        protein1.params=p1.params,
+##        protein2.params=p2.params,
+##        protein.fusion=p.fusions)
+## }
 
 #' Collect fusion-related data into a single list
 #'
