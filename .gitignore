@@ -18,3 +18,4 @@ tests/testthat/*.rds
 /vignettes/svfusions.md
 /vignettes/svfusions_v0.0.8.Rmd
 
+/vignettes/svfusions.pdf
