@@ -8,7 +8,7 @@ test_that("binNormalize", {
   bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode="coarse")
   bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
   bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
-  bins$cnt <- binCounts(bviews)
+  bins$cnt <- binnedCounts(bviews)
   normalized <- binNormalize(bins)
   expect_that(length(normalized), equals(1378))
   width <- width(bins)
