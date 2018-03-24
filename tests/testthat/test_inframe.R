@@ -1,7 +1,7 @@
 .test_that <- function(nm, expr) NULL
 
 test_that("fuseCDS_Rlist", {
-  loadGenomeData()
+  ##loadGenomeData()
   extdata <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
   extdata2 <- system.file("extdata", package="trellis")
@@ -72,10 +72,9 @@ test_that("fuseCDS_Rlist", {
 })
 
 test_that("pipeline", {
-  loadGenomeData()
-  library(trellis)
+  ##loadGenomeData()
+  ##library(trellis)
   extdata <- system.file("extdata", package="trellis")
-  extdata2 <- system.file("extdata", package="trellis")
   build <- "hg19"
   if(FALSE){
     rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
@@ -99,11 +98,10 @@ test_that("pipeline", {
     proteins <- translateCDS(cds.list)
   }
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
-  extdata2 <- system.file("extdata", package="trellis")
-  coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
+  coding_jxns <- readRDS(file.path(extdata, "coding_jxns.rds"))
   rlist <- rlist[coding_jxns$rid]
-  cds.list <- readRDS(file.path(extdata2, "cds_list.rds"))
-  proteins <- readRDS(file.path(extdata2, "cgov11t_proteins.rds"))
+  cds.list <- readRDS(file.path(extdata, "cds_list.rds"))
+  proteins <- readRDS(file.path(extdata, "cgov11t_proteins.rds"))
   ##
   ## partition the amino acid sequence of the fusion into 5' and 3' components
   ## - repeat for each of the 3 possible reading frames
@@ -164,7 +162,7 @@ test_that("pipeline", {
     extdata2 <- system.file("extdata", package="trellis")
     saveRDS(valid.fusions, file=file.path(extdata2, "valid_fusions.rds"))
   }
-  expected <- readRDS(file.path(extdata2, "valid_fusions.rds"))
+  expected <- readRDS(file.path(extdata, "valid_fusions.rds"))
   expect_equivalent(valid.fusions, expected)
   expect_true(ikaros.rid %in% names(valid.fusions[[1]]))
 })

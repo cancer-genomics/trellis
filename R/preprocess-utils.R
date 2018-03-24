@@ -263,9 +263,9 @@ binGCCorrect <- function(bins){
 
 #' Computes a median normalized coverage across samples for each bin.
 #'
-#' This funciton is helpful for reducing bin-to-bin variation in normalized
+#' This function reduces bin-to-bin variation in normalized
 #' coverage that is often correlated between samples.
-#' 
+#'
 #' @param nchunks The matrix of normalized coverage is potentially a very large matrix (bins x number samples).  To reduce the required RAM, we can read subsets of this matrix.  nchunks is an integer specifying how many subsets of the matrix are derived. Increasing the value of this parameter reduces the required RAM at the expense of increased computational time.
 #' @param files character string of bamfile paths
 #' @examples
@@ -276,8 +276,8 @@ binGCCorrect <- function(bins){
 #' bins <- head(bins, 100)
 #' extdir <- system.file("extdata", package="svbams", mustWork=TRUE)
 #' bamfile <- file.path(extdir, "cgov10t.bam")
-#' ## Let's pretend we have 20 BAM files
-#' bamfiles <- rep(bamfile, 20)
+#' ## Assume we had 5 BAM files
+#' bamfiles <- rep(bamfile, 5)
 #' tempfiles <- replicate(length(bamfiles), tempfile())
 #' for(i in seq_along(bamfiles)){
 #'   bviews <- BamViews(bamRanges=bins, bamPaths=bamfiles[i])
@@ -597,15 +597,17 @@ preprocessDirs <- function(){
 #'                        which=bins)
 #' param1b <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE,
 #'                                         isSecondaryAlignment=FALSE))
-#' galp1 <- readGAlignmentPairs(bamfile, param=param1)
-#' galp1 <- galp1[do.call(order, as.data.frame(galp1))]
-#' galp1b <- readGAlignmentPairs(bamfile, param=param1b)
-#' galp1b <- subsetByOverlaps(galp1b, bins, ignore.strand=TRUE)
-#' galp1b <- galp1b[do.call(order, as.data.frame(galp1b))]
-#' identical(galp1, galp1b) ## FALSE because galp1 has duplicates
-#' galp1 <- galp1[!duplicatedGAlignmentPairs(galp1)]
-#' identical(galp1, galp1b)
-#'
+#' \dontrun{
+#'   galp1 <- readGAlignmentPairs(bamfile, param=param1)
+#'   galp1 <- galp1[do.call(order, as.data.frame(galp1))]
+#'   galp1b <- readGAlignmentPairs(bamfile, param=param1b)
+#'   galp1b <- subsetByOverlaps(galp1b, bins, ignore.strand=TRUE)
+#'   galp1b <- galp1b[do.call(order, as.data.frame(galp1b))]
+#'   identical(galp1, galp1b) ## FALSE because galp1 has duplicates
+#'   galp1 <- galp1[!duplicatedGAlignmentPairs(galp1)]
+#'   identical(galp1, galp1b)
+#' }
+
 #' @export
 duplicatedGAlignmentPairs <- function(galp){
   df <- as(galp, "data.frame")
@@ -613,11 +615,11 @@ duplicatedGAlignmentPairs <- function(galp){
 }
 
 #' Counts the number of read fragments mapped to bins
-#' 
-#' For each bin provided by a \code{GRanges object}, \code{binFragments} 
+#'
+#' For each bin provided by a \code{GRanges object}, \code{binFragments}
 #' counts the number of fragments, determined by read pairs in a 
 #' \code{GAlignmentPair} object, that overlap that bin
-#' 
+#'
 #' @param galp a \code{GAlignmentPairs} object
 #' @param bins a \code{GRanges} object
 #' @return an integer-vector of counts corresponding to each range in the \code{GRanges} object
@@ -633,8 +635,6 @@ duplicatedGAlignmentPairs <- function(galp){
 #'                                        isSecondaryAlignment=FALSE)) 
 #' galp <- readGAlignmentPairs(bamfile, param=param)
 #' fragmentCounts <- binFragments(galp, bins) 
-#'
-#' @export
 binFragments <- function(galp, bins){
   galp <- galp[!duplicatedGAlignmentPairs(galp)]
   fragments <- as(galp, "GRanges") 

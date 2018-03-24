@@ -513,7 +513,7 @@ ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
   c(r1.ga, r2.ga)
 }
 
-#' Sort GRanges object with read values R1 and R2 by start of R1
+#' Sort GRanges object with read pairs R1 and R2 by start of R1
 #'
 #' In order to plot the read pairs as position versus read pair index,
 #' information on the mates needs to be kept intact and the visualization is
@@ -532,19 +532,22 @@ ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
 #'   seqinfo(region) <- si["chr15", ]
 #'
 #'   path <-system.file("extdata", package="svbams")
-#'   bampath <- list.files(path, pattern="cgov44t_revised.bam$", full.names=TRUE)
+#'   bampath <- list.files(path, pattern="cgov44t_revised.bam$",
+#'                         full.names=TRUE)
 #'
 #'   iparams <- improperAlignmentParams(mapqFilter=30)
 #'   pparams <- properAlignmentParams(mapqFilter=30)
-#'   irp <- getImproperAlignmentPairs(bampath,
-#'                                    iparams, build="hg19")
-#'   g.irp <- ga2gr(irp, is.improper=TRUE)
-#'   prp <- getProperAlignmentPairs(bampath,
-#'                                  pparams, build="hg19")
-#'   g.prp <- ga2gr(prp, is.improper=FALSE)
-#'   gr <- c(g.irp, g.prp)
-#'   gr <- sortByRead1(gr)
-#'   gr
+#'   \dontrun{
+#'     irp <- getImproperAlignmentPairs(bampath,
+#'                                      iparams, build="hg19")
+#'     g.irp <- ga2gr(irp, is.improper=TRUE)
+#'     prp <- getProperAlignmentPairs(bampath,
+#'                                    pparams, build="hg19")
+#'     g.prp <- ga2gr(prp, is.improper=FALSE)
+#'     gr <- c(g.irp, g.prp)
+#'     gr <- sortByRead1(gr)
+#'     gr
+#' }
 #' @export
 sortByRead1 <- function(gr){
   gr.read1 <- gr[gr$read=="R1"]

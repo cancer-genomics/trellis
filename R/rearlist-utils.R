@@ -716,8 +716,10 @@ seqJunctionNearTx <- function(rlist, build){
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
 #'  near.coding <- seqJunctionNearTx(rlist, "hg19")
-#'  rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
-#'  rlist2
+#'  \dontrun{
+#'    rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
+#'    rlist2
+#' }
 fiveTo3List <- function(rlist, build){
   rlist2 <- RearrangementList()
   nms.list <- vector("list", length(rlist) * 2)
@@ -800,9 +802,12 @@ seqJunction <- function(r, maxgap=50){
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
 #'  near.coding <- seqJunctionNearTx(rlist, "hg19")
-#'  rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
+#'  ## Just do the first two
+#'  index <- which(near.coding)[1:2]
+#'  rlist2 <- fiveTo3List(rlist[index], build="hg19")
 #'  jxns <- seqJunctions_Rlist(rlist2)
 #'  jxns
+#' }
 seqJunctions_Rlist <- function(rlist){
   jxn.grl <- GRangesList(lapply(rlist, seqJunction))
   names(jxn.grl) <- names(rlist)
