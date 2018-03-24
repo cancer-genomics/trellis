@@ -2,7 +2,7 @@
 % Please edit documentation in R/alignment-utils.R
 \name{sortByRead1}
 \alias{sortByRead1}
-\title{Sort GRanges object with read values R1 and R2 by start of R1}
+\title{Sort GRanges object with read pairs R1 and R2 by start of R1}
 \usage{
 sortByRead1(gr)
 }
@@ -28,17 +28,20 @@ of the first read (R1) in the pair.
   seqinfo(region) <- si["chr15", ]
 
   path <-system.file("extdata", package="svbams")
-  bampath <- list.files(path, pattern="cgov44t_revised.bam$", full.names=TRUE)
+  bampath <- list.files(path, pattern="cgov44t_revised.bam$",
+                        full.names=TRUE)
 
   iparams <- improperAlignmentParams(mapqFilter=30)
   pparams <- properAlignmentParams(mapqFilter=30)
-  irp <- getImproperAlignmentPairs(bampath,
-                                   iparams, build="hg19")
-  g.irp <- ga2gr(irp, is.improper=TRUE)
-  prp <- getProperAlignmentPairs(bampath,
-                                 pparams, build="hg19")
-  g.prp <- ga2gr(prp, is.improper=FALSE)
-  gr <- c(g.irp, g.prp)
-  gr <- sortByRead1(gr)
-  gr
+  \dontrun{
+    irp <- getImproperAlignmentPairs(bampath,
+                                     iparams, build="hg19")
+    g.irp <- ga2gr(irp, is.improper=TRUE)
+    prp <- getProperAlignmentPairs(bampath,
+                                   pparams, build="hg19")
+    g.prp <- ga2gr(prp, is.improper=FALSE)
+    gr <- c(g.irp, g.prp)
+    gr <- sortByRead1(gr)
+    gr
+}
 }

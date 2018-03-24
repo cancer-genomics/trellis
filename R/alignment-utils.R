@@ -577,7 +577,7 @@ sortByRead1 <- function(gr){
 #' prp <- getProperAlignmentPairs(bam.file, build="hg19")
 #' pgr <- ga2gr(prp, is.improper=FALSE)
 #' length(pgr)
-#' pgr2 <- thinProperPairs(pgr, 10)
+#' pgr2 <- thinProperPairs(pgr, 100)
 #' length(pgr2)
 #' @export
 thinProperPairs <- function(gr, thin=10){

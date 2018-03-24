@@ -15,13 +15,3 @@ a \code{GRanges} object of the 5-prime and 3-prime sequence junctions.  The 3-pr
 \description{
 This function constructs a \code{GRanges} object of the 5-prime and 3-prime sequence junctions for a \code{RearrangementList} that has already been ordered by its two 5-prime to 3-prime orientation.
 }
-\examples{
- library(trellis)
- extdata <- system.file("extdata", package="trellis")
- rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
- rlist <- readRDS(rfile)
- near.coding <- seqJunctionNearTx(rlist, "hg19")
- rlist2 <- fiveTo3List(rlist[near.coding], build="hg19")
- jxns <- seqJunctions_Rlist(rlist2)
- jxns
-}

@@ -27,13 +27,14 @@ param1 <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE,
                        which=bins)
 param1b <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE,
                                         isSecondaryAlignment=FALSE))
-galp1 <- readGAlignmentPairs(bamfile, param=param1)
-galp1 <- galp1[do.call(order, as.data.frame(galp1))]
-galp1b <- readGAlignmentPairs(bamfile, param=param1b)
-galp1b <- subsetByOverlaps(galp1b, bins, ignore.strand=TRUE)
-galp1b <- galp1b[do.call(order, as.data.frame(galp1b))]
-identical(galp1, galp1b) ## FALSE because galp1 has duplicates
-galp1 <- galp1[!duplicatedGAlignmentPairs(galp1)]
-identical(galp1, galp1b)
-
+\dontrun{
+  galp1 <- readGAlignmentPairs(bamfile, param=param1)
+  galp1 <- galp1[do.call(order, as.data.frame(galp1))]
+  galp1b <- readGAlignmentPairs(bamfile, param=param1b)
+  galp1b <- subsetByOverlaps(galp1b, bins, ignore.strand=TRUE)
+  galp1b <- galp1b[do.call(order, as.data.frame(galp1b))]
+  identical(galp1, galp1b) ## FALSE because galp1 has duplicates
+  galp1 <- galp1[!duplicatedGAlignmentPairs(galp1)]
+  identical(galp1, galp1b)
+}
 }

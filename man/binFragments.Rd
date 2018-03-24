@@ -15,11 +15,12 @@ binFragments(galp, bins)
 an integer-vector of counts corresponding to each range in the \code{GRanges} object
 }
 \description{
-For each bin provided by a \code{GRanges object}, \code{binFragments} 
-counts the number of fragments, determined by read pairs in a 
+For each bin provided by a \code{GRanges object}, \code{binFragments}
+counts the number of fragments, determined by read pairs in a
 \code{GAlignmentPair} object, that overlap that bin
 }
 \examples{
+\dontrun{
 library(Rsamtools)
 library(svbams)
 library(GenomicAlignments)
@@ -29,6 +30,6 @@ data(bins, package='svbams')
 param <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE,
                                        isSecondaryAlignment=FALSE)) 
 galp <- readGAlignmentPairs(bamfile, param=param)
-fragmentCounts <- binFragments(galp, bins) 
-
+fragmentCounts <- binFragments(galp, bins)
+}
 }

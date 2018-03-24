@@ -617,14 +617,15 @@ duplicatedGAlignmentPairs <- function(galp){
 #' Counts the number of read fragments mapped to bins
 #'
 #' For each bin provided by a \code{GRanges object}, \code{binFragments}
-#' counts the number of fragments, determined by read pairs in a 
+#' counts the number of fragments, determined by read pairs in a
 #' \code{GAlignmentPair} object, that overlap that bin
 #'
 #' @param galp a \code{GAlignmentPairs} object
 #' @param bins a \code{GRanges} object
 #' @return an integer-vector of counts corresponding to each range in the \code{GRanges} object
-#' 
-#' @examples 
+#'
+#' @examples
+#' \dontrun{
 #' library(Rsamtools)
 #' library(svbams)
 #' library(GenomicAlignments)
@@ -634,7 +635,8 @@ duplicatedGAlignmentPairs <- function(galp){
 #' param <- ScanBamParam(flag=scanBamFlag(isDuplicate=FALSE,
 #'                                        isSecondaryAlignment=FALSE)) 
 #' galp <- readGAlignmentPairs(bamfile, param=param)
-#' fragmentCounts <- binFragments(galp, bins) 
+#' fragmentCounts <- binFragments(galp, bins)
+#' }
 binFragments <- function(galp, bins){
   galp <- galp[!duplicatedGAlignmentPairs(galp)]
   fragments <- as(galp, "GRanges") 

@@ -12,7 +12,7 @@ binMedians(files, nchunks = 50)
 \item{nchunks}{The matrix of normalized coverage is potentially a very large matrix (bins x number samples).  To reduce the required RAM, we can read subsets of this matrix.  nchunks is an integer specifying how many subsets of the matrix are derived. Increasing the value of this parameter reduces the required RAM at the expense of increased computational time.}
 }
 \description{
-This funciton is helpful for reducing bin-to-bin variation in normalized
+This function reduces bin-to-bin variation in normalized
 coverage that is often correlated between samples.
 }
 \examples{
@@ -23,8 +23,8 @@ data(bins, package="svbams")
 bins <- head(bins, 100)
 extdir <- system.file("extdata", package="svbams", mustWork=TRUE)
 bamfile <- file.path(extdir, "cgov10t.bam")
-## Let's pretend we have 20 BAM files
-bamfiles <- rep(bamfile, 20)
+## Assume we had 5 BAM files
+bamfiles <- rep(bamfile, 5)
 tempfiles <- replicate(length(bamfiles), tempfile())
 for(i in seq_along(bamfiles)){
   bviews <- BamViews(bamRanges=bins, bamPaths=bamfiles[i])
