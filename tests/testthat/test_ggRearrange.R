@@ -20,11 +20,9 @@ test_that("ggRearrange", {
   expect_identical(levels(df$region),
                    c("C3orf67-AS1,C3orf67", "FHIT"))
 
-  index <- c(1, match(id, names(rlist)))
+  index <- match(id, names(rlist))
   r.ordered <- fiveTo3List(rlist[index], "hg19")
 
   df <- rearDataFrameList(r.ordered[1:2], "hg19")
-  if(FALSE) ggRearrange(df)
-  df <- rearDataFrameList(r.ordered[3:4], "hg19")
   if(FALSE) ggRearrange(df)
 })
