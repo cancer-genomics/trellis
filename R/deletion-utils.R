@@ -1543,7 +1543,7 @@ meltReadPairs <- function(rps){
 #' extdata <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(extdata, "cgov44t_revised.bam")
 #' bviews <- BamViews(bamRanges=bins1kb, bamPaths=bam.file)
-#' bins1kb$counts <- binCounts(bviews)
+#' bins1kb$counts <- binnedCounts(bviews)
 #' bins1kb$std_cnt <- binNormalize(bins)
 #' bins1kb$log_ratio <- binGCCorrect(bins)
 #' iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))

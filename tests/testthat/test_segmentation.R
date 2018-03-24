@@ -12,7 +12,7 @@ test_that("duplicate segments", {
   bins <- bins[seq(1, length(bins), by=5)]
   bam.file <- file.path(path, "cgov10t.bam")
   bview <- BamViews(bamRanges=bins, bamPaths=bam.file)
-  bins$cnt <- binCounts(bview)
+  bins$cnt <- binnedCounts(bview)
   bins$std_cnt <- binNormalize(bins)
   set.seed(123)
   gc.adj <- binGCCorrect(bins)

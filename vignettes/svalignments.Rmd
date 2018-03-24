@@ -1,21 +1,21 @@
 ---
-title: "Overview of alignment utilities"
+title: "Identifying discordant read pairs and split reads"
 author: "Robert Scharpf"
 date: \today
 output: BiocStyle::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Overview of alignment utilities}
+  %\VignetteIndexEntry{Discordant read pairs and split reads}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc}
 ---
 
 # Introduction
 
-The main use-cases of the alignment utilities in `trellis` are (1) to identify rearranged
-read pairs that support structural variants, (2) assess BLAT realignment of
-selected reads for consistency with putative rearrangements and the whole-genome
-aligner. Most use-cases require a BAM file. For the purpose of illustrating
-examples in this vignette, we use BAM files in the `svbams` package.
+The main use-cases of the alignment utilities in trellis are to identify rearranged
+read pairs that support structural variants and to re-align these reads using the local aligner BLAT.
+Most use-cases require a BAM file.
+For the purpose of illustrating examples in this vignette,
+we use BAM files in the `svbams` package.
 
 # Extract rearranged read pairs from a BAM file for a region of interest
 

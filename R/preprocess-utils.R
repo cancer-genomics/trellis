@@ -25,12 +25,12 @@ NULL
 #' bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode = "coarse")
 #' bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 #' bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
-#' counts <- binCounts(bviews)
+#' counts <- binnedCounts(bviews)
 #' head(counts)
 #' length(bamRanges(bviews)) == length(counts) #TRUE
 #'
 #' @export
-binCounts <- function(object, scan_param){
+binnedCounts <- function(object, scan_param){
   if(missing(scan_param)){
     scan_param <- countParam(gr=bamRanges(object))
   }
@@ -48,7 +48,7 @@ binCounts <- function(object, scan_param){
 #' @param object A \code{BamViews} object
 #' @param scan_param a \code{ScanBamParams} object
 #' @export
-countReads2 <- binCounts
+countReads2 <- binnedCounts
 
 
 #' Generate parameters that specify which reads in a bam file to import
@@ -131,7 +131,7 @@ transformCounts <- function(cnt, i, centerby=c("mode", "median")){
 #' bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode = "coarse")
 #' bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 #' bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
-#' bins$cnt <- binCounts(bviews)
+#' bins$cnt <- binnedCounts(bviews)
 #' head(binNormalize(bins))
 #' std_cnt <- binNormalize(bins)
 #' bins$std_cnt <- std_cnt
@@ -236,7 +236,7 @@ modelGC2 <- function(object, gc_model=.gc_model()){
 #' bins <- keepSeqlevels(bins1kb, "chr3", pruning.mode = "coarse")
 #' bins <- subsetByOverlaps(bins, GRanges("chr3", IRanges(59600000, 61000000)))
 #' bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
-#' bins$cnt <- trellis::binCounts(bviews)
+#' bins$cnt <- trellis::binnedCounts(bviews)
 #' std_cnt <- binNormalize(bins)
 #' bins$std_cnt <- std_cnt
 #' head(trellis::binGCCorrect(bins))
@@ -281,7 +281,7 @@ binGCCorrect <- function(bins){
 #' tempfiles <- replicate(length(bamfiles), tempfile())
 #' for(i in seq_along(bamfiles)){
 #'   bviews <- BamViews(bamRanges=bins, bamPaths=bamfiles[i])
-#'   bins$cnt <- binCounts(bviews)
+#'   bins$cnt <- binnedCounts(bviews)
 #'   std_cnt <- binNormalize(bins)
 #'   bins$std_cnt <- std_cnt
 #'   gc.adj <- binGCCorrect(bins)

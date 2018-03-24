@@ -28,7 +28,7 @@ bamfiles <- rep(bamfile, 5)
 tempfiles <- replicate(length(bamfiles), tempfile())
 for(i in seq_along(bamfiles)){
   bviews <- BamViews(bamRanges=bins, bamPaths=bamfiles[i])
-  bins$cnt <- binCounts(bviews)
+  bins$cnt <- binnedCounts(bviews)
   std_cnt <- binNormalize(bins)
   bins$std_cnt <- std_cnt
   gc.adj <- binGCCorrect(bins)

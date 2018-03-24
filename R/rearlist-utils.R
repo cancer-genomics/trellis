@@ -807,7 +807,6 @@ seqJunction <- function(r, maxgap=50){
 #'  rlist2 <- fiveTo3List(rlist[index], build="hg19")
 #'  jxns <- seqJunctions_Rlist(rlist2)
 #'  jxns
-#' }
 seqJunctions_Rlist <- function(rlist){
   jxn.grl <- GRangesList(lapply(rlist, seqJunction))
   names(jxn.grl) <- names(rlist)

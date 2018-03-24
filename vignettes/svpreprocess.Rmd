@@ -1,0 +1,80 @@
+---
+title: "Preprocessing for whole genome structural variant analyses"
+author: "Robert Scharpf"
+date: \today
+output: BiocStyle::pdf_document
+bibliography:
+vignette: >
+  %\VignetteIndexEntry{trellis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc} 
+---
+
+```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+# Introduction
+
+We begin by loading a bins object from the appropriate sv.filters package and
+obtaining the complete file path to the BAM file. Currently, only hg18 and hg19
+builds are available for the svfilters package.
+
+```{r svfilters}
+library(Rsamtools)
+library(tidyverse)
+library(svbams)
+library(svfilters.hg19)
+library(trellis)
+bins1kb
+bins <- dropSeqlevels(bins1kb, "chrY", pruning.mode = "coarse")
+extdata <- system.file("extdata", package="svbams")
+id <- "CGOV44T.bam"
+bamfile <- file.path(extdata, id)
+```
+
+We use infrastructure provided in the Rsamtools package for counting single-end reads overlapping each bin.
+To make this toy example run faster, we only preprocess chromosome 8.
+
+```{r lib}
+flags <- scanBamFlag(isDuplicate=FALSE,
+                     isPaired=TRUE,
+                     isUnmappedQuery=FALSE,
+                     hasUnmappedMate=FALSE,
+                     isProperPair=TRUE)
+bins.chr8 <- keepSeqlevels(bins, "chr8", pruning.mode="coarse")
+bviews <- BamViews(bamPaths=bamfile, bamRanges=bins.chr8)
+bins.chr8$cnt <- binnedCounts(bviews)
+bins.chr8 <- bins.chr8[ bins.chr8$cnt > 0 ]
+```
+
+Next, we log-transform the raw counts and correct for GC content by loess. As a random subset of the genome is selected to model GC biases, we set a seed in the following code chunk for reproducibility.
+
+```{r normalize}
+bins.chr8$std_cnt <- binNormalize(bins.chr8)
+set.seed(123)
+bins.chr8$gc_adj <- binGCCorrect(bins.chr8)
+```
+
+At this stage, it is a good idea to plot the data.  When many samples are available, differences between groups of samples (batch effects) can be visualized and addressed at this stage.
+
+```{r plot}
+library(ggplot2)
+##schr <- bins[which(seqnames(bins) == "chr8")]
+tibble(chr = "chr8",
+       start=start(bins.chr8),
+       end=end(bins.chr8),
+       log2=bins.chr8$gc_adj) %>%
+  ggplot(.)  +
+  geom_point(aes(start, log2), size = 1) +
+  xlab("Coordinate") +
+  ylab("log2 norrmalized counts") +
+  ylim(c(-4, 1)) +
+  geom_hline(yintercept=0)
+```
+
+# Control samples
+
+If one or more normal controls are available, the bin-counts can be further corrected by the bin-wise medians from normals.
+
+TODO

@@ -1,4 +1,4 @@
-test_that("binCounts", {
+test_that("binnedCounts", {
   library(svbams)
   library(Rsamtools)
   library(svfilters.hg19)
@@ -10,7 +10,7 @@ test_that("binCounts", {
   region <- GRanges("chr3", IRanges(59600000, 61000000), seqinfo=seqinfo(bins))
   bins <- subsetByOverlaps(bins, region)
   bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
-  bins$cnt <- binCounts(bviews)
+  bins$cnt <- binnedCounts(bviews)
   ## Select a 'random' bin
   set.seed(123)
   select <- sample(seq_along(bins), 10)
