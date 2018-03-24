@@ -32,6 +32,7 @@ Imports:
     BSgenome,
     Biostrings
 Suggests:
+    tidyverse,
     knitr,
     testthat,
     svbams,
