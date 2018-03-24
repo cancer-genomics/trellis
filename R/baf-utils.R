@@ -261,17 +261,32 @@ svAF <- function(normalBam,
 filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
   position <- NULL
   pu$position <- paste(pu$seqnames, pu$pos, sep = ":")
+
   ## If a position has more than 2 bases counted (becaue of errors, mutations,
   ## ...) then only keep the 2 most frequent alleles
+
   potentialHet <- as.data.frame(
     pu %>%
       group_by(position) %>%
       top_n(2, count)
   )
+
+  # If the second most frequent allele is tied in counts with the third most frequent (and potentially 4th)
+  # then that entry is maintained at this point.  I remove this position because the MAF
+  # is smiilar to the frequency or an error base so I am less confident of the true MAF.  
+  # Note that this case is very rare.
+
+  potentialHet <- as.data.frame(
+       potentialHet %>%
+         dplyr::group_by(position) %>%
+         dplyr::filter(n() < 3)
+  )
+
   ## If keepSingles == FALSE then single-allele positions are removed. This will
   ## be the case when identifying hets in a matchedNormal, or in a tumor-only
   ## analysis to remove homozygotes. These positions are kept in the tumor in
   ## T/N analysis because of LOH in a high purity sample
+
   if (keepSingles == FALSE) {
     potentialHet <- as.data.frame(
       potentialHet %>%
@@ -284,6 +299,7 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
   }
   ## Remove position with coverage < min.cov
   ## Remove positions with alt allele frequency < min.maf
+
   tot <- NULL
   summed <- potentialHet %>%
     group_by(position) %>%
@@ -325,6 +341,7 @@ filterSNPs <- function(pu, SNPs, min.cov, min.maf, keepSingles) {
     ## Only include positions that match the snp database for both reference and
     ## alt alleles if 2 alleles are present. If one allele is present, only that
     ## allele must match the SNP database
+
     if (nrow(pos) == 2) {
       if ((length(grep(snp$refUCSC, genotype)) == 0) ||
           (length(grep(gsub("/", "|", snp$altAllele), genotype)) == 0)) {
