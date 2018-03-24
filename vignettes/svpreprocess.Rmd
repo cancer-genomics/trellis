@@ -3,16 +3,11 @@ title: "Preprocessing for whole genome structural variant analyses"
 author: "Robert Scharpf"
 date: \today
 output: BiocStyle::pdf_document
-bibliography:
 vignette: >
-  %\VignetteIndexEntry{trellis}
+  %\VignetteIndexEntry{Preprocessing}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc} 
 ---
-
-```{r style, echo=FALSE, results='asis'}
-BiocStyle::markdown()
-```
 
 # Introduction
 
@@ -60,16 +55,16 @@ At this stage, it is a good idea to plot the data.  When many samples are availa
 
 ```{r plot}
 library(ggplot2)
-##schr <- bins[which(seqnames(bins) == "chr8")]
 tibble(chr = "chr8",
        start=start(bins.chr8),
        end=end(bins.chr8),
-       log2=bins.chr8$gc_adj) %>%
+       log2_ratio=bins.chr8$gc_adj) %>%
+  filter(!is.na(log2_ratio)) %>%
   ggplot(.)  +
-  geom_point(aes(start, log2), size = 1) +
+  geom_point(aes(start, log2_ratio), size = 1) +
   xlab("Coordinate") +
-  ylab("log2 norrmalized counts") +
-  ylim(c(-4, 1)) +
+  ylab("log2 normalized counts") +
+  coord_cartesian(ylim=c(-4, 1)) +
   geom_hline(yintercept=0)
 ```
 
