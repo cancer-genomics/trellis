@@ -21,3 +21,4 @@ tests/testthat/*.rds
 /vignettes/svfusions.pdf
 inst/doc
 svcnvs_files
+/vignettes/svrearrange.pdf
