@@ -18,6 +18,7 @@ library(svfilters.hg19)
 library(Rsamtools)
 library(svbams)
 library(trellis)
+library(ggplot2)
 ```
 
 We begin by defining a set of bins over which the number of aligned reads will be counted.  The sv.filters<.build> packages contain 1kb bins that exclude regions with average mappability less than 0.75.
@@ -60,11 +61,10 @@ bins$gc_adj <- binGCCorrect(bins)
 At this stage, it is a good idea to plot the data.  When many samples are available, differences between groups of samples (batch effects) can be visualized and addressed at this stage.
 
 ```{r plot}
-library(ggplot2)
-tibble(chr = "chr8", start=start(bins),
-       end=end(bins), log2_ratio=bins$gc_adj) %>%
-  filter(!is.na(log2_ratio)) %>%
-  ggplot(.)  +
+dat <- data.frame(chr = "chr8", start=start(bins),
+                  end=end(bins), log2_ratio=bins$gc_adj)
+dat <- dat[!is.na(dat$log2_ratio), ]
+ggplot(dat)  +
   geom_point(aes(start, log2_ratio), size = 1) +
   xlab("Coordinate") +
   ylab("log2 normalized counts") +
