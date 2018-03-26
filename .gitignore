@@ -22,3 +22,4 @@ tests/testthat/*.rds
 inst/doc
 svcnvs_files
 /vignettes/svrearrange.pdf
+/vignettes/svpreprocess.Rmd
