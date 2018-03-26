@@ -108,18 +108,54 @@ ag <- trellis:::setDrivers (ag, transcripts, clin_sign=TRUE)
 ag <- trellis:::setDrivers (ag, transcripts, clin_sign=FALSE)
 ```
 
-In order to plot the linked amplicons as a graph, we load several supporting
-packages that support visualization of graph objects. In addition, we write a
-wrapper for plotting the graphs.
+# Visualizations
 
-```{r plotfun}
+In order to plot the linked amplicons as a graph, we load several package that support visualizations of graph objects. To reduce the footprint of trellis requirements, we leave these code chunks unevaluated.
+
+```{r plotfun, eval=FALSE}
 library(ggplot2)
-suppressPackageStartupMessages(library(gridExtra))
+library(gridExtra)
 library(grid)
 library(GGally)
-suppressPackageStartupMessages(library(network))
-suppressPackageStartupMessages(library(sna))
-suppressPackageStartupMessages(library(svplots))
+library(network)
+library(sna)
+plot_amplicons <- function(ag, col_list=qualitativeColors()){
+  if(length(ag)==0){
+    message("No amplicons -- nothing to plot")
+    return(invisible())
+  }
+  dark_colors <- c("#332288", "#661100", "#882255", "#AA4499")
+  ##ar <- ampliconRanges(ag)
+  ar <- nodes(ag)
+  ##ar <- keepSeqlevels(ar, unique(chromosome(ar)))
+  chroms <- sapply(strsplit(ar, ":"), "[", 1)
+  sl <- unique(chroms)
+  ##sl <- seqlevels(ar)
+  L <- length(sl)
+  L <- ifelse(L > 12, 12, L)
+  ##sl <- factor(chromosome(ar), levels=sl)
+  sl <- factor(chroms, levels=sl)
+  color_nodes <- col_list[[L]][as.integer(sl)]
+  g1 <- graph(ag)
+  color_nodes <- setNames(color_nodes, nodes(g1))
+  nodenames <- setNames(nodes(g1), nodes(g1))
+  text_col <- setNames(rep("black", length(nodes(g1))), nodes(g1))
+  text_col[color_nodes %in% dark_colors] <- "gray90"
+  nodeRenderInfo(g1) <- list(label=nodenames, fill=color_nodes, textCol=text_col)
+  ##nodeAttrs <- list(fillcolor=colors)
+  nodeAttrs <- list(fillcolor=color_nodes)
+  attrs <- list(node=list(shape="rectangle",
+                          fixedsize=FALSE),
+                graph=list(rankdir="LR"))
+  graph_object <- layoutGraph(g1,
+                              attrs=attrs,
+                              nodeAttrs=nodeAttrs)
+  ## if(numEdges(graph_object) > 0){
+  ##   renderGraph(graph_object)
+  ## } else plot(graph_object)
+  graph_object
+}
+
 plotAmpGraph <- function(ag, transcripts, color.guide=FALSE){
   B <- svplots:::plot_amplicons(ag)
   B1 <- as(B, "graphAM")
@@ -149,7 +185,7 @@ plotAmpGraph <- function(ag, transcripts, color.guide=FALSE){
 ```
 
 
-```{r graph}
+```{r graph, eval=FALSE}
 p4 <- plotAmpGraph(ag, transcripts, color.guide=guide_legend(title=""))
 grid.arrange(p4)
 ```

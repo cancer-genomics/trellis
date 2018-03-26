@@ -81,3 +81,14 @@ test_that("splitReads<-", {
 })
 
 
+test_that("rlist from vignette",{
+  extdata <- system.file("extdata", package="trellis")
+  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
+  rlist <- readRDS(rfile)
+  build <- "hg19"
+  near.coding <- seqJunctionNearTx(rlist, build)
+  rlist <- rlist[ near.coding ]
+  expect_true(validObject(rlist))
+})
+
+

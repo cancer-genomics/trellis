@@ -428,7 +428,8 @@ setGeneric("tags<-", function(object, value) standardGeneric("tags<-"))
 
 setGeneric("tagMapping", function(object) standardGeneric("tagMapping"))
 
-setGeneric("first<-", function(x, value) standardGeneric("first<-"))
+## import from S4Vectors
+##setGeneric("first<-", function(x, value) standardGeneric("first<-"))
 
 setGeneric("last<-", function(x, value) standardGeneric("last<-"))
 
