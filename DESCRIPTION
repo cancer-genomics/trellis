@@ -1,7 +1,8 @@
 Package: trellis
 Title: Somatic structural variant analysis
 Version: 0.0.31
-Authors@R: c(person("Rob", "Scharpf", email = "rscharpf@jhu.edu", role = c("aut", "cre")), person("Daniel", "Bruhm", email = "danielbruhm@gmail.com", role = "aut"))
+Author: Rob Scharpf and Daniel Bruhm
+Maintainer: Rob Scharpf <rscharpf@jhu.edu>
 Description: This package contains classes and methods used for structural
     variant analyses.
 Depends:
@@ -63,6 +64,7 @@ Collate:
     'Preprocess-class.R'
     'RearrangementList-class.R'
     'RearrangementParams-class.R'
+    'RearrangmentParams-class.R'
     'SegmentParam-class.R'
     'Transcripts-class.R'
     'acf.R'

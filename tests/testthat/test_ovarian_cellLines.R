@@ -6,9 +6,16 @@ context("Ovarian cell line fusions")
 ## fusion in CGOV44T
 test_that("cgov44t", {
   library(trellis)
-  library(svalignments)
   data(rlist, package="trellis")
-  test <- fusionList(rlist, id="CGOV44T")
+  ##attributes(class(rlist))$package <- "trellis"
+  ##for(i in seq_along(rlist)){
+  ##  r <- rlist@data[[i]]
+  ##  attributes(class(r))$package <- "trellis"
+  ##  rlist@data[[i]] <- r
+  ##}
+  ##save(rlist, file="data/rlist.rda")
+  ##trace(fusionList, browser)
+  test <- fusionList(rlist, id="CGOV44T", build="hg19")
   ## check that we've recovered the correct orientation'
   gene1.coords <- GRanges(test$chr.gene1, IRanges(test$cdsStart.gene1,
                                                   test$cdsEnd.gene1))
@@ -17,7 +24,7 @@ test_that("cgov44t", {
   expect_true(!any(overlapsAny(gene1.coords, linkedBins(rlist)[1], maxgap=10000)))
 
   if(FALSE){
-    extdata <- system.file("extdata", package="svalignments")
+    extdata <- system.file("extdata", package="trellis")
     unmap.file <- file.path(extdata, "blat_unmapped.txt")
     blat_unmap <- readBlat(unmap.file)
     split_reads <- rearrangedReads(rlist, blat_unmap, 500)
@@ -48,6 +55,7 @@ test_that("cgov44t", {
 test_that("Check YAP1-MAMML",{
   ## YAP1-MAMML
   data(rear_cgov7t)
+  ##attributes(class(rear_cgov7t))$package <- "trellis"
   ##trace(fusionList, browser)
   fusions <- fusionList(rlist=rear_cgov7t,
                         id="CGOV7T")

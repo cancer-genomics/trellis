@@ -3,6 +3,13 @@ context("Spit read checks")
 test_that("is_valid_splits", {
   extdata <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_endometrioid_project.rds"))
+##  attributes(class(rlist))$package <- "trellis"
+##  for(i in seq_along(rlist)){
+##    r <- rlist@data[[i]]
+##    attributes(class(r))$package <- "trellis"
+##    rlist@data[[i]] <- r
+##  }
+##  saveRDS(rlist, file=file.path(extdata, "rlist_endometrioid_project.rds"))
   expect_true(all(is_valid_splits(rlist, maxgap=200)))
   expect_false(all(is_valid_splits(rlist, maxgap=50)))
   n.sr1 <- elementNROWS(splitReads(rlist))

@@ -6,17 +6,27 @@ promoterFusion <- function(){
   ##
   library(GenomicRanges)
   library(svfilters.hg19)
+  library(trellis)
+  library(TxDb.Hsapiens.UCSC.hg19.refGene)
   data(transcripts, package="svfilters.hg19", envir=environment())
   tx <- get("transcripts")
   is.yap1 <- mcols(tx)$gene_name == "YAP1"
   yap1 <- reduce(tx[is.yap1])
   tx.yap1 <- subsetByOverlaps(tx, yap1)[1]
   yap1.promoter <- promoters(tx.yap1, upstream=5000, downstream=0)
-  library(trellis)
-  library(TxDb.Hsapiens.UCSC.hg19.refGene)
   txdb <- TxDb.Hsapiens.UCSC.hg19.refGene
   tx <- transcripts(txdb)
+
   data(rear_cgov7t, package="trellis")
+  ##rlist <- rear_cgov7t
+  ##attributes(class(rlist))$package <- "trellis"
+  ##for(i in seq_along(rlist)){
+  ##  r <- rlist@data[[i]]
+  ##  attributes(class(r))$package <- "trellis"
+  ##  rlist@data[[i]] <- r
+  ##}
+  ##rear_cgov7t <- rlist
+  ##save(rear_cgov7t, file="data/rear_cgov7t.rda")
   rear.id <- "16978-17458"
   rear <- rear_cgov7t[[rear.id]]
 

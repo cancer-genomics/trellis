@@ -1,7 +1,6 @@
 context("Split reads")
 
 test_that("split_reads", {
-  library(svalignments)
   data(rlist, package="trellis")
   extdata <- system.file("extdata", package="trellis")
   unmap.file <- file.path(extdata, "blat_unmapped.txt")

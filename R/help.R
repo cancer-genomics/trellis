@@ -11,9 +11,7 @@
 #' @importClassesFrom Rsamtools BamViews
 #' @importFrom Rsamtools bamPaths bamRanges bamSamples scanBamFlag PileupParam scanBamWhat BamFile
 #' @importFrom Rsamtools bamFlagAsBitMatrix bamMapqFilter
-#' @importFrom S4Vectors SimpleList mcols mcols<- queryHits subjectHits DataFrame List
-#' @importFrom S4Vectors queryHits subjectHits isTRUEorFALSE isRedundantHit isSelfHit
-#' @importMethodsFrom S4Vectors elementType elementNROWS endoapply
+#' @import S4Vectors
 #' @importMethodsFrom GenomeInfoDb seqnames seqlevels seqlevels<- seqinfo seqinfo<- seqlengths seqlengths<-
 #' @importMethodsFrom GenomeInfoDb genome genome<- seqlevelsStyle<- seqlevelsStyle seqlevelsInUse
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels seqinfo<- seqinfo
