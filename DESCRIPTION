@@ -43,7 +43,8 @@ Suggests:
     svfilters.hg19,
     BiocStyle,
     data.table,
-    org.Hs.eg.db
+    org.Hs.eg.db,
+    gridExtra
 Collate: 
     'help.R'
     'AllGenerics.R'
