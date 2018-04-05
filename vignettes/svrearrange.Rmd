@@ -240,7 +240,7 @@ rlist2
 To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `data.frame`. The function `rearDataFrameList` (need better name) takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we've arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
 
 
-```{r rearDataFrameList}
+```{r rearDataFrameList, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`.  The shorthfand used to indicate the sequenced strands of the tumor genome is <READ NUMBER><STRAND 5-prime><STRAND 3-prime>.  For example, R1+- denotes a read pair where the first read (R1) is aligned to the 5-prime side of the junction on the positive strand and its mate is aligned to the 3-prime side of the junction on the minus strand.  Read pairs R1+- and R2-+ indicate that the positive strand was sequenced on both sides of the junction.  Read pairs R1-+ and R2+- indicate that the negative strand was sequenced on both sides of the junction.  Hence, this rearrangement did not result from an inversion.  (An inversion would have read pairs R1++ and R2-- or R1-- and R2++.)"}
 df <- rearDataFrameList(rlist2[1:2], build="hg19")
 ggRearrange(df)
 ```
