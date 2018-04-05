@@ -393,11 +393,13 @@ numberAlignmentRecords <- function(blat.gr){
   qstarts <- integer_vector(g$qStarts)
   bsizes <- integer_vector(g$blockSizes)
   chrom <- rep(chromosome(g), g$blockcount)
+  qends <- rep(g$qend, g$blockcount)
   bmatch <- rep(g$match, g$blockcount)
   gapbases <- rep(g$gapbases, g$blockcount)
   strands <- rep(cstrand(g), g$blockcount)
   g2 <- GRanges(chrom,
                 IRanges(starts, width=widths),
+                qend=qends,
                 qStarts=qstarts,
                 blockSizes=bsizes,
                 gapbases=gapbases,
@@ -421,6 +423,7 @@ numberAlignmentRecords <- function(blat.gr){
   gr$qname <- rep(g$qname[1], L)
   gr$gapbases <- gapbases
   gr$Qsize <- rep(g$Qsize[1], L)
+  gr$qend <- rep(g$qend[1], L)
   gr
 }
 

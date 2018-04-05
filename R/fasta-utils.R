@@ -125,6 +125,57 @@ fastaFiles <- function(dirs, ids){
 # }
 
 
+unmapped_read2 <- function(bam.file, query, yield_size=1e6, maxgap=200, what=scanBamWhat()){
+  flags <- scanBamFlag(isUnmappedQuery=TRUE, hasUnmappedMate=FALSE, isDuplicate=FALSE)
+  param <- ScanBamParam(flag=flags, what=what, which = query+500)
+  bamfile <- BamFile(bam.file, yieldSize=yield_size)
+  mate_grl <- list()
+  open(bamfile)
+  while(length(unlist(sapply(chunk0 <- scanBam(bamfile, param=param), function(x) x[[1]])))) {
+    cat(".")
+    for (i in 1:length(chunk0)) {
+      mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=100))
+      ## This should be the case -- can remove if statement
+      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){ 
+        mate_gr$seq <- chunk0[[i]]$seq
+        names(mate_gr) <- chunk0[[i]]$qname
+        mate_gr <- subsetByOverlaps(mate_gr, query, maxgap=maxgap)
+        mate_grl[[length(mate_grl)+1]] <- mate_gr
+      }
+    }
+  }
+  close(bamfile)
+  mate_gr <- unlist(GRangesList(mate_grl))
+  if(FALSE){
+    si <- seqinfo(bamRanges(bview))
+    mate_gr <- keepSeqlevels(mate_gr, seqlevels(si))
+    seqinfo(mate_gr) <- si
+  }
+  mate_gr$snms <- names(mate_gr)
+  mate_gr$seq <- as.character(mate_gr$seq)
+  mate_gr
+}
+
+.query_bam <- function(bamfile, param, yield_size, maxgap){
+  mate_grl <- list()
+  open(bamfile)
+  while(length(unlist(sapply(chunk0 <- scanBam(bamfile, param=param), function(x) x[[1]])))) {
+    cat(".")
+    for (i in 1:length(chunk0)) {
+      mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=100))
+      ## This should be the case -- can remove if statement
+      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){ 
+        mate_gr$seq <- chunk0[[i]]$seq
+        names(mate_gr) <- chunk0[[i]]$qname
+        mate_gr <- subsetByOverlaps(mate_gr, query, maxgap=maxgap)
+        mate_grl[[length(mate_grl)+1]] <- mate_gr
+      }
+    }
+  }
+  close(bamfile)
+  mate_grl
+}
+
 #' Extract unmapped reads with a mapped mate from a bam file
 #'
 #' This function extracts all unmapped reads with a mate that overlaps
@@ -172,50 +223,38 @@ fastaFiles <- function(dirs, ids){
 #' ranges = IRanges(start = 128691748, end = 128692097))
 #' unmapped_read(bam.file = bam, query = region, yield_size = 1e6)
 #' @export
-unmapped_read <- function(bam.file, query, yield_size=1e6, maxgap=200, what=scanBamWhat()){
-  flags <- scanBamFlag(isUnmappedQuery=TRUE, hasUnmappedMate=FALSE, isDuplicate=FALSE) 
-  param <- ScanBamParam(flag=flags, what=what, which = query+500)
+unmapped_read <- function(bam.file, query,
+                          yield_size=1e6, maxgap=200, what=scanBamWhat()){
+  flags.r1 <- scanBamFlag(isUnmappedQuery=TRUE,
+                          hasUnmappedMate=FALSE, isDuplicate=FALSE,
+                          isFirstMateRead=TRUE, isSecondMateRead=FALSE)
+  flags.r2 <- scanBamFlag(isUnmappedQuery=TRUE, hasUnmappedMate=FALSE,
+                          isDuplicate=FALSE,
+                          isFirstMateRead=FALSE, isSecondMateRead=TRUE)
+  params.r1 <- ScanBamParam(flag=flags.r1, what=what, which = query+500)
+  params.r2 <- ScanBamParam(flag=flags.r2, what=what, which = query+500)
   bamfile <- BamFile(bam.file, yieldSize=yield_size)
-  mate_grl <- list()
-  open(bamfile)
-  while(length(unlist(sapply(chunk0 <- scanBam(bamfile, param=param), function(x) x[[1]])))) {
-    cat(".")
-    for (i in 1:length(chunk0)) {
-      mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=100))
-      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){ # This should be the case -- can remove if statement
-        mate_gr$seq <- chunk0[[i]]$seq
-        names(mate_gr) <- chunk0[[i]]$qname
-        mate_gr <- subsetByOverlaps(mate_gr, query, maxgap=maxgap)
-        mate_grl[[length(mate_grl)+1]] <- mate_gr
-      } 
-    }
-  }
-  close(bamfile)
+  mate_grl <- .query_bam(bamfile, params.r1,
+                         yield_size=yield_size,
+                         maxgap=maxgap)
   mate_gr <- unlist(GRangesList(mate_grl))
+  mate_gr$read <- "R1"
+
+  mate_grl2 <- .query_bam(bamfile, params.r2,
+                          yield_size=yield_size,
+                          maxgap=maxgap)
+  mate_gr2 <- unlist(GRangesList(mate_grl2))
+  mate_gr2$read <- "R2"
+  mate_gr3 <- c(mate_gr, mate_gr2)
   if(FALSE){
     si <- seqinfo(bamRanges(bview))
     mate_gr <- keepSeqlevels(mate_gr, seqlevels(si))
     seqinfo(mate_gr) <- si
   }
-  mate_gr$snms <- names(mate_gr)
-  mate_gr$seq <- as.character(mate_gr$seq)
-  mate_gr
+  mate_gr3$snms <- names(mate_gr3)
+  mate_gr3$seq <- as.character(mate_gr3$seq)
+  mate_gr3
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #' Write the read sequences of unmapped-mapped read pairs to disk in fasta format
 #'

@@ -106,6 +106,8 @@ The `linked.to` value in the `mcols` of the linked bins is itself a `GRanges` ob
 
 ```{r linked_to}
 linkedBins(rlist)$linked.to
+##or
+linkedTo(rlist)
 ```
 
 Next, we apply the filters we've assembled:
@@ -174,7 +176,11 @@ In addition to using BLAT to confirm the ELAND alignments of the improperly pair
 
 ```{r mapped_unmapped}
 query <- uncouple(linkedBins(rlist))
+trace(unmapped_read, browser)
 unmapped <- unmapped_read(bam.file, query, yield_size=200000)
+
+unmapped2 <- unmapped_read2(bam.file, query, yield_size=200000)
+
 length(unmapped)
 dir <- tempdir()
 mapped_unmapped.fa <- file.path(dir, "mapped-unmapped.fa")
