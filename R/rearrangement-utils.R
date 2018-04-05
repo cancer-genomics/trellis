@@ -906,7 +906,8 @@ rearDataFrameList <- function(rlist, build, maxgap=5000){
     stop("Unexpected inequality in GRanges lengths")
   }
   igr$region <- regions
-  df <- as(igr, "data.frame")
+  df <- as(igr, "data.frame") %>%
+    as.tibble()
   df2 <- df[, 1:5]
   tagid <- df$tagid
   read <- paste0(df$read, df$strand)
