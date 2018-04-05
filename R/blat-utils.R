@@ -395,12 +395,14 @@ numberAlignmentRecords <- function(blat.gr){
   chrom <- rep(chromosome(g), g$blockcount)
   bmatch <- rep(g$match, g$blockcount)
   gapbases <- rep(g$gapbases, g$blockcount)
+  strands <- rep(cstrand(g), g$blockcount)
   g2 <- GRanges(chrom,
                 IRanges(starts, width=widths),
                 qStarts=qstarts,
                 blockSizes=bsizes,
                 gapbases=gapbases,
-                match=bmatch)
+                match=bmatch,
+                strand=strands)
   gr <- reduce(g2, with.revmap=TRUE)
   revmap <- mcols(gr)$revmap
   tmp <- relist(g2$qStarts[unlist(revmap)], revmap)
@@ -527,7 +529,8 @@ blat_to_granges <- function(blat, lb){
           blockcount=blat$blockcount,
           qStarts=blat$qStarts,
           Qsize=blat$Qsize,
-          seqinfo=seqinfo(lb))
+          seqinfo=seqinfo(lb),
+          strand=blat$strand)
 }
 
 overlapsLinkedBins <- function(blat_gr, lb, maxgap=500){
