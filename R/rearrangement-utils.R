@@ -980,19 +980,21 @@ readPairColors <- function(){
   cols
 }
 
-#' gg-style plot of reads supporting a rearrangement
-#'
-#' @param df a \code{data.frame} as created by \code{rearDataFrame}
-#' @seealso \code{\link{rearDataFrame}}
-#' @examples
-#'   extdata <- system.file("extdata", package="trellis")
-#'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
-#'   rlist <- readRDS(rfile)
-#'   r <- rlist[[1]]
-#'   df <- rearDataFrame(r, "hg19")
-#'   ggRearrange(df)
-#' @export
-ggRearrange <- function(df){
+readColors <- function(){
+  cols <- brewer.pal(12, "Paired")
+  cols <- cols[-c(7,8)]
+  cols <- cols[1:5]
+  ##cols <- c(cols, "black")
+  names(cols) <- c("R1-", "R2+",
+                   "R1+", "R2-",
+                   ##"R1-", "R2-",
+                   ##"R1+", "R2+",
+                   "splitread")
+  cols
+}
+
+## this is the old version
+ggRearrange2 <- function(df){
   colors <- readPairColors()[unique(df$read_type)]
   nms <- names(readPairColors())
   df$read_type <- factor(df$read_type, levels=nms)
@@ -1016,6 +1018,254 @@ ggRearrange <- function(df){
     theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
           axis.text.y=element_blank()) +
     facet_wrap(~region, scales="free_x", nrow=nr, ncol=nc)
+}
+
+peelLegend <- function(gg){
+  if(!is(gg, "gg")) stop("object must be instance of class 'gg'")
+  gtab <- ggplotGrob(gg)
+  i <- which(sapply(gtab$grobs, function(x) x$name) == "guide-box")
+  legend <- gtab$grobs[[i]]
+  fig <- gg + theme(legend.position="none")
+  gtab <- ggplotGrob(fig)
+  list(gtab=gtab, legend=legend)
+}
+
+axis_limit5p <- function(df, basepairs){
+   if(!df$reverse[1]){
+     xlim1 <- c(min(df$start),
+                df$junction_5p[1])
+     padding <- basepairs - abs(diff(xlim1))
+     xlim1[1] <- xlim1[1] - padding
+  } else {
+    xlim1 <- c(max(df$start),
+               df$junction_5p[1])
+    padding <- basepairs - abs(diff(xlim1))
+    xlim1[1] <- xlim1[1] + padding
+  }
+  xlim1
+}
+
+axis_limit3p <- function(df, basepairs){
+  if(!df$reverse[1]){
+    xlim2 <- c(min(df$junction_3p),
+               max(df$end))
+    padding <- basepairs - abs(diff(xlim2))
+    xlim2[2] <- xlim2[2] + padding
+  } else {
+    xlim2 <- c(df$junction_3p[1],
+               min(df$end))
+    padding <- basepairs - abs(diff(xlim2))
+    xlim2[2] <- xlim2[2] - padding
+  }
+  xlim2
+}
+
+##
+## - Make both panels have same width
+## - include junction label on x-axis
+##
+#' @export
+axis_limits <- function(df, basepairs){
+  region <- NULL
+  df1 <- filter(df, region==levels(region)[1])
+  df2 <- filter(df, region==levels(region)[2])
+  xlim1 <- axis_limit5p(df1, basepairs)
+  xlim2 <- axis_limit3p(df2, basepairs)
+  limits <- list(xlim1=xlim1, xlim2=xlim2)
+  names(limits) <- levels(df$region)
+  limits
+}
+
+axis_labels5p <- function(df, xlim1, num.ticks){
+  absoluteNum <- function(x, ...) prettyNum(abs(x), big.mark=",")
+  brks1 <- pretty(xlim1, n=num.ticks)
+  if(!df$reverse[1]){
+    brks1[length(brks1)] <- df$junction_5p[1]
+    ## avoid overcrowding of labels
+    delta <- brks1[length(brks1)] - brks1[(length(brks1)-1)]
+    if(delta < 20){
+      brks1 <- brks1[ (length(brks1)-1) ]
+    }
+  } else {
+    brks1[1] <- df$junction_5p[1]
+    delta <- abs(brks1[2] - brks1[1])
+    if(delta < 20){
+      brks1 <- brks1[-2]
+    }
+  }
+  labs1 <- paste(absoluteNum(brks1), "bp")
+  list(breaks=brks1, labels=labs1)
+}
+
+axis_labels3p <- function(df, xlim2, num.ticks){
+  absoluteNum <- function(x, ...) prettyNum(abs(x), big.mark=",")
+  brks2 <- pretty(xlim2, n=num.ticks)
+  if(!df$reverse[1]){
+    brks2[1] <- df$junction_3p[1]
+    ## avoid crowded labels
+    delta <- brks2[2] - brks2[1]
+    if(delta < 20){
+      brks2 <- brks2[-2]
+    }
+  } else {
+    brks2[length(brks2)] <- df$junction_3p[1]
+    ## avoid crowded labels
+    delta <- abs(brks2[length(brks2)] - brks2[length(brks2)-1])
+    if(delta < 20){
+      brks2 <- brks2[-(length(brks2)-1)]
+    }
+  }
+  labs2 <- paste(absoluteNum(brks2), "bp")
+  list(breaks=brks2, labels=labs2)
+}
+
+.ggRearrange <- function(df, ylabel="Read pair index",
+                         basepairs=400, num.ticks=5){
+  colors <- readColors()[unique(df$read_type)]
+  colors["splitread"] <- "black"
+  nms <- names(readColors())
+  df$read_type <- factor(df$read_type, levels=nms)
+  region <- read_type <- tagid <- NULL
+  df1 <- filter(df, region==levels(region)[1])
+  df2 <- filter(df, region==levels(region)[2])
+  limits <- axis_limits(df, basepairs)
+  gene1 <- levels(df$region)[1]
+  gene2 <- levels(df$region)[2]
+  xlim1 <- limits[[gene1]]
+  xlim2 <- limits[[gene2]]
+  labs1 <- axis_labels5p(df1, xlim1, num.ticks)
+  labs2 <- axis_labels3p(df2, xlim2, num.ticks)
+  a <- ggplot(df1, aes(ymin=tagid-0.2,
+                       ymax=tagid+0.2,
+                       xmin=start,
+                       xmax=end,
+                       color=read_type,
+                       fill=read_type, group=tagid)) +
+    geom_rect() +
+    ylab(ylabel) +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    scale_x_continuous(breaks=labs1[["breaks"]],
+                       labels=labs1[["labels"]]) +
+    coord_cartesian(xlim=xlim1) +
+    xlab("") +
+    theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
+          axis.text.y=element_blank(),
+          plot.title=element_text(size=5)) +
+    guides(color=FALSE, fill=FALSE) +
+    geom_vline(xintercept=df$junction_5p[1], linetype="dashed") +
+    ggtitle(paste0(df1$region[1], " (", df1$seqnames[1], ")"))
+  if(df1$reverse[1]){
+    a <- a + scale_x_reverse(breaks=labs1[["breaks"]],
+                             labels=labs1[["labels"]])
+  }
+  b <- ggplot(df2, aes(ymin=tagid-0.2,
+                       ymax=tagid+0.2,
+                       xmin=start,
+                       xmax=end,
+                       color=read_type,
+                       fill=read_type, group=tagid)) +
+    geom_rect() +
+    ylab("read pair index") +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    scale_x_continuous(breaks=labs2[["breaks"]],
+                       labels=labs2[["labels"]]) +
+    coord_cartesian(xlim=xlim2) +
+    xlab("") +
+    theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          legend.position="bottom",
+          legend.direction="horizontal",
+          plot.title=element_text(size=5)) +
+    guides(color=FALSE, fill=FALSE) +
+    geom_vline(xintercept=df$junction_3p[1], linetype="dashed") +
+    ylab("") +
+    ggtitle(paste0(df2$region[1], " (", df2$seqnames[1], ")"))
+  if(df2$reverse[1]){
+    b <- b + scale_x_reverse(breaks=labs2[["breaks"]],
+                             labels=labs2[["labels"]])
+  }
+  ##
+  ## plot both panels just to get the legend
+  d <- ggplot(df, aes(ymin=tagid-0.2,
+                      ymax=tagid+0.2,
+                      xmin=start,
+                      xmax=end,
+                      color=read_type,
+                      fill=read_type, group=tagid)) +
+    geom_rect() +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    theme(legend.position="bottom", legend.direction="horizontal") +
+    guides(color=guide_legend(title=""), fill=guide_legend(title=""))
+  legend.grob <- peelLegend(d)[[2]]
+  agrob <- ggplotGrob(a)
+  bgrob <- ggplotGrob(b)
+  ##legend.grob <- gg.objs[[2]]
+  bgrob$widths <- agrob$widths
+  list(`5p`=agrob,
+       `3p`=bgrob,
+       legend=legend.grob)
+}
+
+#' @export
+ggRearrangeLegend <- function(){
+  read_type <- NULL
+  cols <- readColors()
+  cols[["splitread"]] <- "black"
+  df <- data.frame(start=seq_along(cols),
+                   end=seq_along(cols) + 1,
+                   read_type=names(cols))
+  fig <- ggplot(df, aes(xmin=start, xmax=end,
+                        ymin=start, ymax=end,
+                        color=read_type,
+                        fill=read_type)) +
+    geom_rect() +
+    scale_fill_manual(values=cols) +
+    scale_color_manual(values=cols) +
+    guides(color=guide_legend(title=""),
+           fill=guide_legend(title="")) +
+    theme(legend.direction="horizontal")
+  gobj <- peelLegend(fig)
+  gobj[[2]]
+}
+
+#' gg-style plot of reads supporting a rearrangement
+#'
+#' @param df a \code{data.frame} as created by \code{rearDataFrame}
+#' @seealso \code{\link{rearDataFrame}}
+#' @examples
+#'   extdata <- system.file("extdata", package="trellis")
+#'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
+#'   rlist <- readRDS(rfile)
+#'   r <- rlist[[1]]
+#'   df <- rearDataFrame(r, "hg19")
+#'   ggRearrange(df)
+#' @export
+ggRearrange <- function(df, ylab="Read pair index",
+                         basepairs=400, num.ticks=5){
+  . <- NULL
+  grobs <- .ggRearrange(df, ylabel=ylab,  basepairs, num.ticks)
+  widths <- c(0.5, 0.5) %>%
+    "/"(sum(.)) %>%
+    unit(., "npc")
+  heights <- c(0.95, 0.05) %>%
+    "/"(sum(.)) %>%
+    unit(., "npc")
+  mat <- matrix(c(1, 2,
+                  3, 3), byrow=TRUE, ncol=2, nrow=2)
+  agrob <- grobs[["5p"]]
+  bgrob <- grobs[["3p"]]
+  legend.grob <- grobs[["legend"]]
+  gobj <- grid.arrange(agrob, bgrob,
+                       legend.grob,
+                       layout_matrix=mat,
+                       widths=widths,
+                       heights=heights)
+  list(arranged.grobs=gobj,
+       grobs=grobs)
 }
 
 strands <- function(r){
