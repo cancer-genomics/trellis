@@ -31,7 +31,11 @@ Imports:
     scales,
     GenomicFeatures,
     BSgenome,
-    Biostrings
+    Biostrings,
+    grid,
+    gridExtra,
+    tibble,
+    purrr
 Suggests:
     tidyverse,
     knitr,
@@ -43,8 +47,7 @@ Suggests:
     svfilters.hg19,
     BiocStyle,
     data.table,
-    org.Hs.eg.db,
-    gridExtra
+    org.Hs.eg.db
 Collate: 
     'help.R'
     'AllGenerics.R'
