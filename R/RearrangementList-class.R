@@ -204,7 +204,9 @@ setReplaceMethod("splitReads", c("RearrangementList", "GRangesList"),
                      splitReads(object2[[i]]) <- value[[i]]
                    }
                    notchanged <- object [ !names(object) %in% names(object2) ]
-                   object3 <- c(notchanged, object2)
+                   if(length(notchanged) > 0){
+                     object3 <- c(notchanged, object2)
+                   } else object3 <- object2
                    object3 <- object3[ orig_order ]
                    object3
                  })
