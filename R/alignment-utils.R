@@ -149,7 +149,8 @@ properAlignmentFlags <- function(){
 #' @export
 #' @rdname alignment-flags
 improperAlignmentParams <- function(flag=improperAlignmentFlags(),
-                                    what=c("flag", "mrnm", "mpos", "mapq"),
+                                    what=c("flag", "mrnm", "mpos", "mapq",
+                                           "qname"),
                                     ...){
   ScanBamParam(flag=flag, what=what, ...)
 }
