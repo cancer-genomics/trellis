@@ -387,13 +387,14 @@ numberAlignmentRecords <- function(blat.gr){
 }
 
 .each_block_granges <- function(g){
+  ##browser()
   starts <- integer_vector(g$tStarts)
   L <- length(starts)
   widths <- integer_vector(g$blockSizes)
   qstarts <- integer_vector(g$qStarts)
   bsizes <- integer_vector(g$blockSizes)
   chrom <- rep(chromosome(g), g$blockcount)
-  qends <- rep(g$qend, g$blockcount)
+  qends <- qstarts+bsizes
   bmatch <- rep(g$match, g$blockcount)
   gapbases <- rep(g$gapbases, g$blockcount)
   strands <- rep(cstrand(g), g$blockcount)
@@ -423,7 +424,8 @@ numberAlignmentRecords <- function(blat.gr){
   gr$qname <- rep(g$qname[1], L)
   gr$gapbases <- gapbases
   gr$Qsize <- rep(g$Qsize[1], L)
-  gr$qend <- rep(g$qend[1], L)
+  ##gr$qend <- ##rep(g$qend[1], L)
+  gr$qend <- gr$qStarts + gr$blockSizes
   gr
 }
 
@@ -463,8 +465,6 @@ splitreadIntersection <- function(g){
 #' sequence  junction. Each list element corresponds to one read that is
 #'  aligned to two  locations (i.e., each element of the list consists of the
 #'  vector of reads that supports one rearrangement).
-#'
-#'
 #'
 #' @export
 #'
