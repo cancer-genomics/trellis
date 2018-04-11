@@ -24,3 +24,7 @@ svcnvs_files
 /vignettes/svrearrange.pdf
 /vignettes/svpreprocess.Rmd
 /vignettes/svfusions.R
+/vignettes/amplicons.log
+/vignettes/amplicons.tex
+/vignettes/diagram.pdf
+/vignettes/svrearrange_files/figure-latex/blat_scores-1.pdf

@@ -5,15 +5,15 @@ test_that("ggRearrange", {
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
-  ##trace(rearDataFrame, browser)
-  df <- rearDataFrame(r, "hg19")
-  ##trace(ggRearrange, browser)
+  r2 <- fiveTo3Prime(r, "hg19")
+  df <- rearDataFrame(r2[[1]], "hg19")
   p <- ggRearrange(df)
-  expect_is(p, "gg")
+  expect_is(p, "list")
 
   ## a more challenging example
   id <- "10546-10582"
   r <- rlist[[id]]
+  r <- fiveTo3Prime(r, "hg19")[[1]]
   df <- rearDataFrame(r, "hg19")
   if(FALSE)
     ggRearrange(df)
