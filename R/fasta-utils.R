@@ -136,7 +136,7 @@ unmapped_read2 <- function(bam.file, query, yield_size=1e6, maxgap=200, what=sca
     for (i in 1:length(chunk0)) {
       mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=100))
       ## This should be the case -- can remove if statement
-      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){ 
+      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){
         mate_gr$seq <- chunk0[[i]]$seq
         names(mate_gr) <- chunk0[[i]]$qname
         mate_gr <- subsetByOverlaps(mate_gr, query, maxgap=maxgap)
@@ -156,7 +156,7 @@ unmapped_read2 <- function(bam.file, query, yield_size=1e6, maxgap=200, what=sca
   mate_gr
 }
 
-.query_bam <- function(bamfile, param, yield_size, maxgap){
+.query_bam <- function(bamfile, query, param, yield_size, maxgap){
   mate_grl <- list()
   open(bamfile)
   while(length(unlist(sapply(chunk0 <- scanBam(bamfile, param=param), function(x) x[[1]])))) {
@@ -164,7 +164,7 @@ unmapped_read2 <- function(bam.file, query, yield_size=1e6, maxgap=200, what=sca
     for (i in 1:length(chunk0)) {
       mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=100))
       ## This should be the case -- can remove if statement
-      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){ 
+      if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){
         mate_gr$seq <- chunk0[[i]]$seq
         names(mate_gr) <- chunk0[[i]]$qname
         mate_gr <- subsetByOverlaps(mate_gr, query, maxgap=maxgap)
@@ -224,27 +224,31 @@ unmapped_read2 <- function(bam.file, query, yield_size=1e6, maxgap=200, what=sca
 #' unmapped_read(bam.file = bam, query = region, yield_size = 1e6)
 #' @export
 unmapped_read <- function(bam.file, query,
-                          yield_size=1e6, maxgap=200, what=scanBamWhat()){
+                          yield_size=1e6, maxgap=500,
+                          what=scanBamWhat()){
   flags.r1 <- scanBamFlag(isUnmappedQuery=TRUE,
-                          hasUnmappedMate=FALSE, isDuplicate=FALSE,
-                          isFirstMateRead=TRUE, isSecondMateRead=FALSE)
-  flags.r2 <- scanBamFlag(isUnmappedQuery=TRUE, hasUnmappedMate=FALSE,
+                          hasUnmappedMate=FALSE,
                           isDuplicate=FALSE,
-                          isFirstMateRead=FALSE, isSecondMateRead=TRUE)
-  params.r1 <- ScanBamParam(flag=flags.r1, what=what, which = query+500)
-  params.r2 <- ScanBamParam(flag=flags.r2, what=what, which = query+500)
+                          isFirstMateRead=TRUE,
+                          isSecondMateRead=FALSE)
+  flags.r2 <- scanBamFlag(isUnmappedQuery=TRUE,
+                          hasUnmappedMate=FALSE,
+                          isDuplicate=FALSE,
+                          isFirstMateRead=FALSE,
+                          isSecondMateRead=TRUE)
+  params.r1 <- ScanBamParam(flag=flags.r1, what=what, which = query+maxgap)
+  params.r2 <- ScanBamParam(flag=flags.r2, what=what, which = query+maxgap)
   bamfile <- BamFile(bam.file, yieldSize=yield_size)
-  mate_grl <- .query_bam(bamfile, params.r1,
+  mate_grl <- .query_bam(bamfile, query+maxgap, params.r1,
                          yield_size=yield_size,
                          maxgap=maxgap)
   mate_gr <- unlist(GRangesList(mate_grl))
-  mate_gr$read <- "R1"
-
-  mate_grl2 <- .query_bam(bamfile, params.r2,
+  mate_gr$read <- rep("R1", length(mate_gr))
+  mate_grl2 <- .query_bam(bamfile, query+maxgap, params.r2,
                           yield_size=yield_size,
                           maxgap=maxgap)
   mate_gr2 <- unlist(GRangesList(mate_grl2))
-  mate_gr2$read <- "R2"
+  mate_gr2$read <- rep("R2", length(mate_gr2))
   mate_gr3 <- c(mate_gr, mate_gr2)
   if(FALSE){
     si <- seqinfo(bamRanges(bview))
