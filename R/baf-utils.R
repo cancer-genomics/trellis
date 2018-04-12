@@ -233,8 +233,13 @@ svAF <- function(normalBam,
       return(out.df)
     }
     
-    message("Identifying heterozygous positions")
-    tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = FALSE)
+    message(paste0("Identifying positions with MAF >= ", minMafTumor))
+    if (minMafTumor > 0) {
+       tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = FALSE)  
+    } else if (minMafTumor == 0) {
+      tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = TRUE)
+    }
+    
     
     if (length(tumorSNPs) == 0) {
       warning(paste0("0 heterozygous positions were found in", tumorBam), call. = FALSE)
