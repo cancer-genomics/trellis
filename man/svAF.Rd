@@ -8,8 +8,8 @@ given by \code{normalBam} and retuns the minor allele frequency at these positio
 specified by \code{tumorBam}.}
 \usage{
 svAF(normalBam, tumorBam, genome, positions, region, n = 50000,
-  minCovNormal = 20, minCovTumor = 20, max_depth = 1000,
-  minMafNormal = 0.3, minMafTumor = 0, min_base_quality = 0)
+  minCovNormal = 20, minCovTumor = 20, minMafNormal = 0.3,
+  minMafTumor = 0, min_base_quality = 0)
 }
 \arguments{
 \item{normalBam}{The path to a bam file}
@@ -43,8 +43,6 @@ from targeted capture protocols, it is recommended to use the full set of SNPs i
 \item{minCovNormal}{The minimum coverage of a position in \code{normalBam} to be considered.}
 
 \item{minCovTumor}{The minimum coverage of a position in \code{tumorBam} to be considered.}
-
-\item{max_depth}{The maximum number of alignments considered for each position.}
 
 \item{minMafNormal}{The minimum minor allele frequency (MAF) in order to consider a position 
 as heterozygous in \code{normalBam}.}
@@ -95,7 +93,6 @@ svAF(normalBam=bam1,
      n = 1000, 
      minCovNormal = 10, 
      minCovTumor = 10, 
-     max_depth = 1e3, 
      minMafNormal = 0.3, 
      minMafTumor = 0)
 }
