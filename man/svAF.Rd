@@ -9,7 +9,7 @@ specified by \code{tumorBam}.}
 \usage{
 svAF(normalBam, tumorBam, genome, positions, region, n = 50000,
   minCovNormal = 20, minCovTumor = 20, max_depth = 1000,
-  minMafNormal = 0.3, minMafTumor = 0)
+  minMafNormal = 0.3, minMafTumor = 0, min_base_quality = 0)
 }
 \arguments{
 \item{normalBam}{The path to a bam file}
@@ -52,6 +52,8 @@ as heterozygous in \code{normalBam}.}
 \item{minMafTumor}{The minimum minor allele frequency (MAF) in order to consider a position 
 as heterozygous in \code{tumorBam}.  It is recommended to set this value to at least 0.05 
 when setting \code{normalBam = NULL} to avoid outputting homozygous positions.}
+
+\item{min_base_quality}{The minimum Phred score of a base for it to be counted}
 }
 \value{
 A data.frame with the following columns:

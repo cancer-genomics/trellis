@@ -28,7 +28,7 @@
 #' \code{svfilters.hg19} or \code{svfilters.hg18} to identify a suffient number of SNPs with high enough coverage.
 #' @param minCovNormal The minimum coverage of a position in \code{normalBam} to be considered.
 #' @param minCovTumor The minimum coverage of a position in \code{tumorBam} to be considered.
-#' @param max_depth The maximum number of alignments considered for each position.
+#' @param min_base_quality The minimum Phred score of a base for it to be counted
 #' @param minMafNormal The minimum minor allele frequency (MAF) in order to consider a position 
 #' as heterozygous in \code{normalBam}.
 #' @param minMafTumor The minimum minor allele frequency (MAF) in order to consider a position 
@@ -55,7 +55,6 @@
 #'      n = 1000, 
 #'      minCovNormal = 10, 
 #'      minCovTumor = 10, 
-#'      max_depth = 1e3, 
 #'      minMafNormal = 0.3, 
 #'      minMafTumor = 0)
 #'}
@@ -82,9 +81,9 @@ svAF <- function(normalBam,
                  n = 50000, 
                  minCovNormal = 20, 
                  minCovTumor = 20, 
-                 max_depth = 1e3, 
                  minMafNormal = 0.3,
-                 minMafTumor = 0) {
+                 minMafTumor = 0,
+                 min_base_quality = 0) {
   
   if (!is.null(normalBam)) {
     if (!file.exists(normalBam)) {
@@ -121,8 +120,8 @@ svAF <- function(normalBam,
     SNPs <- positions
   }
   
-  if (max_depth <= 0) {
-    stop("The value of 'max_depth' must be greater than 0")
+  if (min_base_quality < 0) {
+    stop("The value of 'min_base_quality' must be greater than or equal to 0")
   }
   
   if (n < 1) {
@@ -180,9 +179,9 @@ svAF <- function(normalBam,
     normalPU <- pileup(normalBam,
                        scanBamParam=ScanBamParam(which=querySNPs,
                                                  flag = scanBamFlag(isDuplicate = FALSE)),
-                       pileupParam=PileupParam(max_depth=max_depth,
-                                               distinguish_strands=FALSE,
-                                               include_deletions=FALSE))
+                       pileupParam=PileupParam(distinguish_strands=FALSE,
+                                               include_deletions=FALSE,
+                                               min_base_quality=min_base_quality))
     
     if (nrow(normalPU) == 0) {
       warning(paste0("0 coverage was found at every specified position in", normalBam), call. = FALSE)
@@ -201,9 +200,9 @@ svAF <- function(normalBam,
     tumorPU <- pileup(tumorBam,
                       scanBamParam=ScanBamParam(which=normalSNPs,
                                                 flag = scanBamFlag(isDuplicate = FALSE)),
-                      pileupParam=PileupParam(max_depth=max_depth,
-                                              distinguish_strands=FALSE,
-                                              include_deletions=FALSE))
+                      pileupParam=PileupParam(distinguish_strands=FALSE,
+                                              include_deletions=FALSE,
+                                              min_base_quality=min_base_quality))
     
     if (nrow(tumorPU) == 0) {
       warning(paste0("0 coverage was found at every identified germline heterozygous position in", tumorBam), call. = FALSE)
@@ -224,9 +223,9 @@ svAF <- function(normalBam,
     tumorPU <- pileup(tumorBam,
                       scanBamParam=ScanBamParam(which=querySNPs,
                                                 flag = scanBamFlag(isDuplicate = FALSE)),
-                      pileupParam=PileupParam(max_depth=max_depth,
-                                              distinguish_strands=FALSE,
-                                              include_deletions=FALSE))
+                      pileupParam=PileupParam(distinguish_strands=FALSE,
+                                              include_deletions=FALSE,
+                                              min_base_quality=min_base_quality))
     
     if (nrow(tumorPU) == 0) {
       warning(paste0("0 coverage was found at every identified germline heterozygous position in", tumorBam), call. = FALSE)
