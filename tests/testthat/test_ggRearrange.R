@@ -26,3 +26,13 @@ test_that("ggRearrange", {
   df <- rearDataFrameList(r.ordered[1:2], "hg19")
   if(FALSE) ggRearrange(df)
 })
+
+
+test_that("ggRearrangeSequences", {
+  
+
+
+})
+
+
+
