@@ -378,35 +378,3 @@ test_that("no germline filter", {
   ag.4adcc78 <- readRDS(file.path(path, "sv_deletion.4adcc78.rds"))
   expect_identical(ag2, ag.4adcc78)
 })
-
-.test_that <- function(name, expr) NULL
-
-.test_that("Full amplicon analysis of CGOV44T", {
-  ##
-  ## This test works for commmit 05d01c6
-  ##
-  ## saved amplicons graphs for the ovarian cell lines can be reproduced with
-  ## commit 05d01c6
-  library(svfilters.hg19)
-  library(Rsamtools)
-  ##library(rtracklayer)
-  library(graph)
-  library(svovarian)
-  library(trellis)
-  data(germline_filters)
-  data(bviews_hg19)
-  id <- "CGOV44T.bam"
-  setwd("/dcl01/scharpf/data/rscharpf/projects/OvarianCellLines")
-  gr <- readRDS("structuralvar/data/segment/0cbs/CGOV44T.bam.rds")
-  bview <- bviews_hg19[, id]
-  ag2 <- sv_amplicons(bview,
-                      segs=gr,
-                      amplicon_filters=germline_filters,
-                      params=ampliconParams(),
-                      transcripts=transcripts)
-
-  ## this evaluates to TRUE prior for commmit 05d01c6 and earlier
-  ## (LOW_THR is explicitly set to NULL)
-  expected <- readRDS("structuralvar/data/segment/1amplicons/CGOV44T.bam.rds")
-  expect_identical(ag2, expected)
-})
