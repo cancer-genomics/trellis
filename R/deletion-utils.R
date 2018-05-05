@@ -1326,7 +1326,7 @@ revise <- function(sv, bins, param){
 #' @seealso \code{\link{preprocessData}}
 #' @examples 
 #' data(pdata)
-#' pdata$bam.file <- system.file("extdata", "cgov44t.bam", package="svbams")
+#' pdata$bam.file <- system.file("extdata", "cgov44t_revised.bam", package="svbams")
 #' sv_deletions(pdata)
 #' @export
 sv_deletions <- function(preprocess,
