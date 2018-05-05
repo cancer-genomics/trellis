@@ -937,6 +937,8 @@ rearDataFrameList <- function(rlist, build, maxgap=5000){
   }
   df2$junction_5p <- sr$junction_5p <- junction_5p
   df2$junction_3p <- sr$junction_3p <- junction_3p
+  if(!"qname" %in% colnames(df2))
+    df2$qname <- NA
   sr.df <- as(sr, "data.frame")
   ##sr.df2 <- sr.df[, c(1:5, 13, 14)]
   sr.df2 <- sr.df[, colnames(df2)]
@@ -1210,6 +1212,153 @@ axis_labels3p <- function(df, xlim2, num.ticks){
        legend=legend.grob)
 }
 
+
+## plot sequences of split reads
+.ggRearrange_sequences <- function(df, ylabel="Read pair index",
+                                   basepairs=400, num.ticks=5){
+  colors <- readColors()[unique(df$read_type)]
+  colors["splitread"] <- "black"
+  nms <- names(readColors())
+  df$read_type <- factor(df$read_type, levels=nms)
+  region <- read_type <- tagid <- NULL
+  df1 <- filter(df, region==levels(region)[1])
+  df2 <- filter(df, region==levels(region)[2])
+  limits <- axis_limits(df, basepairs/2)
+  gene1 <- levels(df$region)[1]
+  gene2 <- levels(df$region)[2]
+  xlim1 <- limits[[gene1]]
+  xlim2 <- limits[[gene2]]
+  labs1 <- axis_labels5p(df1, xlim1, num.ticks)
+  labs2 <- axis_labels3p(df2, xlim2, num.ticks)
+
+  df1.seq <- filter(df1, !is.na(seq1))
+  df2.seq <- filter(df2, !is.na(seq2))
+  ##
+  ## sequences are of variable lengths and have different starts and ends
+  ## - need a data.frame of the form
+  ## position qname dna_base
+  position.list1 <- list()
+  position.list2 <- list()
+  base.list2 <- base.list1 <- list()
+  for(i in seq_len(nrow(df1.seq))){
+    position.list1[[i]] <- (df1.seq$start[i]+1):(df1.seq$end[i])
+    position.list2[[i]] <- (df2.seq$start[i]+1):(df2.seq$end[i])
+    tmp1 <- DNAString(df1.seq$seq1[[i]])
+    tmp2 <- DNAString(df2.seq$seq2[[i]])
+    base.list1[[i]] <- sapply(as.list(tmp1), as.character)
+    base.list2[[i]] <- sapply(as.list(tmp2), as.character)
+  }
+  ##
+  ##  match sequences to the dna coordinates based on the lenths
+  ##
+  sizes1 <- lengths(position.list1) 
+  sizes2 <- lengths(base.list1)
+  sizes3 <- lengths(base.list2)
+  if(all(sizes1 == sizes2)){
+    tab1 <- tibble(position=unlist(position.list1),
+                   dna_base=unlist(base.list1))
+    tab1$qname <- rep(df1.seq$qname, lengths(position.list1))
+    tab1$tagid <- rep(df1.seq$tagid, lengths(position.list1))
+    tab2 <- tibble(position=unlist(position.list2),
+                   dna_base=unlist(base.list2))
+    tab2$qname <- rep(df2.seq$qname, lengths(position.list2))
+    tab2$tagid <- rep(df2.seq$tagid, lengths(position.list2))
+    tab <- bind_rows(tab1, tab2)
+  }
+  if(all(sizes1 == sizes3)){
+    tab1 <- tibble(position=unlist(position.list1),
+                   dna_base=unlist(base.list2))
+    tab1$qname <- rep(df1.seq$qname, lengths(position.list1))
+     tab1$tagid <- rep(df1.seq$tagid, lengths(position.list1))
+    tab2 <- tibble(position=unlist(position.list2),
+                   dna_base=unlist(base.list1))
+    tab2$qname <- rep(df2.seq$qname, lengths(position.list2))
+    tab2$tagid <- rep(df2.seq$tagid, lengths(position.list2))
+    tab <- bind_rows(tab1, tab2)
+  }
+
+  a <- ggplot(df1, aes(ymin=tagid-0.2,
+                       ymax=tagid+0.2,
+                       xmin=start,
+                       xmax=end,
+                       color=read_type,
+                       fill=read_type, group=tagid)) +
+    geom_rect() +
+    geom_text(data=tab1,
+              aes(x=position, y=tagid, label=dna_base),
+              color="white",
+              inherit.aes=FALSE,
+              size=1) +
+    ylab(ylabel) +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    scale_x_continuous(breaks=labs1[["breaks"]],
+                       labels=labs1[["labels"]]) +
+    coord_cartesian(xlim=xlim1) +
+    xlab("") +
+    theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
+          axis.text.y=element_blank(),
+          plot.title=element_text(size=5)) +
+    guides(color=FALSE, fill=FALSE) +
+    geom_vline(xintercept=df$junction_5p[1], linetype="dashed") +
+    ggtitle(paste0(df1$region[1], " (", df1$seqnames[1], ")"))
+  if(df1$reverse[1]){
+    a <- a + scale_x_reverse(breaks=labs1[["breaks"]],
+                             labels=labs1[["labels"]])
+  }
+  b <- ggplot(df2, aes(ymin=tagid-0.2,
+                       ymax=tagid+0.2,
+                       xmin=start,
+                       xmax=end,
+                       color=read_type,
+                       fill=read_type, group=tagid)) +
+    geom_rect() +
+    ylab("read pair index") +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    scale_x_continuous(breaks=labs2[["breaks"]],
+                       labels=labs2[["labels"]]) +
+    coord_cartesian(xlim=xlim2) +
+    xlab("") +
+    theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          legend.position="bottom",
+          legend.direction="horizontal",
+          plot.title=element_text(size=5)) +
+    guides(color=FALSE, fill=FALSE) +
+    geom_vline(xintercept=df$junction_3p[1], linetype="dashed") +
+    ylab("") +
+    ggtitle(paste0(df2$region[1], " (", df2$seqnames[1], ")"))
+  if(df2$reverse[1]){
+    b <- b + scale_x_reverse(breaks=labs2[["breaks"]],
+                             labels=labs2[["labels"]])
+  }
+  ##
+  ## plot both panels just to get the legend
+  d <- ggplot(df, aes(ymin=tagid-0.2,
+                      ymax=tagid+0.2,
+                      xmin=start,
+                      xmax=end,
+                      color=read_type,
+                      fill=read_type, group=tagid)) +
+    geom_rect() +
+    scale_fill_manual(values=colors) +
+    scale_color_manual(values=colors) +
+    theme(legend.position="bottom", legend.direction="horizontal") +
+    guides(color=guide_legend(title=""), fill=guide_legend(title=""))
+  legend.grob <- peelLegend(d)[[2]]
+  agrob <- ggplotGrob(a)
+  bgrob <- ggplotGrob(b)
+  ##legend.grob <- gg.objs[[2]]
+  bgrob$widths <- agrob$widths
+  list(`5p`=agrob,
+       `3p`=bgrob,
+       legend=legend.grob)
+}
+
+
+
 #' @export
 ggRearrangeLegend <- function(){
   read_type <- NULL
@@ -1248,6 +1397,31 @@ ggRearrange <- function(df, ylab="Read pair index",
                          basepairs=400, num.ticks=5){
   . <- NULL
   grobs <- .ggRearrange(df, ylabel=ylab,  basepairs, num.ticks)
+  widths <- c(0.5, 0.5) %>%
+    "/"(sum(.)) %>%
+    unit(., "npc")
+  heights <- c(0.95, 0.05) %>%
+    "/"(sum(.)) %>%
+    unit(., "npc")
+  mat <- matrix(c(1, 2,
+                  3, 3), byrow=TRUE, ncol=2, nrow=2)
+  agrob <- grobs[["5p"]]
+  bgrob <- grobs[["3p"]]
+  legend.grob <- grobs[["legend"]]
+  gobj <- grid.arrange(agrob, bgrob,
+                       legend.grob,
+                       layout_matrix=mat,
+                       widths=widths,
+                       heights=heights)
+  list(arranged.grobs=gobj,
+       grobs=grobs)
+}
+
+
+ggRearrangeSequences <- function(df, ylab="Read pair index",
+                                 basepairs=400, num.ticks=5){
+  . <- NULL
+  grobs <- .ggRearrange_sequences(df, ylabel=ylab,  basepairs, num.ticks)
   widths <- c(0.5, 0.5) %>%
     "/"(sum(.)) %>%
     unit(., "npc")
