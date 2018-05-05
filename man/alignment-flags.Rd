@@ -12,7 +12,7 @@ improperAlignmentFlags()
 properAlignmentFlags()
 
 improperAlignmentParams(flag = improperAlignmentFlags(), what = c("flag",
-  "mrnm", "mpos", "mapq"), ...)
+  "mrnm", "mpos", "mapq", "qname"), ...)
 
 properAlignmentParams(flag = properAlignmentFlags(), what = c("flag",
   "mrnm", "mpos", "mapq"), ...)
