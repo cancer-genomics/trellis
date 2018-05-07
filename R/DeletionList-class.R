@@ -1,7 +1,7 @@
 #' @include AllGenerics.R
 NULL
 
-setClass("DeletionList", contains="GRangesList")
+setClass("DeletionList", contains="CompressedGRangesList")
 
 #' @rdname DeletionList-methods
 #' @aliases DeletionList,list-method
