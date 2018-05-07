@@ -22,17 +22,17 @@ test_that("ggRearrange", {
 
   index <- match(id, names(rlist))
   r.ordered <- fiveTo3List(rlist[index], "hg19")
-
   df <- rearDataFrameList(r.ordered[1:2], "hg19")
   if(FALSE) ggRearrange(df)
+  expect_is(df, "tbl_df")
 })
 
 
-test_that("ggRearrangeSequences", {
-  
-
-
-})
+##test_that("ggRearrangeSequences", {
+##  
+##
+##
+##})
 
 
 
