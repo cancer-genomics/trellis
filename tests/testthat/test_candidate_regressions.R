@@ -56,13 +56,6 @@ test_that("findCandidates", {
   }
   path <- system.file("extdata", package = "trellis")
   rlist.fe9b1f6 <- readRDS(file.path(path, "findCandidates.fe9b1f6.rds"))
-  ##  r1 <- rlist.fe9b1f6[[1]]
-  ##  attributes(class(r1))$package <- "trellis"
-  ##  r2 <- rlist.fe9b1f6[[2]]
-  ##  attributes(class(r2))$package <- "trellis"
-  ##  rlist.fe9b1f6[[1]] <- r1
-  ##  rlist.fe9b1f6[[2]] <- r2
-  ##  saveRDS(rlist.fe9b1f6, file=file.path(path, "findCandidates.fe9b1f6.rds"))
   expect_equivalent(rlist.fe9b1f6, rlist)
 })
 
@@ -75,54 +68,42 @@ test_that("seqJunctionsInferredByPairedTags", {
     saveRDS(candidates, file="seqJunctionsInferredByPairedTags.fe9b1f6.rds")
   }
   path <- system.file("extdata", package = "trellis")
-  cand.fe9b1f6 <- readRDS(file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds"))
-  ##attributes(class(cand.fe9b1f6))$package <- "trellis"
-  ##saveRDS(cand.fe9b1f6, file=file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds"))
+  f <- file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds")
+  cand.fe9b1f6 <- readRDS(f)
   expect_equivalent(candidates, cand.fe9b1f6)
 })
 
 test_that("RearrangementList", {
   path <- system.file("extdata", package = "trellis")
-  candidates <- readRDS(file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds"))
-  ##attributes(class(candidates))$package <- "trellis"
-  ##saveRDS(candidates, file=file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds"))
+  f <- file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds")
+  candidates <- readRDS(f)
   cand.list <- RearrangementList(candidates)
   if(FALSE){
     saveRDS(cand.list, file="RearrangementList.fe9b1f6.rds")
   }
   path <- system.file("extdata", package = "trellis")
   expected.fe9b1f6 <- readRDS(file.path(path, "RearrangementList.fe9b1f6.rds"))
-##  e <- expected.fe9b1f6
-##  attributes(class(e))$package <- "trellis"
-##  e1 <- e[[1]]
-##  e2 <- e[[2]]
-##  attributes(class(e1))$package <- "trellis"
-##  attributes(class(e2))$package <- "trellis"
-##  e[[1]] <- e1
-##  e[[2]] <- e2
-##  saveRDS(e, file=file.path(path, "RearrangementList.fe9b1f6.rds"))
-  expect_identical(cand.list, expected.fe9b1f6)
+  expect_equivalent(cand.list, expected.fe9b1f6)
 })
 
 test_that("type_each", {
   path <- system.file("extdata", package = "trellis")
   cand.list <- readRDS(file.path(path, "RearrangementList.fe9b1f6.rds"))
+  if(FALSE){
+    for(j in seq_along(cand.list)){
+      irp <- improper(cand.list[[j]])
+      irp@first <- updateObject(irp@first)
+      irp@last <- updateObject(irp@last)
+      improper(cand.list[[j]]) <- irp
+    }
+  }
   result <- type_each(cand.list)
   if(FALSE){
     saveRDS(result, file="type_each.fe9b1f6.rds")
   }
   path <- system.file("extdata", package = "trellis")
   result.fe9b1f6 <- readRDS(file.path(path, "type_each.fe9b1f6.rds"))
-##  e <- result.fe9b1f6
-##  attributes(class(e))$package <- "trellis"
-##  e1 <- e[[1]]
-##  e2 <- e[[2]]
-##  attributes(class(e1))$package <- "trellis"
-##  attributes(class(e2))$package <- "trellis"
-##  e[[1]] <- e1
-##  e[[2]] <- e2
-##  saveRDS(e, file=file.path(path, "type_each.fe9b1f6.rds"))
-  expect_identical(result, result.fe9b1f6)
+  expect_equivalent(result, result.fe9b1f6)
 })
 
 test_that("modalRearrangement", {

@@ -9,7 +9,7 @@ test_that("AmpliconGraph", {
   library(Rsamtools)
   library(rtracklayer)
   library(graph)
-  data(germline_filters)
+  data(germline_filters, package="svfilters.hg19")
   data(transcripts)
   ##
   ## read in some CNVs
@@ -19,6 +19,7 @@ test_that("AmpliconGraph", {
   seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
+  ##bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_test.bam"))
   ##
   ## Begin testing internals of sv_amplicons
   ##
@@ -33,7 +34,7 @@ test_that("AmpliconGraph", {
   }
   path <- system.file("extdata", package = "trellis")
   ag.100362c <- readRDS(file.path(path, "AmpliconGraph100362c.rds"))
-  expect_identical(ag, ag.100362c)
+  expect_equivalent(ag, ag.100362c)
 
   ag <- makeAGraph(segs, germline_filters, params)
   if(FALSE){

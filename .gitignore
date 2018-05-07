@@ -28,3 +28,4 @@ svcnvs_files
 /vignettes/amplicons.tex
 /vignettes/diagram.pdf
 /vignettes/svrearrange_files/figure-latex/blat_scores-1.pdf
+/tests/testthat/update_objects.R

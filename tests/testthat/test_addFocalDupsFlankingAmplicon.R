@@ -27,6 +27,7 @@ test_that("addFocalDupsFlankingAmplicon", {
   }
   path <- system.file("extdata", package = "trellis")
   flanks.21adcf5 <- readRDS(file.path(path, "flankingDuplications.21adcf5.rds"))
+  flanks.21adcf5 <- updateObject(flanks.21adcf5)
   expect_identical(flanks, flanks.21adcf5)
   names(left.flanks) <- NULL
   expected <- GRanges("chr8", IRanges(128515001, 128691001),

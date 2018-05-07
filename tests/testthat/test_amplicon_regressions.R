@@ -14,6 +14,12 @@ cgov44t_preprocess <- function(){
 
   irp.file <- file.path(extdata, "cgov44t_improper.rds")
   irp <- readRDS(irp.file)
+  if(FALSE){
+    f <- irp@first
+    irp@first <- updateObject(f)
+    irp@last <- updateObject(irp@last)
+    saveRDS(irp, file=file.path(extdata, "cgov44t_improper.rds"))
+  }
   ddir <- system.file("extdata", package="trellis",
                       mustWork=TRUE)
   lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
@@ -95,7 +101,7 @@ test_that("initialize_graph", {
   }
   path <- system.file("extdata", package = "trellis")
   ag.a4d7744 <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
-  expect_identical(ag, ag.a4d7744)
+  expect_equivalent(ag, ag.a4d7744)
   ## proposed
   pdat <- cgov44t_preprocess()
   pdat$segments <- amplified_segments(pdat$segments, params)
@@ -168,7 +174,7 @@ test_that("annotate_amplicons", {
   ag <- readRDS(file.path(path, "link_amplicons.a4d744.rds"))
   tx <- loadTx("hg19")
   ag <- annotate_amplicons(ag, tx)
-  expect_identical(ag, expected)
+  expect_equivalent(ag, expected)
 })
 
 
@@ -196,7 +202,7 @@ test_that("makeAGraph", {
   ag <- makeAGraph(segs, amplicon_filters, params)
   path <- system.file("extdata", package = "trellis")
   ag.ffab104 <- readRDS(file.path(path, "makeAGraphffab104.rds"))
-  expect_identical(ag, ag.ffab104)
+  expect_equivalent(ag, ag.ffab104)
   expect_true(validObject(ag))
   ##
   ## Proposed setup
@@ -325,7 +331,7 @@ test_that("setDrivers", {
   }
   path <- system.file("extdata", package = "trellis")
   ag.4adcc78 <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
-  expect_identical(ag.4adcc78, ag)
+  expect_equivalent(ag.4adcc78, ag)
 })
 
 test_that("no germline filter", {

@@ -5,21 +5,24 @@ test_that("fiveTo3Prime", {
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
+  if(FALSE){
+    for(i in seq_along(rlist)){
+      r <- rlist[[i]]
+      irp <- improper(r)
+      first(irp) <- updateObject(irp@first)
+      last(irp) <- updateObject(irp@last)
+      improper(r) <- irp
+      rlist[[i]] <- r
+    }
+    saveRDS(rlist, rfile)
+  }
   r2 <- posNeg(r, "hg19")
   expect_identical(geneNames(r2), c("C3orf67-AS1,C3orf67", "FHIT"))
   r3 <- negPos(r, "hg19")
-    df3 <- rearDataFrame(r3)
+  df3 <- rearDataFrame(r3)
   if(FALSE) ggRearrange(df3)
-
   bins <- overlappingTranscripts(r, "hg19")
-  df <- rearDataFrame(r, "hg19")
-  
   orientations <- fiveTo3Prime(r, "hg19")
-
-  if(FALSE){
-    ggRearrange(df)
-    ggRearrange(df2)
-  }
   id <- "10546-10582"
   r <- rlist[[id]]
   r2 <- fiveTo3Prime(r, "hg19")[[1]]
@@ -27,18 +30,17 @@ test_that("fiveTo3Prime", {
   if(FALSE){
     ggRearrange(df)
   }
-
   ##id <- "12263-12576"
   r <- rlist[[1]]
   ##tx <- overlappingTranscripts(r, "hg19")
   ##expect_identical(as.character(tx$gene_name), c("CCDC58", "noncoding1"))
-  df <- rearDataFrame(r, "hg19")
+  ##df <- rearDataFrame(r, "hg19")
   ##expect_identical(levels(df$region), c("CCDC58", "noncoding1"))
   tx <- overlappingTranscripts(r, "hg19")
   is.valid <- check_splitreads(r)
   expect_identical(sum(!is.valid), 0L)
   splitReads(r) <- splitReads(r)[is.valid]
-  df <- rearDataFrame(r, "hg19")
+  ##df <- rearDataFrame(r, "hg19")
   if(FALSE)
     ggRearrange(df)
   tx <- overlappingTranscripts(rlist[[8]], "hg19")
