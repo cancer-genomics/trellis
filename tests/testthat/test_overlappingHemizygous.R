@@ -41,11 +41,15 @@ cgov10t_preprocess <- function(){
                          read_pairs=read_pairs)
 }
 
-test_that("overlappingHemizgyous", {
+.test_that <- function(name, expr) NULL
+
+.test_that("overlappingHemizgyous", {
   library(Rsamtools)
   library(svbams)
   pdat <- cgov10t_preprocess()
   set.seed(123)
+  ## trace(sv_deletions, browser)
+  ## might need to reset maxgap -- 2 deletions do not have improper reads
   sv1 <- sv_deletions(pdat)
   param <- DeletionParam()
   gr_filters <- genomeFilters("hg19")
@@ -71,8 +75,6 @@ test_that("overlappingHemizgyous", {
                                  "OverlappingHemizygous+"))
 })
 
-
-.test_that <- function(name, expr) NULL
 .test_that("scratch", {
   g.old <- variant(sv.old)
   g.cur <- variant(sv)

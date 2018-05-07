@@ -1294,8 +1294,9 @@ revise <- function(sv, bins, param){
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins)
   indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
   calls(sv) <- rpSupportedDeletions(sv, param, bins)
-  sv2 <- leftHemizygousHomolog(sv, bins, param)
-  sv3 <- rightHemizygousHomolog(sv2, bins, param)
+  sv2 <- rightHemizygousHomolog(sv, bins, param)
+  sv3 <- leftHemizygousHomolog(sv2, bins, param)
+  ##sv3 <- rightHemizygousHomolog(sv2, bins, param)
   calls(sv3) <- rpSupportedDeletions(sv3, param, bins)
   message("Refining homozygous boundaries by spanning hemizygous+")
   sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
@@ -1342,7 +1343,8 @@ sv_deletions <- function(preprocess,
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   sv <- removeHemizygous(sv)
   improper_rp <- preprocess$read_pairs[["improper"]]
-  mapq <- mcols(first(improper_rp))$mapq > 30 & mcols(last(improper_rp))$mapq > 30
+  mapq <- mcols(first(improper_rp))$mapq > 30 &
+                                  mcols(last(improper_rp))$mapq > 30
   improper_rp <- improper_rp[mapq]
   if(length(variant(sv)) > 0){
     sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
