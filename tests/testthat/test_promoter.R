@@ -18,6 +18,17 @@ promoterFusion <- function(){
   tx <- transcripts(txdb)
 
   data(rear_cgov7t, package="trellis")
+  if(FALSE){
+    for(i in seq_along(rear_cgov7t)){
+      r <- rear_cgov7t[[i]]
+      irp <- improper(r)
+      first(irp) <- updateObject(irp@first)
+      last(irp) <- updateObject(irp@last)
+      improper(r) <- irp
+      rear_cgov7t[[i]] <- r
+    }
+    save(rear_cgov7t, file="data/rear_cgov7t.rda")
+  }
   ##rlist <- rear_cgov7t
   ##attributes(class(rlist))$package <- "trellis"
   ##for(i in seq_along(rlist)){
