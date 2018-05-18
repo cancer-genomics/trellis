@@ -1,66 +1,52 @@
 #' Compute allele frequencies at germline heterozygous positions
 #
-#' Given a set of genomic coordinates this function identifies heterozygous positions in a bam file 
-#' given by \code{normalBam} and retuns the minor allele frequency at these positions in a bam file 
-#' specified by \code{tumorBam}.  
-#'  
-#' @param normalBam The path to a bam file 
+#' Given a set of genomic coordinates this function identifies heterozygous positions in a bam file
+#' given by \code{normalBam} and retuns the minor allele frequency at these positions in a bam file
+#' specified by \code{tumorBam}.
+#'
+#' @param normalBam The path to a bam file
 #' @param tumorBam The path to a bam file
-#' @param genome The genome build of \code{tumorBam} and \code{normalBam}.  Possible values are "hg38", "hg19", and "hg18". 
-#' @param positions A \code{GRanges} object consisting of the genomic regions of interest.  The default set of positions is 
-#' the \code{snps} object from \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svilters.hg18} depending on the user-specified \code{genome} argument.  The \code{snps}
-#' object contains 1,000,000 positions that are frequently seen as heterozygous, therefore fewer positions are needed to find a sufficient 
-#' number of heterozygous positions.  The \code{snps} object contains more than enough positions for tumor ploidy/ploidy analysis on well-covered
-#' WGS bam files, although for bam files genertated from targeted capture-based sequencing data it is recommended to use all or most the \code{dbsnp150_snps}
-#' object in \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svfilters.hg18} to find a sufficient number of heterozygous positions as these objects contain
-#' over 12,000,000 positions.  
-#' @param region If \code{region} is specified only SNPs in \code{position} that fall in \code{region} will 
-#' be used.  This argument is useful for capture-based sequencing technologies (e.g. Whole-exome sequencing) where we tend to only have high enough
-#' coverage to accurately call SNPs in the targeted regions.  By supplying a \code{GRanges} object containing the targeted 
-#' regions this function avoids calculating coverage metrics and allele frequencies for low coverage off-target regions. Alternatively, 
-#' users can provide the full path to a bed file in BED format.
+#' @param genome The genome build of \code{tumorBam} and \code{normalBam}.  Possible values are "hg38", "hg19", and "hg18".
+#' @param positions A \code{GRanges} object consisting of the genomic regions of interest.  The default set of positions is the \code{snps} object from \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svilters.hg18} depending on the user-specified \code{genome} argument.  The \code{snps} object contains 1,000,000 positions that are frequently seen as heterozygous, therefore fewer positions are needed to find a sufficient number of heterozygous positions.  The \code{snps} object contains more than enough positions for tumor ploidy/ploidy analysis on well-covered WGS bam files, although for bam files genertated from targeted capture-based sequencing data it is recommended to use all or most the \code{dbsnp150_snps} object in \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svfilters.hg18} to find a sufficient number of heterozygous positions as these objects contain over 12,000,000 positions.
+#' 
+#' @param region If \code{region} is specified only SNPs in \code{position} that fall in \code{region} will be used.  This argument is useful for capture-based sequencing technologies (e.g. Whole-exome sequencing) where we tend to only have high enough coverage to accurately call SNPs in the targeted regions.  By supplying a \code{GRanges} object containing the targeted regions this function avoids calculating coverage metrics and allele frequencies for low coverage off-target regions. Alternatively, users can provide the full path to a bed file in BED format.
 #' @param n The number of positions to use for pileup in \code{normalBam}.  The \code{snps} objects 
-#' in \code{svfilters.hg38}, \code{svfilters.hg19} and \code{svfilters.hg18} contain 1 million frequently heterozygous positions.  By specifying the \code{n} argument
-#' a random sample of the positions object of length \code{n} will be used.  For tumor purity/ploidy
-#' analysis 10,000 heterozygous positions well spread across the genome is typically plenty.  The 
-#' default value of \code{n = 50000} is generally sufficient to achieve this on a 30X WGS bam file.  For sequencing data
-#' from targeted capture protocols, it is recommended to use the full set of SNPs in \code{dbsnp150_snp} in \code{svfilters.hg38}, 
-#' \code{svfilters.hg19} or \code{svfilters.hg18} to identify a suffient number of SNPs with high enough coverage.
+#' in \code{svfilters.hg38}, \code{svfilters.hg19} and \code{svfilters.hg18} contain 1 million frequently heterozygous positions.  By specifying the \code{n} argument a random sample of the positions object of length \code{n} will be used.  For tumor purity/ploidy analysis 10,000 heterozygous positions well spread across the genome is typically plenty.  The default value of \code{n = 50000} is generally sufficient to achieve this on a 30X WGS bam file.  For sequencing data from targeted capture protocols, it is recommended to use the full set of SNPs in \code{dbsnp150_snp} in \code{svfilters.hg38}, \code{svfilters.hg19} or \code{svfilters.hg18} to identify a suffient number of SNPs with high enough coverage.
 #' @param minCovNormal The minimum coverage of a position in \code{normalBam} to be considered.
 #' @param minCovTumor The minimum coverage of a position in \code{tumorBam} to be considered.
 #' @param min_base_quality The minimum Phred score of a base for it to be counted
-#' @param minMafNormal The minimum minor allele frequency (MAF) in order to consider a position 
+#' @param minMafNormal The minimum minor allele frequency (MAF) in order to consider a position
 #' as heterozygous in \code{normalBam}.
-#' @param minMafTumor The minimum minor allele frequency (MAF) in order to consider a position 
-#' as heterozygous in \code{tumorBam}.  It is recommended to set this value to at least 0.05 
-#' when setting \code{normalBam = NULL} to avoid outputting homozygous positions.  
-#' 
-#' @details If using this function to generate allele frequencies in a tumor 
+#' @param minMafTumor The minimum minor allele frequency (MAF) in order to consider a position
+#' as heterozygous in \code{tumorBam}.  It is recommended to set this value to at least 0.05
+#' when setting \code{normalBam = NULL} to avoid outputting homozygous positions.
+#'
+#' @details If using this function to generate allele frequencies in a tumor
 #' sample at germline heterozygous positions identified in a matched normal sample then
-#' \code{tumorBam} should point to the bam file for the tumor sample and \code{normalBam} 
+#' \code{tumorBam} should point to the bam file for the tumor sample and \code{normalBam}
 #' should point to the bam file for its matched normal.
-#' 
-#' @examples 
+#'
+#' @examples
 #' extdir <- system.file("extdata", package="svbams")
 #' bam1 <- file.path(extdir, "cgov10t.bam")
 #' bam2 <- file.path(extdir, "cgov44t_revised.bam")
-#' 
+#'
 #' data(snps, package = "svfilters.hg19")
 #' snps <- keepSeqlevels(snps, c("chr3", "chr5"), pruning.mode = "coarse")
 #' \dontrun{
-#' svAF(normalBam=bam1, 
-#'      tumorBam=bam2, 
-#'      genome="hg19", 
-#'      positions = snps, 
-#'      n = 1000, 
-#'      minCovNormal = 10, 
-#'      minCovTumor = 10, 
-#'      minMafNormal = 0.3, 
+#' svAF(normalBam=bam1,
+#'      tumorBam=bam2,
+#'      genome="hg19",
+#'      positions = snps,
+#'      n = 1000,
+#'      minCovNormal = 10,
+#'      minCovTumor = 10,
+#'      minMafNormal = 0.3,
 #'      minMafTumor = 0)
 #'}
 #' @return
 #' A data.frame with the following columns:
-#' 
+#'
 #' \strong{Chrom}: The chromosome of the event \cr
 #' \strong{Pos}: The coordinate of the event \cr
 #' \strong{RefBase}: The base in the reference genome (corresponds to the refUCSC column in dbSNP build 150) \cr
@@ -70,27 +56,25 @@
 #' \strong{Tumor.Mut.Count}: The coverage of AltBase in tumorBam \cr
 #' \strong{Tumor.Coverage}: The distinct coverage of RefBase + AltBase in tumorBam \cr
 #' \strong{Tumor.MAF}: The minor allele frequency of the event in tumorBam
-#' 
+#'
 #' @export
-#' 
-svAF <- function(normalBam, 
-                 tumorBam, 
-                 genome, 
+#'
+svAF <- function(normalBam,
+                 tumorBam,
+                 genome,
                  positions,
                  region,
-                 n = 50000, 
-                 minCovNormal = 20, 
-                 minCovTumor = 20, 
+                 n = 50000,
+                 minCovNormal = 20,
+                 minCovTumor = 20,
                  minMafNormal = 0.3,
                  minMafTumor = 0,
                  min_base_quality = 0) {
-  
   if (!is.null(normalBam)) {
     if (!file.exists(normalBam)) {
       stop(paste0(normalBam), " doesn't exist!")
     }
   }
-  
   if (!is.null(tumorBam)) {
     if (!file.exists(tumorBam)) {
       stop(paste0(tumorBam), " doesn't exist!")
