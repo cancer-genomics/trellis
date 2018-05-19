@@ -376,31 +376,50 @@ calcAlleleFreq <- function(tumorSNPs, normalSNPs = NULL, min.cov) {
   maf <- tumorSNPs$refCount / (tumorSNPs$refCount + tumorSNPs$altCount)
   maf[which(maf > 0.5)] <- 1 - maf[which(maf > 0.5)]
 
+  ##
+  ## DB:  why not return the GRanges object?
+  ##
   if (!is.null(normalSNPs)) {
-    out.df <- data.frame(Chrom = as.character(seqnames(tumorSNPs)),
-                         Pos = start(ranges(tumorSNPs)),
-                         RefBase = tumorSNPs$refUCSC,
-                         AltBase = tumorSNPs$altAllele,
-                         Normal.Mut.Count = normalSNPs$altCount,
-                         Normal.Coverage = (normalSNPs$refCount +
-                                            normalSNPs$altCount),
-                         Tumor.Mut.Count = tumorSNPs$altCount,
-                         Tumor.Coverage = (tumorSNPs$altCount + tumorSNPs$refCount),
-                         Tumor.MAF = round(maf, digits = 2))
+    g <- GRanges(as.character(seqnames(tumorSNPs)),
+                 IRanges(start(ranges(tumorSNPs)), width=1),
+                 RefBase=tumorSNPs$refUCSC,
+                 AltBase = tumorSNPs$altAllele,
+                 Normal.Mut.Count = normalSNPs$altCount,
+                 Normal.Coverage = (normalSNPs$refCount +
+                                    normalSNPs$altCount),
+                 Tumor.Mut.Count = tumorSNPs$altCount,
+                 Tumor.Coverage = (tumorSNPs$altCount +
+                                   tumorSNPs$refCount),
+                 Tumor.MAF = round(maf, digits = 2))
+    ##out.df <- data.frame(Chrom = as.character(seqnames(tumorSNPs)),
+    ##                     Pos = start(ranges(tumorSNPs)),
+    ##                     RefBase = tumorSNPs$refUCSC,
+    ##                     AltBase = tumorSNPs$altAllele,
+    ##                     Normal.Mut.Count = normalSNPs$altCount,
+    ##                     Normal.Coverage = (normalSNPs$refCount +
+    ##                                        normalSNPs$altCount),
+    ##                     Tumor.Mut.Count = tumorSNPs$altCount,
+    ##                     Tumor.Coverage = (tumorSNPs$altCount + tumorSNPs$refCount),
+    ##                     Tumor.MAF = round(maf, digits = 2))
   }
-
   if (is.null(normalSNPs)) {
-    out.df <- data.frame(Chrom = as.character(seqnames(tumorSNPs)),
-                         Pos = start(ranges(tumorSNPs)),
-                         RefBase = tumorSNPs$refUCSC,
-                         AltBase = tumorSNPs$altAllele,
-                         Normal.Mut.Count = NA,
-                         Normal.Coverage = NA,
-                         Tumor.Mut.Count = tumorSNPs$altCount,
-                         Tumor.Coverage = (tumorSNPs$altCount + tumorSNPs$refCount),
-                         Tumor.MAF = round(maf, digits = 2))
+    ##    out.df <- data.frame(Chrom = as.character(seqnames(tumorSNPs)),
+    ##                         Pos = start(ranges(tumorSNPs)),
+    ##                         RefBase = tumorSNPs$refUCSC,
+    ##                         AltBase = tumorSNPs$altAllele,
+    g <- GRanges(as.character(seqnames(tumorSNPs)),
+                 IRanges(start(ranges(tumorSNPs)), width=1),
+                 RefBase=tumorSNPs$refUCSC,
+                 AltBase = tumorSNPs$altAllele,
+                 Normal.Mut.Count = NA,
+                 Normal.Coverage = NA,
+                 Tumor.Mut.Count = tumorSNPs$altCount,
+                 Tumor.Coverage = (tumorSNPs$altCount +
+                                   tumorSNPs$refCount),
+                 Tumor.MAF = round(maf, digits = 2))
   }
-  return(out.df)
+  ##return(out.df)
+  g
 }
 
 
