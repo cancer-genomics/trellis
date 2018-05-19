@@ -103,7 +103,7 @@ svAF <- function(normalBam,
   } else {
     SNPs <- positions
   }
-
+  SI <- seqinfo(positions)
   if (min_base_quality < 0) {
     stop("The value of 'min_base_quality' must be greater than or equal to 0")
   }
@@ -182,8 +182,6 @@ svAF <- function(normalBam,
     }
     tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = TRUE)
     alleleFreqs <- calcAlleleFreq(tumorSNPs = tumorSNPs, normalSNPs = normalSNPs)
-    message(paste0("Retuning allele frequencies for ", nrow(alleleFreqs), " position(s)"))
-    return(alleleFreqs)
   }
   ## When tumorBam is specified and normalBam isn't, do pileup in tumorBam with minMafTumor
   if (is.null(normalBam) & !is.null(tumorBam)) {
@@ -210,9 +208,11 @@ svAF <- function(normalBam,
       return(out.df)
     }
     alleleFreqs <- calcAlleleFreq(tumorSNPs = tumorSNPs, normalSNPs = NULL)
-    message(paste0("Retuning allele frequencies for ", length(alleleFreqs), " position(s)"))
-    return(alleleFreqs)
   }
+  message(paste0("Retuning allele frequencies for ", length(alleleFreqs), " position(s)"))
+  genome(alleleFreqs) <- genome
+  seqinfo(alleleFreqs) <- SI
+  alleleFreqs
 }
 
 
