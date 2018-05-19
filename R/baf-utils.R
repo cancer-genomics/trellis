@@ -80,46 +80,44 @@ svAF <- function(normalBam,
       stop(paste0(tumorBam), " doesn't exist!")
     }
   }
-  
+
   if (minCovNormal < 0) {
     stop("minCovNormal cannot take on a negative value.")
   }
-  
+
   if (minCovTumor < 0) {
     stop("minCovTumor cannot take on a negative value.")
   }
-  
+
   if ((minMafNormal < 0) | (minMafNormal > 0.5)) {
     stop("minMafNormal must be in the range [0,0.5]")
   }
-  
+
   if ((minMafTumor < 0) | (minMafTumor > 0.5)) {
     stop("minMafTumor must be in the range [0,0.5]")
   }
-  
+
   if (missing(positions)) {
     data("snps", package = paste0("svfilters.", genome), envir = environment())
     SNPs <- get("snps")
   } else {
     SNPs <- positions
   }
-  
+
   if (min_base_quality < 0) {
     stop("The value of 'min_base_quality' must be greater than or equal to 0")
   }
-  
+
   if (n < 1) {
     stop("The value of 'n' must be at least 1")
   }
-  
+
   if (n > length(SNPs)) {
     stop("The value of 'n' must be less than or equal to the number of SNPs in 'positions'")
   }
-  
   if (!(genome %in% c("hg18", "hg19", "hg38"))) {
     stop(paste0(genome, " is not a possible value for 'genome'.  Possible values include 'hg19' and 'hg18'"))
   }
-  
   if (!missing(region)) {
     if (!is(region, "GRanges")) {
       if (file.exists(region)) {
@@ -130,7 +128,6 @@ svAF <- function(normalBam,
       }
       }
     }
-  
   out.df <- data.frame(Chrom = character(0),
                        Pos = character(0),
                        RefBase = character(0),
@@ -140,7 +137,6 @@ svAF <- function(normalBam,
                        Tumor.Mut.Count = character(0),
                        Tumor.Coverage = character(0),
                        Tumor.MAF = character(0))
-  
   if (!missing(region)) {
     SNPs <- subsetByOverlaps(SNPs, region)
     if (length(SNPs) > 0) {
@@ -149,14 +145,11 @@ svAF <- function(normalBam,
       stop(paste0(length(SNPs), " SNPs in 'positions' overlap with 'region'"))
     }
   }
-  
   if (n > length(SNPs)) {
     n <- length(SNPs)
     message("Scaling down 'n' to ", n)
   }
-  
   SNPs <- SNPs[sample(1:length(SNPs), size = n, replace = FALSE)]
-  
   if (!is.null(normalBam) & !is.null(tumorBam)) {
     message(paste0("Computing pileup at ", n, " position(s) in ", normalBam))
     querySNPs <- SNPs
@@ -166,20 +159,16 @@ svAF <- function(normalBam,
                        pileupParam=PileupParam(distinguish_strands=FALSE,
                                                include_deletions=FALSE,
                                                min_base_quality=min_base_quality))
-    
     if (nrow(normalPU) == 0) {
       warning(paste0("0 coverage was found at every specified position in", normalBam), call. = FALSE)
       return(out.df)
     }
-    
     message("Identifying heterozygous positions")
     normalSNPs <- filterSNPs(pu = normalPU, SNPs = querySNPs, min.cov = minCovNormal, min.maf = minMafNormal, keepSingles = FALSE)
-    
     if (length(normalSNPs) == 0) {
       warning(paste0("0 heterozygous positions were found in", normalBam), call. = FALSE)
       return(out.df)
     }
-    
     message(paste0("Computing pileup at ", length(normalSNPs), " position(s) in ", tumorBam))
     tumorPU <- pileup(tumorBam,
                       scanBamParam=ScanBamParam(which=normalSNPs,
@@ -187,20 +176,16 @@ svAF <- function(normalBam,
                       pileupParam=PileupParam(distinguish_strands=FALSE,
                                               include_deletions=FALSE,
                                               min_base_quality=min_base_quality))
-    
     if (nrow(tumorPU) == 0) {
       warning(paste0("0 coverage was found at every identified germline heterozygous position in", tumorBam), call. = FALSE)
       return(out.df)
     }
-    
     tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = TRUE)
     alleleFreqs <- calcAlleleFreq(tumorSNPs = tumorSNPs, normalSNPs = normalSNPs)
     message(paste0("Retuning allele frequencies for ", nrow(alleleFreqs), " position(s)"))
-    
     return(alleleFreqs)
   }
-  
-  # When tumorBam is specified and normalBam isn't, do pileup in tumorBam with minMafTumor
+  ## When tumorBam is specified and normalBam isn't, do pileup in tumorBam with minMafTumor
   if (is.null(normalBam) & !is.null(tumorBam)) {
     querySNPs <- SNPs
     message(paste0("Computing pileup at ", length(querySNPs), " position(s) in ", tumorBam))
@@ -210,32 +195,25 @@ svAF <- function(normalBam,
                       pileupParam=PileupParam(distinguish_strands=FALSE,
                                               include_deletions=FALSE,
                                               min_base_quality=min_base_quality))
-    
     if (nrow(tumorPU) == 0) {
       warning(paste0("0 coverage was found at every identified germline heterozygous position in", tumorBam), call. = FALSE)
       return(out.df)
     }
-    
     message(paste0("Identifying positions with MAF >= ", minMafTumor))
     if (minMafTumor > 0) {
-       tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = FALSE)  
+       tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = FALSE)
     } else if (minMafTumor == 0) {
       tumorSNPs <- filterSNPs(pu = tumorPU, SNPs = querySNPs, min.cov = minCovTumor, min.maf = minMafTumor, keepSingles = TRUE)
     }
-    
-    
     if (length(tumorSNPs) == 0) {
       warning(paste0("0 heterozygous positions were found in", tumorBam), call. = FALSE)
       return(out.df)
     }
-    
     alleleFreqs <- calcAlleleFreq(tumorSNPs = tumorSNPs, normalSNPs = NULL)
-    message(paste0("Retuning allele frequencies for ", nrow(alleleFreqs), " position(s)"))
-    
+    message(paste0("Retuning allele frequencies for ", length(alleleFreqs), " position(s)"))
     return(alleleFreqs)
   }
-  
-  }
+}
 
 
 
