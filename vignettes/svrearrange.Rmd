@@ -65,13 +65,8 @@ rdat <- rearrangementData(bins=bins1kb,
 ```
 
 
-The function `findCandidates2` identifies clusters of improperly paired reads.
-Parameters for identifying improperly paired read clusters are specified in the
-`RearrangementParams` function. In particular, note the
-`min_number_tags_per_cluster` argument. With 30x coverage and a clonal ovarian
-cancer cell line, we set this value to 5. Note, we require the read pairs to be
-at least 10kb apart with respect to the reference genome to reduce false
-positives.
+The function `findCandidates2` identifies clusters of improperly paired reads. Parameters for identifying improperly paired read clusters are specified in the `RearrangementParams` function. In particular, note the
+`min_number_tags_per_cluster` argument. With 30x coverage and a clonal ovarian cancer cell line, we set this value to 5. Note, we require the read pairs to be at least 10kb apart with respect to the reference genome to reduce false positives.
 
 ```{r find_candidates}
 rparam <- RearrangementParams(min_number_tags_per_cluster=5,
@@ -84,20 +79,14 @@ rlist
 ```
 
 Two candidate rearrangements are identified. Each improperly paired read
-flanking a candidate rearrangement is typed according to the orientation and
-spacing of the paired reads. See @TODO@ for more information on the
-rearrangement types. Each rearrangement, supported by at least 5 read pairs in
-this example, is classified according to the modal type. To extract all the
-improperly paired reads supporting the first rearrangement, one can use the
-function `improper`:
+flanking a candidate rearrangement is typed according to the orientation and spacing of the paired reads. See @TODO@ for more information on the
+rearrangement types. Each rearrangement, supported by at least 5 read pairs in this example, is classified according to the modal type. To extract all the improperly paired reads supporting the first rearrangement, one can use the function `improper`:
 
 ```{r improper_pairs}
 improper(rlist[[1]])
 ```
 
-The rearranged read pair clusters link potentially distant regions within a
-chromosome (intra-chromosome) or between chromosomes (inter-chromosomal). These
-links can be accessed by the `linkedBins` accessor:
+The rearranged read pair clusters link potentially distant regions within a chromosome (intra-chromosome) or between chromosomes (inter-chromosomal). These links can be accessed by the `linkedBins` accessor:
 
 ```{r linked_bins}
 linkedBins(rlist)

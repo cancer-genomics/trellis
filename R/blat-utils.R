@@ -28,24 +28,24 @@ blatGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
   g
 }
 
-elandGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
-  g <- GRanges(blat$eland.chr, IRanges(blat$eland.start, blat$eland.end))
+genomeGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
+  g <- GRanges(blat$genome.chr, IRanges(blat$genome.start, blat$genome.end))
   seqlevels(g, pruning.mode="coarse") <- sl
   g
 }
 
-elandAndBlatOverlap <- function(blat){
+genomeAndBlatOverlap <- function(blat){
   blat$Qname <- factor(blat$Qname, levels=unique(blat$Qname))
   g.blat <- blatGRanges(blat)
-  g.eland <- elandGRanges(blat)
-  if(length(g.blat) != length(g.eland)){
-    msg <- "Check whether unique(blat$Tname) is the same as unique(blat$eland.chr)"
+  g.genome <- genomeGRanges(blat)
+  if(length(g.blat) != length(g.genome)){
+    msg <- "Check whether unique(blat$Tname) is the same as unique(blat$genome.chr)"
     stop(msg)
   }
-  strand(g.eland) <- strand(g.blat)
-  same_seqname <- chromosome(g.eland) == chromosome(g.blat)
-  tmp <- pintersect(g.eland[same_seqname], g.blat[same_seqname]) ##resolve.empty="start.x")
-  is_overlap <- rep(FALSE, length(g.eland))
+  strand(g.genome) <- strand(g.blat)
+  same_seqname <- chromosome(g.genome) == chromosome(g.blat)
+  tmp <- pintersect(g.genome[same_seqname], g.blat[same_seqname]) ##resolve.empty="start.x")
+  is_overlap <- rep(FALSE, length(g.genome))
   is_overlap[same_seqname] <- width(tmp) > 0
   is_overlap
 }
@@ -65,19 +65,23 @@ annotateBlatRecords <- function(blat, tag.sequences){
   ## Q is for query (tag sequence)
   sampleids <- tag.sequences$id
   ##sampleids <- rep(sampleids, elementNROWS(tag.sequences))
-  eland.starts <- tag.sequences$start
-  eland.ends <- tag.sequences$end
-  eland.chr <- tag.sequences$seqnames
-  eland.strand <- tag.sequences$strand
+
+  ##
+  ## genome aligner
+  ##
+  genome.starts <- tag.sequences$start
+  genome.ends <- tag.sequences$end
+  genome.chr <- tag.sequences$seqnames
+  genome.strand <- tag.sequences$strand
   ##
   ## This no longer applies
   ##
   tagnames <- paste(tag.sequences$qname, tag.sequences$read, sep="_")
   names(sampleids) <- tagnames
-  names(eland.starts) <- tagnames
-  names(eland.ends) <- tagnames
-  names(eland.chr) <- tagnames
-  names(eland.strand) <- tagnames
+  names(genome.starts) <- tagnames
+  names(genome.ends) <- tagnames
+  names(genome.chr) <- tagnames
+  names(genome.strand) <- tagnames
   ##
   ##
   ##
@@ -88,13 +92,13 @@ annotateBlatRecords <- function(blat, tag.sequences){
     blat <- blat[blat$Qname %in% tagnames, ]
   }
   blat$id <- sampleids[blat$Qname]
-  blat$eland.chr <- eland.chr[blat$Qname]
-  blat$eland.start <- eland.starts[blat$Qname]
-  blat$eland.end <- eland.ends[blat$Qname]
-  blat$eland.strand <- eland.strand[blat$Qname]
+  blat$genome.chr <- genome.chr[blat$Qname]
+  blat$genome.start <- genome.starts[blat$Qname]
+  blat$genome.end <- genome.ends[blat$Qname]
+  blat$genome.strand <- genome.strand[blat$Qname]
   ## replace Tsize with T.end-T.start
   blat$Tsize <- blat$Tend-blat$Tstart
-  blat$is_overlap <- elandAndBlatOverlap(blat)
+  blat$is_overlap <- genomeAndBlatOverlap(blat)
   rownames(blat) <- NULL
   blat
 }
@@ -130,28 +134,57 @@ addXCoordinateForTag <- function(blat){
 }
 
 blatStatsPerTag <- function(blat.records, tag_length){
-  ## summary statistics for a single read
-  is_90 <- blat.records$match > 90
-  ## Tsize in blat.records is size of target sequence (chromosome)
-  Tsize <- abs(blat.records$Tend-blat.records$Tstart)
-  is_size_near100 <- Tsize > (tag_length - 1/5*tag_length) &
-    Tsize < (tag_length + 1/5*tag_length)
-  is_90 <- is_90 & is_size_near100
-  is_overlap <- blat.records$is_overlap
-  ## calculate number of near-perfect matches for each tag
-  n.matches <- sapply(split(is_90, blat.records$Qname), sum)
-  n.eland.matches <- sapply(split(is_overlap & is_90, blat.records$Qname), sum)
-  ## there should only be one eland alignment with high quality (n.matches == 1)
-  ## AND this read should overlap the eland alignment
-  n.matches==1 & n.eland.matches==1
+  stats <- blat.records %>%
+    mutate(is_90 = match > 90,
+           Tsize=abs(Tend-Tstart),
+           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
+             Tsize < (tag_length + 1/5*tag_length),
+           is_90 = is_90 & is_size_near100) %>%
+    group_by(Qname) %>%
+    summarize(n.matches=sum(is_90),
+              n.eland.matches=sum(is_90 & is_overlap)) %>%
+    mutate(is_pass=n.matches == 1 & n.eland.matches==1)
+  return(stats)
+  if(FALSE){
+    ## summary statistics for a single read
+    is_90 <- blat.records$match > 90
+    ## Tsize in blat.records is size of target sequence (chromosome)
+    Tsize <- abs(blat.records$Tend-blat.records$Tstart)
+    is_size_near100 <- Tsize > (tag_length - 1/5*tag_length) &
+      Tsize < (tag_length + 1/5*tag_length)
+    is_90 <- is_90 & is_size_near100
+    is_overlap <- blat.records$is_overlap
+    ## calculate number of near-perfect matches for each tag
+    n.matches <- sapply(split(is_90, blat.records$Qname), sum)
+    n.eland.matches <- sapply(split(is_overlap & is_90, blat.records$Qname), sum)
+    ## there should only be one eland alignment with high quality (n.matches == 1)
+    ## AND this read should overlap the eland alignment
+    n.matches==1 & n.eland.matches==1
+  }
 }
 
 .blatStatsRearrangement <- function(blat, thr=0.8, tag_length){
   cols <- c("Qname", "match", "is_overlap", "Tstart", "Tend")
   blat <- blat[, cols]
   if(nrow(blat) == 0) return(NULL)
-  blat$tag_index <- addXCoordinateForTag(blat)
-  stats <- blatStatsPerTag(blat, tag_length)
+  splitby <- blat$Qname %>%
+    strsplit("R[12]") %>%
+    sapply("[", 1)
+  blat$tag_index <- blat$Qname %>% strsplit(splitby) %>%
+    sapply("[", 2)
+  ##blat$tag_index <- addXCoordinateForTag(blat)
+  ##stats <- blatStatsPerTag(blat, tag_length)
+  stats <- blat %>%
+    mutate(is_90 = match > 90,
+           Tsize=abs(Tend-Tstart),
+           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
+             Tsize < (tag_length + 1/5*tag_length),
+           is_90 = is_90 & is_size_near100) %>%
+    group_by(Qname) %>%
+    summarize(n.matches=sum(is_90),
+              n.eland.matches=sum(is_90 & is_overlap)) %>%
+    mutate(is_pass=n.matches == 1 & n.eland.matches==1)
+
   proportion_pass <- mean(stats)
   qnames <- gsub("R[12]", "", blat$Qname)
   n_tags <- length(unique(qnames))
@@ -159,6 +192,17 @@ blatStatsPerTag <- function(blat.records, tag_length){
   ##blat$passQC <- rep(proportion_pass > thr, nrow(blat))
   blat$passQC <- is_pass
   blat
+}
+
+blatGRanges <- function(blat){
+  chr <- blat$Tname
+  starts <- blat$Tstart
+  ends <- blat$Tend
+  g <- GRanges(chr, IRanges(starts, ends),
+               blockcount=blat$blockcount,
+               Qname=blat$Qname,
+               rid=blat$rid,
+               score=blat$score)
 }
 
 #' blatScores assesses whether the improper read pairs at a
@@ -248,31 +292,128 @@ blatStatsPerTag <- function(blat.records, tag_length){
 #' @export
 #' @param blat a \code{data.frame} of results from  command-line blat
 #' @param tags a \code{data.frame} containing read names and the original alignment locations
-#' @param id  a character-vector of sample identifiers
-#' @param thr a length-one numeric vector indicating the fraction of
+#' @param prop.pass a length-one numeric vector indicating the fraction of
 #'   reads at a rearrangement that must pass the read-level QC.
-blatScores <- function(blat, tags, id, thr=0.8){
-  tag_length <- nchar(tags$seq[1])
-  blat$match <- blat$match/tag_length * 100
-  rownames(tags) <- paste0(tags$qname, "_", tags$read)
-  blat <- annotateBlatRecords(blat, tags)
-  blat <- removeReadsWithoutMate(blat)
-  tagnames.list <- .listTagsByGroup(tags, tags[["rearrangement.id"]])
-  blat.parsed <- vector("list", length(tagnames.list))
-  for(j in seq_along(tagnames.list)){
-    tagnames <- tagnames.list[[j]]
-    rid <- names(tagnames.list)[j]
-    blat_rid <- blat[blat$Qname %in% tagnames, ]
-    result <- .blatStatsRearrangement(blat_rid, thr=thr, tag_length)
-    if(!is.null(result)){
-      result$rearrangement <- rep(rid, nrow(result))
-    }
-    blat.parsed[[j]] <- result
-  }
-  blat.parsed <- blat.parsed[!sapply(blat.parsed, is.null)]
-  blat.parsed <- do.call("rbind", blat.parsed)
-  blat.parsed$id <- rep(id, nrow(blat.parsed))
-  blat.parsed
+#' @param min.tags the minimum number of tags that pass BLAT QC for each rearrangement
+#' @param id sample id
+blatScores <- function(blat, tags, min.tags=5, prop.pass=0.8, id){
+  tags <- tags %>%
+    unite("Qname", c("qname", "read"))
+  ##table(blat_aln$Qname %in% tags$Qname)
+  rid <- tags %>%
+    group_by(Qname) %>%
+    summarize(rid=unique(rearrangement.id))
+  blat2 <- left_join(blat, rid, by="Qname") %>%
+    mutate(score=match/Qsize) %>%
+    mutate(tsize=abs(Tstart-Tend)) %>%
+    filter(score >= 0.90 & blockcount==1) %>%
+    filter(tsize >= (Qsize - 1/5*Qsize) & tsize <= (Qsize + 1/5*Qsize))
+  blat.g <- blatGRanges(blat2)
+  genome.g <- GRanges(tags$seqnames, IRanges(tags$start, tags$end),
+                      Qname=tags$Qname, rid=tags$rearrangement.id)
+  hits <- findOverlaps(blat.g, genome.g, ignore.strand=TRUE, maxgap=500)
+  keep <- blat.g$Qname[queryHits(hits)] == genome.g$Qname[subjectHits(hits)]
+  hits <- hits[keep]
+  blat2$overlaps_genome <- FALSE
+  blat2$overlaps_genome[ queryHits(hits) ] <- TRUE
+  blat3 <- blat2 %>%
+    group_by(Qname)  %>%
+    summarize(overlaps_genome=sum(overlaps_genome),
+              overlaps_other=sum(!overlaps_genome),
+              rid=unique(rid)) %>%
+    ungroup %>%
+    group_by(rid) %>%
+    summarize(number_reads=length(unique(Qname)),
+              p_overlap_genome=mean(overlaps_genome >= 1),
+              p_notoverlap_genome=mean(overlaps_genome < 1)) %>%
+    mutate(passQC=p_overlap_genome >= prop.pass &
+           number_reads >= min.tags)
+  return(blat3)
+  ## bind blat results with tag information
+##  tag_length <- nchar(tags$seq[1])
+##  blat <- blat %>%
+##    mutate(score=match/tag_length*100) %>%
+##    filter(score >= 90)
+##
+##  tags2 <- tags
+##  ix <- match("qname", colnames(tags2))
+##  colnames(tags2) <- paste0("genome_", colnames(tags2))
+##  colnames(tags2)[ix] <- "Qname"
+##  splitby <- blat$Qname %>%
+##    strsplit("R[12]") %>%
+##    sapply("[", 1)
+##  blat$read <-   blat$Qname %>% strsplit(splitby) %>%
+##    sapply("[", 2)
+##  blat$Qname <- gsub("_R[12]", "", blat$Qname)
+##  blat2 <- left_join(blat, tags2, by="Qname") %>%
+##    as.tibble
+##  blat.gr <- GRanges(blat2$Tname, IRanges(blat2$Tstart, blat2$Tend))
+##  tags.gr <- GRanges(as.character(blat2$genome_seqnames),
+##                     IRanges(blat2$genome_start, blat2$genome_end))
+##  hits <- findOverlaps(blat.gr, tags.gr, ignore.strand=TRUE)
+##  keep <- queryHits(hits) == subjectHits(hits)
+##  hits <- hits[keep]
+##  blat.gr$overlaps_genome <- FALSE
+##  blat.gr$overlaps_genome[queryHits(hits)] <- TRUE
+##  blat2$overlaps_genome <- blat.gr$overlaps_genome
+##  ## Remove reads without mate
+##  tab <- table(tags2$Qname)
+##  tab <- tab[tab < 2]
+##  if(length(tab) > 0){
+##    blat2 <- filter(blat2, !Qname %in% names(tab))
+##  }
+##  ##blat$match <- blat$match/tag_length * 100
+##  ##rownames(tags) <- paste0(tags$qname, "_", tags$read)
+##  ##blat3 <- annotateBlatRecords(blat2, tags) %>%
+##  ##as.tibble
+##  ##blat <- removeReadsWithoutMate(blat)
+##  ##colnames(tags) <- gsub("rearrangement.id", "rid", colnames(tags))
+##  ix <- match("genome_rearrangement.id", colnames(blat2))
+##  colnames(blat2)[ix] <- "rid"
+  ##blat2 <- left_join(blat, tags, by="Qname")
+##  blat2 <- .listTagsByGroup(tags, tags[["rearrangement.id"]]) %>% {
+##    tibble(rid=rep(names(.), elementNROWS(.)),
+##           Qname=unlist(.))
+##  } %>% left_join(blat)
+##  splitby <- blat2$Qname %>%
+##    strsplit("R[12]") %>%
+##    sapply("[", 1)
+##  blat2$read <-   blat2$Qname %>% strsplit(splitby) %>%
+##    sapply("[", 2)
+  blat.qname <- blat2 %>%
+    mutate(Tsize=abs(Tend-Tstart),
+           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
+             Tsize < (tag_length + 1/5*tag_length),
+           is_90 = match > 90 & is_size_near100) %>%
+    filter(is_90) %>%
+    group_by(Qname) %>%
+    summarize(rid=unique(rid),
+              n.matches=sum(is_90),
+              n.genome.matches=sum(is_90 & overlaps_genome)) %>%
+    select(c("rid", "n.matches", "n.genome.matches", "Qname")) %>%
+    mutate(is_pass=n.matches == 2 & n.genome.matches  >= 2)
+  blat.rid <- blat.qname %>%
+    group_by(rid) %>%
+    summarize(proportion_pass=mean(is_pass),
+              ntags=n()) %>%
+    mutate(passQC=proportion_pass > prop.pass & ntags >= min.tags)
+  return(blat.rid)
+  ##  blat.parsed <- vector("list", length(tagnames.list))
+  ##  for(j in seq_along(tagnames.list)){
+  ##    tagnames <- tagnames.list[[j]]
+  ##    rid <- names(tagnames.list)[j]
+
+  ##    blat_rid <- blat[blat$Qname %in% tagnames, ]
+  ##    result <- .blatStatsRearrangement(blat_rid, thr=thr, tag_length)
+  ##    if(!is.null(result)){
+  ##      result$rearrangement <- rep(rid, nrow(result))
+  ##    }
+  ##    blat.parsed[[j]] <- result
+  ##  }
+  ##  blat.parsed <- blat.parsed[!sapply(blat.parsed, is.null)]
+  ##  blat.parsed <- do.call("rbind", blat.parsed)
+  ##  blat.parsed$id <- rep(id, nrow(blat.parsed))
+  ##blat.parsed
 }
 
 
