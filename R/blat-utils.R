@@ -296,7 +296,7 @@ blatGRanges <- function(blat){
 #'   reads at a rearrangement that must pass the read-level QC.
 #' @param min.tags the minimum number of tags that pass BLAT QC for each rearrangement
 #' @param id sample id
-blatScores <- function(blat, tags, min.tags=5, prop.pass=0.8, id){
+blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
   tags <- tags %>%
     unite("Qname", c("qname", "read"))
   ##table(blat_aln$Qname %in% tags$Qname)
@@ -327,7 +327,8 @@ blatScores <- function(blat, tags, min.tags=5, prop.pass=0.8, id){
               p_overlap_genome=mean(overlaps_genome >= 1),
               p_notoverlap_genome=mean(overlaps_genome < 1)) %>%
     mutate(passQC=p_overlap_genome >= prop.pass &
-           number_reads >= min.tags)
+             number_reads >= min.tags) %>%
+    mutate(rid=factor(rid))
   return(blat3)
   ## bind blat results with tag information
 ##  tag_length <- nchar(tags$seq[1])
@@ -414,54 +415,6 @@ blatScores <- function(blat, tags, min.tags=5, prop.pass=0.8, id){
   ##  blat.parsed <- do.call("rbind", blat.parsed)
   ##  blat.parsed$id <- rep(id, nrow(blat.parsed))
   ##blat.parsed
-}
-
-
-#' Reads files output by the blat executable.
-#'
-#' The blat executable is run with the default set of arguments using
-#' a reference genome comprised of standard sequences without
-#' alternates.  This function is a wrapper for \code{blatScores}. If a
-#' file containing \code{blatScores} already exists, this function
-#' only reads previously saved computations from disk.
-#'
-#' @seealso See \code{blatScores}
-#' @examples
-#' \dontrun{
-#'  library(svovarian)
-#'  dirs <- projectOvarian(rootname="OvarianData2")
-#'  if(FALSE){
-#'    tags <- readRDS(file.path(dirs[["3read"]], "CGOV2T.rds"))
-#'    blat <- readBlat(file.path(dirs["1blat"], "CGOV2T.txt"))
-#'    parsed <- scoreBlatExperiment(id, blat, tags, dirs)
-#'    parsed
-#'  }
-#' }
-#'
-#' @return a list of \code{tbl_df} objects
-#'
-#' @param id sample id
-#'
-#' @param blat data.frame of blat records from the command-line blat tool
-#'
-#' @param tags a \code{tbl_df} object of the read sequences
-#'
-#' @param dirs a \code{DataPaths} object
-#'
-#' @param thr a length-one numeric vector indicating the fraction of
-#'   improper reads that are of high quality for a given
-#'   rearrangement.
-#'
-scoreBlatExperiment <- function(id, blat, tags, dirs, thr=0.8){
-  parsed_file <- file.path(dirs[["4parsed_mapped"]], paste0(id, ".rds"))
-  if(file.exists(parsed_file)){
-    blat2 <- readRDS(parsed_file)
-  } else {
-    blat2 <- blatScores(blat, tags, id=id, thr=thr)
-    saveRDS(blat2, file=parsed_file)
-  }
-  blat2 <- tbl_df(blat2)
-  blat2
 }
 
 overlapsBlatRecord <- function(linked_bins, blat_record, maxgap=200){
@@ -827,4 +780,178 @@ removeAmbiguous <- function(x, blat){
 #' }
 removeAmbiguousAln <- function(rlist, blat_list){
   mapply(removeAmbiguous, x=rlist, blat=blat_list)
+}
+
+breakpointInvA <- function(blat.gr, query.gr){
+  message("Rearrangement_A")
+  ## end of query range is first element
+  break1 <- GRanges(seqnames(blat.gr)[1],
+                    IRanges(start(blat.gr)[1], width=1),
+                    strand=strand(blat.gr[1]))
+  break1$linkedto <- GRanges(seqnames(blat.gr)[2],
+                             IRanges(start(blat.gr)[2], width=1),
+                             strand=strand(blat.gr[2]))
+  break1
+}
+
+breakpointInvB <- function(blat.gr, query.gr){
+  message("Rearrangement_B")
+  ## reverse so that lowest query start point is first
+  blat.gr <- blat.gr[order(start(query.gr))]
+  if(cstrand(blat.gr)[1]=="+"){
+    brk1 <- end(blat.gr)[1]
+  } else brk1 <- start(blat.gr)[1]
+  if(cstrand(blat.gr)[2]=="-"){
+    brk2 <- end(blat.gr)[2]
+  } else brk2 <- start(blat.gr)[2]
+  break1 <- GRanges(seqnames(blat.gr)[1],
+                    IRanges(brk1, width=1),
+                    strand=strand(blat.gr[1]))
+  break1$linkedto <- GRanges(seqnames(blat.gr)[2],
+                             IRanges(brk2, width=1),
+                             strand=strand(blat.gr[2]))
+  break1
+}
+
+breakpointsInversion <- function(x, rear){
+  lb <- linkedBins(rear)
+  blat.gr <- GRanges(x$Tname, IRanges(x$Tstart, x$Tend),
+                     strand=x$strand,
+                     match=x$match,
+                     blockcount=x$blockcount,
+                     blockSizes=x$blockSizes,
+                     seqinfo=seqinfo(lb),
+                     qname=x$Qname)
+  blat.gr <- blat.gr[!duplicated(blat.gr)]
+  query.gr <- GRanges(x$Tname, IRanges(x$Qstart, x$Qend),
+                      strand=x$strand,
+                      match=x$match,
+                      size=x$Qsize,
+                      qname=x$Qname)
+  query.gr <- query.gr[!duplicated(query.gr)]
+
+  blat.grl <- split(blat.gr, blat.gr$qname)
+  query.grl <- split(query.gr, query.gr$qname)
+  brks <- NULL
+  for(i in seq_along(blat.grl)){
+    blat.gr2 <- blat.grl[[i]]
+    query.gr2 <- query.grl[[i]]
+    ##
+    ## Rearrangement_A proximal part of inversion
+    ## - genomic start for second half of query overlaps linkedBins interval
+    ##   -- breakpoint is in linkedbins
+    ##  (Figure S9, Ordulu)
+    ## - genomic start of the first half of query overlaps linkedTo interval
+    ##  (Figure S9, Ordulu)
+    ix <- order(-end(query.gr2))
+    blat.gr2 <- blat.gr2[ix]
+    query.gr2 <- query.gr2[ix]
+    isRearrangementA <- overlapsAny(blat.gr2[1], lb, maxgap=200)
+    if(isRearrangementA) {
+      brks2 <- breakpointInvA(blat.gr2, query.gr2)
+      brks2$rearrangement <- "A"
+      brks <- c(brks, brks2)
+    } else{
+      ## must be rearrangement_B
+      brks2 <- breakpointInvB(blat.gr2, query.gr2)
+      brks2$rearrangement <- "B"
+      brks <- c(brks, brks2)
+    }
+    brks
+  }
+  brks2 <- unlist(GRangesList(brks))
+}
+
+breakpointsForQuery <- function(x, seqinfo){
+  ## For each split read supporting rearrangement,
+  ## determine the sequence junction
+  blat.gr <- GRanges(x$Tname, IRanges(x$Tstart, x$Tend),
+                     strand=x$strand,
+                     match=x$match,
+                     blockcount=x$blockcount,
+                     blockSizes=x$blockSizes,
+                     seqinfo=seqinfo)
+  blat.gr <- blat.gr[!duplicated(blat.gr)]
+  query.gr <- GRanges(x$Tname, IRanges(x$Qstart, x$Qend),
+                      strand=x$strand,
+                      match=x$match,
+                      size=x$Qsize)
+  query.gr <- query.gr[!duplicated(query.gr)]
+  ##
+  ## order by chromosome and then by alignment with highest score
+  ##
+  ix <- order(factor(as.character(seqnames(blat.gr)),
+                     levels=seqlevels(blat.gr)),
+              -blat.gr$match)
+  blat.gr2 <- blat.gr[ix]
+  if(sum(width(blat.gr2)) > query.gr$size[1]){
+    overhang <- sum(width(blat.gr2)) - query.gr$size[1]
+    if(cstrand(blat.gr2)[1] == "+"){
+      end(blat.gr2)[1] <- end(blat.gr2)[1] - overhang
+    } else {
+      start(blat.gr2)[1] <- start(blat.gr2)[1] + overhang
+    }
+  }
+  query.gr2 <- query.gr[ix]
+  breakpoints <- ifelse(cstrand(blat.gr2)=="+",
+                        end(blat.gr2),
+                        start(blat.gr2))
+  breaks.gr <- GRanges(seqnames(blat.gr2), IRanges(breakpoints, width=1),
+                       strand=strand(blat.gr2))
+  breaks.gr
+}
+
+iscnName <- function(A){
+  extdata <- system.file("extdata", package="SNPchip")
+  cytobands <- read_tsv(file.path(extdata, "cytoBand_hg19.txt"),
+                        col_names=FALSE) %>%
+    set_colnames(c("seqnames", "start", "end", "band", "stain")) %$%{
+      GRanges(seqnames, IRanges(start, end), band=band, stain=stain)
+    }
+  band1 <- subsetByOverlaps(cytobands, A) %>%
+    .$band
+  band2 <- subsetByOverlaps(cytobands, A$linkedto) %>%
+    .$band
+  ## for A, end of query range is listed in the GRanges
+  ##  the linkedto field contains the first part of the query
+  if(cstrand(A$linkedto) == "+"){
+    if(substr(band2, 1, 1) == "p"){
+      terminus1 <- "pter->"
+    } else {
+      terminus1 <- "pter_cen->"
+    }
+  } else {
+    if(substr(band2, 1, 1) == "p"){
+      terminus1 <- "qter_cen->"
+    } else {
+      terminus1 <- "qter_->"
+    }
+  }
+  if(cstrand(A) == "+"){
+    if(substr(band1, 1, 1) == "p"){
+      terminus2 <- "->pter"
+    } else {
+      terminus2 <- "->cen_pter"
+    }
+  } else {
+    if(substr(band1, 1, 1) == "p"){
+      terminus2 <- "->_cen_qter"
+    } else {
+      terminus2 <- "->qter"
+    }
+  }
+  chrA <- gsub("chr", "", chromosome(A))
+  iscn <- paste0("seq[hg19]inv(", chrA, ")(",
+                 band1, ";", band2, ")")
+  ## go from start of read to end of read
+  ## for A, end of read is in linkedBins and start of read is in 'linkedto'
+  hgsv <- paste0(terminus1, band1,
+                 "(", start(A$linkedto), ")::",
+                 band2, band1, "(",
+                 start(A), "-", start(A$linkedto), ")::",
+                 band2, "(", start(A), ")",
+                 terminus2)
+  A$iscn <- iscn
+  A$hgsv <- hgsv
+  A
 }

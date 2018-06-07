@@ -5,16 +5,18 @@
 \title{blatScores assesses whether the improper read pairs at a
 rearrangement junction provide strong support of the rearrangement}
 \usage{
-blatScores(blat, tags, id, thr = 0.8)
+blatScores(blat, tags, id, min.tags = 5, prop.pass = 0.8)
 }
 \arguments{
 \item{blat}{a \code{data.frame} of results from  command-line blat}
 
 \item{tags}{a \code{data.frame} containing read names and the original alignment locations}
 
-\item{id}{a character-vector of sample identifiers}
+\item{id}{sample id}
 
-\item{thr}{a length-one numeric vector indicating the fraction of
+\item{min.tags}{the minimum number of tags that pass BLAT QC for each rearrangement}
+
+\item{prop.pass}{a length-one numeric vector indicating the fraction of
 reads at a rearrangement that must pass the read-level QC.}
 }
 \description{

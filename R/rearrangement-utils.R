@@ -1033,6 +1033,7 @@ peelLegend <- function(gg){
 }
 
 axis_limit5p <- function(df, basepairs){
+  if(nrow(df) == 0) return()
    if(!df$reverse[1]){
      xlim1 <- c(min(df$start),
                 df$junction_5p[1])
@@ -1068,7 +1069,6 @@ axis_limit3p <- function(df, basepairs){
 ##
 #' @export
 axis_limits <- function(df, basepairs){
-  region <- NULL
   df1 <- filter(df, region==levels(region)[1])
   df2 <- filter(df, region==levels(region)[2])
   xlim1 <- axis_limit5p(df1, basepairs)
