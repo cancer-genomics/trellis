@@ -1,0 +1,692 @@
+---
+title: "Tumor-only structural variant analyses using trellis"
+author: "Robert Scharpf, Dorothy Hallberg, Daniel Bruhm, and Victor Velculescu"
+date: \today
+output: BiocStyle::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Preprocessing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc} 
+---
+
+# Introduction
+
+The trellis package was developed to identify somatic structural variants in tumor-only analyses, including deletions, amplifications and how amplicons are grouped in the tumor genome, intra-and inter-chromosomal rearrangements, inversions, and in-frame fusions.  An additional packages required for this vignette is the `svfilters.hg<build>` package that contains various sequence filters for structural variant analyses and the `svbams` package that contains subsampled data that is used to illustrate various aspects of data processing.
+
+
+```{r packages, results="hide"}
+library(Rsamtools)
+library(magrittr)
+library(Rsamtools)
+library(ggplot2)
+library(svbams)
+library(svfilters.hg19)
+library(tidyverse)
+library(trellis)
+```
+
+# Batch jobs 
+
+## Improperly paired reads
+
+Here, we illustrate aspects of the preprocessing that are best handled as a batch job in a non-interactive session.  We illustrate the extraction of improperly paired reads in the following code chunk. This step takes a long time depending on the size of the bam file.  In practice, we submit this as a batch job and save the result to disk to read in later.
+
+```{r improper_pairs}
+extdata <- system.file("extdata", package="svbams")
+bamfile <- file.path(extdata, "cgov44t_revised.bam")
+if(!dir.exists("improper_align")) dir.create("improper_align")
+what <- c("flag", "mrnm", "mpos", "mapq")
+iparams <- improperAlignmentParams(what=what)
+improper_rp <- getImproperAlignmentPairs(bamfile,
+                                         param=iparams, 
+                                         build="hg19")
+```
+
+
+## Normalizing bin counts
+
+We begin by defining a set of bins over which the number of aligned reads will be counted.  The sv.filters<.build> packages contain 1kb bins that exclude regions with average mappability less than 0.75.
+To make this toy example run faster, we only preprocess chromosome 8.
+
+```{r define_bins}
+data(bins1kb, package="svfilters.hg19")
+bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"), pruning.mode="coarse")
+```
+
+We use infrastructure provided in the Rsamtools package for counting single-end reads overlapping the bins. We remove the bins with zero counts as these are a consequence of the artificially small bam file included in the `svbams` package.
+
+
+```{r counts}
+flags <- scanBamFlag(isDuplicate=FALSE,
+                     isPaired=TRUE,
+                     isUnmappedQuery=FALSE,
+                     hasUnmappedMate=FALSE,
+                     isProperPair=TRUE)
+bviews <- BamViews(bamPaths=bamfile, bamRanges=bins)
+bins$cnt <- binnedCounts(bviews)
+bins <- bins[ bins$cnt > 0 ]
+```
+
+Next, we log-transform the raw counts and correct for GC content by loess. As a random subset of the genome is selected to model GC biases, we set a seed in the following code chunk for reproducibility.
+
+```{r normalize}
+bins$std_cnt <- binNormalize(bins)
+set.seed(123)
+bins$log_ratio <- binGCCorrect(bins)
+```
+
+At this stage, it is a good idea to plot the data.  When many samples are available, differences between groups of samples (batch effects) can be visualized and addressed at this stage.
+
+```{r plot}
+dat <- tibble(chr = as.character(seqnames(bins)),
+              start=start(bins),
+              end=end(bins),
+              log2_ratio=bins$log_ratio) %>%
+  mutate(chr=factor(chr, levels=c("chr5", "chr8", "chr15")))
+dat <- dat[!is.na(dat$log2_ratio), ]
+ggplot(dat)  +
+  geom_point(aes(start, log2_ratio), size = 1) +
+  xlab("Coordinate") +
+  ylab("log2 normalized counts") +
+  coord_cartesian(ylim=c(-4, 1)) +
+  geom_hline(yintercept=0) +
+  facet_grid(~chr, space="free", scales="free_x") 
+```
+
+If one or more normal controls are available, the bin-counts can be further corrected by the bin-wise medians from normals.  This is particularly helpful for capture-based sequencing where bins are often of variable width.
+
+# Amplifications and deletions
+
+
+<!-- We first load an object from the `trellis` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `trellis` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38. -->
+
+## Segmentation
+
+
+Next, we segment the $\log_2$ ratios using circular binary segmentation (CBS) [@REF]. See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object.
+
+```{r segment}
+##bins_subset <- bins1kb
+##seqlevels(bins_subset, pruning.mode="coarse") <- c("chr1", "chr2")
+##bins_subset <- bins_subset[ seq(1, length(bins_subset), 50) ]
+params <- SegmentParam()
+params
+g <- segmentBins(bins, param=SegmentParam())
+g
+```
+
+The result is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.   
+
+## Plotting the genome
+
+We routinely visualize the segmented $\log_2$ ratios of the entire genome to get an overview of the data.  An example using the `ggplot2` library follows. Because this dataset is very small, we set the transparency to one and use relatively large points.
+
+```{r genome, fig.width=8, fig.height=4, warning=FALSE}
+segs <- tibble(chr=as.character(seqnames(g)),
+               start=start(g), end=end(g), seg.mean=g$seg.mean) %>%
+  mutate(chr=factor(chr, levels=levels(dat$chr)))
+alpha <- 1; size <- 0.9
+ggplot(dat, aes(start, log2_ratio)) +
+  geom_point(size=0.9, color="steelblue", alpha = alpha) +
+  geom_segment(data=segs,
+               aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
+               color="black", inherit.aes=FALSE, size=1.2) +
+  facet_grid(~chr, space="free", scales="free_x") +
+  theme(axis.text.x=element_blank(),
+        panel.grid=element_blank(),
+        panel.background=element_rect(fill="white"),
+        axis.ticks.x=element_blank(), 
+        strip.text.x = element_text(size = 3)) + 
+  xlab("") +
+  ylab(expression(log[2](r))) + 
+  ylim(c(-3, 2))
+```
+
+## Deletions
+
+In additition to the segmented $\log_2$ ratios, the deletion analysis requires improperly paired reads. Below, we specify the complete file path to the BAM file used for this analysis that is provided by the `svbams` package. We extract improperly paired reads from the entire genome and an initial set of properly paired reads from a region on chromosome 15.
+
+```{r views}
+##extdata <- system.file("extdata", package="svbams")
+##bam.file <- file.path(extdata, "cgov44t_revised.bam")
+##iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
+##improper_rp <- getImproperAlignmentPairs(bam.file,
+##                                         param=iparams, 
+##                                         build="hg19")
+##segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
+segs <- keepSeqlevels(g, "chr15", pruning.mode="coarse")
+del.gr <- IRanges::reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
+                          min.gapwidth=2000)
+proper_rp <- properReadPairs(bamfile, gr=del.gr, DeletionParam())
+read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
+```
+
+We collect the bin-level summaries ($\log_2$ ratios), the segmentation data, and the read pair data in a single list object:
+
+
+```{r preprocess_data}
+pdata <- preprocessData(bam.file=bamfile,
+                        genome="hg19",
+                        bins=bins,
+                        segments=segs,
+                        read_pairs=read_pairs)
+```
+
+Below, we call segments as homozygous deletion (homozygous), homozygous deletion supported by improperly paired reads (homozygous+), hemizygous deletion (hemizygous), and hemizygous deletion supported by improperly paired reads (hemizygous). 
+For identifying somatic deletions without a matched normal, we exclude hemizygous deletions not supported by improperly paired reads. With this toy dataset, we identify 16 possible homozygous deletions and the calls are both `homozygous` except one which is `homozygous+`.
+
+```{r sv_deletions}
+param <- DeletionParam(remove_hemizygous=FALSE)
+deletions <- sv_deletions(preprocess=pdata, param=param)
+variant(deletions)
+calls(deletions)
+```
+
+The improperly-paired reads supporting the `homozygous+` call can be extracted
+as a `GAlignmentPairs` object from the twelth element of the `StructuralVariant` object.
+
+```{r structural_variant}
+##improper(deletions[12])
+```
+
+# Amplicons
+
+Amplicons can be identified using the same list data structure for the
+preprocessed data we called `pdata` as was used in the *Deletions* section.  
+
+```{r amplified_segments}
+ag <- sv_amplicons2(pdata, params=ampliconParams())
+```
+
+Note the object returned by `sv_amplicons` is a graph where the nodes are the
+individual amplicons and the edges are links between amplicons given by
+improperly paired reads. By default, with 30x coverage we require at least 5
+improperly paired reads to support an edge. See `?ampliconParams` for customing
+these settings.
+
+# Plotting deletions
+
+We will use the *ggplot2* and *gridExtra* packages for plotting the deletions.
+
+```{r plot_libraries}
+library(ggplot2)
+suppressPackageStartupMessages(library(gridExtra))
+library(scales)
+```
+
+In the following code chunk, we extract the genomic coordinates for a deletion
+stored in a *StructuralVariant* object distributed with this package. To view the deletion in the context of the
+surrounding region, we create a second *GRanges* object that includes 200kb of
+the flanking genome on each side of the deletion.
+
+```{r region_of_interest}
+data(deletion)
+roi <- variant(deletion) # region of interest 
+seqlevels(roi, pruning.mode="coarse") <- "chr15"
+expand <- 200e3
+roi2 <- GRanges(seqnames(roi), IRanges(start(roi)-expand,
+                                       end(roi) + expand))
+seqinfo(roi2) <- seqinfo(roi)
+```
+
+Next, we subset the views object to contain only the genomic bins in the region
+of interest defined above. In addition, we create a data.frame containing all
+the segments for this particular chromosome and sample and a data.frame
+containing the preprocessed coverage.
+
+```{r dataframes}
+segs <- keepSeqlevels(segments, seqlevels(roi), pruning.mode="coarse")
+segs.df <- as(segs, "data.frame")
+hom.plus <- subsetByOverlaps(bins1kb, roi2)
+df <- data.frame(logr=hom.plus$log_ratio,
+                 start=start(hom.plus))
+```
+
+We restrict the y-axis limits to a suitable range for visualizing the log
+ratios, thresholding log ratios that are extreme. We highlight the region
+identified by the segmentation in the ggplot graphic (the boundaries for the
+deletion are subsequently revised by the improperly paired reads as described in
+the next section).
+
+```{r plot_logratios}
+ylim <- c(-9, 2)
+df$logr <- threshold(df$logr, ylim)
+brks <- pretty(df$start, n=8)
+region <- subsetByOverlaps(segs, roi)
+region <- region[region$seg.mean < -1]
+region <- as.data.frame(region)
+xlim <- c(start(roi2), end(roi2))
+
+A <- ggplot(df, aes(start, logr)) +
+  geom_point(size=1, color="gray50") +
+  scale_x_continuous(expand=c(0,0), breaks=brks, labels=brks/1e6)+
+  scale_y_continuous(expand=c(0,0)) +
+  geom_segment(data=segs.df,
+               aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
+               size=1) +
+  coord_cartesian(xlim=xlim, ylim=ylim) +
+  ylab(expression(log[2]~ratio)) +
+  geom_rect(data=region,
+            aes(xmin=start, xmax=end, ymin=-Inf, ymax=+Inf),
+            fill="steelblue", color="transparent", alpha=0.3,
+            inherit.aes=FALSE) +
+  theme(axis.text=element_text(size=10),
+        axis.text.x=element_blank()) + xlab("") +
+  annotate("text", x=xlim[1] + 15e3, y=-8, label="chr15", size=3)
+A1 <- ggplotGrob(A)
+```
+
+## Plotting rearranged read pairs from a deletion object
+
+In addition to the log ratios, we would like to visualize the rearranged read
+pairs (read pairs with aberrant spacing or orientation with respect to the
+reference genome) that support the deletion. The rearranged read pairs
+supporting the deletion are encapsulated in the *deletion* object that we
+already loaded. First, we pull read pairs flanking the candidate deletion that
+have normal spacing and orientation. Because there are typically a large number
+of the normal read pairs, we thin these using the function *thinReadPairs*.
+Next, we melt these reads into a *data.frame* useful for plotting.
+
+```{r rearranged_reads}
+rps <- thinReadPairs(deletion)
+rps <- trellis:::meltReadPairs(rps)
+```
+
+We again use *ggplot* to plot the data. Note the vertical dashed lines depict
+the more precise boundaries of the deletion made possible by the improperly
+paired (rearranged) reads. 
+
+```{r plot_rearranged_reads}
+colors <- c("#0072B2", "#009E73")
+p <- ggplot(rps, aes(ymin=readpair-0.2, ymax=readpair+0.2,
+                xmin=start/1e6, xmax=end/1e6, color=read,
+                fill=read, group=readpair)) +
+  geom_rect() +
+  xlim(c(min(rps$start), max(rps$end))/1e6) +
+  geom_line(aes(x=start/1e6, y=readpair)) +
+  ylab("read pair index") +
+  scale_x_continuous(breaks=pretty_breaks(5)) +
+  geom_rect(data=region,
+            aes(xmin=start/1e6, xmax=end/1e6, ymin=-Inf, ymax=+Inf),
+            fill="steelblue", color="transparent", alpha=0.2,
+            inherit.aes=FALSE) +
+  scale_color_manual(values=colors) +
+  scale_fill_manual(values=colors) + 
+  xlab("Mb") +
+  theme(axis.text.x=element_text(size=7)) +
+  guides(fill=FALSE, color=FALSE) +
+  geom_vline(xintercept=c(start(roi)/1e6, end(roi)/1e6), linetype="dashed")
+B <- ggplotGrob(p)
+```
+
+
+Finally, we make a composite graphic of the log ratios and rearranged reads.
+Note, the vertical dashed lines show the revised deletion boundaries using the
+improperly-paired reads that flank the new sequence junction formed as a result
+of the deletion.
+
+```{r composite}
+grid.arrange(A1, B, ncol=1)
+```
+
+## Plotting amplicon graphs
+
+See the amplicons vignette.
+
+# Rearrangement analysis
+
+# Identifying candidate rearrangements
+
+This package uses improperly paired reads to identify candidate somatic
+rearrangements. We assume the improperly paired reads have been extracted from a
+bam file (see the `svalignments` package). Here, we provide an example bam file, load the 1kb bins from the svfilters package, and load all the  improperly paired reads corresponding to this bam file.
+
+```{r improper}
+data(bins1kb, package="svfilters.hg19")
+bins1kb <- keepSeqlevels(bins1kb, paste0("chr", c(1:22, "X")),
+                         pruning.mode="coarse")
+extdata <- system.file("extdata", package="svbams")
+id <- "cgov44t_revised.bam"
+bam.file <- file.path(extdata, id)
+irp.file <- file.path(extdata, "cgov44t_improper.rds")
+irp <- readRDS(irp.file)
+seqlevels(irp, pruning.mode="coarse") <- seqlevels(bins1kb)
+```
+
+Below, we use simple helper functions to assemble different pieces of data
+needed for rearrangement analyses. In particular, we create a list of filters
+used to reduce the identification of spurious alignment artifacts. This
+`GRangesList` of filters is created by the function `rFilters` and nincludes
+somatic deletions and amplifications identified from read-depth analyses as part
+of the `svcnvs` vignette, outliers in read depth coverage, germline CNVs, and germline rearrangements. For rearrangements, the two regions that are joined in the rearrangement to create the novel adjacency are unlinked and a single `GRanges` vector is created (see `germline_rear` below).
+Both the outliers, germline CNVs, and germline rearrangements were identified from a set of 10
+lymphoblastoid cell lines and are provided by the
+`svfilters.hg19` package in the `germline_filters` object.
+
+
+```{r filters}
+data(germline_filters, package="svfilters.hg19")
+data(amplicon_graph, package="trellis")
+data(deletions2, package="trellis")
+genome_filters <- reduceGenomeFilters(germline_filters,
+                                      seqlevels(bins1kb))
+filters <- rFilters(amplicons=ampliconRanges(amplicon_graph),
+                    deletions=variant(deletions2),
+                    rear=germline_rear,
+                    germline=genome_filters)
+rdat <- rearrangementData(bins=bins1kb,
+                          read_pairs=list(improper=irp),
+                          filters=filters)
+```
+
+
+The function `findCandidates2` identifies clusters of improperly paired reads. Parameters for identifying improperly paired read clusters are specified in the `RearrangementParams` function. In particular, note the
+`min_number_tags_per_cluster` argument. With 30x coverage and a clonal ovarian cancer cell line, we set this value to 5. Note, we require the read pairs to be at least 10kb apart with respect to the reference genome to reduce false positives.
+
+```{r find_candidates}
+rparam <- RearrangementParams(min_number_tags_per_cluster=5,
+                              rp_separation=10e3)
+minNumberTagsPerCluster(rparam)
+rpSeparation(rparam)
+rlist <- findCandidates2(rdat, rparam)
+rdat$rlist <- rlist
+rlist
+```
+
+Two candidate rearrangements are identified. Each improperly paired read
+flanking a candidate rearrangement is typed according to the orientation and spacing of the paired reads. See @TODO@ for more information on the
+rearrangement types. Each rearrangement, supported by at least 5 read pairs in this example, is classified according to the modal type. To extract all the improperly paired reads supporting the first rearrangement, one can use the function `improper`:
+
+```{r improper_pairs_two}
+improper(rlist[[1]])
+```
+
+The rearranged read pair clusters link potentially distant regions within a chromosome (intra-chromosome) or between chromosomes (inter-chromosomal). These links can be accessed by the `linkedBins` accessor:
+
+```{r linked_bins}
+linkedBins(rlist)
+```
+
+The `linked.to` value in the `mcols` of the linked bins is itself a `GRanges` object:
+
+```{r linked_to}
+linkedBins(rlist)$linked.to
+##or
+linkedTo(rlist)
+```
+
+Next, we apply the filters we've assembled:
+
+```{r rear_filters}
+rlist <- filterRear(rdat, rparam)
+```
+
+Like `rlist`, `rlist2` is also a `RearrangementList` object.
+
+# Confirmation by BLAT 
+
+The rearangements identified thus far are required to have a physical separation of at least `rp_separation` with respect to the reference genome, must be supported by at least `min_number_tags_per_cluster` paired reads, at least `prop_modal_rearrangement` of the read pairs must be consistent with the modal rearrangement type, and the size of the read clusters must be at least `min_cluster_size` basepairs. This section demonstrates how realignment using BLAT can further improve specifity of the rearrangement analysis.
+
+## Mapped-mapped 
+
+For each rearrangement identified in the above analyses, we have saved the set of improperly paired reads supporting the new sequence junction. Because both reads in the improper pairs were mapped to the reference genome by ELAND, this section describes the realignment of 'mapped-mapped' pairs. In the following code chunk, we extract the tag sequence of all improperly paired reads in a `RearrangementList` and write these sequences to file in fasta format. Note, the `MAX` argument to `getSequenceOfReads` below indicates the maximum number of sequences for a specific rearrangement to extract from the BAM file. The first rearrangement in the `rlist` object has 52 improperly paired reads spanning the sequence junction. Setting this parameter to 25 (`MAX=25`), we randomly select 25 of the 52 read pairs for re-alignment by BLAT.
+
+
+```{r tag_sequence}
+set.seed(123)
+tags <- getSequenceOfReads(rlist, bam.file,
+                           MAX=25L, build = "hg19")
+dir <- tempdir()
+fa.file <- file.path(dir, paste0(id, ".fa"))
+writeToFasta(tags, fa.file)
+```
+
+The unevaluated code below illustrates how one could do a `system` call to run the command-line version of BLAT. In addition to requiring installation of BLAT, we must also have a copy of the appropriate reference genome available.
+
+```{r blat, eval=FALSE}
+blatpath <- "~/bin/x86_64/blat"
+refgenome <- "~/Dropbox/reference_genome/hg19.fa"
+outfile <- tempfile()
+cmd <- paste(blatpath, refgenome, fa.file, outfile)
+system(cmd)
+file.copy(outfile, "../../svalignments/inst/extdata/blat_alignment.txt")
+```
+
+Here, we read the previously saved BLAT alignments for this data included with the `svalignments` package.
+
+```{r read_fasta}
+extdata <- system.file("extdata", package="trellis")
+blat.file <- file.path(extdata, "blat_alignment.txt")
+blat_aln <- readBlat(blat.file)
+```
+
+Next, we parse the BLAT alignments (@DESCRIBE@) and assess whether the BLAT alignment for each read pair is consistent with the whole genome aligner. In particular, we require that each read have only one near perfect match in the genome (match > 90) and, if there is a near-perfect match, the near-perfect match must be consistent with the whole genome aligner. 
+
+
+```{r blat_scores}
+scores <- blatScores(blat_aln, tags, id="CGOV44T",
+                     min.tags=5, prop.pass=0.8)
+##library(ggplot2)
+##ggplot(scores, aes(tag_index, match)) +
+##  geom_jitter(width=0.05, aes(color=eland), size=0.5) +
+##  geom_hline(yintercept=90, linetype="dashed") +
+##  scale_color_manual(values=c("black", "gray")) +
+##  facet_wrap(~rearrangement, ncol=1, scales="free_x")
+```
+
+## Mapped-unmapped 
+
+In addition to using BLAT to confirm the ELAND alignments of the improperly paired reads supporting a rearrangement, BLAT can also be used to identify split reads that directly span the sequence junction. Here, we query the BAM file for all read pairs in which a read was mapped near the putative rearrangement but its mate was not aligned (mapped-unmapped). If the unmapped mate spans the sequence junction, we will assess whether BLAT aligns a subsequence of the read to one cluster and the complement of the subsequence to the second cluster. Such reads further improve the specificity of the rearrangement and establish basepair resolution of the sequence junction. First, we construct a `GRanges` object of all the linked read clusters identified in our rearrangement analyses. This `GRanges` object will be used to query the BAM file for any read pair in which one read mapped to this region near the rearrangement and its mate did not. Next, we write the sequence of the unmapped reads to a fasta file.
+
+```{r mapped_unmapped}
+query <- uncouple(linkedBins(rlist))
+unmapped <- unmapped_read(bam.file, query, yield_size=200000)
+length(unmapped)
+dir <- tempdir()
+mapped_unmapped.fa <- file.path(dir, "mapped-unmapped.fa")
+writeUnmappedToFasta(unmapped, mapped_unmapped.fa)
+```
+
+The object `unmapped` is a `GRanges` object of 87 reads that were not mapped by ELAND to the reference genome and that have a mate mapped to one of the intervals in `query`. Again, we use a system call in the following unevaluated code chunk to realign the unmapped reads: 
+
+```{r blat-unmapped, eval=FALSE}
+outfile <- tempfile()
+cmd <- paste(blatpath, refgenome, mapped_unmapped.fa, outfile)
+system(cmd)
+file.copy(outfile, "../../svalignments/inst/extdata/blat_unmapped.txt")
+```
+
+TODO: create a script in data-raw/ that creates the above blat_unmapped.txt object.  
+
+```{r parse-blat-unmapped}
+unmap.file <- file.path(extdata, "blat_unmapped.txt")
+blat_unmap <- readBlat(unmap.file)
+```
+
+Recall that our QC analysis of the mapped-mapped read pairs focused on whether  the original ELAND alignment was the only high-scoring BLAT alignment. Here,  our goal is to assess whether BLAT splits the alignment of the ELAND-unmapped  reads to the approximate locations of the rearrangement given by the `rlist`  object. To make this more concrete, the locations in the first rearrangement  (with respect to the reference genome) that we think are joined in the somatic  genome are given by the linked bins:
+
+```{r first-linked-bin}
+linkedBins(rlist)[1]
+ ```
+
+We want to assess whether BLAT aligns part of a subsequence of a read to this region
+
+```{r rearrangement1-first}
+granges(linkedBins(rlist)[1])
+```
+
+and the compliment of the above subsequence to this bin:
+
+```{r rearrangement1-last}
+linkedTo(rlist)[1]
+```
+ 
+We use the function `rearrangedReads` to identify BLAT records that correspond to split reads supporting a rearrangement. Depending on the size of the sequenced DNA fragments, the improperly paired reads can only approximate the location of a sequence junction (likely to within 100 basepairs). Finally, we check that each rearrangement is supported by one or more reads that map to both sides of the sequence junction using the function `is_valid_splits`.
+
+
+```{r rearrangedReads}
+split_reads <- rearrangedReads(linkedBins(rlist), blat_unmap, 500)
+elementNROWS(split_reads)
+split_reads
+splitReads(rlist) <- split_reads
+is_valid <- is_valid_splits(rlist, maxgap=50)
+rlist <- rlist[ is_valid ]
+```
+
+# 5-prime to 3-prime orientation
+
+The above BLAT analysis identifies 60 and 12 split reads for the two rearrangements named `1-2` and `3-4`, respectively. Each of these rearrangements have two possible 5-prime to 3-prime orientations.  The function `fiveTo3List`  places the linked bins in their 5-prime to 3-prime orientation.  Note, in the code below that `rlist2` is now twice the length of the original `rlist` object as each rearrangement has been placed in two possible orientations (This is required for evaluating in-frame fusions).   Because some of the split reads may be filtered when evaluating the orientation of the sequence junction, we again filter rearrangements that are not supported by at least one split read.
+
+```{r fiveTo3List}
+rlist2 <- fiveTo3List(rlist, build="hg19")
+rlist2 <- rlist2[ is_valid_splits(rlist2, maxgap=50) ]
+rlist2
+```
+
+To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `data.frame`. The function `rearDataFrameList` (need better name) takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we've arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
+
+
+```{r rearDataFrameList, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`. "}
+##df <- rearDataFrameList(rlist2[1:2], build="hg19")
+df <- rearDataFrame(rlist2[[1]], build="hg19")
+grobs <- ggRearrange(df)
+grobs[["arranged.grobs"]]
+```
+
+The second rearrangement in the original `rlist` object now corresponds to elements 3 and 4 of the `rlist2` object.  Again, we call `rearDataFrameList` and `ggRearrange` to organize and then plot the supporting reads.
+
+```{r plot_secoind_rearrangement}
+df2 <- rearDataFrame(rlist2[[3]], build="hg19")
+ggRearrange(df2)[["arranged.grobs"]]
+```
+
+# Fusions
+
+# Analysis pipeline
+
+```{r RearrangementList}
+suppressPackageStartupMessages(library(trellis))
+extdata <- system.file("extdata", package="trellis")
+rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
+rlist <- readRDS(rfile)
+rlist
+```
+
+The above `rlist` contains 68 rearrangements. We begin by selecting only the rearrangements in which both ends of a sequence junction are within 5kb of a known transcript.
+
+
+```{r subsetRlist}
+build <- "hg19"
+near.coding <- seqJunctionNearTx(rlist=rlist, build=build)
+rlist <- rlist[ near.coding ]
+length(rlist)
+```
+
+As discussed in the vignette for rearrangements, each candidate rearrangement has two possible 5-prime to 3-prime orientations that can be inferred by the orientation of the rearranged read pairs (RRPs) and split reads (SRs).  We use the function `fiveTo3List` to order each rearrangement in the `rlist` object by these two orientations.  In doing so, the length of the `rlist` object doubles.
+
+```{r fiveToThree, eval=TRUE}
+rlist2 <- fiveTo3List(rlist, build)
+length(rlist2)
+```
+
+Having established the 5-prime to 3-prime orientations in the `rlist2` object, we make the definition of the sequence junctions more precise.
+
+```{r seqJunctions, eval=TRUE}
+jxns <- seqJunctions_Rlist(rlist2)
+jxns
+```
+
+In addition, we require the 3-prime genomic region of the junction to lie strictly within a transcript, while the 5-prime genomic region forming the junction can occur either in the promoter or within the 5-prime transcript.  Operationally, we define the promoter as the genomic region 5kb upstream of the transcription start site of the 5-prime gene. We refer to the remaining junctions as `coding_jxns`.  As the coding junctions are named by the rearrangement ids, we can use these names to  subset the `rlist2` object, excluding those rearrangements that do not meet the above criteria.
+
+```{r coding_jxns, eval=TRUE}
+coding_jxns <- codingJunctions(jxns, build)
+coding_jxns
+rlist2 <- rlist2[ names(coding_jxns) ]
+```
+
+Next, we use the `fuseCDS_Rlist` function to extract for each rearrangement the full CDS of the fused sequence in the somatic genome (`fusions`), the partial CDS of the 5-prime (`tum.5p`) and 3-prime (`tum.3p`) transcripts that are involved in the fusion, and the full CDS of the 5-prime (`ref.5p`) and 3-prime transcripts in the reference genome. To speed up computation in the remaining portions of this vignette, we restrict the `RearrangementList` object to a rearrangement involving the fusion of the tyrosine kinase IKAROS to a known driver ERBB4.  Note, we use a single bracket `[` when subsetting the `RearrangementList` so that the resulting object is still an instance of `RearrangementList` (albeit a length-one list).
+
+```{r fuseCDS, eval=TRUE}
+ikaros.erbb4 <- "9136-9181"
+coding_jxns <- coding_jxns[ikaros.erbb4]
+cds.list <- fuseCDS_Rlist(rlist2[ikaros.erbb4], coding_jxns)
+cds.list
+```
+
+For each fusion, we translate the CDS in each of the three possible reading frames and partition the amino acid sequence of the fusion protein into the sequences derived from the 5-prime and 3-prime transcripts.  In particular, by partioning the amino acid sequence of the fusion into its 5-prime and 3-prime parts, we can compare the 5-prime partition to the amino acid sequence of the 5-prime reference protein and the 3-prime partition to the amino acid sequence of the 3-prime reference protein. The function `translateCDS` translates the CDS in the 3 possible reading frames. 
+
+```{r translate, eval=TRUE}
+proteins <- translateCDS(cds.list)
+proteins
+```
+
+The amino acid sequence obtained by translating the CDS involved in the 5-prime and 3-prime transcripts are represented as `AAStringSet` objects.  Since a single gene can have multiple transcripts, we translate every possible combination of 5-prime and 3-prime transcripts in each of the 3 frames.  Here, we show the amino acid sequences for the two possible combinations of transcripts involving IKAROS and ERBB4:
+
+```{r aminoacid_sequence, eval=TRUE}
+proteins$fusion[[1]]
+```
+
+We can also list the amino acid sequences derived from the 5-prime gene and the 3-prime gene:
+
+```{r aminoacid_sequence_5prime, eval=TRUE}
+proteins$tum5p[[1]]
+proteins$tum3p[[1]]
+```
+
+The function `partitionAASequence` reorganizes the list of amino acid sequences by frame to facilitate downstream computation.
+
+```{r partitionAASequence, eval=TRUE}
+partition.fusion <- partitionAASequence(proteins)
+partition.fusion
+```
+
+For a fusion to be in-frame, we require that the amino acid sequence derived from the 5- and 3-prime transcripts to be subsequences of the full amino acid sequence of the reference genome that was translated in the same frame.  In addition, we require that there be no premature stop codons.  The following code accomplishes these two tasks, with the `ref.frames` object below containing the full amino acid sequence of the transcripts associated with IKAROS and ERBB4.  
+
+```{r inframe_and_nostops, eval=TRUE}
+nostop.list <- noPrematureStop(partition.fusion)
+nostop.list
+ref.frames <- organizeReferenceByFrame(proteins)
+inframe.list <- inFrameList(fusion.frames=partition.fusion,
+                            ref.frames=ref.frames)
+inframe.list
+```
+
+Each element of the `nostop.list` and `inframe.list` lists are an object of class `LogicalList`, each evaluated from a different reading frame.  The `LogicalList` objects are named by the rearrangement identifier.  The helper function `inFrameNoStop` combines these to lists to create a single list that is `TRUE` for rearrangements that are in-frame and have no premature stop codons.
+
+```{r combine_LogicalLists, eval=TRUE}
+inframe.nostop <- inFrameNoStop(nostop.list, inframe.list)
+inframe.nostop
+```
+
+Finally, `validFusions` returns a list object containing only the fusions that are in-frame and have no premature stops.  For each such fusion, the amino acid sequence, CDS of the fusion, partial CDS of the 5-prime and 3-prime transcripts, and the full CDS of the reference transcripts are available.
+
+```{r valid_fusions, eval=TRUE}
+valid.fusions <- validFusions(partition.fusion,
+                              cds.list,
+                              inframe.nostop,
+                              ref.frames)
+valid.fusions
+```
+
+The above data can be summarized in tabular format using the `fusionTable2` function:
+
+```{r fusionTable2, eval=TRUE}
+tab <- fusionTable2(valid.fusions)
+head(tab)
+```
+
+Note, this table provides both the genomic coordinates of the fusion (junction.5prime, junction.3prime), but also the portion of the amino acid sequence that was retained by the fusion (aa.5prime.start, aa.5prime.end, aa.3prime.start, aa.3prime.end).  In the following code chunk, we construct amino acid ranges for the genes involved in the fusion and the protein domains for these genes in the reference genome.
+
+```{r protein_domains, eval=TRUE}
+  tumor_aa_ranges <- aa_granges(tab)
+  extdata2 <- system.file("extdata", package="trellis")
+  up <- readRDS(file.path(extdata2, "uniprot.rds"))
+  up2 <- uniprotFeatures(up, tab, strwrap.width=20)
+  domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),
+                              chromosome=up2$seqnames,
+                              description=up2$description,
+                              short.desc=up2$short.desc,
+                              aa_len=up2$aa_len)
+  domains <- subsetByOverlaps(domain_aa_ranges, tumor_aa_ranges, type="within")
+  domains
+```
