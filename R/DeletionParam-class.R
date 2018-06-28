@@ -53,7 +53,9 @@ NULL
 #' @slot bam_seqlevels_style character string indicating style of seqnames
 #'
 #' @slot tumor_purity estimated fraction of sequenced DNA that is tumor-derived
-#' 
+#'
+#' @slot remove_hemizygous whether to remove "hemizygous" calls ('hemizygous+' calls are not removed).
+#'
 #' @examples
 #' DeletionParam()
 #' @rdname DeletionParam-class
@@ -70,7 +72,8 @@ setClass("DeletionParam", representation(homozygous_thr="numeric",
                                          nflanking_homozygous="integer",
                                          maxRatioObservedToExpected="numeric",
                                          max_proportion_in_filter="numeric",
-                                         bam_seqlevels_style="character"))
+                                         bam_seqlevels_style="character",
+                                         remove_hemizygous="logical"))
 
 
 #' @param homozygous_thr length-one numeric vector indicating the maximum log2
@@ -125,7 +128,8 @@ DeletionParam <- function(min_width=2e3,
                           nflanking_homozygous=5L,
                           maxRatioObservedToExpected=2L,
                           max_proportion_in_filter=0.75,
-                          bam_seqlevels_style="UCSC"){
+                          bam_seqlevels_style="UCSC",
+                          remove_hemizygous=TRUE){
   new("DeletionParam",
       min_width=min_width,
       max_width=max_width,
@@ -139,7 +143,8 @@ DeletionParam <- function(min_width=2e3,
       nflanking_homozygous=nflanking_homozygous,
       maxRatioObservedToExpected=maxRatioObservedToExpected,
       max_proportion_in_filter=max_proportion_in_filter,
-      bam_seqlevels_style=bam_seqlevels_style)
+      bam_seqlevels_style=bam_seqlevels_style,
+      remove_hemizygous=remove_hemizygous)
 }
 
 #' @keywords internal

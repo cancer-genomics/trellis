@@ -262,20 +262,18 @@ updateImproperIndex <- function(sv, maxgap=2e3){
 updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   left_boundary <- resize(gr, width=2)
   right_boundary <- resize(gr, width=2, fix="end")
+  index_all <- setNames(vector("list", length(gr)), names(gr))
   if(FALSE){
-    ##irp <- sv@improper
-    fst <- granges(first(irp))
-    lst <- granges(last(irp))
-    i1 <- .hits(left_boundary, fst, maxgap=maxgap)
-    i4 <- .hits(right_boundary, lst, maxgap=maxgap)
-    hits1 <- .hits_intersection(i1, i4)
-
-    i2 <- .hits(left_boundary, lst, maxgap=maxgap)
-    i3 <- .hits(right_boundary, fst, maxgap=maxgap)
-    hits2 <- .hits_intersection(i2, i3)
-    index_list <- mapply(function(x,y) unique(c(x, y)),
-                         hits1, hits2)
-    return(index_list)
+    ## simpler??
+    for(i in seq_along(gr)){
+      tmp <- (overlapsAny(first(irp), left_boundary[i], maxgap=maxgap) &
+              overlapsAny(last(irp), right_boundary[i], maxgap=maxgap)) |
+        (overlapsAny(first(irp), right_boundary[i], maxgap=maxgap) &
+         overlapsAny(last(irp), left_boundary[i], maxgap=maxgap))
+      index_all[[i]] <- which(tmp)
+    }
+    index_irp <- index_all
+    return(index_irp)
   }
   hitsLeft <- findOverlaps(left_boundary, irp, maxgap=maxgap)
   hitsRight <- findOverlaps(right_boundary, irp, maxgap=maxgap)
@@ -1341,14 +1339,17 @@ sv_deletions <- function(preprocess,
   sv <- deletion_call(preprocess, gr_filters, param)
   ##sv <- deletion_call(bam.file, improper_rp, pview, gr, gr_filters)
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
-  sv <- removeHemizygous(sv)
+  if(param@remove_hemizygous){
+    sv <- removeHemizygous(sv)
+  }
   improper_rp <- preprocess$read_pairs[["improper"]]
   mapq <- mcols(first(improper_rp))$mapq > 30 &
                                   mcols(last(improper_rp))$mapq > 30
   improper_rp <- improper_rp[mapq]
   if(length(variant(sv)) > 0){
     sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
-    sv <- removeHemizygous(sv)
+    if(param@remove_hemizygous)
+      sv <- removeHemizygous(sv)
   }
   if(length(variant(sv)) > 0){
     sv <- revise(sv, bins=preprocess$bins, param=param)
