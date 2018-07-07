@@ -118,57 +118,6 @@ ggplot(df, aes(ymin=tagid-0.2, ymax=tagid+0.2,
   guides(fill=FALSE, color=FALSE)
 ```
 
-# Extract read pairs from BAM file with exogenous barcodes
-
-DEPRECATE: duplicates can be marked in a way that is barcode-aware. Downstream
-processing would be identical.
-
-```{r targeted_bam, message = F}
-targeted.bam <- file.path(path, "PGDX5881P_PS_Seq_novo.sorted_nofa.bam")
-library(dplyr)
-### Read in GAlignmentPairs
-### Not getting rid of duplicates yet
-### Not sure if BC tag is unique to pgdx
-gr <- GRanges("chr8", IRanges(5000, 100000))
-seqinfo(gr) <- Seqinfo(seqnames="chr8", seqlengths=146364022)
-param <- ScanBamParam(flag=scanBamFlag(isSecondaryAlignment=FALSE,
-                                       isUnmappedQuery=FALSE),
-                      which=gr,
-                      what="mapq",
-                      tag="BC")
-galp <- readGAlignmentPairs(targeted.bam, param=param)
-read1mapq <- mcols(GenomicAlignments::first(galp))$mapq
-read2mapq <- mcols(GenomicAlignments::second(galp))$mapq
-galp <- galp[read1mapq >= 30 & read2mapq >= 30]
-```
-
-Next, we extract the barcode from the GAlignmentPairs object and convert the
-paired reads to DNA fragments.
-
-```{r barcode}
-### Get barcode
-barcode <- mcols(GenomicAlignments::first(galp))$BC
-## Only care about this part of the barcode since first 8 BP are same within a
-## sample
-mcols(galp)$barcode <- substr(barcode, 9, 16)
-fragments <- granges(galp, on.discordant.seqnames = "drop",
-                     use.mcols=TRUE)
-```
-
-Finally, we identify the set of unique fragments, coercing the `GRanges` object
-to a `data.frame` and grouping the fragments by chromosome, start, end, and
-barcode. We do this because using the `unique` function on our fragments `GRanges` object will not take into account the barcode.
-
-```{r unique_fragments}
-### Now to data.table
-fragments.df <- data.frame(chr = as.character(seqnames(fragments)),
-                           start = start(fragments),
-                           end = end(fragments),
-                           barcode = fragments$barcode)
-which.isduplicated <- duplicated(fragments.df)
-fragments <- fragments[!which.isduplicated]
-```
-
 # Write selected reads to fasta
 
 TODO
