@@ -11,10 +11,10 @@ vignette: >
 
 # Introduction
 
-The trellis package was developed to identify somatic structural variants in tumor-only analyses, including deletions, amplifications and how amplicons are grouped in the tumor genome, intra-and inter-chromosomal rearrangements, inversions, and in-frame fusions.  An additional packages required for this vignette is the `svfilters.hg<build>` package that contains various sequence filters for structural variant analyses and the `svbams` package that contains subsampled data that is used to illustrate various aspects of data processing.
+The trellis package was developed to identify somatic structural variants in tumor-only analyses.  The types of somatic structural alterations that can be identified include deletions, amplifications,, intra-and inter-chromosomal rearrangements, inversions, and in-frame fusions.  Additional packages required for this vignette are the `svfilters.hg19` package that contains various sequence filters for structural variant analyses and the `svbams` package that contains subsampled data that is used to illustrate various aspects of data processing.
 
 
-```{r packages, results="hide"}
+```{r packages, results="hide", message=F}
 library(Rsamtools)
 library(magrittr)
 library(Rsamtools)
@@ -25,11 +25,11 @@ library(tidyverse)
 library(trellis)
 ```
 
-# Batch jobs 
+# Batch jobs
+
+In this section, we illustrate aspects of the preprocessing that are best handled as a batch job in a non-interactive session.  We begin by extracting all read pairs with aberrant orientation or spacing with respect to the reference genome (improperly paired reads). This step takes a long time depending on the size of the bam file.  In practice, we submit this as a batch job (one sample to each core) and save the result to disk to read in later.
 
 ## Improperly paired reads
-
-Here, we illustrate aspects of the preprocessing that are best handled as a batch job in a non-interactive session.  We illustrate the extraction of improperly paired reads in the following code chunk. This step takes a long time depending on the size of the bam file.  In practice, we submit this as a batch job and save the result to disk to read in later.
 
 ```{r improper_pairs}
 extdata <- system.file("extdata", package="svbams")
@@ -46,14 +46,15 @@ improper_rp <- getImproperAlignmentPairs(bamfile,
 ## Normalizing bin counts
 
 We begin by defining a set of bins over which the number of aligned reads will be counted.  The sv.filters<.build> packages contain 1kb bins that exclude regions with average mappability less than 0.75.
-To make this toy example run faster, we only preprocess chromosome 8.
+To make this toy example run faster, we only preprocess chromosomes 5, 8, and 15.
 
 ```{r define_bins}
 data(bins1kb, package="svfilters.hg19")
-bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"), pruning.mode="coarse")
+bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
+                      pruning.mode="coarse")
 ```
 
-We use infrastructure provided in the Rsamtools package for counting single-end reads overlapping the bins. We remove the bins with zero counts as these are a consequence of the artificially small bam file included in the `svbams` package.
+We use infrastructure provided in the Rsamtools package for counting single-end reads overlapping these bins. Bins with zero counts are a consequence of the artificially small bam file included in the `svbams` package and are excluded from further analysis.
 
 
 ```{r counts}
@@ -75,35 +76,7 @@ set.seed(123)
 bins$log_ratio <- binGCCorrect(bins)
 ```
 
-At this stage, it is a good idea to plot the data.  When many samples are available, differences between groups of samples (batch effects) can be visualized and addressed at this stage.
-
-```{r plot}
-dat <- tibble(chr = as.character(seqnames(bins)),
-              start=start(bins),
-              end=end(bins),
-              log2_ratio=bins$log_ratio) %>%
-  mutate(chr=factor(chr, levels=c("chr5", "chr8", "chr15")))
-dat <- dat[!is.na(dat$log2_ratio), ]
-ggplot(dat)  +
-  geom_point(aes(start, log2_ratio), size = 1) +
-  xlab("Coordinate") +
-  ylab("log2 normalized counts") +
-  coord_cartesian(ylim=c(-4, 1)) +
-  geom_hline(yintercept=0) +
-  facet_grid(~chr, space="free", scales="free_x") 
-```
-
-If one or more normal controls are available, the bin-counts can be further corrected by the bin-wise medians from normals.  This is particularly helpful for capture-based sequencing where bins are often of variable width.
-
-# Amplifications and deletions
-
-
-<!-- We first load an object from the `trellis` package containing normalized and $\log_2$-transformed coverage estimates ($\log_2$ ratios) in non-overlapping 1kb bins along the genome (see `trellis` to generate $\log_2$ ratios). The $\log_2$ ratios were multipled by 1000, rounded to the nearest integer, and saved as integers in a serialized R object to reduce the memory footpring.  We append the $\log_2$ ratios to the `GRanges` object bins1kb from the `svfilters.hg19` package and remove chromosome Y from the analysis as this sample is of female origin. Note that in this instance we are using `svfilters.hg19` because we aligned our reads to the hg19 reference genome.  There is an `svfilters.hg18` package for if your reads were aligned to hg18, and an `svfilters.hg38` package will be available in the future to support alignments to hg38. -->
-
-## Segmentation
-
-
-Next, we segment the $\log_2$ ratios using circular binary segmentation (CBS) [@REF]. See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object.
+If one or more normal controls are available, the bin-counts can be further corrected by the bin-wise medians from normals.  This is particularly helpful for capture-based sequencing where bins are often of variable width.  Next, we segment the $\log_2$ ratios using circular binary segmentation (CBS). See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object.
 
 ```{r segment}
 ##bins_subset <- bins1kb
@@ -115,45 +88,50 @@ g <- segmentBins(bins, param=SegmentParam())
 g
 ```
 
-The result is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.   
+The result is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.   Limited to a very small portion of the genome for illustration, the log ratios obtained from the preceding normalization and GC correction steps can not be interpreted as fold changes from the modal ploidy.  Below, we load log ratios that were obtained from processing the full genome in the same manner illustrated above.
 
-## Plotting the genome
+```{r load_logratios}
+data(bins1kb, package="svfilters.hg19")
+ddir <- system.file("extdata", package="trellis",
+                    mustWork=TRUE)
+lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
+seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+bins1kb$log_ratio <- lr
+bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
+                      pruning.mode="coarse")
 
-We routinely visualize the segmented $\log_2$ ratios of the entire genome to get an overview of the data.  An example using the `ggplot2` library follows. Because this dataset is very small, we set the transparency to one and use relatively large points.
-
-```{r genome, fig.width=8, fig.height=4, warning=FALSE}
-segs <- tibble(chr=as.character(seqnames(g)),
-               start=start(g), end=end(g), seg.mean=g$seg.mean) %>%
-  mutate(chr=factor(chr, levels=levels(dat$chr)))
-alpha <- 1; size <- 0.9
-ggplot(dat, aes(start, log2_ratio)) +
-  geom_point(size=0.9, color="steelblue", alpha = alpha) +
-  geom_segment(data=segs,
-               aes(x=start, xend=end, y=seg.mean, yend=seg.mean),
-               color="black", inherit.aes=FALSE, size=1.2) +
-  facet_grid(~chr, space="free", scales="free_x") +
-  theme(axis.text.x=element_blank(),
-        panel.grid=element_blank(),
-        panel.background=element_rect(fill="white"),
-        axis.ticks.x=element_blank(), 
-        strip.text.x = element_text(size = 3)) + 
-  xlab("") +
-  ylab(expression(log[2](r))) + 
-  ylim(c(-3, 2))
+path <- system.file("extdata", package="trellis")
+g <- readRDS(file.path(path, "cgov44t_segments.rds"))
+seqlevels(g, pruning.mode="coarse") <- c("chr5", "chr8", "chr18")
 ```
+
+The data:
+
+```{r plot, width=10, height=6}
+segs.df <- as.tibble(g)
+as.tibble(bins) %>%
+  filter(!is.na(log_ratio)) %>%
+  ggplot  +
+  geom_point(aes(start/1e6, log_ratio), shape = ".", color="gray") +
+  xlab("Coordinate") +
+  ylab("log2 normalized counts") +
+  coord_cartesian(ylim=c(-4, 2.5)) +
+  facet_grid(~seqnames, space="free", scales="free_x") +
+  xlab("") +
+  theme_bw() +
+  geom_segment(data=segs.df, aes(x=start/1e6,
+                                 xend=end/1e6,
+                                 y=seg.mean,
+                                 yend=seg.mean))
+```
+
+# Amplifications and deletions
 
 ## Deletions
 
-In additition to the segmented $\log_2$ ratios, the deletion analysis requires improperly paired reads. Below, we specify the complete file path to the BAM file used for this analysis that is provided by the `svbams` package. We extract improperly paired reads from the entire genome and an initial set of properly paired reads from a region on chromosome 15.
+The deletion analysis uses both the improperly paired reads and the normalized read depth.
 
 ```{r views}
-##extdata <- system.file("extdata", package="svbams")
-##bam.file <- file.path(extdata, "cgov44t_revised.bam")
-##iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
-##improper_rp <- getImproperAlignmentPairs(bam.file,
-##                                         param=iparams, 
-##                                         build="hg19")
-##segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
 segs <- keepSeqlevels(g, "chr15", pruning.mode="coarse")
 del.gr <- IRanges::reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
                           min.gapwidth=2000)
