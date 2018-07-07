@@ -23,7 +23,7 @@ DeletionParam(min_width = 2000, max_width = 2e+06, min_gapwidth = 10000,
   min_RPs_in_hemizygous = 1, max_RPs_in_homozygous = 100,
   nflanking_hemizygous = 5L, nflanking_homozygous = 5L,
   maxRatioObservedToExpected = 2L, max_proportion_in_filter = 0.75,
-  bam_seqlevels_style = "UCSC")
+  bam_seqlevels_style = "UCSC", remove_hemizygous = TRUE)
 
 bamSeqLevelsStyle(object)
 
@@ -166,6 +166,8 @@ normal samples.}
 \item{\code{bam_seqlevels_style}}{character string indicating style of seqnames}
 
 \item{\code{tumor_purity}}{estimated fraction of sequenced DNA that is tumor-derived}
+
+\item{\code{remove_hemizygous}}{whether to remove "hemizygous" calls ('hemizygous+' calls are not removed).}
 }}
 
 \examples{
