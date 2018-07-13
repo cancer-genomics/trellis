@@ -693,7 +693,9 @@ setMethod("getSequenceOfReads", "Rearrangement",
                    params=RearrangementParams(),
                    MAX=25L, 
                    build){
-            .getReadSeqsForRear(object, bam.file, params, MAX, build = build)
+            dat <- .getReadSeqsForRear(object, bam.file, params, MAX, build = build)
+            dat2 <- as.tibble(dat)
+            dat2
           })
 
 #' @aliases getSequenceOfReads,RearrangementList-method
@@ -714,5 +716,6 @@ setMethod("getSequenceOfReads", "RearrangementList",
             tags <- do.call(rbind, tag.list)
             readId <- paste(tags$qname, tags$read, sep="_")
             tags <- tags[!duplicated(readId), ]
-            tags
+            tags2 <- as.tibble(tags)
+            tags2
           })
