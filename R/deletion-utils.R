@@ -859,7 +859,7 @@ adjudicateHomozygousOverlap2 <- function(object){
   if(length(gr) < 2) return(object)
   sv2 <- removeDuplicateSv(object)
   gr <- variant(sv2)
-  if(length(gr) < 2) next()
+  if(length(gr) < 2) return(object)
   self_hits <- selfHits(variant(sv2))
   if(length(self_hits) == 0) return(sv2)
   ##
