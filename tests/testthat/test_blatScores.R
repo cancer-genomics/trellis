@@ -86,5 +86,5 @@ test_that("blatScores", {
   stags4$seqnames=rep("chrX", 10)
   blat <- annotateBlatRecords(sblat4, stags4)
   s4 <- blatScores(blat, stags4, "SOME_ID")
-  expect_true(!any(s4$passQC))
+ expect_true(!any(s4$passQC))
 })
