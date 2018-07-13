@@ -26,6 +26,7 @@ library(ggplot2)
 library(svbams)
 library(svfilters.hg19)
 library(tidyverse)
+library(gridExtra)
 library(trellis)
 library(ggnet)
 library(graph)
@@ -33,7 +34,6 @@ library(Rgraphviz)
 library(network)
 library(sna)
 library(kableExtra)
-knitr::opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE)
 ```
 
 # Batch jobs
@@ -47,7 +47,6 @@ The time required to extract all improperly paired reads depends on the size of 
 ```{r improper_pairs}
 extdata <- system.file("extdata", package="svbams")
 bamfile <- file.path(extdata, "cgov44t_revised.bam")
-if(!dir.exists("improper_align")) dir.create("improper_align")
 what <- c("flag", "mrnm", "mpos", "mapq")
 iparams <- improperAlignmentParams(what=what)
 improper_rp <- getImproperAlignmentPairs(bamfile,
@@ -179,7 +178,7 @@ bins.del <- subsetByOverlaps(bins1kb, roi2)
 ylim <- c(-3, 2)
 df <- tibble(logr=bins.del$log_ratio,
              start=start(bins.del))
-df$logr <- threshold(df$logr, ylim, amount=0.4)
+df$logr <- trellis::threshold(df$logr, ylim, amount=0.4)
 brks <- pretty(df$start, n=8)
 region <- subsetByOverlaps(segs, roi)
 region <- region[region$seg.mean < -1]
@@ -215,7 +214,7 @@ p <- ggplot(rps, aes(ymin=readpair-0.2, ymax=readpair+0.2,
   xlim(c(min(rps$start), max(rps$end))/1e6) +
   geom_line(aes(x=start/1e6, y=readpair), size=0.5) +
   ylab("Read pair index") +
-  scale_x_continuous(breaks=pretty_breaks(5)) +
+  scale_x_continuous(breaks=scales::pretty_breaks(5)) +
   geom_rect(data=region,
             aes(xmin=start/1e6, xmax=end/1e6, ymin=-Inf, ymax=+Inf),
             fill="steelblue", color="transparent", alpha=0.2,
@@ -335,7 +334,6 @@ rparam <- RearrangementParams(min_number_tags_per_cluster=5,
 minNumberTagsPerCluster(rparam)
 rpSeparation(rparam) %>% "/"(1000) %>% paste0("kb")
 rlist <- findCandidates2(pdata, rparam)
-rdat$rlist <- rlist
 rlist
 ```
 
