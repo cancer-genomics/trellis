@@ -187,36 +187,38 @@ blatStatsPerTag <- function(blat.records, tag_length){
   }
 }
 
-.blatStatsRearrangement <- function(blat, thr=0.8, tag_length){
-  cols <- c("Qname", "match", "is_overlap", "Tstart", "Tend")
-  blat <- blat[, cols]
-  if(nrow(blat) == 0) return(NULL)
-  splitby <- blat$Qname %>%
-    strsplit("R[12]") %>%
-    sapply("[", 1)
-  blat$tag_index <- blat$Qname %>% strsplit(splitby) %>%
-    sapply("[", 2)
-  ##blat$tag_index <- addXCoordinateForTag(blat)
-  ##stats <- blatStatsPerTag(blat, tag_length)
-  stats <- blat %>%
-    mutate(is_90 = match > 90,
-           Tsize=abs(Tend-Tstart),
-           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
-             Tsize < (tag_length + 1/5*tag_length),
-           is_90 = is_90 & is_size_near100) %>%
-    group_by(Qname) %>%
-    summarize(n.matches=sum(is_90),
-              n.eland.matches=sum(is_90 & is_overlap)) %>%
-    mutate(is_pass=n.matches == 1 & n.eland.matches==1)
-
-  proportion_pass <- mean(stats)
-  qnames <- gsub("R[12]", "", blat$Qname)
-  n_tags <- length(unique(qnames))
-  is_pass <- proportion_pass > thr & n_tags >= 5
-  ##blat$passQC <- rep(proportion_pass > thr, nrow(blat))
-  blat$passQC <- is_pass
-  blat
-}
+##.blatStatsRearrangement <- function(blat, thr=0.8, tag_length){
+##  cols <- c("Qname", "match", "is_overlap", "Tstart", "Tend")
+##  blat <- blat[, cols]
+##  if(nrow(blat) == 0) return(NULL)
+##  splitby <- blat$Qname %>%
+##    strsplit("R[12]") %>%
+##    sapply("[", 1)
+##  blat$tag_index <- blat$Qname %>% strsplit(splitby) %>%
+##    sapply("[", 2)
+##  ##blat$tag_index <- addXCoordinateForTag(blat)
+##  ##stats <- blatStatsPerTag(blat, tag_length)
+##  Tend <- Tstart <- Tsize <- is_90 <- is_size_near100 <- NULL
+##  is_overlap <- n.matches <- n.eland.matches <- NULL
+##  stats <- blat %>%
+##    mutate(is_90 = match > 90,
+##           Tsize=abs(Tend-Tstart),
+##           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
+##             Tsize < (tag_length + 1/5*tag_length),
+##           is_90 = is_90 & is_size_near100) %>%
+##    group_by(Qname) %>%
+##    summarize(n.matches=sum(is_90),
+##              n.eland.matches=sum(is_90 & is_overlap)) %>%
+##    mutate(is_pass=n.matches == 1 & n.eland.matches==1)
+##
+##  proportion_pass <- mean(stats)
+##  qnames <- gsub("R[12]", "", blat$Qname)
+##  n_tags <- length(unique(qnames))
+##  is_pass <- proportion_pass > thr & n_tags >= 5
+##  ##blat$passQC <- rep(proportion_pass > thr, nrow(blat))
+##  blat$passQC <- is_pass
+##  blat
+##}
 
 
 

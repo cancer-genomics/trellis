@@ -34,3 +34,4 @@ svcnvs_files
 /vignettes/trellis_cache/html/RearrangementList_6c0575d5a0fdf6c36cfeb352b0465fe8.RData
 trellis_cache
 trellis_files
+/tests/testthat/Rplots.pdf
