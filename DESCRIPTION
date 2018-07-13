@@ -46,8 +46,12 @@ Suggests:
     svfilters.hg18,
     svfilters.hg19,
     BiocStyle,
+    rmarkdown,
     data.table,
     org.Hs.eg.db
+    ggnet,
+    network,
+    sna
 Collate: 
     'help.R'
     'AllGenerics.R'

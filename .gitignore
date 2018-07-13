@@ -29,3 +29,8 @@ svcnvs_files
 /vignettes/diagram.pdf
 /vignettes/svrearrange_files/figure-latex/blat_scores-1.pdf
 /tests/testthat/update_objects.R
+/vignettes/trellis.html
+/vignettes/trellis.pdf
+/vignettes/trellis_cache/html/RearrangementList_6c0575d5a0fdf6c36cfeb352b0465fe8.RData
+trellis_cache
+trellis_files
