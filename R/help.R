@@ -33,7 +33,8 @@
 #' @importFrom stats setNames predict acf loess median runif setNames kmeans
 #' @importFrom utils read.table data read.delim read.csv
 #' @importFrom tibble as.tibble
-#' @importFrom dplyr group_by top_n summarize mutate count n tbl_df filter
+#' @importFrom tidyr unite
+#' @importFrom dplyr group_by top_n summarize mutate count n tbl_df filter left_join ungroup
 #' @importFrom purrr map_lgl
 #' @importFrom magrittr '%>%' set_names
 #' @importFrom RBGL kCliques

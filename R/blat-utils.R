@@ -18,7 +18,8 @@ readBlat <- function(filename){
   blat <- read.delim(filename, skip=5, stringsAsFactors=FALSE, header=FALSE, sep="\t")
   colnames(blat) <- nms
   blat$Tname <- gsub(".fa", "", blat$Tname)
-  blat
+  blat2 <- as.tibble(blat)
+  blat2
 }
 
 blatGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
@@ -26,6 +27,18 @@ blatGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
                strand=factor(blat$strand, levels=c("+", "-", "*")))
   seqlevels(g, pruning.mode="coarse") <- sl
   g
+}
+
+blatGRanges2 <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
+  chr <- blat$Tname
+  starts <- blat$Tstart
+  ends <- blat$Tend
+  strand <- factor(blat$strand, levels=c("+", "-", "*"))
+  g <- GRanges(chr, IRanges(starts, ends),
+               blockcount=blat$blockcount,
+               Qname=blat$Qname,
+               rid=blat$rid,
+               score=blat$score)
 }
 
 genomeGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
@@ -50,10 +63,10 @@ genomeAndBlatOverlap <- function(blat){
   is_overlap
 }
 
+#' @export
 annotateBlatRecords <- function(blat, tag.sequences){
-  tmp <- tag.sequences
-  qname2 <- paste0(tmp$qname, "_", tmp$read)
-  query.sequences <- setNames(tmp$seq, qname2)
+  qname2 <- paste0(tag.sequences$qname, "_", tag.sequences$read)
+  query.sequences <- setNames(tag.sequences$seq, qname2)
   query.sequences <- query.sequences[names(query.sequences) %in% blat$Qname]
   query.sequences <- query.sequences[blat$Qname]
   ##identical(names(query.sequences), blat$Qname)
@@ -99,8 +112,19 @@ annotateBlatRecords <- function(blat, tag.sequences){
   ## replace Tsize with T.end-T.start
   blat$Tsize <- blat$Tend-blat$Tstart
   blat$is_overlap <- genomeAndBlatOverlap(blat)
-  rownames(blat) <- NULL
-  blat
+
+  tags <- tag.sequences %>%
+    unite("Qname", c("qname", "read"))
+  rid <- tags %>%
+    group_by(Qname) %>%
+    summarize(rid=unique(rearrangement.id))
+  ##qsize <- nchar(blat$Qsequence[1])
+  blat2 <- left_join(blat, rid, by="Qname") %>%
+    mutate(score=match/Qsize,
+           tsize=length(Tstart[1]:Tend[1]))
+  rownames(blat2) <- NULL
+  blat2 <- as.tibble(blat2)
+  blat2
 }
 
 ## A read can not have 2 hits meeting the 90-90 rule
@@ -194,16 +218,7 @@ blatStatsPerTag <- function(blat.records, tag_length){
   blat
 }
 
-blatGRanges <- function(blat){
-  chr <- blat$Tname
-  starts <- blat$Tstart
-  ends <- blat$Tend
-  g <- GRanges(chr, IRanges(starts, ends),
-               blockcount=blat$blockcount,
-               Qname=blat$Qname,
-               rid=blat$rid,
-               score=blat$score)
-}
+
 
 #' blatScores assesses whether the improper read pairs at a
 #' rearrangement junction provide strong support of the rearrangement
@@ -299,35 +314,49 @@ blatGRanges <- function(blat){
 blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
   tags <- tags %>%
     unite("Qname", c("qname", "read"))
-  ##table(blat_aln$Qname %in% tags$Qname)
-  rid <- tags %>%
-    group_by(Qname) %>%
-    summarize(rid=unique(rearrangement.id))
-  blat2 <- left_join(blat, rid, by="Qname") %>%
-    mutate(score=match/Qsize) %>%
-    mutate(tsize=abs(Tstart-Tend)) %>%
+##  ##table(blat_aln$Qname %in% tags$Qname)
+##  rid <- tags %>%
+##    group_by(Qname) %>%
+##    summarize(rid=unique(rearrangement.id))
+  ##qsize <- nchar(blat$Qsequence[1])
+##  blat2 <- left_join(blat, rid, by="Qname") %>%
+##    mutate(score=match/Qsize,
+  ##           tsize=length(Tstart[1]:Tend[1])) %>%
+  filter <- dplyr::filter
+  blat2 <- blat %>%
     filter(score >= 0.90 & blockcount==1) %>%
     filter(tsize >= (Qsize - 1/5*Qsize) & tsize <= (Qsize + 1/5*Qsize))
-  blat.g <- blatGRanges(blat2)
+  blat.g <- blatGRanges2(blat2)
+  ##
+  ## Record for each blat record whether the blat alignment corresponds to the whole-genome-aligner
+  ##
   genome.g <- GRanges(tags$seqnames, IRanges(tags$start, tags$end),
                       Qname=tags$Qname, rid=tags$rearrangement.id)
+  ##
+  ## Force to have same seqlevels
+  ##
+  seqlevels(blat.g) <- seqlevels(genome.g) <- paste0("chr", c(1:22, "X", "Y", "M"))
   hits <- findOverlaps(blat.g, genome.g, ignore.strand=TRUE, maxgap=500)
   keep <- blat.g$Qname[queryHits(hits)] == genome.g$Qname[subjectHits(hits)]
   hits <- hits[keep]
   blat2$overlaps_genome <- FALSE
   blat2$overlaps_genome[ queryHits(hits) ] <- TRUE
+  ##
+  ## We've already filtered low scoring alignments
+  ## - number below is number of high scoring alignments
+  ##
   blat3 <- blat2 %>%
     group_by(Qname)  %>%
-    summarize(overlaps_genome=sum(overlaps_genome),
-              overlaps_other=sum(!overlaps_genome),
+    summarize(number_alignments=n(),
+              overlaps_genome=sum(overlaps_genome),
               rid=unique(rid)) %>%
     ungroup %>%
     group_by(rid) %>%
-    summarize(number_reads=length(unique(Qname)),
-              p_overlap_genome=mean(overlaps_genome >= 1),
-              p_notoverlap_genome=mean(overlaps_genome < 1)) %>%
+    summarize(##number_reads=length(unique(Qname)),
+      number_tags=n(),
+      p_overlap_genome=mean(overlaps_genome/number_alignments)) %>%
     mutate(passQC=p_overlap_genome >= prop.pass &
-             number_reads >= min.tags) %>%
+             number_tags >= min.tags) %>%
     mutate(rid=factor(rid))
   return(blat3)
   ## bind blat results with tag information

@@ -23,6 +23,7 @@ Imports:
     matrixStats,
     utils,
     dplyr,
+    tidyr,
     RBGL,
     magrittr,
     ggplot2,
@@ -48,10 +49,12 @@ Suggests:
     BiocStyle,
     rmarkdown,
     data.table,
-    org.Hs.eg.db
+    org.Hs.eg.db,
     ggnet,
     network,
-    sna
+    sna,
+    graph,
+    Rgraphviz
 Collate: 
     'help.R'
     'AllGenerics.R'
