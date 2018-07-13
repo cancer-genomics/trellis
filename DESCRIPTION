@@ -1,6 +1,6 @@
 Package: trellis
 Title: Somatic structural variant analysis
-Version: 0.0.36
+Version: 0.0.37
 Author: Rob Scharpf and Daniel Bruhm
 Maintainer: Rob Scharpf <rscharpf@jhu.edu>
 Description: This package contains classes and methods used for structural
@@ -54,7 +54,8 @@ Suggests:
     network,
     sna,
     graph,
-    Rgraphviz
+    Rgraphviz,
+    kableExtra
 Collate: 
     'help.R'
     'AllGenerics.R'

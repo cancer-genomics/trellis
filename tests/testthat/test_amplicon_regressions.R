@@ -14,6 +14,7 @@ cgov44t_preprocess <- function(){
 
   irp.file <- file.path(extdata, "cgov44t_improper.rds")
   irp <- readRDS(irp.file)
+  genome(irp) <- "hg19"
   if(FALSE){
     f <- irp@first
     irp@first <- updateObject(f)
@@ -384,3 +385,80 @@ test_that("no germline filter", {
   ag.4adcc78 <- readRDS(file.path(path, "sv_deletion.4adcc78.rds"))
   expect_identical(ag2, ag.4adcc78)
 })
+
+test_amplicon_vignette <- function(){
+  ## unit test bins
+  data(bins1kb, package="svfilters.hg19")
+  ddir <- system.file("extdata", package="trellis",
+                      mustWork=TRUE)
+  lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
+  seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+  bins1kb$log_ratio <- lr
+  ut.bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
+                           pruning.mode="coarse")
+
+  path <- system.file("extdata", package="trellis")
+  segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  ## unit test (ut) segments
+  ut.segs <- segs
+
+  ##
+  ## vignette bins
+  ##
+  ## The vignette log ratios on chr5 are centered at zero, but this is actually a big amplicon that we can see when we process the full data
+  data(bins1kb, package="svfilters.hg19")
+  bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
+                        pruning.mode="coarse")
+  bviews <- BamViews(bamPaths=bamfile, bamRanges=bins)
+  bins$cnt <- binnedCounts(bviews)
+  bins <- bins[ bins$cnt > 0 ]
+  bins$std_cnt <- binNormalize(bins)
+  set.seed(123)
+  bins$log_ratio <- binGCCorrect(bins)
+  params <- SegmentParam()
+  g <- segmentBins(bins, param=SegmentParam())
+  ut.segs.subset <- subsetByOverlaps(ut.segs, g)
+
+  dat <- as.tibble(ut.bins) %>%
+    filter(seqnames %in% c("chr5", "chr8")) %>%
+    mutate(seqnames=factor(seqnames,
+                           levels=c("chr5", "chr8"))) %>%
+    filter(!is.na(log_ratio))
+  segs.dat <- as.tibble(ut.segs)
+  ggplot(dat)  +
+    geom_point(aes(start/1e6, log_ratio), size = 1, shape=".",
+               col="gray") +
+    xlab("Coordinate") +
+    ylab("log2 normalized counts") +
+    coord_cartesian(ylim=c(-4, 2), xlim=c(172, 177)) +
+    geom_segment(data=segs.dat, aes(x=start/1e6, xend=end/1e6,
+                                    y=seg.mean, yend=seg.mean),
+                 inherit.aes=FALSE) +
+    facet_grid(~seqnames, space="free", scales="free_x") +
+    theme(panel.background=element_rect(fill="white", color="black")) +
+    xlab("")
+
+  ## chr5 is one big segment
+  dat2 <- as.tibble(bins) %>%
+    filter(seqnames %in% c("chr5", "chr8")) %>%
+    mutate(seqnames=factor(seqnames,
+                           levels=c("chr5", "chr8"))) %>%
+    filter(!is.na(log_ratio))
+  g.dat <- as.tibble(g) %>%
+    filter(seqnames %in% c("chr5", "chr8"))
+  ggplot(dat2)  +
+    geom_point(aes(start/1e6, log_ratio), size = 1, shape=".",
+               col="gray") +
+    xlab("Coordinate") +
+    ylab("log2 normalized counts") +
+    coord_cartesian(ylim=c(-4, 2)) +
+    geom_segment(data=g.dat, aes(x=start/1e6, xend=end/1e6,
+                                 y=seg.mean, yend=seg.mean),
+                 inherit.aes=FALSE) +
+    facet_grid(~seqnames, space="free", scales="free_x") +
+    theme(panel.background=element_rect(fill="white", color="black")) +
+    xlab("")
+  ggsave("~/tmp.pdf", width=10, height=6)
+
+}
