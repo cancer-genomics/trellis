@@ -32,6 +32,7 @@ library(graph)
 library(Rgraphviz)
 library(network)
 library(sna)
+library(kableExtra)
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE)
 ```
 
@@ -447,7 +448,7 @@ unmap.file <- file.path(extdata, "blat_unmapped.txt")
 blat_unmap <- readBlat(unmap.file)
 ```
 
-Recall that our QC analysis of the mapped-mapped read pairs focused on whether the original ELAND alignment was the only high-scoring BLAT alignment. Here,  our goal is to assess whether BLAT splits the alignment of the ELAND-unmapped  reads to the approximate locations of the rearrangement given by the `rlist`  object. The locations in the first rearrangement  (with respect to the reference genome) that we think are joined in the somatic  genome are given by the linked bins of the `RearrangementList` object.  We want to assess whether BLAT aligns part of a subsequence of a read to
+Recall that our QC analysis of the mapped-mapped read pairs focused on whether the original whole genome alignment was the only high-scoring BLAT alignment. Here,  our goal is to assess whether BLAT splits the alignment of reads that are initially unmapped by the whole genome aligner and have a mate that is aligned to the approximate location of the rearrangement. The locations in the first rearrangement  (with respect to the reference genome) that we think are joined in the somatic  genome are given by the linked bins of the `RearrangementList` object.  We want to assess whether BLAT aligns part of a subsequence of a read to
 
 ```{r rearrangement1-first}
 granges(linkedBins(rlist)[1])
@@ -473,7 +474,11 @@ rlist2 <- rlist[ is_valid ]
 
 # 5- to 3-prime orientation
 
-The above BLAT analysis identifies 60 and 12 split reads for the two rearrangements named `1-2` and `3-4`, respectively. Each of these rearrangements have two possible 5-prime to 3-prime orientations.  The function `fiveTo3List`  places the linked bins in their 5-prime to 3-prime orientation.  Note, in the code below that `rlist2` is now twice the length of the original `rlist` object as each rearrangement has been placed in two possible orientations (This is required for evaluating in-frame fusions).   Because some of the split reads may be filtered when evaluating the orientation of the sequence junction, we again filter rearrangements that are not supported by at least one split read.
+```{r number_split, echo=FALSE}
+n.split <- elementNROWS(splitReads(rlist2))
+```
+
+The above BLAT analysis identifies `r n.split[1]` and `r n.split[2]` split reads for the two rearrangements named `1-2` and `3-4`, respectively. Each of these rearrangements have two possible 5-prime to 3-prime orientations.  The function `fiveTo3List`  places the linked bins in their 5-prime to 3-prime orientation.  Note, in the code below that `rlist2` is now twice the length of the original `rlist` object as each rearrangement has been placed in two possible orientations.   Because some of the split reads may be filtered when evaluating the orientation of the sequence junction, we again filter rearrangements that are not supported by at least one split read.
 
 ```{r fiveTo3List}
 rlist3 <- fiveTo3List(rlist2, build="hg19")
@@ -481,22 +486,129 @@ rlist3 <- rlist3[ is_valid_splits(rlist3, maxgap=50) ]
 rlist3
 ```
 
-To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `data.frame`. The function `rearDataFrameList` (need better name) takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we've arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
+To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `tibble`. The function `rearDataFrameList` takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we've arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
 
-
-```{r rearDataFrameList, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`. "}
-##df <- rearDataFrameList(rlist3[1:2], build="hg19")
+```{r rearDataFrameList, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
 df <- rearDataFrame(rlist3[[1]], build="hg19")
 grobs <- ggRearrange(df)
 grobs[["arranged.grobs"]]
 ```
 
-The second rearrangement in the original `rlist` object now corresponds to elements 3 and 4 of the `rlist3` object.  Again, we call `rearDataFrameList` and `ggRearrange` to organize and then plot the supporting reads.
+The second rearrangement in the original `rlist` object now corresponds to elements 3 and 4 of the `rlist3` object.  Again, we call `rearDataFrame` and `ggRearrange` to organize and then plot the supporting reads.
 
-```{r plot_secoind_rearrangement}
+```{r TLN2.TPM1, fig.cap="Rearrangement involving possible fusion of genes TLN2 and TPM1 on chromosome 15." }
 df2 <- rearDataFrame(rlist3[[3]], build="hg19")
 ggRearrange(df2)[["arranged.grobs"]]
 ```
 
 # Fusions
 
+We begin by selecting only the rearrangements in which both ends of a sequence junction are within 5kb of a known transcript.
+
+```{r subsetRlist}
+near.coding <- seqJunctionNearTx(rlist=rlist3, build='hg19')
+rlist4 <- rlist3[ near.coding ]
+length(rlist4)
+```
+
+Next, we make the definition of the sequence junctions more precise.
+
+```{r seqJunctions}
+jxns <- seqJunctions_Rlist(rlist4)
+jxns
+```
+
+In addition, we require the 3-prime genomic region of the junction to lie strictly within a transcript, while the 5-prime genomic region forming the junction can occur either in the promoter or within the 5-prime transcript.  Operationally, we define the promoter as the genomic region 5kb upstream of the transcription start site of the 5-prime gene. We refer to the remaining junctions as `coding_jxns`.  As the coding junctions are named by the rearrangement ids, we can use these names to  subset the `rlist` object, excluding those rearrangements that do not meet the above criteria.
+
+```{r coding_jxns}
+coding_jxns <- codingJunctions(jxns, "hg19")
+coding_jxns
+rlist4 <- rlist4[ names(coding_jxns) ]
+```
+
+Next, we use the `fuseCDS_Rlist` function to extract for each rearrangement the full CDS of the fused sequence in the somatic genome (`fusions`), the partial CDS of the 5-prime (`tum.5p`) and 3-prime (`tum.3p`) transcripts that are involved in the fusion, and the full CDS of the 5-prime (`ref.5p`) and 3-prime transcripts in the reference genome.   Note, we use a single bracket `[` when subsetting the `RearrangementList` so that the resulting object is still an instance of `RearrangementList` (albeit a length-one list).
+
+```{r fuseCDS}
+cds.list <- fuseCDS_Rlist(rlist4, coding_jxns)
+cds.list
+```
+
+For each fusion, we translate the CDS in each of the three possible reading frames and partition the amino acid sequence of the fusion protein into the sequences derived from the 5-prime and 3-prime transcripts.  By partioning the amino acid sequence of the fusion into its 5-prime and 3-prime parts, we can compare the 5-prime partition to the amino acid sequence of the 5-prime reference protein and the 3-prime partition to the amino acid sequence of the 3-prime reference protein. The function `translateCDS` translates the CDS in the 3 possible reading frames. 
+
+```{r translate}
+proteins <- translateCDS(cds.list)
+proteins
+```
+
+The amino acid sequence obtained by translating the CDS involved in the 5-prime and 3-prime transcripts are represented as `AAStringSet` objects.  Since a single gene can have multiple transcripts, we translate every possible combination of 5-prime and 3-prime transcripts in each of the 3 frames.  Here, we show the amino acid sequences for the two possible combinations of transcripts involving TLN2 and TPM1:
+
+```{r aminoacid_sequence}
+proteins$fusion[[1]]
+```
+
+We can also list the amino acid sequences derived from the 5-prime gene and the 3-prime gene:
+
+```{r aminoacid_sequence_5prime}
+proteins$tum5p[[1]]
+proteins$tum3p[[1]]
+```
+
+The function `partitionAASequence` reorganizes the list of amino acid sequences by frame to facilitate downstream computation.
+
+```{r partitionAASequence}
+partition.fusion <- partitionAASequence(proteins)
+partition.fusion
+```
+
+For a fusion to be in-frame, we require that the amino acid sequence derived from the 5- and 3-prime transcripts to be subsequences of the full amino acid sequence of the reference genome that was translated in the same frame.  In addition, we require that there be no premature stop codons.  The following code accomplishes these two tasks, with the `ref.frames` object below containing the full amino acid sequence of the transcripts associated with IKAROS and ERBB4.  
+
+```{r inframe_and_nostops}
+nostop.list <- noPrematureStop(partition.fusion)
+nostop.list
+ref.frames <- organizeReferenceByFrame(proteins)
+inframe.list <- inFrameList(fusion.frames=partition.fusion,
+                            ref.frames=ref.frames)
+inframe.list
+```
+
+Each element of the `nostop.list` and `inframe.list` lists are an object of class `LogicalList`, each evaluated from a different reading frame.  The `LogicalList` objects are named by the rearrangement identifier.  The helper function `inFrameNoStop` combines these to lists to create a single list that is `TRUE` for rearrangements that are in-frame and have no premature stop codons.
+
+```{r combine_LogicalLists}
+inframe.nostop <- inFrameNoStop(nostop.list, inframe.list)
+inframe.nostop
+```
+
+Finally, `validFusions` returns a list object containing only the fusions that are in-frame and have no premature stops.  For each such fusion, the amino acid sequence, CDS of the fusion, partial CDS of the 5-prime and 3-prime transcripts, and the full CDS of the reference transcripts are available.
+
+```{r valid_fusions}
+valid.fusions <- validFusions(partition.fusion,
+                              cds.list,
+                              inframe.nostop,
+                              ref.frames)
+valid.fusions
+```
+
+The above data can be summarized in tabular format using the `fusionTable2` function:
+
+```{r fusionTable2}
+tab <- fusionTable2(valid.fusions)
+tab %>%
+  kable("html",  format.args=list(big.mark=",")) %>%
+  kable_styling(bootstrap_options=c("striped", "hover"))
+```
+
+Note, this table provides both the genomic coordinates of the fusion (junction.5prime, junction.3prime), but also the portion of the amino acid sequence that was retained by the fusion (aa.5prime.start, aa.5prime.end, aa.3prime.start, aa.3prime.end).  In the following code chunk, we construct amino acid ranges for the genes involved in the fusion and the protein domains for these genes in the reference genome.
+
+```{r protein_domains}
+tumor_aa_ranges <- aa_granges(tab)
+extdata2 <- system.file("extdata", package="trellis")
+up <- readRDS(file.path(extdata2, "uniprot.rds"))
+up2 <- uniprotFeatures(up, tab, strwrap.width=20)
+domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),
+                            chromosome=up2$seqnames,
+                            description=up2$description,
+                            short.desc=up2$short.desc,
+                            aa_len=up2$aa_len)
+domains <- subsetByOverlaps(domain_aa_ranges, tumor_aa_ranges, type="within")
+domains
+```
