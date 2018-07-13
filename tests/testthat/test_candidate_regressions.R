@@ -34,6 +34,7 @@ cgov44t_preprocess<- function(){
   seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
   bins1kb$log_ratio <- lr
   del.gr <- segs[segs$seg.mean < hemizygousThr(DeletionParam())]
+  reduce <- IRanges::reduce
   proper.del <- properReadPairs(bamfile,
                                 gr=reduce(del.gr,
                                           min.gapwidth=2000))

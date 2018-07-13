@@ -50,7 +50,8 @@ test_that("filterRearrangementList", {
   sl <- paste0("chr", c(1:22, "X"))
   gf <- reduceGenomeFilters(germline_filters, sl)
   rf <- rFilters(germline=gf)
-  expect_identical(names(rf), c("germline", "rear", "deletions", "amplicons"))
+  expect_identical(names(rf),
+                   c("germline", "rear", "deletions", "amplicons"))
   expect_identical(length(rf$amplicons), 0L)
   rparams <- RearrangementParams()
   rdat <- rearrangementData(rlist=rlist,
