@@ -24,7 +24,7 @@ a specific genomic region of interest (e.g., a possible deletion). In the
 following code chunk, we load the `svbams` package which contains a small
 bam files for a region of chr15.
 
-```{r svbams, message = F}
+```{r svbams, message = FALSE}
 library(GenomicAlignments)
 library(Rsamtools)
 library(svbams)
