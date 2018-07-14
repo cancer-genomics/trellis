@@ -1177,7 +1177,8 @@ add_amplicons <- function(ag, bam.file, params){
 #' @return an \code{AmpliconGraph} object
 #' @examples
 #' data(pdata)
-#' pdata$bam.file <- system.file("extdata", "cgov44t.bam", package="svbams")
+#' pdata$bam.file <- system.file("extdata", "cgov44t_revised.bam",
+#'                               package="svbams")
 #' sv_amplicons2(pdata)
 #' @export
 sv_amplicons2 <- function(preprocess, amplicon_filters,
