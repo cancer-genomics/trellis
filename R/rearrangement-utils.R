@@ -238,16 +238,37 @@ setMethod("numberLinkingRP", "Rearrangement", function(object){
   as.integer(nsupportingReads)
 })
 
+
+seqJunctionsInferredByPairedTags <- function(aln.file, bins, param){
+  gp <- readRDS(aln.file)
+  ##gp <- updateObject(gp)
+  seqlevelsStyle(gp) <- "UCSC"
+  gp <- keepSeqlevels(gp, seqlevels(bins), pruning.mode="coarse")
+  gp <- .trimInvalidReads(gp)
+  gp2 <- filterPairedReads(gp, bins, param)
+  ctags <- clusterTags(gp2, param)
+  ##
+  ## Note, the Rearrangement constructor does additional work
+  ##
+  L <- Rearrangement(improper=gp2, unlinked_clusters=ctags)
+  L2 <- L[ numberLinkingRP(L) >= minNumberTagsPerCluster(param) ]
+  L2
+}
+
+mapq <- function(galp){
+  f <- first(galp)
+  l <- last(galp)
+  cbind(mcols(f)$mapq, mcols(l)$mapq)
+}
+
 #' Constructs a Rearrangement object of unlinked tag-clusters
-#' 
+#'
 #' Identifies genomic intervals containing clusters of improper reads
 #'  and constructs a Rearrangement object containing the unlinked
 #'  clusters and the improper read pairs.
 #'
 #' @details
-#' Improper read pairs have been previously saved as a serialized R
-#' object.  This function reads the serialized R objects from the file
-#' path provided. Read pairs are selected with parameters set in the
+#' Read pairs are selected with parameters set in the
 #' \code{RearrangementParams} object (denoted \code{params}) as follows:
 #'
 #' 1. the distance between the first and last read for a given pair
@@ -283,39 +304,32 @@ setMethod("numberLinkingRP", "Rearrangement", function(object){
 #'   following:
 #'
 #'   i. annotates the red pairs with a unique id for cluster membership
-#' 
+#'
 #'   ii. links the clusters (called linkedBins) (\code{linkClustersByReadPairs})
-#' 
+#'
 #'   iii.  partitions the improper read pairs according to whether
 #'   they link two clusters (a read pair can belong to multiple paired
 #'   clusters)
-#' 
+#'
 #'   iv.  maps each tag to a cluster
 #'
 #' REFACTORING: Rearrangement should do nothing and should be able to
 #'   construct an empty Rearrangement object if no data is provided.
 #'   Move the functions that do step 5 out of the constructor.
-#' 
+#'
 #' @examples
-#' \dontrun{
-#'   library(Rsamtools)
-#'   library(svovarian)
-#'   dirs <- projectOvarian()
-#'   bviews <- readRDS(file.path(dirs[1], "bviews_hg19.rds"))
-#'   bview <- bviews[, "CGOV52T"]
-#'   aview <- AlignmentViews2(bview, dirs)
+#'   data(pdata, package="trellis")
 #'   rp <- RearrangementParams()
 #'   ##
 #'   ## The file of improper read pairs is large, so this is slow
 #'   ##
-#'   r <- seqJunctionsInferredByPairedTags(improperPaths(aview),
-#'                                         bamRanges(aview),
-#'                                         param=rp)
+#'   r <- seqJunctionsInferredByPairedTags2(pdata,
+#'                                          param=rp)
+#'   r
 #'   ## improper read pairs that link the clusters
 #'   head(improper(r))
 #'   ## The linked tag cluster intervals
 #'   linkedBins(r)
-#' }
 #' @export
 #'
 #' @param aln.file A length-one character vector providing the file
@@ -326,38 +340,12 @@ setMethod("numberLinkingRP", "Rearrangement", function(object){
 #'   along the genome with high mappability and good GC content.
 #'
 #' @param param A \code{RearrangementParams} object
-seqJunctionsInferredByPairedTags <- function(aln.file, bins, param){
-  gp <- readRDS(aln.file)
-  ##gp <- updateObject(gp)
-  seqlevelsStyle(gp) <- "UCSC"
-  gp <- keepSeqlevels(gp, seqlevels(bins), pruning.mode="coarse")
-  gp <- .trimInvalidReads(gp)
-  gp2 <- filterPairedReads(gp, bins, param)
-  ctags <- clusterTags(gp2, param)
-  ##
-  ## Note, the Rearrangement constructor does additional work
-  ##
-  L <- Rearrangement(improper=gp2, unlinked_clusters=ctags)
-  L2 <- L[ numberLinkingRP(L) >= minNumberTagsPerCluster(param) ]
-  L2
-}
-
-mapq <- function(galp){
-  f <- first(galp)
-  l <- last(galp)
-  cbind(mcols(f)$mapq, mcols(l)$mapq)
-}
-
 seqJunctionsInferredByPairedTags2 <- function(preprocess, param){
   bins <- preprocess$bins
   gp <- preprocess$read_pairs[["improper"]]
   m <- mapq(gp)
   gp <- gp[rowSums(m < 30) == 0]
-  ##gp <- readRDS(aln.file)
-  ##gp <- updateObject(gp)
-  ##seqlevelsStyle(gp) <- "UCSC"
   gp <- keepSeqlevels(gp, seqlevels(bins), pruning.mode="coarse")
-  ## gp <- .trimInvalidReads(gp)
   gp2 <- filterPairedReads(gp, bins, param)
   ctags <- clusterTags(gp2, param)
   ##
@@ -703,7 +691,15 @@ rearrangementType <- function(object){
 #'   \code{\link{rearrangementType}} for the type of rearrangement
 #'   supported by each read pair.  See \code{\link{preprocessData}} for constructing a list of elemented obtained from preprocessing.
 #'
-#'
+#' @examples
+#' ## Load list of preprocessed data (see preprocessData)
+#' data(pdata, package="trellis")
+#' ## Parameters for finding candidate rearrangements
+#' rparam <- RearrangementParams(min_number_tags_per_cluster=5,
+#'                               rp_separation=10e3)
+#' ## List of candidate rearrangements
+#' rlist <- findCandidates2(pdata, rparam)
+#' rlist
 #' @export
 #' @param preprocess A list of preprocessing data as constructed by \code{preprocessData}
 #' @param rp A \code{RearrangementParams} object
