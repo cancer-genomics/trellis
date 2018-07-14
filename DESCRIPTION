@@ -36,7 +36,8 @@ Imports:
     grid,
     gridExtra,
     tibble,
-    purrr
+    purrr,
+    readr
 Suggests:
     tidyverse,
     knitr,

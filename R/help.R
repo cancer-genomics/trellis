@@ -36,7 +36,7 @@
 #' @importFrom tidyr unite
 #' @importFrom dplyr group_by top_n summarize mutate count n tbl_df filter left_join ungroup bind_rows
 #' @importFrom purrr map_lgl
-#' @importFrom magrittr '%>%' set_names
+#' @importFrom magrittr '%>%' set_names '%$%' set_colnames
 #' @importFrom RBGL kCliques
 #' @importFrom ggplot2 ggplot geom_rect ylab xlab scale_fill_manual aes
 #' @importFrom ggplot2 theme scale_color_manual scale_x_continuous theme coord_cartesian guides geom_vline guide_legend ggtitle scale_x_reverse geom_text
@@ -46,8 +46,9 @@
 #' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
 #' @importMethodsFrom GenomicFeatures transcripts cdsBy exonsBy
 #' @importFrom BSgenome getBSgenome
-#' @importMethodsFrom Biostrings getSeq translate subseq DNAString
-#' @importFrom Biostrings DNAStringSet
+#' @importMethodsFrom Biostrings getSeq translate subseq
+#' @importFrom Biostrings DNAStringSet DNAString
 #' @importFrom gridExtra grid.arrange
 #' @importFrom grid unit
+#' @importFrom readr read_tsv
 NULL
