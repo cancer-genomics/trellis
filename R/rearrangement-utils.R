@@ -701,7 +701,7 @@ rearrangementType <- function(object){
 #'   additional details regarding the clustering of tags from improper
 #'   pairs and the identification of linked tag clusters. See
 #'   \code{\link{rearrangementType}} for the type of rearrangement
-#'   supported by each read pair.  See \code{\link[svcnvs]{preprocessData}} for constructing a list of elemented obtained from preprocessing.
+#'   supported by each read pair.  See \code{\link{preprocessData}} for constructing a list of elemented obtained from preprocessing.
 #'
 #'
 #' @export
@@ -1063,11 +1063,6 @@ axis_limit3p <- function(df, basepairs){
   xlim2
 }
 
-##
-## - Make both panels have same width
-## - include junction label on x-axis
-##
-#' @export
 axis_limits <- function(df, basepairs){
   df1 <- filter(df, region==levels(region)[1])
   df2 <- filter(df, region==levels(region)[2])
@@ -1360,7 +1355,6 @@ axis_labels3p <- function(df, xlim2, num.ticks){
 
 
 
-#' @export
 ggRearrangeLegend <- function(){
   read_type <- NULL
   cols <- readColors()
@@ -1382,9 +1376,12 @@ ggRearrangeLegend <- function(){
   gobj[[2]]
 }
 
-#' gg-style plot of reads supporting a rearrangement
+#' ggplot wrapper for plotting reads supporting a rearrangement
 #'
 #' @param df a \code{data.frame} as created by \code{rearDataFrame}
+#' @param ylab y-axis label
+#' @param basepairs integer specifying size of window in basepairs
+#' @param num.ticks integer specifying number of x-axis ticks
 #' @seealso \code{\link{rearDataFrame}}
 #' @examples
 #'   extdata <- system.file("extdata", package="trellis")

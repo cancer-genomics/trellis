@@ -2,15 +2,21 @@
 % Please edit documentation in R/rearrangement-utils.R
 \name{ggRearrange}
 \alias{ggRearrange}
-\title{gg-style plot of reads supporting a rearrangement}
+\title{ggplot wrapper for plotting reads supporting a rearrangement}
 \usage{
 ggRearrange(df, ylab = "Read pair index", basepairs = 400, num.ticks = 5)
 }
 \arguments{
 \item{df}{a \code{data.frame} as created by \code{rearDataFrame}}
+
+\item{ylab}{y-axis label}
+
+\item{basepairs}{integer specifying size of window in basepairs}
+
+\item{num.ticks}{integer specifying number of x-axis ticks}
 }
 \description{
-gg-style plot of reads supporting a rearrangement
+ggplot wrapper for plotting reads supporting a rearrangement
 }
 \examples{
   extdata <- system.file("extdata", package="trellis")

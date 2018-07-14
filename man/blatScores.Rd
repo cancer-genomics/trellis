@@ -63,41 +63,10 @@ Given a pass / fail designation for each read by the above
   rearrangement pass QC.
 }
 \examples{
- qnames <- c(paste0(letters[1:10], "_R1"),
-             paste0(letters[1:10], "_R2"))
- ## only 1 location
- numberAlignedLocations <- rep(1, length(qnames))
- matchScores <- rep(95, length(qnames))
- Tend <-  150
- Tstart <- 51
- ## Made up output from blat
- sblat <- data.frame(Qname=qnames,
-                     match=matchScores,
-                     Tend=Tend,
-                     Tstart=Tstart,
-                     Tname=rep("chr1", length(qnames)),
-                     strand=rep("+", length(qnames)),
-                     stringsAsFactors=FALSE)
-
-## Made up information on a rearrangement, including the locations
-##  at which the reads were originally aligned
-
- stags <- data.frame(qname=rep(letters[1:10], 2),
-                     read=rep(c("R1", "R2"), each=10),
-                     seqnames=rep("chr1", 10),
-                     strand=rep("+", 10),
-                     start=Tstart,
-                     end=Tend,
-                     seq=replicate(10, paste(sample(c("g","c"), 10, replace=TRUE),
-                         collapse="")),
-                     stringsAsFactors=FALSE)
- stags$id <- "CGOV32T"
- stags$rearrangement.id <- "1-3"
- ## For each tag, calculate the number of near-perfect matches of the
- ## right size that overlap with eland.  If the number is 0 or more
- ## than 1, then the tag 'fails'.
- blat <- trellis:::annotateBlatRecords(sblat, stags)
- nrow(blat) == 20
- s <- blatScores(sblat, stags, "SOME_ID")
- head(s)
+data(tags)
+extdata <- system.file("extdata", package="trellis")
+blat.file <- file.path(extdata, "blat_alignment.txt")
+blat_aln <- readBlat(blat.file)
+blat <- annotateBlatRecords(blat_aln, tags)
+blatScores(blat, tags)
 }

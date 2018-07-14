@@ -57,5 +57,5 @@ See \code{\link{seqJunctionsInferredByPairedTags}} for
   additional details regarding the clustering of tags from improper
   pairs and the identification of linked tag clusters. See
   \code{\link{rearrangementType}} for the type of rearrangement
-  supported by each read pair.  See \code{\link[svcnvs]{preprocessData}} for constructing a list of elemented obtained from preprocessing.
+  supported by each read pair.  See \code{\link{preprocessData}} for constructing a list of elemented obtained from preprocessing.
 }

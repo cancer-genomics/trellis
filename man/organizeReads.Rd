@@ -15,5 +15,5 @@ organizeReads(rlist, split_reads)
 Facilitates plotting reads supporting a rearrangement with ggplot.
 }
 \seealso{
-\code{\link[svalignments]{rearrangedReads}}
+\code{\link{rearrangedReads}}
 }

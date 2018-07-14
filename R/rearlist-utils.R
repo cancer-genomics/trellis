@@ -571,7 +571,7 @@ splitreadSide <- function(split_reads, regions){
 #'
 #' @param rlist a `RearrangementList`
 #' @param split_reads a data.frame of split reads from BLAT. See `rearrangedReads`.
-#' @seealso \code{\link[svalignments]{rearrangedReads}}
+#' @seealso \code{\link{rearrangedReads}}
 #' @export
 organizeReads <- function(rlist, split_reads){
   if(!missing(split_reads)){
