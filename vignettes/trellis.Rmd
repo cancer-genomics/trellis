@@ -132,7 +132,7 @@ as.tibble(bins) %>%
                color="black")
 ```
 
-# Deletions 
+# Deletions
 
 Candidate somatic deletions are identified from the improperly paired reads and the normalized read depth.  Below, we create an object of class `DeletionParm` containing a list of parameters needed for the deletion analysis.  In addition, we delineate a list of the candidate hemizygous and homozygous deletions from the segmented data.  For each candidate regions, we extract properly paired reads and improperly paired reads within 2kb of the breakpoints.
 
@@ -147,7 +147,7 @@ improper_rp <- keepSeqlevels(improper_rp, seqlevels(segs),
 read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
 ```
 
-The bin-level summaries ($\log_2$ ratios), the segmentation data, and read pair data are collected in a single object by the function `preprocessData`. 
+The bin-level summaries ($\log_2$ ratios), the segmentation data, and read pair data are collected in a single object by the function `preprocessData`.
 
 ```{r preprocess_data}
 pdata <- preprocessData(bam.file=bamfile,
