@@ -32,21 +32,21 @@
 #' @importFrom DNAcopy CNA segment
 #' @importFrom stats setNames predict acf loess median runif setNames kmeans
 #' @importFrom utils read.table data read.delim read.csv
-#' @importFrom tibble as.tibble
+#' @importFrom tibble as.tibble tibble
 #' @importFrom tidyr unite
-#' @importFrom dplyr group_by top_n summarize mutate count n tbl_df filter left_join ungroup
+#' @importFrom dplyr group_by top_n summarize mutate count n tbl_df filter left_join ungroup bind_rows
 #' @importFrom purrr map_lgl
 #' @importFrom magrittr '%>%' set_names
 #' @importFrom RBGL kCliques
 #' @importFrom ggplot2 ggplot geom_rect ylab xlab scale_fill_manual aes
-#' @importFrom ggplot2 theme scale_color_manual scale_x_continuous theme coord_cartesian guides geom_vline guide_legend ggtitle scale_x_reverse
+#' @importFrom ggplot2 theme scale_color_manual scale_x_continuous theme coord_cartesian guides geom_vline guide_legend ggtitle scale_x_reverse geom_text
 #' @importFrom ggplot2 element_text element_blank facet_wrap ggplotGrob
 #' @importFrom scales trans_new pretty_breaks
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom AnnotationDbi select loadDb dbFileConnect dbFileDisconnect
 #' @importMethodsFrom GenomicFeatures transcripts cdsBy exonsBy
 #' @importFrom BSgenome getBSgenome
-#' @importMethodsFrom Biostrings getSeq translate subseq
+#' @importMethodsFrom Biostrings getSeq translate subseq DNAString
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom gridExtra grid.arrange
 #' @importFrom grid unit
