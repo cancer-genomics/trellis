@@ -36,5 +36,4 @@ bviews <- BamViews(bamRanges=bins, bamPaths=bamfile)
 counts <- binnedCounts(bviews)
 head(counts)
 length(bamRanges(bviews)) == length(counts) #TRUE
-
 }

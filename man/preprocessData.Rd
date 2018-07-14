@@ -34,29 +34,46 @@ a comprehensive \code{list} that can be used as input to the
 \code{sv_deletions} and \code{sv_amplicons2} functions.
 }
 \examples{
-\dontrun{
 library(svbams)
 library(svfilters.hg19)
 data(bins1kb)
-bins1kb <- keepSeqlevels(bins1kb, paste0("chr", c(1:22, "X")),
-                         pruning.mode="coarse")
-data(segments, package="trellis")
 extdata <- system.file("extdata", package="svbams")
-bam.file <- file.path(extdata, "cgov44t_revised.bam")
-bviews <- BamViews(bamRanges=bins1kb, bamPaths=bam.file)
-bins1kb$counts <- binnedCounts(bviews)
-bins1kb$std_cnt <- binNormalize(bins)
-bins1kb$log_ratio <- binGCCorrect(bins)
-iparams <- improperAlignmentParams(what=c("flag", "mrnm", "mpos", "mapq"))
-improper_rp <- getImproperAlignmentPairs(bam.file, param = iparams, build="hg19")
-segs <- keepSeqlevels(segments, "chr15", pruning.mode="coarse")
-del.gr <- reduce(segs[segs$seg.mean < hemizygousThr(DeletionParam())],
-                 min.gapwidth=2000)
-proper_rp <- properReadPairs(bam.file, gr=del.gr, DeletionParam())
+bamfile <- file.path(extdata, "cgov44t_revised.bam")
+## Extract all improper readpairs
+what <- c("flag", "mrnm", "mpos", "mapq")
+iparams <- improperAlignmentParams(what=what)
+improper_rp <- getImproperAlignmentPairs(bamfile,
+                                         param=iparams,
+                                         build="hg19")
+
+ddir <- system.file("extdata", package="trellis",
+                    mustWork=TRUE)
+## load normalized read depth (see trellis vignette)
+lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
+seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
+bins1kb$log_ratio <- lr
+bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
+                      pruning.mode="coarse")
+## Load segmentation data
+path <- system.file("extdata", package="trellis")
+segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
+seqlevels(segs, pruning.mode="coarse") <- seqlevels(bins)
+
+## candidate deletions
+dp <- DeletionParam(remove_hemizygous=FALSE)
+dp
+del.gr <- IRanges::reduce(segs[segs$seg.mean < hemizygousThr(dp)],
+                          min.gapwidth=2000)
+
+## sample properly and improperly paired read pairs near candidate deletions
+proper_rp <- properReadPairs(bamfile, gr=del.gr, dp)
+improper_rp <- keepSeqlevels(improper_rp, seqlevels(segs),
+                             pruning.mode="coarse")
 read_pairs <- list(proper_del=proper_rp, improper=improper_rp)
-pdata <- preprocessData(bam.file=bam.file, genome="hg19",
+## Collect data from preprocessing in a single list object
+pdata <- preprocessData(bam.file=bamfile,
+                        genome="hg19",
                         bins=bins1kb,
-                        segments=segments,
+                        segments=segs,
                         read_pairs=read_pairs)
-}
 }

@@ -52,6 +52,16 @@ rearrangement, and the percent of read pairs supporting the modal
 rearrangement.  The collection of all linked clusters for a given
 sample is represented as a \code{RearrangementList}.
 }
+\examples{
+## Load list of preprocessed data (see preprocessData)
+data(pdata, package="trellis")
+## Parameters for finding candidate rearrangements
+rparam <- RearrangementParams(min_number_tags_per_cluster=5,
+                              rp_separation=10e3)
+## List of candidate rearrangements
+rlist <- findCandidates2(pdata, rparam)
+rlist
+}
 \seealso{
 See \code{\link{seqJunctionsInferredByPairedTags}} for
   additional details regarding the clustering of tags from improper
