@@ -41,7 +41,6 @@ junction between two amplicons.
 }
 \examples{
 data(pdata)
-rp=pdata$read_pairs
 pdata$bam.file <- system.file("extdata", "cgov44t_revised.bam",
                               package="svbams")
 sv_amplicons2(pdata)
