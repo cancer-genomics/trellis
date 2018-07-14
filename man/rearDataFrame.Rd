@@ -21,6 +21,6 @@ This function is useful for converting a Rearrangement object to a data.frame fo
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[1]]
-  df <- rearDataFrame(r, "hg19")
-  head(df)
+  r2 <- fiveTo3Prime(r, "hg19")
+  rearDataFrame(r2[[1]], "hg19") 
 }

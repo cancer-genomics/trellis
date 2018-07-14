@@ -12,10 +12,3 @@ isComplex(x)
 \description{
 For most rearrangements, the strand of the 5-prime and 3-prime reads belonging to a rearranged read pair will be consistent. For example, all rearranged read pairs are +/-, indicating a fusion on the positive strand (R1+, R2-) or negative strand (R1-, R2+).
 }
-\examples{
-  extdata <- system.file("extdata", package="trellis")
-  r <- readRDS(file.path(extdata, "cgov1t_complex_rearrangement.rds"))
-  s <- type(r)
-  print(s)
-  isComplex(r)
-}

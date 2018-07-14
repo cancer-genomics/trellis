@@ -20,6 +20,6 @@ extdata <- system.file("extdata", package="trellis")
 blat.file <- file.path(extdata, "blat_alignment.txt")
 blat_aln <- readBlat(blat.file)
 records <- annotateBlatRecords(blat_aln, tags)
-annotateBlatRecords(sblat, stags)
+annotateBlatRecords(records, tags)
 
 }

@@ -19,10 +19,15 @@ ggRearrange(df, ylab = "Read pair index", basepairs = 400, num.ticks = 5)
 ggplot wrapper for plotting reads supporting a rearrangement
 }
 \examples{
+  data(rlist)
   extdata <- system.file("extdata", package="trellis")
-  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
-  rlist <- readRDS(rfile)
-  r <- rlist[[1]]
+  unmap.file <- file.path(extdata, "blat_unmapped.txt")
+  blat_unmap <- readBlat(unmap.file)
+  split_reads <- rearrangedReads(linkedBins(rlist),
+                                 blat_unmap, 500)
+  splitReads(rlist) <- split_reads
+  rlist2 <- fiveTo3List(rlist, build="hg19")
+  r <- rlist2[[1]]
   df <- rearDataFrame(r, "hg19")
   ggRearrange(df)
 }
