@@ -815,8 +815,8 @@ typeRead <- function(gap){
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
-#'   df <- rearDataFrame(r, "hg19")
-#'   head(df)
+#'   r2 <- fiveTo3Prime(r, "hg19")
+#'   rearDataFrame(r2[[1]], "hg19") 
 #' @export
 rearDataFrame <- function(r, build, maxgap=5000){
   lb <- linkedBins(r)
@@ -1384,10 +1384,15 @@ ggRearrangeLegend <- function(){
 #' @param num.ticks integer specifying number of x-axis ticks
 #' @seealso \code{\link{rearDataFrame}}
 #' @examples
+#'   data(rlist)
 #'   extdata <- system.file("extdata", package="trellis")
-#'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
-#'   rlist <- readRDS(rfile)
-#'   r <- rlist[[1]]
+#'   unmap.file <- file.path(extdata, "blat_unmapped.txt")
+#'   blat_unmap <- readBlat(unmap.file)
+#'   split_reads <- rearrangedReads(linkedBins(rlist),
+#'                                  blat_unmap, 500)
+#'   splitReads(rlist) <- split_reads
+#'   rlist2 <- fiveTo3List(rlist, build="hg19")
+#'   r <- rlist2[[1]]
 #'   df <- rearDataFrame(r, "hg19")
 #'   ggRearrange(df)
 #' @export
@@ -1545,13 +1550,12 @@ setMethod("type", "RearrangementList", function(object){
 #' For most rearrangements, the strand of the 5-prime and 3-prime reads belonging to a rearranged read pair will be consistent. For example, all rearranged read pairs are +/-, indicating a fusion on the positive strand (R1+, R2-) or negative strand (R1-, R2+).
 #'
 #' @param x a \code{Rearrangement} or \code{RearrangementList}
-#' @export
-#' @examples
-#'   extdata <- system.file("extdata", package="trellis")
-#'   r <- readRDS(file.path(extdata, "cgov1t_complex_rearrangement.rds"))
-#'   s <- type(r)
-#'   print(s)
-#'   isComplex(r)
+## @examples
+##   extdata <- system.file("extdata", package="trellis")
+##   r <- readRDS(file.path(extdata, "cgov1t_complex_rearrangement.rds"))
+##   s <- type(r)
+##   print(s)
+##   isComplex(r)
 isComplex <- function(x){
   ss <- type(x)
   xx <- strsplit(ss, ",")

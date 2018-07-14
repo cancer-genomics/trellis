@@ -74,8 +74,8 @@ genomeAndBlatOverlap <- function(blat){
 #' blat.file <- file.path(extdata, "blat_alignment.txt")
 #' blat_aln <- readBlat(blat.file)
 #' records <- annotateBlatRecords(blat_aln, tags)
-#' annotateBlatRecords(sblat, stags)
-#'
+#' annotateBlatRecords(records, tags)
+#' 
 #' @export
 annotateBlatRecords <- function(blat, tag.sequences){
   Qname <- NULL
