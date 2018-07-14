@@ -65,6 +65,7 @@ genomeAndBlatOverlap <- function(blat){
 
 #' @export
 annotateBlatRecords <- function(blat, tag.sequences){
+  Qname <- NULL
   qname2 <- paste0(tag.sequences$qname, "_", tag.sequences$read)
   query.sequences <- setNames(tag.sequences$seq, qname2)
   query.sequences <- query.sequences[names(query.sequences) %in% blat$Qname]
@@ -113,6 +114,7 @@ annotateBlatRecords <- function(blat, tag.sequences){
   blat$Tsize <- blat$Tend-blat$Tstart
   blat$is_overlap <- genomeAndBlatOverlap(blat)
 
+  Tstart <- Tend <- Qsize <- rearrangement.id <- NULL
   tags <- tag.sequences %>%
     unite("Qname", c("qname", "read"))
   rid <- tags %>%
@@ -157,35 +159,35 @@ addXCoordinateForTag <- function(blat){
   x
 }
 
-blatStatsPerTag <- function(blat.records, tag_length){
-  stats <- blat.records %>%
-    mutate(is_90 = match > 90,
-           Tsize=abs(Tend-Tstart),
-           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
-             Tsize < (tag_length + 1/5*tag_length),
-           is_90 = is_90 & is_size_near100) %>%
-    group_by(Qname) %>%
-    summarize(n.matches=sum(is_90),
-              n.eland.matches=sum(is_90 & is_overlap)) %>%
-    mutate(is_pass=n.matches == 1 & n.eland.matches==1)
-  return(stats)
-  if(FALSE){
-    ## summary statistics for a single read
-    is_90 <- blat.records$match > 90
-    ## Tsize in blat.records is size of target sequence (chromosome)
-    Tsize <- abs(blat.records$Tend-blat.records$Tstart)
-    is_size_near100 <- Tsize > (tag_length - 1/5*tag_length) &
-      Tsize < (tag_length + 1/5*tag_length)
-    is_90 <- is_90 & is_size_near100
-    is_overlap <- blat.records$is_overlap
-    ## calculate number of near-perfect matches for each tag
-    n.matches <- sapply(split(is_90, blat.records$Qname), sum)
-    n.eland.matches <- sapply(split(is_overlap & is_90, blat.records$Qname), sum)
-    ## there should only be one eland alignment with high quality (n.matches == 1)
-    ## AND this read should overlap the eland alignment
-    n.matches==1 & n.eland.matches==1
-  }
-}
+##blatStatsPerTag <- function(blat.records, tag_length){
+##  stats <- blat.records %>%
+##    mutate(is_90 = match > 90,
+##           Tsize=abs(Tend-Tstart),
+##           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
+##             Tsize < (tag_length + 1/5*tag_length),
+##           is_90 = is_90 & is_size_near100) %>%
+##    group_by(Qname) %>%
+##    summarize(n.matches=sum(is_90),
+##              n.eland.matches=sum(is_90 & is_overlap)) %>%
+##    mutate(is_pass=n.matches == 1 & n.eland.matches==1)
+##  return(stats)
+##  if(FALSE){
+##    ## summary statistics for a single read
+##    is_90 <- blat.records$match > 90
+##    ## Tsize in blat.records is size of target sequence (chromosome)
+##    Tsize <- abs(blat.records$Tend-blat.records$Tstart)
+##    is_size_near100 <- Tsize > (tag_length - 1/5*tag_length) &
+##      Tsize < (tag_length + 1/5*tag_length)
+##    is_90 <- is_90 & is_size_near100
+##    is_overlap <- blat.records$is_overlap
+##    ## calculate number of near-perfect matches for each tag
+##    n.matches <- sapply(split(is_90, blat.records$Qname), sum)
+##    n.eland.matches <- sapply(split(is_overlap & is_90, blat.records$Qname), sum)
+##    ## there should only be one eland alignment with high quality (n.matches == 1)
+##    ## AND this read should overlap the eland alignment
+##    n.matches==1 & n.eland.matches==1
+##  }
+##}
 
 ##.blatStatsRearrangement <- function(blat, thr=0.8, tag_length){
 ##  cols <- c("Qname", "match", "is_overlap", "Tstart", "Tend")
@@ -314,6 +316,10 @@ blatStatsPerTag <- function(blat.records, tag_length){
 #' @param min.tags the minimum number of tags that pass BLAT QC for each rearrangement
 #' @param id sample id
 blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
+  blockcount <- tsize <- Qsize <- Qname <- overlaps_genome <- NULL
+  rid <- number_alignments <- p_overlap_genome <- number_tags <- NULL
+  Tend <- Tstart <- Tsize <- tag_length <- is_size_near100 <- NULL
+  is_90 <- n.matches <- n.genome.matches <- is_pass <- proportion_pass <- ngats <- NULL
   tags <- tags %>%
     unite("Qname", c("qname", "read"))
 ##  ##table(blat_aln$Qname %in% tags$Qname)
