@@ -103,30 +103,30 @@ listRearFilters <- function(genome=c("hg19", "hg18")){
   lymphoblast_rear
 }
 
-#' Provides a reduced set of germline rearrangement filters derived
-#' from 10 lymphoblast cell lines (mixed ethnicities) and 8 normal
-#' blood sammples.
-#'
-#' TODO: deprecate
-#'
-#' @details
-#'
-#' The reduced set is restricted to the sequence names provided in
-#'   \code{seqlev} (if provided).
-#'
-#' @examples
-#' filters <- listRearFilters("hg19")
-#' reduceRearFilters(filters, "chr1")
-#'
-#' @return a \code{GRanges} object
-#' @seealso \code{\link{listRearFilters}}
-#' @param filters a list of germline CNV filters
-#' @param seqlev character vector of sequence names
-#' 
-#' @export
-reduceRearFilters <- function(filters, seqlev){
-  ##filters <- listRearFilters()
-  r <- reduce(unlist(filters))
-  if(missing(seqlev)) return(r)
-  keepSeqlevels(r, seqlev, pruning.mode="coarse")
-}
+## #' Provides a reduced set of germline rearrangement filters derived
+## #' from 10 lymphoblast cell lines (mixed ethnicities) and 8 normal
+## #' blood sammples.
+## #'
+## #' TODO: deprecate
+## #'
+## #' @details
+## #'
+## #' The reduced set is restricted to the sequence names provided in
+## #'   \code{seqlev} (if provided).
+## #'
+## #' @examples
+## #' filters <- listRearFilters("hg19")
+## #' reduceRearFilters(filters, "chr1")
+## #'
+## #' @return a \code{GRanges} object
+## #' @seealso \code{\link{listRearFilters}}
+## #' @param filters a list of germline CNV filters
+## #' @param seqlev character vector of sequence names
+## #' 
+## #' @export
+## reduceRearFilters <- function(filters, seqlev){
+##   ##filters <- listRearFilters()
+##   r <- reduce(unlist(filters))
+##   if(missing(seqlev)) return(r)
+##   keepSeqlevels(r, seqlev, pruning.mode="coarse")
+## }
