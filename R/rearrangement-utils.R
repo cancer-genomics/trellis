@@ -1230,6 +1230,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
   xlim2 <- limits[[gene2]]
   labs1 <- axis_labels5p(df1, xlim1, num.ticks)
   labs2 <- axis_labels3p(df2, xlim2, num.ticks)
+  seq2 <- seq1 <- NULL
 
   df1.seq <- filter(df1, !is.na(seq1))
   df2.seq <- filter(df2, !is.na(seq2))
@@ -1276,7 +1277,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
     tab2$tagid <- rep(df2.seq$tagid, lengths(position.list2))
     tab <- bind_rows(tab1, tab2)
   }
-
+  dna_base <- position <- NULL
   a <- ggplot(df1, aes(ymin=tagid-0.2,
                        ymax=tagid+0.2,
                        xmin=start,
