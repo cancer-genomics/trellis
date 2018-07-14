@@ -63,6 +63,19 @@ genomeAndBlatOverlap <- function(blat){
   is_overlap
 }
 
+#' Annotate blat records
+#'
+#' @param blat \code{data.frame} of blat records from \code{readBlat}
+#' @param tag.sequences \code{data.frame} of read sequences
+#'
+#' @examples
+#' data(tags)
+#' extdata <- system.file("extdata", package="trellis")
+#' blat.file <- file.path(extdata, "blat_alignment.txt")
+#' blat_aln <- readBlat(blat.file)
+#' records <- annotateBlatRecords(blat_aln, tags)
+#' annotateBlatRecords(sblat, stags)
+#'
 #' @export
 annotateBlatRecords <- function(blat, tag.sequences){
   Qname <- NULL
@@ -271,43 +284,12 @@ addXCoordinateForTag <- function(blat){
 #'   rearrangement pass QC.
 #' 
 #' @examples
-#'  qnames <- c(paste0(letters[1:10], "_R1"),
-#'              paste0(letters[1:10], "_R2"))
-#'  ## only 1 location
-#'  numberAlignedLocations <- rep(1, length(qnames))
-#'  matchScores <- rep(95, length(qnames))
-#'  Tend <-  150
-#'  Tstart <- 51
-#'  ## Made up output from blat
-#'  sblat <- data.frame(Qname=qnames,
-#'                      match=matchScores,
-#'                      Tend=Tend,
-#'                      Tstart=Tstart,
-#'                      Tname=rep("chr1", length(qnames)),
-#'                      strand=rep("+", length(qnames)),
-#'                      stringsAsFactors=FALSE)
-#' 
-#' ## Made up information on a rearrangement, including the locations
-#' ##  at which the reads were originally aligned
-#' 
-#'  stags <- data.frame(qname=rep(letters[1:10], 2),
-#'                      read=rep(c("R1", "R2"), each=10),
-#'                      seqnames=rep("chr1", 10),
-#'                      strand=rep("+", 10),
-#'                      start=Tstart,
-#'                      end=Tend,
-#'                      seq=replicate(10, paste(sample(c("g","c"), 10, replace=TRUE),
-#'                          collapse="")),
-#'                      stringsAsFactors=FALSE)
-#'  stags$id <- "CGOV32T"
-#'  stags$rearrangement.id <- "1-3"
-#'  ## For each tag, calculate the number of near-perfect matches of the
-#'  ## right size that overlap with eland.  If the number is 0 or more
-#'  ## than 1, then the tag 'fails'.
-#'  blat <- trellis:::annotateBlatRecords(sblat, stags)
-#'  nrow(blat) == 20
-#'  s <- blatScores(sblat, stags, "SOME_ID")
-#'  head(s)
+#' data(tags)
+#' extdata <- system.file("extdata", package="trellis")
+#' blat.file <- file.path(extdata, "blat_alignment.txt")
+#' blat_aln <- readBlat(blat.file)
+#' blat <- annotateBlatRecords(blat_aln, tags)
+#' blatScores(blat, tags)
 #' @export
 #' @param blat a \code{data.frame} of results from  command-line blat
 #' @param tags a \code{data.frame} containing read names and the original alignment locations
@@ -322,14 +304,6 @@ blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
   is_90 <- n.matches <- n.genome.matches <- is_pass <- proportion_pass <- ngats <- NULL
   tags <- tags %>%
     unite("Qname", c("qname", "read"))
-##  ##table(blat_aln$Qname %in% tags$Qname)
-##  rid <- tags %>%
-##    group_by(Qname) %>%
-##    summarize(rid=unique(rearrangement.id))
-  ##qsize <- nchar(blat$Qsequence[1])
-##  blat2 <- left_join(blat, rid, by="Qname") %>%
-##    mutate(score=match/Qsize,
-  ##           tsize=length(Tstart[1]:Tend[1])) %>%
   filter <- dplyr::filter
   blat2 <- blat %>%
     filter(score >= 0.90 & blockcount==1) %>%
@@ -366,92 +340,7 @@ blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
     mutate(passQC=p_overlap_genome >= prop.pass &
              number_tags >= min.tags) %>%
     mutate(rid=factor(rid))
-  return(blat3)
-  ## bind blat results with tag information
-##  tag_length <- nchar(tags$seq[1])
-##  blat <- blat %>%
-##    mutate(score=match/tag_length*100) %>%
-##    filter(score >= 90)
-##
-##  tags2 <- tags
-##  ix <- match("qname", colnames(tags2))
-##  colnames(tags2) <- paste0("genome_", colnames(tags2))
-##  colnames(tags2)[ix] <- "Qname"
-##  splitby <- blat$Qname %>%
-##    strsplit("R[12]") %>%
-##    sapply("[", 1)
-##  blat$read <-   blat$Qname %>% strsplit(splitby) %>%
-##    sapply("[", 2)
-##  blat$Qname <- gsub("_R[12]", "", blat$Qname)
-##  blat2 <- left_join(blat, tags2, by="Qname") %>%
-##    as.tibble
-##  blat.gr <- GRanges(blat2$Tname, IRanges(blat2$Tstart, blat2$Tend))
-##  tags.gr <- GRanges(as.character(blat2$genome_seqnames),
-##                     IRanges(blat2$genome_start, blat2$genome_end))
-##  hits <- findOverlaps(blat.gr, tags.gr, ignore.strand=TRUE)
-##  keep <- queryHits(hits) == subjectHits(hits)
-##  hits <- hits[keep]
-##  blat.gr$overlaps_genome <- FALSE
-##  blat.gr$overlaps_genome[queryHits(hits)] <- TRUE
-##  blat2$overlaps_genome <- blat.gr$overlaps_genome
-##  ## Remove reads without mate
-##  tab <- table(tags2$Qname)
-##  tab <- tab[tab < 2]
-##  if(length(tab) > 0){
-##    blat2 <- filter(blat2, !Qname %in% names(tab))
-##  }
-##  ##blat$match <- blat$match/tag_length * 100
-##  ##rownames(tags) <- paste0(tags$qname, "_", tags$read)
-##  ##blat3 <- annotateBlatRecords(blat2, tags) %>%
-##  ##as.tibble
-##  ##blat <- removeReadsWithoutMate(blat)
-##  ##colnames(tags) <- gsub("rearrangement.id", "rid", colnames(tags))
-##  ix <- match("genome_rearrangement.id", colnames(blat2))
-##  colnames(blat2)[ix] <- "rid"
-  ##blat2 <- left_join(blat, tags, by="Qname")
-##  blat2 <- .listTagsByGroup(tags, tags[["rearrangement.id"]]) %>% {
-##    tibble(rid=rep(names(.), elementNROWS(.)),
-##           Qname=unlist(.))
-##  } %>% left_join(blat)
-##  splitby <- blat2$Qname %>%
-##    strsplit("R[12]") %>%
-##    sapply("[", 1)
-##  blat2$read <-   blat2$Qname %>% strsplit(splitby) %>%
-##    sapply("[", 2)
-  blat.qname <- blat2 %>%
-    mutate(Tsize=abs(Tend-Tstart),
-           is_size_near100=Tsize > (tag_length-1/5*tag_length) &
-             Tsize < (tag_length + 1/5*tag_length),
-           is_90 = match > 90 & is_size_near100) %>%
-    filter(is_90) %>%
-    group_by(Qname) %>%
-    summarize(rid=unique(rid),
-              n.matches=sum(is_90),
-              n.genome.matches=sum(is_90 & overlaps_genome)) %>%
-    select(c("rid", "n.matches", "n.genome.matches", "Qname")) %>%
-    mutate(is_pass=n.matches == 2 & n.genome.matches  >= 2)
-  blat.rid <- blat.qname %>%
-    group_by(rid) %>%
-    summarize(proportion_pass=mean(is_pass),
-              ntags=n()) %>%
-    mutate(passQC=proportion_pass > prop.pass & ntags >= min.tags)
-  return(blat.rid)
-  ##  blat.parsed <- vector("list", length(tagnames.list))
-  ##  for(j in seq_along(tagnames.list)){
-  ##    tagnames <- tagnames.list[[j]]
-  ##    rid <- names(tagnames.list)[j]
-
-  ##    blat_rid <- blat[blat$Qname %in% tagnames, ]
-  ##    result <- .blatStatsRearrangement(blat_rid, thr=thr, tag_length)
-  ##    if(!is.null(result)){
-  ##      result$rearrangement <- rep(rid, nrow(result))
-  ##    }
-  ##    blat.parsed[[j]] <- result
-  ##  }
-  ##  blat.parsed <- blat.parsed[!sapply(blat.parsed, is.null)]
-  ##  blat.parsed <- do.call("rbind", blat.parsed)
-  ##  blat.parsed$id <- rep(id, nrow(blat.parsed))
-  ##blat.parsed
+  blat3
 }
 
 overlapsBlatRecord <- function(linked_bins, blat_record, maxgap=200){
@@ -939,6 +828,7 @@ breakpointsForQuery <- function(x, seqinfo){
 }
 
 iscnName <- function(A){
+  . <- band <- stain <- NULL
   extdata <- system.file("extdata", package="SNPchip")
   cytobands <- read_tsv(file.path(extdata, "cytoBand_hg19.txt"),
                         col_names=FALSE) %>%
