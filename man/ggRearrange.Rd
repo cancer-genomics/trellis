@@ -29,7 +29,9 @@ ggplot wrapper for plotting reads supporting a rearrangement
   rlist2 <- fiveTo3List(rlist, build="hg19")
   r <- rlist2[[1]]
   df <- rearDataFrame(r, "hg19")
-  ggRearrange(df)
+  \dontrun{
+    ggRearrange(df)
+  }
 }
 \seealso{
 \code{\link{rearDataFrame}}

@@ -7,14 +7,9 @@
 seqJunctionsInferredByPairedTags2(preprocess, param)
 }
 \arguments{
+\item{preprocess}{a list as created by \code{preprocessData}}
+
 \item{param}{A \code{RearrangementParams} object}
-
-\item{aln.file}{A length-one character vector providing the file
-path to a serialized R object of improper read pairs}
-
-\item{bins}{A \code{GRanges} object.  This should be the
-\code{bamRanges} of a \code{BamViews} object -- e.g., 1kb bins
-along the genome with high mappability and good GC content.}
 }
 \description{
 Identifies genomic intervals containing clusters of improper reads

@@ -63,7 +63,7 @@ rlist <- findCandidates2(pdata, rparam)
 rlist
 }
 \seealso{
-See \code{\link{seqJunctionsInferredByPairedTags}} for
+See \code{\link{seqJunctionsInferredByPairedTags2}} for
   additional details regarding the clustering of tags from improper
   pairs and the identification of linked tag clusters. See
   \code{\link{rearrangementType}} for the type of rearrangement

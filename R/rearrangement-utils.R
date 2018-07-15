@@ -332,12 +332,7 @@ mapq <- function(galp){
 #'   linkedBins(r)
 #' @export
 #'
-#' @param aln.file A length-one character vector providing the file
-#'   path to a serialized R object of improper read pairs
-#'
-#' @param bins A \code{GRanges} object.  This should be the
-#'   \code{bamRanges} of a \code{BamViews} object -- e.g., 1kb bins
-#'   along the genome with high mappability and good GC content.
+#' @param preprocess a list as created by \code{preprocessData}
 #'
 #' @param param A \code{RearrangementParams} object
 seqJunctionsInferredByPairedTags2 <- function(preprocess, param){
@@ -685,7 +680,7 @@ rearrangementType <- function(object){
 #' rearrangement.  The collection of all linked clusters for a given
 #' sample is represented as a \code{RearrangementList}.
 #'
-#' @seealso See \code{\link{seqJunctionsInferredByPairedTags}} for
+#' @seealso See \code{\link{seqJunctionsInferredByPairedTags2}} for
 #'   additional details regarding the clustering of tags from improper
 #'   pairs and the identification of linked tag clusters. See
 #'   \code{\link{rearrangementType}} for the type of rearrangement
@@ -1060,6 +1055,7 @@ axis_limit3p <- function(df, basepairs){
 }
 
 axis_limits <- function(df, basepairs){
+  region <- NULL
   df1 <- filter(df, region==levels(region)[1])
   df2 <- filter(df, region==levels(region)[2])
   xlim1 <- axis_limit5p(df1, basepairs)
@@ -1390,7 +1386,9 @@ ggRearrangeLegend <- function(){
 #'   rlist2 <- fiveTo3List(rlist, build="hg19")
 #'   r <- rlist2[[1]]
 #'   df <- rearDataFrame(r, "hg19")
-#'   ggRearrange(df)
+#'   \dontrun{
+#'     ggRearrange(df)
+#'   }
 #' @export
 ggRearrange <- function(df, ylab="Read pair index",
                          basepairs=400, num.ticks=5){
