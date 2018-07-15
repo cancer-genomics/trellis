@@ -99,7 +99,7 @@ As the above steps were restricted to a very small region of the genome, the log
 
 ```{r load_logratios}
 data(bins1kb, package="svfilters.hg19")
-ddir <- system.file("extdata", package="trellis",
+ddir <- system.file("extdata", package="svbams",
                     mustWork=TRUE)
 lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
 seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
@@ -599,7 +599,7 @@ Note, this table provides both the genomic coordinates of the fusion (junction.5
 
 ```{r protein_domains}
 tumor_aa_ranges <- aa_granges(tab)
-extdata2 <- system.file("extdata", package="trellis")
+extdata2 <- system.file("extdata", package="svbams")
 up <- readRDS(file.path(extdata2, "uniprot.rds"))
 up2 <- uniprotFeatures(up, tab, strwrap.width=20)
 domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),

@@ -1548,7 +1548,7 @@ meltReadPairs <- function(rps){
 #'                                          param=iparams,
 #'                                          build="hg19")
 #'
-#' ddir <- system.file("extdata", package="trellis",
+#' ddir <- system.file("extdata", package="svbams",
 #'                     mustWork=TRUE)
 #' ## load normalized read depth (see trellis vignette)
 #' lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000

@@ -4,7 +4,9 @@ test_that("protein_domains", {
   extdata <- system.file("extdata", package="trellis")
   fusions <- readRDS(file.path(extdata, "valid_fusions.rds"))
   tab <- fusionTable2(fusions)
-  up <- readRDS(file.path(extdata, "uniprot.rds"))
+
+  extpath2 <- system.file("extdata", package="svbams")
+  up <- readRDS(file.path(extpath2, "uniprot.rds"))
   up2 <- uniprotFeatures(up, tab, strwrap.width=20)
   ## check that none of the short descriptions are too long
   nchar.desc <- nchar(up2$short.desc)

@@ -21,9 +21,9 @@ cgov44t_preprocess <- function(){
     irp@last <- updateObject(irp@last)
     saveRDS(irp, file=file.path(extdata, "cgov44t_improper.rds"))
   }
-  ddir <- system.file("extdata", package="trellis",
-                      mustWork=TRUE)
-  lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
+  bamdir <- system.file("extdata", package="svbams",
+                        mustWork=TRUE)
+  lr <- readRDS(file.path(bamdir, "preprocessed_coverage.rds"))/1000
   seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
   bins1kb$log_ratio <- lr
 
@@ -389,7 +389,7 @@ test_that("no germline filter", {
 test_amplicon_vignette <- function(){
   ## unit test bins
   data(bins1kb, package="svfilters.hg19")
-  ddir <- system.file("extdata", package="trellis",
+  ddir <- system.file("extdata", package="svbams",
                       mustWork=TRUE)
   lr <- readRDS(file.path(ddir, "preprocessed_coverage.rds"))/1000
   seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
