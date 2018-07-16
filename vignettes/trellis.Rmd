@@ -16,7 +16,7 @@ vignette: >
 
 # Introduction
 
-The trellis package was developed to identify somatic structural variants in tumor-only analyses of whole genome sequencing data.  The types of somatic structural alterations identified by trellis include deletions, amplifications, intra- and inter-chromosomal rearrangements, inversions, and in-frame fusions.  Additional packages required for this vignette are the `r Githubpkg("rscharpf/svfilters.hg19")` package that contains various sequence filters for structural variant analyses and the `r Rpackage("svbams")` package that contains subsampled data used to illustrate various aspects of data processing.
+The trellis package was developed to identify somatic structural variants in tumor-only analyses of whole genome sequencing data.  The types of somatic structural alterations identified by trellis include deletions, amplifications, intra- and inter-chromosomal rearrangements, inversions, and in-frame fusions.  Trellis distinguishes focal high-copy amplifications from low copy duplications and homozygous deletions from heterozygous deletions.  High copy amplicons are linked using the mate information from read pair analyses, simplifying the interpretation of the likely drivers.  Additional packages required for this vignette are listed below, including the `r Githubpkg("rscharpf/svfilters.hg19")` package that contains various sequence filters for structural variant analyses and the `r Rpackage("svbams")` package that contains subsampled data used to illustrate various aspects of data processing.
 
 ```{r packages, results="hide", message=F}
 library(Rsamtools)
@@ -36,13 +36,17 @@ library(sna)
 library(kableExtra)
 ```
 
+# Prerequisites
+
+We assume that a collection of sorted and indexed BAM files are available with PCR duplicates marked.  For this vignette, we provide a heavily subsampled bam file in the `svbams` package that has already been indexed and sorted.
+
 # Batch jobs
 
-This section provides code snippets for extracting all read pairs with aberrant orientation or spacing with respect to the reference genome (improper read pairs) and for computing read-depth in non-overlapping bins along the genome.  These two aspects of preprocessing can be performed in parallel and are ideally suited for submission as batch jobs on a large computing cluster with one core dedicated to the processing of each sample.
+This section provides code for extracting all read pairs with aberrant orientation or spacing with respect to the reference genome (improper read pairs) and for computing read-depth in non-overlapping bins along the genome.  These two aspects of preprocessing can be performed in parallel and are ideally suited for submission as batch jobs on a large computing cluster with one core dedicated to the processing of each sample.
 
 ## Improperly paired reads
 
-The time required to extract all improperly paired reads depends on the size of the bam file. The function `getImproperAlignmentPairs` returns a `GAlignmentPairs` where the `first` and `last` slots store the alignment of the first read and its mate.
+The following code chunk extract all improperly paired reads in a bam file, returning a `GAlignmentPairs` object where the `first` and `last` slots store the alignment of the first read and its mate. The time required to extract these improperly paired reads depends on the size of the bam file. 
 
 ```{r improper_pairs}
 extdata <- system.file("extdata", package="svbams")
@@ -57,11 +61,11 @@ improper_rp <- getImproperAlignmentPairs(bamfile,
 
 ## Normalizing bin counts
 
-To compute normalized read depth along the genome, we first define a set of bins over which the number of aligned reads will be counted.  The `sv.filters.<build>` packages contain 1kb bins that exclude regions with average mappability less than 0.75.  For computational speed, we focus on chromosomes 5, 8, and 15.  We use infrastructure provided in the `r Biocpkg("Rsamtools")` package for counting single-end reads overlapping these bins. 
+To compute normalized read depth along the genome, we first define a set of non-overlapping 1kb bins that have a average mappability of at least 0.75. These bins are provided for builds hg18 and hg19 of the reference genome in the \R{} package `sv.filters.<build>`.  For computational speed, we focus on one part of chromosome 15.  The function `binnedCounts`  is a wrapper for the `countBam` function provided in the `r Biocpkg("Rsamtools")` package.
 
 ```{r define_bins}
 data(bins1kb, package="svfilters.hg19")
-bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
+bins <- keepSeqlevels(bins1kb, "chr15",
                       pruning.mode="coarse")
 flags <- scanBamFlag(isDuplicate=FALSE,
                      isPaired=TRUE,
@@ -87,7 +91,7 @@ set.seed(123)
 bins$log_ratio <- binGCCorrect(bins)
 ```
 
-If one or more normal controls is available, the normalized bin-counts can be further corrected.  Since much of the bin-level technical variation is batch-specific, we advise against the use of historical controls for additional normalization .  Below, we segment the $\log_2$ ratios by circular binary segmentation (CBS). See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object. Note, `segmentBins` requires the variable `log_ratio` in the `GRanges` object. The object returned by `segmentBins` is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.   
+If one or more normal controls is available, the normalized bin-counts can be further corrected.  Since much of the bin-level technical variation is batch-specific, we advise against the use of historical controls for additional normalization.  Below, we segment the $\log_2$ ratios by circular binary segmentation (CBS). See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object. Note, `segmentBins` assumes a variable called `log_ratio` in the `GRanges` object. The object returned by `segmentBins` is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.
 
 ```{r segment}
 params <- SegmentParam()
@@ -95,7 +99,7 @@ g <- segmentBins(bins, param=SegmentParam())
 g
 ```
 
-As the above steps were restricted to a very small region of the genome, the log ratios obtained from the preceding normalization and GC correction can not be interpreted as fold changes from the modal genome ploidy.  Below, we load log ratios and the segmented data obtained from processing the full genome.
+As the above steps were restricted to a very small region of the genome, the log ratios obtained from the preceding normalization and GC correction are not interpretable as fold changes from the modal genome ploidy.  Below, we load log ratios and the segmented data obtained from processing the full genome and then restrict to chromosomes 5, 8, and 15 for illustrating downstream analyses.
 
 ```{r load_logratios}
 data(bins1kb, package="svfilters.hg19")
@@ -319,14 +323,7 @@ print(B)
 
 ## Candidate somatic rearrangements
 
-Trellis uses improperly paired reads to identify candidate somatic
-rearrangements.  Below, we use helper functions `reduceGenomeFilters` and `rFilters` to assemble data needed for rearrangement analyses.  The `GRangesList` of filters includes somatic deletions and amplifications identified from the read-depth analyses, outliers in read depth coverage, germline CNVs, and germline rearrangements. For rearrangements, the two regions that are joined in the cancer genome to create a novel adjacency are stored in a `GRanges` object (see `germline_rear` below). The outliers, germline CNVs, and germline rearrangements were identified from a set of 10 lymphoblastoid cell lines and are provided by the `svfilters.hg19` package in the `germline_filters` object.
-
-```{r filters}
-
-```
-
-The function `findCandidates2` identifies clusters of improperly paired reads. Parameters for identifying improperly paired read clusters are specified in the `RearrangementParams` function. With 30x coverage and a clonal ovarian cancer cell line, we set this value to 5. For the identification of likely somatic variants without a matched normal, we required the read pairs to be at least 10kb apart with respect to the reference genome.  Using these parameters, we identify two candidate rearrangements. The data supporting these rearrangements are encapsulated in a `RearrangementList` object called `rlist`.
+The function `findCandidates2` identifies clusters of reads belonging to improper pairs and links these clusters using the mate-pair information of the reads. Parameters for identifying improperly paired read clusters are specified in the `RearrangementParams` function. With 30x coverage and a clonal ovarian cancer cell line, we set this value to 5. For the identification of likely somatic variants without a matched normal, we required the read pairs to be at least 10kb apart with respect to the reference genome.  Using these parameters, we identify two candidate rearrangements. The data supporting these rearrangements are encapsulated in a `RearrangementList` object called `rlist`.
 
 ```{r find_candidates}
 rparam <- RearrangementParams(min_number_tags_per_cluster=5,
@@ -349,7 +346,9 @@ The rearranged read pair clusters link potentially distant regions within a chro
 linkedBins(rlist)
 ```
 
-The `linked.to` value in the `mcols` of the linked bins is also a `GRanges` object. Next, we exclude possible germline rearrangements as well as rearrangements associated with copy number alterations.
+The `linked.to` value in the `mcols` of the linked bins is also a `GRanges` object.
+
+Below, we use helper functions `reduceGenomeFilters` and `rFilters` to assemble data needed to exclude possible germline rearrangements as well as somatic copy number alterations identified above.  The `GRangesList` of filters includes somatic deletions and amplifications identified from the read-depth analyses, outliers in read depth coverage, germline CNVs, and germline rearrangements. For rearrangements, the two regions that are joined in the cancer genome to create a novel adjacency are stored in a `GRanges` object. The outliers, germline CNVs, and germline rearrangements were identified from a set of 10 lymphoblastoid cell lines and are provided by the `svfilters.hg19` package in the `germline_filters` object.
 
 ```{r rear_filters}
 data(germline_filters, package="svfilters.hg19")
