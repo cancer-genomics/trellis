@@ -1,7 +1,7 @@
 context("writeToFasta")
 
 test_that("writeToFasta", {
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   tags <- readRDS(file.path(path, "tags.34bd277.rds"))
   fa.file <- tempfile()
   expect_true(writeToFasta(tags, fa.file))
@@ -14,7 +14,7 @@ test_that("writeToFasta", {
 })
 
 test_that("umapped_read", {
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(path, "filterRearrangementList.37be188.rds"))
   query <- uncouple(linkedBins(rlist))
   extdata <- system.file("extdata", package="svbams")

@@ -8,7 +8,7 @@ test_that("addFocalDupsFlankingAmplicon", {
   ##
   extdata <- system.file("extdata", package="svbams")
   bamfile <- file.path(extdata, "cgov44t_revised.bam")
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   ag <- readRDS(file.path(path, "makeAGraphffab104.rds"))
   params <- ampliconParams()
   merged <- joinNearGRanges(ranges(ag), params)
@@ -25,7 +25,7 @@ test_that("addFocalDupsFlankingAmplicon", {
   if(FALSE){
     saveRDS(flanks, file="flankingDuplications.21adcf5.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   flanks.21adcf5 <- readRDS(file.path(path, "flankingDuplications.21adcf5.rds"))
   flanks.21adcf5 <- updateObject(flanks.21adcf5)
   expect_identical(flanks, flanks.21adcf5)

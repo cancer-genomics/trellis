@@ -5,7 +5,7 @@ context("IKZF2 fusion")
 test_that("sequenceJunctions", {
   library(trellis)
   library(BSgenome)
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
 ##  x=rlist
 ##  fun <- function(x){
@@ -35,9 +35,9 @@ test_that("sequenceJunctions", {
 test_that("ikaros_fusion", {
   library(trellis)
   library(BSgenome)
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
-  extdata2 <- system.file("extdata", package="trellis")
+  extdata2 <- system.file("extdata", package="svbams")
   coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
   rid <- coding_jxns$rid
   rlist <- rlist[rid]

@@ -2,9 +2,9 @@
 
 test_that("fuseCDS_Rlist", {
   ##loadGenomeData()
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
-  extdata2 <- system.file("extdata", package="trellis")
+  extdata2 <- system.file("extdata", package="svbams")
   coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
   rid <- coding_jxns$rid
   rlist <- rlist[rid]
@@ -26,8 +26,8 @@ test_that("fuseCDS_Rlist", {
 ## this takes too long
 .test_that("translateCDS", {
   loadGenomeData()
-  extdata <- system.file("extdata", package="trellis")
-  extdata2 <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
+  extdata2 <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(extdata, "rlist_5to3p.rds"))
   coding_jxns <- readRDS(file.path(extdata2, "coding_jxns.rds"))
   coding_jxns <- coding_jxns[-grep("NR_", coding_jxns$tx_name)]
@@ -74,7 +74,7 @@ test_that("fuseCDS_Rlist", {
 test_that("pipeline", {
   ##loadGenomeData()
   ##library(trellis)
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   build <- "hg19"
   if(FALSE){
     rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
@@ -159,7 +159,7 @@ test_that("pipeline", {
                                 inframe.nostop,
                                 ref.frames)
   if(FALSE){
-    extdata2 <- system.file("extdata", package="trellis")
+    extdata2 <- system.file("extdata", package="svbams")
     saveRDS(valid.fusions, file=file.path(extdata2, "valid_fusions.rds"))
   }
   expected <- readRDS(file.path(extdata, "valid_fusions.rds"))

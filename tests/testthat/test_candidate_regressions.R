@@ -13,7 +13,7 @@ getBamView <- function(){
 }
 
 improper.path <- function(){
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   file.path(extdata, "improper_cgov44t.bam.rds")
 }
 
@@ -22,7 +22,7 @@ cgov44t_preprocess<- function(){
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
 
-  cnvpath <- system.file("extdata", package="trellis")
+  cnvpath <- system.file("extdata", package="svbams")
   gr <- readRDS(file.path(cnvpath, "cgov44t_segments.rds"))
   segs <- keepSeqlevels(gr, "chr15", pruning.mode="coarse")
 
@@ -55,7 +55,7 @@ test_that("findCandidates", {
   if(FALSE){
     saveRDS(rlist, file="findCandidates.fe9b1f6.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   rlist.fe9b1f6 <- readRDS(file.path(path, "findCandidates.fe9b1f6.rds"))
   expect_equivalent(rlist.fe9b1f6, rlist)
 })
@@ -68,27 +68,27 @@ test_that("seqJunctionsInferredByPairedTags", {
   if(FALSE){
     saveRDS(candidates, file="seqJunctionsInferredByPairedTags.fe9b1f6.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   f <- file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds")
   cand.fe9b1f6 <- readRDS(f)
   expect_equivalent(candidates, cand.fe9b1f6)
 })
 
 test_that("RearrangementList", {
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   f <- file.path(path, "seqJunctionsInferredByPairedTags.fe9b1f6.rds")
   candidates <- readRDS(f)
   cand.list <- RearrangementList(candidates)
   if(FALSE){
     saveRDS(cand.list, file="RearrangementList.fe9b1f6.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   expected.fe9b1f6 <- readRDS(file.path(path, "RearrangementList.fe9b1f6.rds"))
   expect_equivalent(cand.list, expected.fe9b1f6)
 })
 
 test_that("type_each", {
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   cand.list <- readRDS(file.path(path, "RearrangementList.fe9b1f6.rds"))
   if(FALSE){
     for(j in seq_along(cand.list)){
@@ -102,17 +102,17 @@ test_that("type_each", {
   if(FALSE){
     saveRDS(result, file="type_each.fe9b1f6.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   result.fe9b1f6 <- readRDS(file.path(path, "type_each.fe9b1f6.rds"))
   expect_equivalent(result, result.fe9b1f6)
 })
 
 test_that("modalRearrangement", {
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   candidate.list <- readRDS(file.path(path, "type_each.fe9b1f6.rds"))
   colData(candidate.list)$modal_rearrangement <- modalRearrangement(candidate.list)
   colData(candidate.list)$percent_rearrangement <- percentRearrangement(candidate.list)
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   rlist.fe9b1f6 <- readRDS(file.path(path, "findCandidates.fe9b1f6.rds"))
   expect_identical(candidate.list, rlist.fe9b1f6)
 })

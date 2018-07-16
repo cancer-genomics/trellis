@@ -19,7 +19,7 @@ Reorders each rearrangement as two 5-prime to 3-prime orientations
 }
 \examples{
  library(trellis)
- extdata <- system.file("extdata", package="trellis")
+ extdata <- system.file("extdata", package="svbams")
  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
  rlist <- readRDS(rfile)
  near.coding <- seqJunctionNearTx(rlist, "hg19")

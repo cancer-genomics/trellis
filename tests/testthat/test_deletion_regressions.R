@@ -10,11 +10,11 @@ cgov44t_preprocess <- function(){
   extdata <- system.file("extdata", package="svbams")
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(path, "segs.4adcc78.rds"))
 
   ##gr <- readRDS("~/Dropbox/OvarianCellLines/structuralvar/data/segment/0cbs/CGOV44T.bam.rds")
-  cnvpath <- system.file("extdata", package="trellis")
+  cnvpath <- system.file("extdata", package="svbams")
   gr <- readRDS(file.path(cnvpath, "cgov44t_segments.rds"))
   segs <- keepSeqlevels(gr, "chr15", pruning.mode="coarse")
 
@@ -44,7 +44,7 @@ test_that("sv_deletions", {
   if(FALSE){
     saveRDS(dels, file="sv_deletions.ba3c739.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   dels.ba3c739 <- readRDS(file.path(path, "sv_deletions.ba3c739.rds"))
   dels.ba3c739 <- rename(sort(dels.ba3c739))
   expect_equivalent(dels.ba3c739, dels)
@@ -57,7 +57,7 @@ test_that("deletion_call", {
   if(FALSE){
     saveRDS(result, file="deletion_call.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   expected <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
   expect_equivalent(result, expected)
 })
@@ -82,14 +82,14 @@ test_that("addImproperReadPairs2", {
   if(FALSE){
     saveRDS(irp, file="addImproperReadPairs2.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   irp.4adcc78 <- readRDS(file.path(path, "addImproperReadPairs2.4adcc78.rds"))
   expect_equivalent(irp, irp.4adcc78[1:72])
 })
 
 test_that("rpSupportedDeletions", {
   pdat <- cgov44t_preprocess()
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
   calls <- rpSupportedDeletions(sv,
                                 DeletionParam(),
@@ -99,7 +99,7 @@ test_that("rpSupportedDeletions", {
 
 test_that("reviseEachJunction", {
   pdat <- cgov44t_preprocess()
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
   calls(sv) <- "homozygous+"
   ## note, we can not use the improper read pairs stored in the sv object
@@ -113,17 +113,17 @@ test_that("reviseEachJunction", {
   if(FALSE){
     saveRDS(g, file="reviseEachJunction.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   g.4adcc78 <- readRDS(file.path(path, "reviseEachJunction.4adcc78.rds"))
   expect_identical(g.4adcc78, g)
 })
 
 test_that("granges_copynumber", {
   pdat <- cgov44t_preprocess()
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
   calls(sv) <- "homozygous+"
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   g <- readRDS(file.path(path, "reviseEachJunction.4adcc78.rds"))
   variant(sv) <- g
   cn <- granges_copynumber2(variant(sv), pdat$bins)
@@ -138,7 +138,7 @@ test_that("granges_copynumber", {
     indexImproper(sv) <- index
     saveRDS(sv, file="sv_granges_copynumber.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   index.4adcc78 <- readRDS(file.path(path, "updateImproperIndex.4adcc78.rds"))
   expect_identical(index, index.4adcc78)
 })
@@ -148,13 +148,13 @@ test_that("sv_deletions2", {
   library(svfilters.hg19)
   pdat <- cgov44t_preprocess()
   ## the only variant is homozygous+, so these functions are not doing anything
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "sv_granges_copynumber.4adcc78.rds"))
   sv3 <- finalize_deletions(sv, pdat)
   if(FALSE){
     saveRDS(sv3, file="allProperReadPairs.4adcc78.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   sv.4adcc78 <- readRDS(file.path(path, "allProperReadPairs.4adcc78.rds"))
   expect_equivalent(sv.4adcc78, sv3)
 })
@@ -167,7 +167,7 @@ test_that("germlineFilters", {
   if(FALSE){
     saveRDS(cnvs, file="germlineFilters.9492f3f.rds")
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   cnvs.9492f3f <- readRDS(file.path(path, "germlineFilters.9492f3f.rds"))
   expect_identical(cnv, cnvs.9492f3f)
 })

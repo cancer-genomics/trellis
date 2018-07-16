@@ -12,7 +12,7 @@ getBamView <- function(){
 }
 
 improper.path <- function(){
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   file.path(extdata, "improper_cgov44t.bam.rds")
 }
 
@@ -34,7 +34,7 @@ test_that("filterRearrangementList", {
       saveRDS(rlist2, file="filterRearrangementList.37be188.rds")
     }
   }
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   expected <- readRDS(file.path(path, "filterRearrangementList.37be188.rds"))
 ##  x <- expected
 ##  attributes(class(x))$package <- "trellis"
@@ -64,7 +64,7 @@ test_that("filterRearrangementList", {
 
 ## this should be tested in svalignments
 ##test_that("getSequenceOfReads", {
-##  path <- system.file("extdata", package = "trellis")
+##  path <- system.file("extdata", package="svbams")
 ##  rlist <- readRDS(file.path(path, "filterRearrangementList.37be188.rds"))
 ##  extdata <- system.file("extdata", package="svbams")
 ##  bam.file <- file.path(extdata, "cgov44t_revised.bam")
@@ -72,7 +72,7 @@ test_that("filterRearrangementList", {
 ##  if(FALSE){
 ##    saveRDS(tags, file="tags.34bd277.rds")
 ##  }
-##  path <- system.file("extdata", package = "trellis")
+##  path <- system.file("extdata", package="svbams")
 ##  expected <- readRDS(file.path(path, "tags.34bd277.rds"))
 ##  tags <- tags[order(rownames(tags)), ]
 ##  expected <- expected[order(rownames(expected)), ]

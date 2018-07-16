@@ -2,7 +2,7 @@ context("Split reads")
 
 test_that("split_reads", {
   data(rlist, package="trellis")
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   unmap.file <- file.path(extdata, "blat_unmapped.txt")
   blat_unmap <- readBlat(unmap.file)
   split_reads <- rearrangedReads(linkedBins(rlist), blat_unmap, 500)

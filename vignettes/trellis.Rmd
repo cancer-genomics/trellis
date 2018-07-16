@@ -106,7 +106,7 @@ seqlevels(bins1kb, pruning.mode="coarse") <- paste0("chr", c(1:22, "X"))
 bins1kb$log_ratio <- lr
 bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
                       pruning.mode="coarse")
-path <- system.file("extdata", package="trellis")
+path <- system.file("extdata", package="svbams")
 segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
 seqlevels(segs, pruning.mode="coarse") <- seqlevels(bins)
 ```
@@ -397,7 +397,7 @@ file.copy(outfile, "../../svalignments/inst/extdata/blat_alignment.txt")
 Here, we read the previously saved BLAT alignments for this data.  We require that each read have only one near perfect match in the genome (score > 90) and, if there is a near-perfect match, the near-perfect match must be consistent with the whole genome aligner (Figure \@ref("blatscores")).
 
 ```{r read_fasta}
-extdata <- system.file("extdata", package="trellis")
+extdata <- system.file("extdata", package="svbams")
 blat.file <- file.path(extdata, "blat_alignment.txt")
 blat_aln <- readBlat(blat.file)
 records <- annotateBlatRecords(blat_aln, tags)

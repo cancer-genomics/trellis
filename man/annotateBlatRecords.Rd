@@ -16,7 +16,7 @@ Annotate blat records
 }
 \examples{
 data(tags)
-extdata <- system.file("extdata", package="trellis")
+extdata <- system.file("extdata", package="svbams")
 blat.file <- file.path(extdata, "blat_alignment.txt")
 blat_aln <- readBlat(blat.file)
 records <- annotateBlatRecords(blat_aln, tags)

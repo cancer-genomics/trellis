@@ -82,7 +82,7 @@ test_that("splitReads<-", {
 
 
 test_that("rlist from vignette",{
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   build <- "hg19"

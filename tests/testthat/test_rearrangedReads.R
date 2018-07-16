@@ -5,7 +5,7 @@ context("rearrangedReads")
 ## - this unit test checks the consensus sequnce by BLAT against the hg19 reference genome
 ##
 test_that("consensus", {
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   blat <- readBlat(file.path(extdata, "consensus.txt"))
   linked_bins <- readRDS(file.path(extdata, "consensus_linkedbins.rds"))
   lb <- linked_bins[1]
@@ -18,7 +18,8 @@ test_that("consensus", {
   expect_true("tStarts" %in% colnames(mcols(blat_gr)))
   expect_is(blat_gr, "GRanges")
   ##
-  ## Remove any blat alignment that does not overlap the candidate rearrangement
+  ## Remove any blat alignment that does not overlap the
+  ## candidate rearrangement
   ##
   is.overlap <- overlapsLinkedBins(blat_gr, lb)
   expect_is(is.overlap, "logical")
@@ -28,7 +29,9 @@ test_that("consensus", {
   expect_identical(start.list,
                    list(c(209945665L, 209947429L, 209947439L)))
   ##
-  ## Candidate split reads either have a low match score (only part of the read is aligned), or there are multiple starts listed and the overall match is high
+  ## Candidate split reads either have a low match score
+  ## (only part of the read is aligned), or there are multiple
+  ## starts listed and the overall match is high
   ##
   is.candidate <- candidateSplitRead(blat_gr)
   expect_true(is.candidate)
@@ -110,7 +113,7 @@ test_that("consensus", {
 ## - this unit test check for unmapped reads with a mapped mate near the putative sequence junction can be aligned via a split-read with blat
 ##
 test_that("unmapped_reads_near_consensus", {
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   unmap.file <- file.path(extdata, "blat_mapped-unmapped-oralcleft.txt")
   blat <- readBlat(unmap.file)
   ##
@@ -130,7 +133,7 @@ test_that("unmapped_reads_near_consensus", {
 })
 
 test_that("rearrangedReadsFun", {
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   unmap.file <- file.path(extdata, "blat_unmapped.txt")
   blat_unmap <- readBlat(unmap.file)
   rlist <- readRDS(file.path(extdata, "rlist_cgov44t.rds"))
@@ -140,7 +143,7 @@ test_that("rearrangedReadsFun", {
   qnms1 <- unique(split_reads[[1]]$qname)
   if(FALSE){
     saveRDS(qnms1, file="rearrangedReads.fbb19b6.rds")
-    expected <- readRDS("rearrangedReads.fbb19b6.rds")
+    expected <- readRDS(file.path(extdata, "rearrangedReads.fbb19b6.rds"))
     expect_true(all(qnms1 %in% expected))
   }
   if(FALSE){

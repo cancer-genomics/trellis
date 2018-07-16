@@ -35,3 +35,4 @@ svcnvs_files
 trellis_cache
 trellis_files
 /tests/testthat/Rplots.pdf
+/tests/testthat/fasta_34bd277.log

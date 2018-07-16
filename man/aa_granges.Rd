@@ -13,7 +13,7 @@ aa_granges(tab)
 Convert tabled amino acid ranges to a GRanges object to facilitate the overlap with protein domains from Uniprot database.
 }
 \examples{
- extdata <- system.file("extdata", package="trellis")
+ extdata <- system.file("extdata", package="svbams")
  fusions <- readRDS(file.path(extdata, "valid_fusions.rds"))
  tab <- fusionTable2(fusions)
  extdata2 <- system.file("extdata", package="svbams")

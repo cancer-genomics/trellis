@@ -8,7 +8,8 @@ data.raw <- function(){
 
 
 test_that("fusionTable", {
-  r <- readRDS("cgov12t_rear.rds")
+  extdata <- system.file("extdata", package="svbams")
+  r <- readRDS(file.path(extdata, "cgov12t_rear.rds"))
   build <- "hg19"
   library(org.Hs.eg.db)
   orgdb <- org.Hs.eg.db

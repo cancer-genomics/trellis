@@ -55,7 +55,7 @@ bins1kb$log_ratio <- lr
 bins <- keepSeqlevels(bins1kb, c("chr5", "chr8", "chr15"),
                       pruning.mode="coarse")
 ## Load segmentation data
-path <- system.file("extdata", package="trellis")
+path <- system.file("extdata", package="svbams")
 segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
 seqlevels(segs, pruning.mode="coarse") <- seqlevels(bins)
 

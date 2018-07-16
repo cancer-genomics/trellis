@@ -1,7 +1,7 @@
 context("Spit read checks")
 
 test_that("is_valid_splits", {
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(extdata, "rlist_endometrioid_project.rds"))
   if(FALSE){
     for(i in seq_along(rlist)){

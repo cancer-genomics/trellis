@@ -9,7 +9,8 @@ test_that("overlapsAnyTranscript", {
   if(FALSE){
     saveRDS(overlaps.tx, file="overlaps.tx.rds")
   }
-  expected <- readRDS("overlaps.tx.rds")
+  extdata <- system.file("extdata", package="svbams")
+  expected <- readRDS(file.path(extdata, "overlaps.tx.rds"))
   expect_identical(overlaps.tx, expected)
 })
 
@@ -19,7 +20,7 @@ test_that("overlapsAnyTranscript", {
   if(FALSE){
     saveRDS(test, file="fusionList.641eb81.rds")
   }
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   expected <- readRDS(file.path(extdata, "fusionList.641eb81.rds"))
   expect_identical(test, expected)
 })
@@ -42,7 +43,7 @@ test_that("fusionTable", {
                      genome=genome,
                      orgdb=orgdb,
                      id="CGOV7T")
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   expected <- readRDS(file.path(extdata, "fusionList.641eb81.rds"))
   expected <- expected[expected$rearrangement.id == rid, ]
   expect_equivalent(tab, expected)
@@ -60,7 +61,8 @@ test_that("fusionTable", {
   if(FALSE){
     saveRDS(cds.fusions, file="cds.fusions.677b50c.rds")
   }
-  expected <- readRDS("cds.fusions.677b50c.rds")
+  extdata <- system.file("extdata", package="svbams")
+  expected <- readRDS(file.path(extdata, "cds.fusions.677b50c.rds"))
   expect_equivalent(cds.fusions, expected)
 })
 

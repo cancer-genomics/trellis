@@ -802,7 +802,7 @@ typeRead <- function(gap){
 #' @param build character string indicating genome build (only hg19 and hg18 currently supported)
 #' @param maxgap the allowable distance between a split or paired end read and a transcript for assessing whether coding regions
 #' @examples
-#'   extdata <- system.file("extdata", package="trellis")
+#'   extdata <- system.file("extdata", package="svbams")
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
@@ -1377,7 +1377,7 @@ ggRearrangeLegend <- function(){
 #' @seealso \code{\link{rearDataFrame}}
 #' @examples
 #'   data(rlist)
-#'   extdata <- system.file("extdata", package="trellis")
+#'   extdata <- system.file("extdata", package="svbams")
 #'   unmap.file <- file.path(extdata, "blat_unmapped.txt")
 #'   blat_unmap <- readBlat(unmap.file)
 #'   split_reads <- rearrangedReads(linkedBins(rlist),
@@ -1545,7 +1545,7 @@ setMethod("type", "RearrangementList", function(object){
 #'
 #' @param x a \code{Rearrangement} or \code{RearrangementList}
 ## @examples
-##   extdata <- system.file("extdata", package="trellis")
+##   extdata <- system.file("extdata", package="svbams")
 ##   r <- readRDS(file.path(extdata, "cgov1t_complex_rearrangement.rds"))
 ##   s <- type(r)
 ##   print(s)
@@ -1565,7 +1565,7 @@ isComplex <- function(x){
 #' @param maxgap maximum distance between read and transcript for transcript to be considered overlapping
 #' @seealso \code{\link{rearDataFrame}} \code{\link{ggRearrange}}
 #' @examples
-#'   extdata <- system.file("extdata", package="trellis")
+#'   extdata <- system.file("extdata", package="svbams")
 #'   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]

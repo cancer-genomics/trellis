@@ -24,7 +24,7 @@ test_that("cgov44t", {
   expect_true(!any(overlapsAny(gene1.coords, linkedBins(rlist)[1], maxgap=10000)))
 
   if(FALSE){
-    extdata <- system.file("extdata", package="trellis")
+    extdata <- system.file("extdata", package="svbams")
     unmap.file <- file.path(extdata, "blat_unmapped.txt")
     blat_unmap <- readBlat(unmap.file)
     split_reads <- rearrangedReads(rlist, blat_unmap, 500)

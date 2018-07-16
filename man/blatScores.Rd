@@ -64,7 +64,7 @@ Given a pass / fail designation for each read by the above
 }
 \examples{
 data(tags)
-extdata <- system.file("extdata", package="trellis")
+extdata <- system.file("extdata", package="svbams")
 blat.file <- file.path(extdata, "blat_alignment.txt")
 blat_aln <- readBlat(blat.file)
 blat <- annotateBlatRecords(blat_aln, tags)

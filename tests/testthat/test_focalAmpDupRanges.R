@@ -2,7 +2,7 @@ context("Duplication events surrounding focal amplicons")
 
 test_that("focalAmpliconDupRanges", {
   params <- ampliconParams()
-  path <- system.file("extdata", package = "trellis")
+  path <- system.file("extdata", package="svbams")
   ag <- readRDS(file.path(path, "addFocalDups.ffab104.rds"))
 
   LOW_THR <- params[["LOW_THR"]]

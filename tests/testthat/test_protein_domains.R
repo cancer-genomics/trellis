@@ -1,7 +1,7 @@
 context("Protein domains")
 
 test_that("protein_domains", {
-  extdata <- system.file("extdata", package="trellis")
+  extdata <- system.file("extdata", package="svbams")
   fusions <- readRDS(file.path(extdata, "valid_fusions.rds"))
   tab <- fusionTable2(fusions)
 
