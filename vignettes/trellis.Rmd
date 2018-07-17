@@ -59,7 +59,7 @@ improper_rp <- getImproperAlignmentPairs(bamfile,
 ```
 
 
-## Normalizing bin counts
+## Normalized read counts
 
 To compute normalized read depth along the genome, we first define a set of non-overlapping 1kb bins that have a average mappability of at least 0.75. These bins are provided for builds hg18 and hg19 of the reference genome in the \R{} package `sv.filters.<build>`.  For computational speed, we focus on one part of chromosome 15.  The function `binnedCounts`  is a wrapper for the `countBam` function provided in the `r Biocpkg("Rsamtools")` package.
 
@@ -161,7 +161,7 @@ pdata <- preprocessData(bam.file=bamfile,
                         read_pairs=read_pairs)
 ```
 
-The `sv_deletions` function creates an object of class `StructuralVariant` that contains the deletion classification of each segment.  Possible classifications are homozygous deletion (homozygous), homozygous deletion supported by improperly paired reads (homozygous+), hemizygous deletion (hemizygous), and hemizygous deletion supported by improperly paired reads (hemizygous+). For identifying somatic deletions without a matched normal, we typically exclude hemizygous deletions that not supported by improperly paired reads.  <!-- With this toy dataset, we identify 16 possible homozygous deletions and the calls are both `homozygous` except one which is `homozygous+`.  -->
+The `sv_deletions` function creates an object of class `StructuralVariant` that contains the deletion classification of each segment.  Possible classifications include homozygous deletion (`homozygous`), homozygous deletion supported by improperly paired reads (`homozygous+`), hemizygous deletion (`hemizygous`), and hemizygous deletion supported by improperly paired reads (`hemizygous+`). For identifying somatic deletions without a matched normal, we typically exclude hemizygous deletions not supported by improperly paired reads.  <!-- With this toy dataset, we identify 16 possible homozygous deletions and the calls are both `homozygous` except one which is `homozygous+`.  -->
 
 ```{r sv_deletions}
 deletions <- sv_deletions(preprocess=pdata, param=dp)
@@ -169,7 +169,7 @@ variant(deletions)
 calls(deletions)
 ```
 
-The improperly-paired reads supporting the `homozygous+` call can be extracted as a `GAlignmentPairs` object by the `improper` function and plotted (Figure \@ref(fig:deletionplot)).
+The improperly-paired reads supporting the `homozygous+` call can be extracted as a `GAlignmentPairs` object by the `improper` function (Figure \@ref(fig:deletionplot)).
 
 ```{r structural_variant}
 improper(deletions[[4]])
@@ -239,7 +239,7 @@ grid.arrange(C, p, ncol=1)
 
 # Amplifications
 
-Trellis identifies high copy amplifications and then links the individual amplicons by improperly paired reads previously extracted from the bam file. The `sv_amplicons2` function constructs an `AmpliconGraph` where the nodes are the individual amplicons and the edges between amplicons indicate multiple improperly paired reads linking two amplicons in the cancer genome (Figure \@ref(fig:amplicongraph)). The default parameter settings require at least 5 improperly paired reads to support an edge. See `?ampliconParams` for customing these settings.
+Trellis identifies high copy amplifications and then links the individual amplicons by improperly paired reads previously extracted from the bam file. The `sv_amplicons2` function constructs an `AmpliconGraph` where the nodes are the individual amplicons and an edge between two amplicons indicates multiple paired reads that link the two amplicons in the cancer genome (Figure \@ref(fig:amplicongraph)). The default parameter settings require at least 5 paired reads to support an edge. See `?ampliconParams` for customing these settings.
 
 ```{r amplified_segments}
 ag <- sv_amplicons2(pdata, params=ampliconParams())
@@ -253,7 +253,7 @@ granges(ampliconRanges(ag))
 unique(ampliconRanges(ag)$driver)
 ```
 
-```{r passengers, echo=FALSE}
+```{r passengers, echo=FALSE, message=FALSE}
 n.passengers <- strsplit(ampliconRanges(ag)$hgnc, ", ") %>%
   unlist %>%
   "["(! . %in% c("MYC", "FGFR4")) %>%
@@ -263,7 +263,7 @@ n.passengers <- strsplit(ampliconRanges(ag)$hgnc, ", ") %>%
 
 The amplicon groups simplify the interpretation of the likely drivers as the `r n.passengers` other genes in this network are likely passengers.
 
-```{r amplicongraph, echo=FALSE, fig.cap="An amplicon graph.  Nodes are the individual amplicons and edges indicate support by five or more paired reads. Here, all amplicons in the cancer genome were linked. Triangles are amplicons with a known driver. The size of the amplicon plotting symbols is proportional to the number of connections to other amplicons."}
+```{r amplicongraph, message=FALSE, echo=FALSE, fig.cap="An amplicon graph.  Nodes are the individual amplicons and edges indicate support by five or more paired reads. Here, all amplicons in the cancer genome were linked. Triangles are amplicons with a known driver. The size of the amplicon plotting symbols is proportional to the number of connections to other amplicons."}
 plot_amplicons <- function (ag, colors){
     if (length(ag) == 0) {
         message("No amplicons -- nothing to plot")
@@ -485,7 +485,7 @@ rlist3
 
 To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `tibble`. The function `rearDataFrameList` takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we've arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
 
-```{r rearDataFrameList, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
+```{r rearDataFrame, message=FALSE, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
 df <- rearDataFrame(rlist3[[1]], build="hg19")
 grobs <- ggRearrange(df)
 grobs[["arranged.grobs"]]
@@ -493,7 +493,7 @@ grobs[["arranged.grobs"]]
 
 The second rearrangement in the original `rlist` object now corresponds to elements 3 and 4 of the `rlist3` object.  Again, we call `rearDataFrame` and `ggRearrange` to organize and then plot the supporting reads.
 
-```{r TLN2.TPM1, fig.cap="Rearrangement involving possible fusion of genes TLN2 and TPM1 on chromosome 15." }
+```{r TLN2TPM1, fig.cap="Rearrangement involving possible fusion of genes TLN2 and TPM1 on chromosome 15." }
 df2 <- rearDataFrame(rlist3[[3]], build="hg19")
 ggRearrange(df2)[["arranged.grobs"]]
 ```
@@ -608,4 +608,20 @@ domain_aa_ranges <- GRanges(up2$hugo, IRanges(up2$start, up2$end),
                             aa_len=up2$aa_len)
 domains <- subsetByOverlaps(domain_aa_ranges, tumor_aa_ranges, type="within")
 domains
+```
+
+# Session information
+
+Packages were built using  `R 3.5.0`.
+
+```{r sessionInfo, echo=FALSE}
+si <- devtools::session_info()
+si$packages <- si$packages[, c("package", "version", "source")]
+ix <- grep("local", si$packages$source)
+si$packages$source[ix] <- "local"
+pacs <- si$packages
+colnames(pacs) <- c("R package", "Version", "Source")
+pacs %>%
+    kable("html") %>%
+  kable_styling(bootstrap_options=c("striped", "hover", "condensed"))
 ```
