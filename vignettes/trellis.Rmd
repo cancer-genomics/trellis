@@ -483,7 +483,7 @@ rlist3 <- rlist3[ is_valid_splits(rlist3, maxgap=50) ]
 rlist3
 ```
 
-To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `tibble`. The function `rearDataFrameList` takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we've arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
+To visualize the improperly paired reads and the split reads supporting a rearrangement, we first collect the supporting reads in a `tibble`. The function `rearDataFrameList` takes a `RearrangementList` as input and extracts the supporting reads belonging to the *first two* elements of the list that correspond to the two possible 5-prime to 3-prime orientations. Next, we use `ggRearrange`, a wrapper to `ggplot`, to visualize the supporting reads.  Because sequence junctions do not overlap a transcript, we have arbitarily labeled the two genomic regions that are joined in the somatic genome as `noncoding1` and `noncoding2`.
 
 ```{r rearDataFrame, message=FALSE, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
 df <- rearDataFrame(rlist3[[1]], build="hg19")
@@ -612,16 +612,6 @@ domains
 
 # Session information
 
-Packages were built using  `R 3.5.0`.
-
 ```{r sessionInfo, echo=FALSE}
-si <- devtools::session_info()
-si$packages <- si$packages[, c("package", "version", "source")]
-ix <- grep("local", si$packages$source)
-si$packages$source[ix] <- "local"
-pacs <- si$packages
-colnames(pacs) <- c("R package", "Version", "Source")
-pacs %>%
-    kable("html") %>%
-  kable_styling(bootstrap_options=c("striped", "hover", "condensed"))
+sessionInfo()
 ```
