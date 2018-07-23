@@ -97,6 +97,28 @@ test_that("rpSupportedDeletions", {
   expect_identical(calls, "homozygous+")
 })
 
+test_that("rpSupportedDeletions_fails", {
+  ## if the rpSupportedDeletion function filters variants that overlap with bins, then
+  ## the calls returned
+  pdat <- cgov44t_preprocess()
+  path <- system.file("extdata", package="svbams")
+  sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
+  ##
+  ## rpSupportedDeletions requires that each variant overlaps a bin. If one of
+  ##  the variants does not overlap a bin, the calls vector returned will be
+  ##  less than then legnth of the sv object
+  ## -- below, reproduce the problem by removing all bins that overlap with the sv
+  ##
+  pdat$bins <- pdat$bins[!overlapsAny(pdat$bins, variant(sv))]
+  calls <- rpSupportedDeletions(sv,
+                                DeletionParam(),
+                                pdat$bins)
+  expect_error(stopifnot(length(calls) == length(sv)))
+})
+
+
+
+
 test_that("reviseEachJunction", {
   pdat <- cgov44t_preprocess()
   path <- system.file("extdata", package="svbams")

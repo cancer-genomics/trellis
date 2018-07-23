@@ -94,7 +94,6 @@ bins$log_ratio <- binGCCorrect(bins)
 If one or more normal controls is available, the normalized bin-counts can be further corrected.  Since much of the bin-level technical variation is batch-specific, we advise against the use of historical controls for additional normalization.  Below, we segment the $\log_2$ ratios by circular binary segmentation (CBS). See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object. Note, `segmentBins` assumes a variable called `log_ratio` in the `GRanges` object. The object returned by `segmentBins` is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.
 
 ```{r segment}
-params <- SegmentParam()
 g <- segmentBins(bins, param=SegmentParam())
 g
 ```
@@ -416,7 +415,7 @@ ggplot(records, aes(Qname, match)) +
   ylab("BLAT score")
 ```
 
-### Mapped-unmapped 
+### Mapped-unmapped
 
 In addition to using BLAT to confirm the whole genome aligner for improperly paired reads supporting a rearrangement, we also use BLAT to identify split read alignments that directly span the sequence junction. Here, we query the BAM file for all read pairs in which a read was mapped near the putative rearrangement but its mate was not aligned (mapped-unmapped). If the unmapped mate spans the sequence junction, we will assess whether BLAT aligns a subsequence of the read to one cluster and the complement of the subsequence to the second cluster. Such reads further improve the specificity of the rearrangement and establish basepair resolution of the sequence junction. First, we construct a `GRanges` object of all the linked read clusters identified in our rearrangement analyses. This `GRanges` object will be used to query the BAM file for read pairs in which only one read of a pair was aligned near the putative rearrangement. Again, we write the sequence of the unmapped reads to a fasta file and call BLAT by a system call.
 

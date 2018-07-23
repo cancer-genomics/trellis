@@ -485,6 +485,11 @@ isHemizygousDeletion <- function(object, param, bins){
 #'   with mcols value 'log_ratio'
 rpSupportedDeletions <- function(sv, param, bins){
   ## NA means that there were no queryRanges in the view -- i.e., all bins were masked
+  L <- length(sv)
+  ##
+  ## if we subset the sv object here but return only the calls, the length of
+  ## calls will not be the same as the length of the number of variants
+  ##
   sv <- sv[overlapsAny(variant(sv), bins)]
   is_hemizygous <- isHemizygousDeletion(sv, param, bins)
   cncalls <- ifelse(is_hemizygous, "hemizygous", "homozygous")
@@ -714,6 +719,7 @@ hemizygousBorders <- function(object, param){
   irp <- improperRP(variant(sv), improper_rp, param=param)
   improper(sv) <- irp
   indexImproper(sv) <- updateImproperIndex2(variant(sv), irp, maxgap=500)
+  sv <- sv[ overlapsAny(variant(sv), bins) ]
   calls(sv) <- rpSupportedDeletions(sv, param, bins)
   sort(sv)
 }
@@ -1010,6 +1016,7 @@ reviseEachJunction <- function(sv, bins, improper_rp, param=DeletionParam()){
   sv <- .reviseEachJunction(sv, bins, improper_rp, param)
   indexProper(sv) <- initializeProperIndex3(sv, zoom.out=1)
   copynumber(sv) <- granges_copynumber2(variant(sv), bins)
+  sv <- sv[ overlapsAny(variant(sv), bins) ]
   calls(sv) <- rpSupportedDeletions(sv, param, bins)
   sv
 }
@@ -1076,7 +1083,7 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, bins, para
     copynumber(object2)[K] <- means
     return(object2)
   }
-  seqlevels(hemdel,pruning.mode="coarse") <- seqlevels(homdel)
+  seqlevels(hemdel, pruning.mode="coarse") <- seqlevels(homdel)
   seqinfo(hemdel) <- seqinfo(homdel)
   portion_notspanning <- setdiff(hemdel, homdel)
   means <- granges_copynumber2(portion_notspanning, bins)
@@ -1170,7 +1177,7 @@ rightHemizygousHomolog <- function(object, bins, param){
   hits <- findOverlaps(leftedge, first(irp))
   ## group hits by the homozygous deletion interval
   id <- names(leftedge)[queryHits(hits)]
-  hitlist <- split(hits, factor(id,levels=unique(id)))
+  hitlist <- split(hits, factor(id, levels=unique(id)))
   hitlist <- hitlist[names(hitlist) %in% names(gr)[homindex]]
   object2 <- object
   if(length(hitlist) > 0){
@@ -1289,6 +1296,7 @@ removeHemizygous <- function(sv){
 
 revise <- function(sv, bins, param){
   copynumber(sv) <- granges_copynumber2(variant(sv), bins)
+  sv <- sv[ overlapsAny(variant(sv), bins) ]
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins)
   indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
   calls(sv) <- rpSupportedDeletions(sv, param, bins)
@@ -1338,16 +1346,22 @@ sv_deletions <- function(preprocess,
   preprocess$segments <- segs[segs$seg.mean < hemizygousThr(param)]
   sv <- deletion_call(preprocess, gr_filters, param)
   ##sv <- deletion_call(bam.file, improper_rp, pview, gr, gr_filters)
+  sv <- sv[ overlapsAny(variant(sv), preprocess$bins) ]
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   if(param@remove_hemizygous){
     sv <- removeHemizygous(sv)
   }
   improper_rp <- preprocess$read_pairs[["improper"]]
+  ## avoid namespace issues with dplyr
+  first <- GenomicAlignments::first
+  last <- GenomicAlignments::last
   mapq <- mcols(first(improper_rp))$mapq > 30 &
                                   mcols(last(improper_rp))$mapq > 30
   improper_rp <- improper_rp[mapq]
   if(length(variant(sv)) > 0){
-    sv <- reviseEachJunction(sv, preprocess$bins, improper_rp, param)
+    sv <- reviseEachJunction(sv=sv, bins=preprocess$bins,
+                             improper_rp=improper_rp,
+                             param=param)
     if(param@remove_hemizygous)
       sv <- removeHemizygous(sv)
   }
