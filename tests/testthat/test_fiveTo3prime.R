@@ -67,7 +67,9 @@ test_that("noncoding", {
   rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
   rlist <- readRDS(rfile)
   r <- rlist[[5]]
+  ## olist is an ordinary list
   olist <- fiveTo3Prime(r, "hg19")
+  expect_is(olist, "list")
   df <- rearDataFrameList(olist)
   levs <- levels(df$region)
   expect_identical(levs[1], "5'-PDGFRB")

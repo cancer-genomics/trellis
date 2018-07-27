@@ -867,7 +867,7 @@ make_levels_unique <- function(x, z){
 #' @param rlist a length-two list of orientations. Each element is an object of class \code{Rearrangement}
 #' @export
 rearDataFrameList <- function(rlist, build, maxgap=5000){
-  n_split_reads <- lengths(splitReads(rlist))
+  n_split_reads <- lengths(lapply(rlist, splitReads))
   if(!all(n_split_reads > 0)) stop("Each rearrangement must have at least one split read")
   df1 <- rearDataFrame(rlist[[1]], build, maxgap)
   df1$region <- label_orientation(df1$region)
