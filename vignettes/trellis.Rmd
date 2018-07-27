@@ -465,7 +465,8 @@ elementNROWS(split_reads)
 split_reads
 splitReads(rlist) <- split_reads
 is_valid <- is_valid_splits(rlist, maxgap=50)
-rlist2 <- rlist[ is_valid ]
+at_least_one <- lengths(splitReads(rlist)) >= 1
+rlist2 <- rlist[ is_valid & at_least_one ]
 ```
 
 # 5- to 3-prime orientation

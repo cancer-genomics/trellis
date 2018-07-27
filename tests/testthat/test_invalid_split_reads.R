@@ -39,4 +39,13 @@ test_that("is_valid_splits", {
   rlist2 <-  fiveTo3List(rlist, "hg18")
   is_valid <- is_valid_splits(rlist2)
   expect_true(all(is_valid))
+  ##
+  ## Test for exception when no split reads present
+  ##
+  splitReads(rlist2[[1]]) <- splitReads(rlist2[[1]])[0]
+  is_valid <- is_valid_splits(rlist2[1])
+  ## not sure why we want to allow this to be valid. Maybe we should require at least 1 split read here
+  expect_true(is_valid)
+  rlist2 <- fiveTo3List(rlist2[1], build="hg18")
+  expect_error(rearDataFrameList(rlist2))
 })
