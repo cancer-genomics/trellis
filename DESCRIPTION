@@ -1,6 +1,6 @@
 Package: trellis
 Title: Somatic structural variant analysis
-Version: 0.0.39
+Version: 0.0.40
 Author: Rob Scharpf and Daniel Bruhm
 Maintainer: Rob Scharpf <rscharpf@jhu.edu>
 Description: This package contains classes and methods used for structural

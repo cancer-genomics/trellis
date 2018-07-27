@@ -395,7 +395,8 @@ blatBlockList <- function(blat.gr){
 }
 
 candidateSplitRead <- function(blat.gr){
-  blat.gr$match < 95 | blat.gr$blockcount > 1
+  ##blat.gr$match < 95 | blat.gr$blockcount > 1
+  blat.gr$match < 95 & blat.gr$blockcount == 1
 }
 
 numberAlignmentRecords <- function(blat.gr){
@@ -422,6 +423,7 @@ numberAlignmentRecords <- function(blat.gr){
                 IRanges(starts, width=widths),
                 qend=qends,
                 qStarts=qstarts,
+
                 blockSizes=bsizes,
                 gapbases=gapbases,
                 match=bmatch,
@@ -463,7 +465,7 @@ multipleAlignmentRecords2 <- function(records){
   recordlist <- split(records, records$qname)
   ##n.alignments <- elementNROWS(recordlist)
   n.alignments <- sapply(recordlist, numberAlignmentRecords)
-  recordlist <- recordlist[n.alignments >= 2]
+  recordlist <- recordlist[ n.alignments >= 2 ]
   unlist(GRangesList(recordlist))
 }
 
@@ -514,6 +516,23 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   ## alignment, and all alignments that have a match score greater
   ## than 95.
   blat_gr <- multipleAlignmentRecords2(blat_gr)
+  ##
+  ## Total of splits should be near Qsize
+  ##  - intersection of splits should be no more than 10% of Qsize
+  ##
+  grl <- split(blat_gr, names(blat_gr))
+  MIN.SIZE <- ceiling(0.95*blat_gr$Qsize[1])
+  MAX.INTERSECT <- floor(0.1*blat_gr$Qsize[1])
+  queryAligned <- function(g) sum(g$qend - g$qstart)
+  intersectionAligned <- function(g){
+    g2 <- IRanges(g$qstart, g$qend)
+    width(intersect(g2[1], g2[2]))
+  }
+  total_size_aligned <- sapply(grl, queryAligned)
+  intersection_split <- sapply(grl, intersectionAligned)
+  size.intersection.filter <- total_size_aligned >= MIN.SIZE &
+    intersection_split <= MAX.INTERSECT
+  blat_gr <- unlist(grl[ size.intersection.filter ])
   ##
   ## Both intervals in a linked bin must overlap a blat record
   ##
