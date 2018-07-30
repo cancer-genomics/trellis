@@ -124,6 +124,7 @@ annotateBlatRecords <- function(blat, tag.sequences){
   blat$genome.end <- genome.ends[blat$Qname]
   blat$genome.strand <- genome.strand[blat$Qname]
   ## replace Tsize with T.end-T.start
+  ## Tsize from blat is the length of the chromosome.  Change to be the length of the reference sequence that matches the query sequence (read)
   blat$Tsize <- blat$Tend-blat$Tstart
   blat$is_overlap <- genomeAndBlatOverlap(blat)
 
@@ -133,10 +134,8 @@ annotateBlatRecords <- function(blat, tag.sequences){
   rid <- tags %>%
     group_by(Qname) %>%
     summarize(rid=unique(rearrangement.id))
-  ##qsize <- nchar(blat$Qsequence[1])
   blat2 <- left_join(blat, rid, by="Qname") %>%
-    mutate(score=match/Qsize,
-           tsize=length(Tstart[1]:Tend[1]))
+    mutate(score=match/Qsize)
   rownames(blat2) <- NULL
   blat2 <- as.tibble(blat2)
   blat2
@@ -307,7 +306,7 @@ blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
   filter <- dplyr::filter
   blat2 <- blat %>%
     filter(score >= 0.90 & blockcount==1) %>%
-    filter(tsize >= (Qsize - 1/5*Qsize) & tsize <= (Qsize + 1/5*Qsize))
+    filter(Tsize >= (Qsize - 1/5*Qsize) & Tsize <= (Qsize + 1/5*Qsize))
   blat.g <- blatGRanges2(blat2)
   ##
   ## Record for each blat record whether the blat alignment corresponds to the whole-genome-aligner
