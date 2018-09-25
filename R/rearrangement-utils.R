@@ -1056,6 +1056,7 @@ axis_limit3p <- function(df, basepairs){
   xlim2
 }
 
+#' @export
 axis_limits <- function(df, basepairs){
   region <- NULL
   df1 <- filter(df, region==levels(region)[1])
