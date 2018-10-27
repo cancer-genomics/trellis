@@ -135,7 +135,7 @@ properAlignmentFlags <- function(){
 #'   default set of flags.
 #'
 #' @examples
-#' 
+#'
 #' flags <- improperAlignmentFlags()
 #' print(flags)
 #' params <- ScanBamParam(flag = flags, what=c("flag", "mrnm", "mpos", "mapq"))

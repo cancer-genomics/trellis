@@ -4,8 +4,8 @@
 \alias{rearrangementData}
 \title{Creates a list object of data required to identify rearrangements}
 \usage{
-rearrangementData(bins = GRanges(), read_pairs, rlist = RearrangementList(),
-  filters = rFilters())
+rearrangementData(bins = GRanges(), read_pairs,
+  rlist = RearrangementList(), filters = rFilters())
 }
 \arguments{
 \item{bins}{a \code{GRanges} object of non-overlapping (typically 1kb) bins}

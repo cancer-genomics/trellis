@@ -4,10 +4,12 @@
 \alias{readBlat}
 \title{Read output from the command-line blat}
 \usage{
-readBlat(filename)
+readBlat(filename, ...)
 }
 \arguments{
 \item{filename}{character string providing full path to blat output}
+
+\item{...}{additional arguments to \code{read_tsv}}
 }
 \value{
 a \code{data.frame} of alignment records from blat

@@ -41,8 +41,6 @@ A \code{PreprocessViews2} object
 This class directly extends the \code{BamViews} class and provides
 views to intermediate data (saved to disk) from the analysis of one
 or more bam files.
-
-Constructor for PreprocessViews2
 }
 \section{Slots}{
 

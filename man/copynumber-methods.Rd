@@ -16,7 +16,8 @@ copynumber(object) <- value
 
 \S4method{copynumber}{RangedSummarizedExperiment}(object)
 
-\S4method{copynumber}{RangedSummarizedExperiment,matrix}(object) <- value
+
+  \S4method{copynumber}{RangedSummarizedExperiment,matrix}(object) <- value
 
 \S4method{copynumber}{StructuralVariant}(object)
 

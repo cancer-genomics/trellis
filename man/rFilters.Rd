@@ -4,8 +4,8 @@
 \alias{rFilters}
 \title{Construct list of filters for somatic rearrangement analyses}
 \usage{
-rFilters(germline = GRanges(), rear = GRanges(), deletions = GRanges(),
-  amplicons = GRanges())
+rFilters(germline = GRanges(), rear = GRanges(),
+  deletions = GRanges(), amplicons = GRanges())
 }
 \arguments{
 \item{germline}{a \code{GRanges} object of germline filters}

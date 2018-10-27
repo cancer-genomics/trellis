@@ -13,8 +13,6 @@
 a \code{GRanges} object
 }
 \description{
-Class for storing circular binary segmentation results
-
 Coerce \code{DNAcopy} object to \code{GRanges}
 }
 \examples{
@@ -31,3 +29,4 @@ as(test1, "GRanges")
 \seealso{
 \code{\link[DNAcopy]{segment}}
 }
+\concept{DNAcopy}

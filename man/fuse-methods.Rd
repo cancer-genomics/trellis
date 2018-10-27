@@ -22,8 +22,6 @@ fuse(object, nms)
 A \code{GRangesList}
 }
 \description{
-Fuse transcripts
-
 If there are only two transcripts to join, the GRangesList object
 has length one.  In general, the GRangesList object returned has
 length R x C where R is the number of transcripts from the gene

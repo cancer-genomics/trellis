@@ -3,7 +3,6 @@
 \name{paths}
 \alias{paths}
 \alias{paths<-}
-\alias{paths<-}
 \alias{paths,PreprocessViews2-method}
 \alias{paths<-,PreprocessViews2-method}
 \title{Accessor for file paths}

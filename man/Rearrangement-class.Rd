@@ -46,8 +46,6 @@ type(object)
 a \code{Rearrangement} object
 }
 \description{
-Accessor for the combination of strands involved in a rearrangement
-
 This class contains the genomic intervals corresponding to improper
 read clusters.  Improper read clusters that are linked are
 candidate rearrangements.  The linking is represented by a

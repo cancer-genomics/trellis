@@ -5,7 +5,8 @@
 \title{Applies germline CNV and sequence-based filters for non-redundant
 identification of germline rearrangements}
 \usage{
-filterGermlineRear(object, params, germline_filters, return_stats = FALSE)
+filterGermlineRear(object, params, germline_filters,
+  return_stats = FALSE)
 }
 \arguments{
 \item{object}{A \code{RearrangementList} object}

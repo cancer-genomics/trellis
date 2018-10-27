@@ -14,23 +14,6 @@
 \alias{rpSeparation,RearrangementParams-method}
 \alias{minNumberTagsPerCluster,RearrangementParams-method}
 \alias{minClusterSize,RearrangementParams-method}
-\alias{minNumberTagsPerCluster,RearrangementParams-method}
-\alias{maxClusterSize,RearrangementParams-method}
-\alias{minGapWidth,RearrangementParams-method}
-\alias{percentModalType,RearrangementParams-method}
-\alias{percentLinking}
-\alias{RearrangementParams-class}
-\alias{RearrangementParams}
-\alias{rpSeparation}
-\alias{minNumberTagsPerCluster}
-\alias{minClusterSize}
-\alias{maxClusterSize}
-\alias{minGapWidth}
-\alias{percentModalType}
-\alias{rpSeparation,RearrangementParams-method}
-\alias{minNumberTagsPerCluster,RearrangementParams-method}
-\alias{minClusterSize,RearrangementParams-method}
-\alias{minNumberTagsPerCluster,RearrangementParams-method}
 \alias{maxClusterSize,RearrangementParams-method}
 \alias{minGapWidth,RearrangementParams-method}
 \alias{percentModalType,RearrangementParams-method}
@@ -49,8 +32,9 @@ minGapWidth(object)
 
 percentModalType(object)
 
-RearrangementParams(rp_separation = 10000, min_number_tags_per_cluster = 5,
-  min_cluster_size = 115L, max_cluster_size = 5000L, min.gapwidth = 1000L,
+RearrangementParams(rp_separation = 10000,
+  min_number_tags_per_cluster = 5, min_cluster_size = 115L,
+  max_cluster_size = 5000L, min.gapwidth = 1000L,
   percent_modal_type = 0.9, percent_linking = 0.8)
 
 \S4method{rpSeparation}{RearrangementParams}(object)
@@ -67,8 +51,9 @@ RearrangementParams(rp_separation = 10000, min_number_tags_per_cluster = 5,
 
 percentLinking(object)
 
-RearrangementParams(rp_separation = 10000, min_number_tags_per_cluster = 5,
-  min_cluster_size = 115L, max_cluster_size = 5000L, min.gapwidth = 1000L,
+RearrangementParams(rp_separation = 10000,
+  min_number_tags_per_cluster = 5, min_cluster_size = 115L,
+  max_cluster_size = 5000L, min.gapwidth = 1000L,
   percent_modal_type = 0.9, percent_linking = 0.8)
 
 rpSeparation(object)
@@ -149,11 +134,7 @@ details}
 \item{object}{a \code{RearrangementParams} object}
 }
 \description{
-Parameter class for rearrangement analysis
-
 Some details about why we look for linked tag clusters.
-
-Parameter class for rearrangement analysis
 
 Some details about why we look for linked tag clusters.
 }

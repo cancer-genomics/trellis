@@ -162,7 +162,7 @@ unmapped_read2 <- function(bam.file, query, yield_size=1e6, maxgap=200, what=sca
   while(length(unlist(sapply(chunk0 <- scanBam(bamfile, param=param), function(x) x[[1]])))) {
     cat(".")
     for (i in 1:length(chunk0)) {
-      mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=100))
+      mate_gr <- GRanges(chunk0[[i]]$mrnm, IRanges(chunk0[[i]]$mpos, width=length(chunk0[[i]]$seq[[1]])))
       ## This should be the case -- can remove if statement
       if(any(overlapsAny(mate_gr, query, maxgap=maxgap))){
         mate_gr$seq <- chunk0[[i]]$seq

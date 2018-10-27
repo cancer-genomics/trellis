@@ -381,7 +381,7 @@ fa.file <- file.path(dir, paste0(basename(bamfile), ".fa"))
 writeToFasta(tags, fa.file)
 ```
 
-The unevaluated code below illustrates how one could do a `system` call to run the command-line version of BLAT. In addition to requiring installation of BLAT, we must also have a copy of the appropriate reference genome available.
+The unevaluated code below is a `system` call to run the command-line version of BLAT. In addition to requiring installation of BLAT, we must also have a copy of the appropriate reference genome available.
 
 ```{r blat, eval=FALSE}
 blatpath <- "~/bin/x86_64/blat"
@@ -437,20 +437,20 @@ system(cmd)
 file.copy(outfile, "../../svalignments/inst/extdata/blat_unmapped.txt")
 ```
 
-TODO: create a script in data-raw/ that creates the above blat_unmapped.txt object.  
+TODO: create a script in data-raw/ that creates the above blat_unmapped.txt object.
 
 ```{r parse-blat-unmapped}
 unmap.file <- file.path(extdata, "blat_unmapped.txt")
 blat_unmap <- readBlat(unmap.file)
 ```
 
-Recall that our QC analysis of the mapped-mapped read pairs focused on whether the original whole genome alignment was the only high-scoring BLAT alignment. Here,  our goal is to assess whether BLAT splits the alignment of reads that are initially unmapped by the whole genome aligner and have a mate that is aligned to the approximate location of the rearrangement. The locations in the first rearrangement  (with respect to the reference genome) that we think are joined in the somatic  genome are given by the linked bins of the `RearrangementList` object.  We want to assess whether BLAT aligns part of a subsequence of a read to
+Recall that our QC analysis of the mapped-mapped read pairs focused on whether the original whole genome alignment was the only high-scoring BLAT alignment. Here,  our goal is to assess whether BLAT splits the alignment of reads that are initially unmapped by the whole genome aligner and have a mate that is aligned to the approximate location of the rearrangement. The locations in the first rearrangement  (with respect to the reference genome) that we think are joined in the somatic  genome are given by the linked bins of the `RearrangementList` object.  We want to assess whether BLAT aligns part of a subsequence of a read to the interval given by
 
 ```{r rearrangement1-first}
 granges(linkedBins(rlist)[1])
 ```
 
-and the compliment of the above subsequence to
+and the complement of the subsequence to the interval given by
 
 ```{r rearrangement1-last}
 linkedTo(rlist)[1]

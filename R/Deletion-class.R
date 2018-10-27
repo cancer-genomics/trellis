@@ -7,16 +7,16 @@ NULL
 #' intervals of somatic deletions and relevant supporting data.
 #' Properly and improperly paired reads and indices so that subsetting
 #' methods (\code{[}) extracts the relevant data for a given deletion.
-#' 
+#'
 #' @slot variant A  \code{GRanges} object
 #' @slot proper A  \code{GAlignmentPairs} object of properly paired reads
 #' @slot improper A \code{GAlignmentPairs} object of improperly paired
 #'   reads
-#' 
+#'
 #' @slot copynumber A \code{numeric} vector of the mean log ratios
 #'   corresponding to the \code{variant} intervals. The numeric vector
 #'   must have the same length as \code{variant}.
-#' 
+#'
 #' @slot calls A length-N \code{character} vector of deletion calls
 #'   where N is the number of intervals in \code{variant}.  Possible
 #'   calls are (i) hemizygous: hemizygous deletion with fewer than 5
@@ -25,30 +25,30 @@ NULL
 #'   homozygous: homozygous deletion with fewer than 5 supporting
 #'   improper read pairs (iv) homozygous+: homozygous deletion with 5
 #'   or more supporting improper read pairs
-#' 
+#'
 #' @slot index_proper a list of indices.  Each element is a vector of
 #'   integers.  The kth element are the elements of the
 #'   \code{GAlignmentPairs} object in slot \code{proper} supporting
 #'   the kth deletion.
-#' 
+#'
 #' @slot index_improper A list of indices.  Each element is a vector
 #'   of integers.  The kth element are the elements of the
 #'   \code{GAlignmentPairs} object in slot \code{improper} supporting
 #'   the kth deletion.
-#' 
+#'
 #' @slot grouped_variant a factor indicating whether deletions belong
 #'   to the same group (e.g., overlapping hemizygous deletions)
-#' 
+#'
 #' @slot length_improper Keeps track of the numer of the total number
 #'   of improper read pairs for quick summaries of this object.
-#' 
+#'
 #' @slot length_proper Keeps track of the numer of the total number of
 #'   proper read pairs for quick summaries of this object.
-#' 
+#'
 #' @examples
 #' StructuralVariant()
 #'
-#' 
+#'
 #' @export
 setClass("StructuralVariant",
          representation(variant="GRanges",

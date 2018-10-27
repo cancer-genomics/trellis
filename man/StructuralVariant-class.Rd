@@ -25,7 +25,8 @@
 \usage{
 readPairs(object)
 
-\S4method{[}{StructuralVariant,numeric,ANY,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{StructuralVariant,numeric,ANY,ANY}(x, i, j, ...,
+  drop = FALSE)
 
 StructuralVariant(variant = GRanges(), proper = .GAlignmentPairs(),
   improper = .GAlignmentPairs(), copynumber, calls, index_proper,

@@ -18,12 +18,13 @@
 \alias{maxRPsHomozygous}
 \title{Parameter class for calling deletions}
 \usage{
-DeletionParam(min_width = 2000, max_width = 2e+06, min_gapwidth = 10000,
-  homozygous_thr = -3, hemizygous_thr = -0.7, tumor_purity = 1,
-  min_RPs_in_hemizygous = 1, max_RPs_in_homozygous = 100,
-  nflanking_hemizygous = 5L, nflanking_homozygous = 5L,
-  maxRatioObservedToExpected = 2L, max_proportion_in_filter = 0.75,
-  bam_seqlevels_style = "UCSC", remove_hemizygous = TRUE)
+DeletionParam(min_width = 2000, max_width = 2e+06,
+  min_gapwidth = 10000, homozygous_thr = -3, hemizygous_thr = -0.7,
+  tumor_purity = 1, min_RPs_in_hemizygous = 1,
+  max_RPs_in_homozygous = 100, nflanking_hemizygous = 5L,
+  nflanking_homozygous = 5L, maxRatioObservedToExpected = 2L,
+  max_proportion_in_filter = 0.75, bam_seqlevels_style = "UCSC",
+  remove_hemizygous = TRUE)
 
 bamSeqLevelsStyle(object)
 

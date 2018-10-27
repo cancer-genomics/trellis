@@ -1,3 +1,25 @@
+blat_colnames <- c("match",
+                   "mis-match",
+                   "rep.match",
+                   "N's",
+                   "Qgapcount",
+                   "Qgapbases",
+                   "Tgapcount",
+                   "Tgapbases",
+                   "strand",
+                   "Qname",
+                   "Qsize",
+                   "Qstart",
+                   "Qend",
+                   "Tname",
+                   "Tsize",
+                   "Tstart",
+                   "Tend",
+                   "blockcount",
+                   "blockSizes",
+                   "qStarts",
+                   "tStarts")
+
 #' Read output from the command-line blat
 #'
 #' The command-line version of blat can be downloaded from sourceforge:
@@ -5,21 +27,25 @@
 #'
 #' @export
 #' @param filename character string providing full path to blat output
+#' @param ... additional arguments to \code{read_tsv}
 #' @return a \code{data.frame} of alignment records from blat
 #'
 #' @seealso See \code{\link{blatScores}} for evaluating whether the
 #'   blat alignments support a novel sequence junction
 #'
-readBlat <- function(filename){
-  blat <- read.delim(filename, skip=2, nrows=5, stringsAsFactors=FALSE, sep="\t", header=FALSE)
-  nms <- paste0(as.character(blat[1, ]), as.character(blat[2, ]))
-  nms <- gsub(" ", "", nms)
-  ##nms[22:23] <- c("seq1", "seq2")
-  blat <- read.delim(filename, skip=5, stringsAsFactors=FALSE, header=FALSE, sep="\t")
-  colnames(blat) <- nms
-  blat$Tname <- gsub(".fa", "", blat$Tname)
-  blat2 <- as.tibble(blat)
-  blat2
+readBlat <- function(filename, skip=5, col_names=FALSE, ...){
+##  blat <- read.delim(filename, skip=2, nrows=5, stringsAsFactors=FALSE, sep="\t", header=FALSE)
+##  nms <- paste0(as.character(blat[1, ]), as.character(blat[2, ]))
+##  nms <- gsub(" ", "", nms)
+##  ##nms[22:23] <- c("seq1", "seq2")
+##  blat <- read.delim(filename, skip=5, stringsAsFactors=FALSE,
+##                     header=FALSE, sep="\t", nrows=100000)
+  ##  colnames(blat) <- nms
+  blat <- read_tsv(filename, skip=skip, col_names=col_names, ...) %>%
+    set_colnames(blat_colnames) %>%
+    mutate(Tname=gsub(".fa", "", Tname))
+  ##blat2 <- as.tibble(blat)
+  blat
 }
 
 blatGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
@@ -374,6 +400,7 @@ multipleAlignmentRecords <- function(records){
 }
 
 integer_vector <- function(x){
+  if(is.numeric(x)) return(x)
   as.integer(unlist(strsplit(x, ",")))
 }
 
@@ -422,7 +449,6 @@ numberAlignmentRecords <- function(blat.gr){
                 IRanges(starts, width=widths),
                 qend=qends,
                 qStarts=qstarts,
-
                 blockSizes=bsizes,
                 gapbases=gapbases,
                 match=bmatch,
@@ -503,7 +529,7 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
     blat <- blat[!is_na, ]
   }
   blat <- blat[blat$Tname %in% seqlevels(linked_bins), ]
-  blat_gr <- blat_to_granges(blat, linked_bins)
+  blat_gr <- blat_to_granges(blat, seqinfo(linked_bins))
   genome(blat_gr) <- genome(linked_bins)
   ##
   ## A blat record must overlap one of the intervals in a linked bin
@@ -559,7 +585,7 @@ empty_record <- function(){
   g
 }
 
-blat_to_granges <- function(blat, lb){
+blat_to_granges <- function(blat, seqinfo){
   GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
           match=blat$match, qname=blat$Qname,
           qstart=blat$Qstart,
@@ -570,7 +596,7 @@ blat_to_granges <- function(blat, lb){
           blockcount=blat$blockcount,
           qStarts=blat$qStarts,
           Qsize=blat$Qsize,
-          seqinfo=seqinfo(lb),
+          seqinfo=seqinfo,
           strand=blat$strand)
 }
 

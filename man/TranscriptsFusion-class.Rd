@@ -42,7 +42,8 @@ TranscriptsFusion(object, fusions = list())
 
 \S4method{numberFusions}{TranscriptsFusion}(object)
 
-\S4method{[}{TranscriptsFusion,ExonSubset,ANY,ANY}(x, i, j, ..., drop = FALSE)
+\S4method{[}{TranscriptsFusion,ExonSubset,ANY,ANY}(x, i, j, ...,
+  drop = FALSE)
 }
 \arguments{
 \item{value}{a \code{GRanges} object}
@@ -64,8 +65,6 @@ a \code{ClippedTranscripts} object
 }
 \description{
 Container for fused transcripts.
-
-Subsetting by one of the fusions produces a ClippedTranscripts object
 }
 \section{Slots}{
 

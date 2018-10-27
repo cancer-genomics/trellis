@@ -26,3 +26,16 @@ test_that("umapped_read", {
   expected <- readRDS(file.path(path, "unmapped.34bd277.rds"))
   expect_true(sum(unmapped$snms %in% expected$snms) == 86)
 })
+
+
+test_that("umapped_read", {
+  path <- system.file("extdata", package="svbams")
+  bam.file <- file.path(path, "test.bam")
+  query <- GRanges("chr1", )
+  unmapped <- unmapped_read(bam.file, query, yield_size=200000, maxgap=200)
+  if(FALSE){
+    saveRDS(unmapped, file="unmapped.34bd277.rds")
+  }
+  expected <- readRDS(file.path(path, "unmapped.34bd277.rds"))
+  expect_true(sum(unmapped$snms %in% expected$snms) == 86)
+})

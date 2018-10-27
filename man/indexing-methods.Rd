@@ -11,11 +11,7 @@
 \alias{indexImproper<-,StructuralVariant,list-method}
 \alias{indexImproper,StructuralVariant,list-method}
 \alias{indexProper,StructuralVariant-method}
-\alias{indexProper<-,StructuralVariant,list-method}
-\alias{indexProper,StructuralVariant,list-method}
 \alias{indexImproper,StructuralVariant-method}
-\alias{indexImproper<-,StructuralVariant,list-method}
-\alias{indexImproper,StructuralVariant,list-method}
 \title{Accessor of an index for the proper read pairs}
 \usage{
 indexProper(object)

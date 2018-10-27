@@ -6,9 +6,6 @@
 \alias{txB}
 \alias{txC}
 \alias{txD}
-\alias{txB}
-\alias{txC}
-\alias{txD}
 \alias{txA<-}
 \alias{txB<-}
 \alias{txC<-}

@@ -27,7 +27,8 @@
 \alias{seqlevels,RearrangementList-method}
 \title{Constructor for \code{RearrangementList} class}
 \usage{
-RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
+RearrangementList(object, modal_rearrangement, percent_rearrangement,
+  colData)
 
 \S4method{RearrangementList}{missing}(object, colData)
 
@@ -46,8 +47,8 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
 \S4method{names}{RearrangementList}(x)
 
 \S4method{overlapsAny}{RearrangementList,GRanges}(query, subject,
-  maxgap = -1L, minoverlap = 0L, type = c("any", "start", "end", "within",
-  "equal"), ...)
+  maxgap = -1L, minoverlap = 0L, type = c("any", "start", "end",
+  "within", "equal"), ...)
 
 \S4method{$}{RearrangementList}(x, name) <- value
 
@@ -104,8 +105,6 @@ a \code{Rearrangement} object
 a \code{Rearrangement} object
 }
 \description{
-Constructor for \code{RearrangementList} class
-
 A given sample may have multiple rearrangements.  It is convenient
 to encapsulate the data supporting each rearrangement in a
 \code{Rearrangement} object, and to list all of these

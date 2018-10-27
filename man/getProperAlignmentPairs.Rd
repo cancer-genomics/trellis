@@ -4,8 +4,8 @@
 \alias{getProperAlignmentPairs}
 \title{Extract properly paired reads from a bam file}
 \usage{
-getProperAlignmentPairs(bam.file, param = properAlignmentParams(mapqFilter =
-  0), build)
+getProperAlignmentPairs(bam.file,
+  param = properAlignmentParams(mapqFilter = 0), build)
 }
 \arguments{
 \item{bam.file}{a \code{BamViews} object}
