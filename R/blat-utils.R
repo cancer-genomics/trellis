@@ -430,7 +430,7 @@ candidateSplitRead <- function(blat.gr){
   ## Alternatively, blat can report a single alignment with multiple blocks.
   ## Here, the high match score should be high, two of the blocks should hit the linked bins, and there should be more than start site in the target genome.
   ##
-  tstarts <- integer_vector(blat_gr$tStarts)
+  tstarts <- integer_vector(blat.gr$tStarts)
   is_candidate <- (blat.gr$match < 95 & blat.gr$blockcount == 1) |
     (blat.gr$match > 95 & blat.gr$blockcount > 1 & length(tstarts) > 1)
   ##blat.gr$match < 95 | blat.gr$blockcount > 1
