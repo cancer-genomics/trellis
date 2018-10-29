@@ -455,7 +455,6 @@ numberAlignmentRecords <- function(blat.gr){
   bsizes <- integer_vector(g$blockSizes)
   chrom <- rep(chromosome(g), g$blockcount)
   qends <- qstarts+bsizes
-  qends <- tmp2$Qsize
   bmatch <- rep(g$match, g$blockcount)
   gapbases <- rep(g$gapbases, g$blockcount)
   strands <- rep(cstrand(g), g$blockcount)
@@ -542,6 +541,10 @@ intersectionAligned <- function(g){
       ir <- IRanges(tstarts, tends)
       hits <- findOverlaps(ir, ir)
       hits <- hits[queryHits(hits) != subjectHits(hits)]
+      if(length(hits) == 0) {
+        w[i] <- 0
+        next()
+      }
       ir1 <- ir[queryHits(hits)]
       ir2 <- ir[subjectHits(hits)]
       widths <- rep(NA, length(hits))
@@ -599,6 +602,12 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
     blat <- blat[!is_na, ]
   }
   blat <- blat[blat$Tname %in% seqlevels(linked_bins), ]
+  ## Exclude blat records with a single block and only one alignment
+  drop <- blat %>%  filter(blockcount==1) %>%
+    group_by(Qname) %>%
+    summarize(n=n()) %>%
+    filter(n == 1)
+  blat <- filter(blat, !Qname %in% drop$Qname)
   blat_gr <- blat_to_granges(blat, seqinfo(linked_bins))
   genome(blat_gr) <- genome(linked_bins)
   ##
@@ -615,6 +624,14 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   ## alignment, and all alignments that have a match score greater
   ## than 95.
   blat_gr <- multipleAlignmentRecords2(blat_gr)
+  blat2 <- as(blat_gr, "DataFrame")
+  blat2 <- blat2[ colnames(blat2) != "X"]
+  blat2 <- as.tibble(blat2) 
+  drop <- blat2 %>%  filter(blockcount==1) %>%
+    group_by(qname) %>%
+    summarize(n=n()) %>%
+    filter(n == 1)
+  blat_gr <- blat_gr[!blat_gr$qname %in% drop$qname]
   ##
   ## Total of splits should be near Qsize
   ##  - intersection of splits should be no more than 10% of Qsize
@@ -625,6 +642,7 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   queryAligned <- function(g) sum(g$qend - g$qstart)
   total_size_aligned <- sapply(grl, queryAligned)
   intersection_split <- sapply(grl, intersectionAligned)
+  intersection_split <- sapply(intersection_split, max)
   size.intersection.filter <- total_size_aligned >= MIN.SIZE &
     intersection_split <= MAX.INTERSECT
   blat_gr <- unlist(grl[ size.intersection.filter ])
@@ -638,7 +656,8 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
     if(!overlaps_both[i]) sr_list[[i]] <- empty_record()
     sr_list[[i]] <-   rearrangedReads2(linked_bins[i], blat_gr, maxgap)
   }
-  sr.grl <- GRangesList(sr_list)
+  sr.grl <- sr_list[ !sapply(sr_list, is.null) ]
+  sr.grl <- GRangesList(sr.grl)
   sr.grl
 }
 
@@ -731,7 +750,7 @@ rearrangedReads2 <- function(linked_bins, blat_gr, maxgap=500){
   blat.grl <- blat.grl[ is.overlap ]
   if(length(blat.grl) == 0){
     msg <- "Split reads do not uniquely align to both ends of the target sequence"
-    message(msg)
+    ##message(msg)
     return(NULL)
   }
   blat.grl <- blat.grl [ elementNROWS(blat.grl) == 2 ]
