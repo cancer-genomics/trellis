@@ -38,12 +38,14 @@ readBlat <- function(filename, skip=5, col_names=FALSE, ...){
 ##  nms <- paste0(as.character(blat[1, ]), as.character(blat[2, ]))
 ##  nms <- gsub(" ", "", nms)
 ##  ##nms[22:23] <- c("seq1", "seq2")
-##  blat <- read.delim(filename, skip=5, stringsAsFactors=FALSE,
-##                     header=FALSE, sep="\t", nrows=100000)
+  blat <- read.delim(filename, skip=5, stringsAsFactors=FALSE,
+                     header=FALSE, sep="\t")
+  colnames(blat) <- blat_colnames
   ##  colnames(blat) <- nms
-  blat <- read_tsv(filename, skip=skip, col_names=col_names, ...) %>%
-    set_colnames(blat_colnames) %>%
-    mutate(Tname=gsub(".fa", "", Tname))
+  ##  blat <- read_table(filename, skip=skip, col_names=col_names,
+  ##                     col_types=col_types, ...) %>%
+  ##    set_colnames(blat_colnames) %>%
+  ##    mutate(Tname=gsub(".fa", "", Tname))
   ##blat2 <- as.tibble(blat)
   blat
 }
@@ -421,8 +423,20 @@ blatBlockList <- function(blat.gr){
 }
 
 candidateSplitRead <- function(blat.gr){
+  ## We are looking for split read alignments--a read with a blockcount of 1
+  ## must have at least 2 alignments. Get rid of all reads with only a single
+  ## alignment having a block count of 1. Among these reads, remove alignments that have a match score greater than 95.
+  ##
+  ## Alternatively, blat can report a single alignment with multiple blocks.
+  ## Here, the high match score should be high, two of the blocks should hit the linked bins, and there should be more than start site in the target genome.
+  ##
+  tstarts <- integer_vector(blat_gr$tStarts)
+  is_candidate <- (blat.gr$match < 95 & blat.gr$blockcount == 1) |
+    (blat.gr$match > 95 & blat.gr$blockcount > 1 & length(tstarts) > 1)
   ##blat.gr$match < 95 | blat.gr$blockcount > 1
-  blat.gr$match < 95 & blat.gr$blockcount == 1
+  ##browser()
+  ##blat.gr$match < 95 & blat.gr$blockcount == 1
+  is_candidate
 }
 
 numberAlignmentRecords <- function(blat.gr){
@@ -434,7 +448,6 @@ numberAlignmentRecords <- function(blat.gr){
 }
 
 .each_block_granges <- function(g){
-  ##browser()
   starts <- integer_vector(g$tStarts)
   L <- length(starts)
   widths <- integer_vector(g$blockSizes)
@@ -442,6 +455,7 @@ numberAlignmentRecords <- function(blat.gr){
   bsizes <- integer_vector(g$blockSizes)
   chrom <- rep(chromosome(g), g$blockcount)
   qends <- qstarts+bsizes
+  qends <- tmp2$Qsize
   bmatch <- rep(g$match, g$blockcount)
   gapbases <- rep(g$gapbases, g$blockcount)
   strands <- rep(cstrand(g), g$blockcount)
@@ -477,10 +491,9 @@ numberAlignmentRecords <- function(blat.gr){
 }
 
 eachBlockAsGRanges <- function(blat.grl){
-##  browser()
-##  for(i in seq_along(blat.grl)){
-##    .each_block_granges(blat.grl[[i]])
-##  }
+  ##  for(i in seq_along(blat.grl)){
+  ##    .each_block_granges(blat.grl[[i]])
+  ##  }
   blat.grl2 <- lapply(blat.grl, .each_block_granges)
   GRangesList(blat.grl2)
 }
@@ -505,6 +518,42 @@ splitreadIntersection <- function(g){
   sapply(g, .splitread_intersection)
 }
 
+#' Compute the intersection of the split read alignment
+#'
+#' Example
+#'
+#' split 1     :  -----------
+#' split 2     :           -----------
+#' intersection:  2
+intersectionAligned <- function(g){
+  grl <- split(g, g$blockcount)
+  w <- rep(NA, length(grl))
+  for(i in seq_along(grl)){
+    g2 <- grl[[i]]
+    if(g2$blockcount[1] == 1){
+      g2 <- IRanges(g2$qstart, g2$qend)
+      tmp <- width(intersect(g2[1], g2[2]))
+      ## no intersection should be recorded as zero
+      w[i] <- ifelse(length(tmp) == 0, 0, tmp)
+    } else {
+      ## if the read is aligned in blocks and the blocks are non-overlapping, the intersection is zero
+      tstarts <- integer_vector(g2$tStarts)
+      tends <- tstarts + integer_vector(g2$blockSizes)
+      ir <- IRanges(tstarts, tends)
+      hits <- findOverlaps(ir, ir)
+      hits <- hits[queryHits(hits) != subjectHits(hits)]
+      ir1 <- ir[queryHits(hits)]
+      ir2 <- ir[subjectHits(hits)]
+      widths <- rep(NA, length(hits))
+      for(j in seq_along(ir1)){
+        widths[j] <- width(intersect(ir1[j], ir2[j]))
+      }
+      w[i] <- max(widths)
+    }
+  }
+  w
+}
+
 #' Identify rearranged reads -- initiallly unmapped reads that can be
 #' aligned by blat to span a novel sequence junction.
 #'
@@ -522,7 +571,28 @@ splitreadIntersection <- function(g){
 #' @param maxgap this maximum gap between the mapped read and the
 #'   genomic intervals of the improper read clusters
 rearrangedReads <- function(linked_bins, blat, maxgap=500){
-  ##lb <- linkedBins(rlist)
+  ## BLAT fields
+  ## matches - Number of matching bases that aren't repeats.
+  ## misMatches - Number of bases that don't match.
+  ## repMatches - Number of matching bases that are part of repeats.
+  ## nCount - Number of 'N' bases.
+  ## qNumInsert - Number of inserts in query.
+  ## qBaseInsert - Number of bases inserted into query.
+  ## tNumInsert - Number of inserts in target.
+  ## tBaseInsert - Number of bases inserted into target.
+  ## strand - defined as + (forward) or - (reverse) for query strand. In mouse, a second '+' or '-' indecates genomic strand.
+  ## qName - Query sequence name.
+  ## qSize - Query sequence size.
+  ## qStart - Alignment start position in query.
+  ## qEnd - Alignment end position in query.
+  ## tName - Target sequence name.
+  ## tSize - Target sequence size.
+  ## tStart - Alignment start position in target.
+  ## tEnd - Alignment end position in target.
+  ## blockCount - Number of blocks in the alignment.
+  ## blockSizes - Comma-separated list of sizes of each block.
+  ## qStarts - Comma-separated list of start position of each block in query.
+  ## tStarts - Comma-separated list of start position of each block in target.
   ## filter blat alignments
   is_na <- is.na(blat$Tstart)
   if(any(is_na)){
@@ -536,6 +606,10 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   ##
   is.overlap <- overlapsLinkedBins(blat_gr, linked_bins, maxgap=maxgap)
   blat_gr <- blat_gr[ is.overlap ]
+  if(length(blat_gr) == 0){
+    message("No blat records overlap the linked regions")
+    return(NULL)
+  }
   ## We are looking for split read alignments--a read must have at
   ## least 2 alignments.  Get rid of all reads with only a single
   ## alignment, and all alignments that have a match score greater
@@ -549,13 +623,6 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   MIN.SIZE <- ceiling(0.95*blat_gr$Qsize[1])
   MAX.INTERSECT <- floor(0.1*blat_gr$Qsize[1])
   queryAligned <- function(g) sum(g$qend - g$qstart)
-  intersectionAligned <- function(g){
-    g2 <- IRanges(g$qstart, g$qend)
-    w <- width(intersect(g2[1], g2[2]))
-    ## no intersection should be recorded as zero
-    if(length(w) == 0) w <- 0
-    w
-  }
   total_size_aligned <- sapply(grl, queryAligned)
   intersection_split <- sapply(grl, intersectionAligned)
   size.intersection.filter <- total_size_aligned >= MIN.SIZE &
@@ -590,7 +657,8 @@ empty_record <- function(){
 
 blat_to_granges <- function(blat, seqinfo){
   GRanges(blat$Tname, IRanges(blat$Tstart, blat$Tend),
-          match=blat$match, qname=blat$Qname,
+          match=blat$match,
+          qname=blat$Qname,
           qstart=blat$Qstart,
           qend=blat$Qend,
           tStarts=blat$tStarts,
@@ -636,7 +704,8 @@ rearrangedReads2 <- function(linked_bins, blat_gr, maxgap=500){
   ##
   records_qname <- split(records, records$qname)
   ##
-  ## Each sequence should have a unique rearrangement
+  ## Each query aligned with a single block should have a unique rearrangement id
+  ##
   ##
   n.rear <- sapply(records_qname, function(x) length(unique(x$rear.id)))
   records_qname <- records_qname [ n.rear == 1 ]
@@ -644,19 +713,27 @@ rearrangedReads2 <- function(linked_bins, blat_gr, maxgap=500){
   ## And the number of records for a given rearrangement should be 2
   ##
   blat.grl <- eachBlockAsGRanges(records_qname)
-
   # Pass along seqinfo
   seqlevels(blat.grl) <- seqlevels(lb)
   seqlengths(blat.grl) <- seqlengths(lb)
   genome(blat.grl) <- genome(lb)
 
   overlapFun <- function(g1, lb, ...){
-    o1 <- any(overlapsAny(g1, lb, ...))
-    o2 <- any(overlapsAny(g1, lb$linked.to, ...))
-    o1 && o2
+    ## a query only map to lb or the linked range
+    ## lb and the linked range must have at least one hit
+    o1 <- overlapsAny(g1, lb, ...)
+    o2 <- overlapsAny(g1, lb$linked.to, ...)
+    is.overlap <- any((o1 & !o2) | (o2 & !o1)) &&
+      sum(o1) >= 1 && sum(o2) >= 1
+    is.overlap
   }
   is.overlap <- sapply(blat.grl, overlapFun, lb=lb, maxgap=500)
   blat.grl <- blat.grl[ is.overlap ]
+  if(length(blat.grl) == 0){
+    msg <- "Split reads do not uniquely align to both ends of the target sequence"
+    message(msg)
+    return(NULL)
+  }
   blat.grl <- blat.grl [ elementNROWS(blat.grl) == 2 ]
   ##
   ## The split should involve nearly non-overlapping subsequences of
