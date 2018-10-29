@@ -551,7 +551,10 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   queryAligned <- function(g) sum(g$qend - g$qstart)
   intersectionAligned <- function(g){
     g2 <- IRanges(g$qstart, g$qend)
-    width(intersect(g2[1], g2[2]))
+    w <- width(intersect(g2[1], g2[2]))
+    ## no intersection should be recorded as zero
+    if(length(w) == 0) w <- 0
+    w
   }
   total_size_aligned <- sapply(grl, queryAligned)
   intersection_split <- sapply(grl, intersectionAligned)
