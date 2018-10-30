@@ -652,12 +652,24 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   overlaps_both <- overlapsBlatRecord(linked_bins, blat_gr, maxgap)
   sr_list <- vector("list", length(linked_bins))
   names(sr_list) <- names(linked_bins)
+  sr_list[ !overlaps_both ] <- replicate(sum(!overlaps_both), empty_record())
+  identical(names(sr_list), names(linked_bins))
   for(i in seq_along(linked_bins)){
-    if(!overlaps_both[i]) sr_list[[i]] <- empty_record()
-    sr_list[[i]] <-   rearrangedReads2(linked_bins[i], blat_gr, maxgap)
+    cat(".")
+    if(!overlaps_both[i]){
+      sr_list[[i]] <- empty_record()
+      next()
+    }
+    tmp <- rearrangedReads2(linked_bins[i], blat_gr, maxgap)
+    if(is.null(tmp)){
+      sr_list[[i]] <- empty_record()
+      next()
+    }
+    sr_list[[i]] <- tmp
+    if(is.null(sr_list[[i]])) stop()
   }
-  sr.grl <- sr_list[ !sapply(sr_list, is.null) ]
-  sr.grl <- GRangesList(sr.grl)
+  sr.grl <- GRangesList(sr_list)
+  ##sr.grl <- sr.grl[elementNROWS(sr.grl) > 0]
   sr.grl
 }
 

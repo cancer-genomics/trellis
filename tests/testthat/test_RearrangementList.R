@@ -92,3 +92,39 @@ test_that("rlist from vignette",{
 })
 
 
+test_that("rlist for ovarian clearcell CGOV30T1", {
+  extdata <- system.file("extdata", package="trellis")
+  rlist <- readRDS(file.path(extdata, "rlist_cgov30t1.rds"))
+  ##options(warn=2, error=recover)
+  expect_success(near.coding <- seqJunctionNearTx(rlist=rlist, build="hg19"))
+
+  rlist2 <- rlist[ near.coding ]
+  if(length(rlist2) == 0){
+    msg <- "No rearrangements near coding regions"
+    if(interactive()) stop(msg) else stop(msg); q('no')
+  }
+  rlist2 <- fiveTo3List(rlist2, build="hg19")
+  jxns <- seqJunctions_Rlist(rlist2)
+  if(FALSE){
+    labid <- strsplit(rds.file, "\\.") %>%
+      sapply("[", 1)
+    saveRDS(rlist2, file="~/Dropbox/Software/svpackages/trellis/inst/extdata/rlist_cgov30t1.rds")
+  }
+  coding_jxns <- codingJunctions(jxns, "hg19")
+  rlist2 <- rlist2[ names(coding_jxns) ]
+  cds.list <- fuseCDS_Rlist(rlist2, coding_jxns)
+  proteins <- translateCDS(cds.list)
+  partition.fusion <- partitionAASequence(proteins)
+  nostop.list <- noPrematureStop(partition.fusion)
+  ref.frames <- organizeReferenceByFrame(proteins)
+  inframe.list <- inFrameList(fusion.frames=partition.fusion,
+                              ref.frames=ref.frames)
+  inframe.nostop <- inFrameNoStop(nostop.list, inframe.list)
+  fusions <- validFusions(partition.fusion,
+                          cds.list,
+                          inframe.nostop,
+                          ref.frames)
+  tab <- fusionTable2(fusions) %>%
+    as.tibble %>%
+    filter(gene.5prime != gene.3prime)
+})

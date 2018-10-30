@@ -1622,11 +1622,21 @@ posNeg <- function(r, build, maxgap=5000){
   sr <- splitReads(r)
   if(length(sr) == 0) {
     message("no split reads")
+    bins$reverse <- as.logical(NA)
+    bins2 <- bins[1]
+    bins2$linked.to <- bins[2]
+    names(bins2) <- paste(r@link1id, r@link2id, sep="-")
+    linkedBins(r) <- bins2
     return(r)
   }
   sr <- subsetByOverlaps(sr, bins, maxgap=50)
   if (length(sr) == 0) {
-    message(paste0("No split reads are within 50bp of improper read pairs for rearrangement: ", names(linkedBins(r))))
+    message(paste0("No split reads are within ",  maxgap, "bp of improper read pairs for rearrangement: ", names(linkedBins(r))))
+    bins$reverse <- as.logical(NA)
+    bins2 <- bins[1]
+    bins2$linked.to <- bins[2]
+    names(bins2) <- paste(r@link1id, r@link2id, sep="-")
+    linkedBins(r) <- bins2
     return(r)
   }
   hits <- findOverlaps(sr, bins, maxgap=50)

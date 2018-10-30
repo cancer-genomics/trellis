@@ -116,6 +116,12 @@ setMethod("length", "RearrangementList", function(x) length(x@data))
 setMethod("linkedBins", "RearrangementList", function(object){
   dat <- object@data
   lblist <- lapply(dat, linkedBins)
+  ##varnames <- lapply(lblist, function(x) colnames(mcols(x)))
+  ##  missing.vars <- !all(sapply(varnames, function(x) "reverse" %in% x)) ||
+  ##    !all(sapply(varnames, function(x) "gene_name" %in% x))
+  ##  if(missing.vars){
+  ##    stop("Some elements of the rearrangement list have missing variables from 'mcols' slot")
+  ##  }
   nms <- sapply(lblist, names)
   grl <- GRangesList(lblist)
   g <- unlist(grl)
@@ -200,7 +206,7 @@ setReplaceMethod("splitReads", c("RearrangementList", "GRangesList"),
                    orig_order <- names(object)
                    object2 <- object[ names(object) %in% names(value) ]
                    object2 <- object2 [ names(value) ]
-                   for (i in 1:length(object2)) {
+                   for (i in seq_len(length(object2))) {
                      splitReads(object2[[i]]) <- value[[i]]
                    }
                    notchanged <- object [ !names(object) %in% names(object2) ]
