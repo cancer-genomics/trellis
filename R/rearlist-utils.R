@@ -686,6 +686,7 @@ loadTxdbTranscripts <- function(build, seq_levels){
 #'
 #' @param rlist a \code{RearrangementList}
 #' @param build genome build
+#' @param maxgap integer for number of basepairs allowed between a candidate sequence junction and the improperly paired read alignments
 #' @export
 #' @return a logical vector of the same length as the \code{rlist} object
 #' @examples
@@ -693,14 +694,14 @@ loadTxdbTranscripts <- function(build, seq_levels){
 #'  rfile <- file.path(extdata, "CGOV11T_1.bam.rds")
 #'  rlist <- readRDS(rfile)
 #'  head(seqJunctionNearTx(rlist, "hg19"))
-seqJunctionNearTx <- function(rlist, build){
+seqJunctionNearTx <- function(rlist, build, maxgap=5000){
   tx.cds <- loadTxdbTranscripts(build, seq_levels=seqlevels(rlist))
   tx <- tx.cds[["transcripts"]]
   lb <- linkedBins(rlist)
   region1 <- lb
   region2 <- linkedTo(lb)
-  cds.region1 <- overlapsAny(region1, tx, ignore.strand=TRUE, maxgap=5000)
-  cds.region2 <- overlapsAny(region2, tx, ignore.strand=TRUE, maxgap=5000)
+  cds.region1 <- overlapsAny(region1, tx, ignore.strand=TRUE, maxgap=maxgap)
+  cds.region2 <- overlapsAny(region2, tx, ignore.strand=TRUE, maxgap=maxgap)
   cds.region1 & cds.region2
 }
 
@@ -741,6 +742,31 @@ fiveTo3List <- function(rlist, build){
   cd <- cd[index, ]
   rownames(cd) <- nms
   rlist2@colData <- cd
+  ##
+  ## remove rearrangements that are not near a gene (why was this not already caught?)
+  ##
+  lb <- tryCatch(linkedBins(rlist2), error=function(e) NULL)
+  if(is.null(lb)){
+    lb.list <- lapply(rlist2, linkedBins)
+    nc <- sapply(lb.list, function(x) ncol(mcols(x)))
+    j <- which(nc != 3)
+    ## we didn't determine a gene_name or whether orientation is reversed for these rearrangements
+    lb.list2 <- lapply(lb.list[j], function(x){
+      mc <- mcols(x)
+      mc$gene_name <- as.character(NA)
+      mc$reverse <- as.logical(NA)
+      mc <- mc[c("gene_name", "reverse", "linked.to")]
+      mcols(x) <- mc
+      x
+    })
+    rlist3 <- rlist2[j]
+    for(i in seq_along(rlist3)){
+      linkedBins(rlist3@data[[i]]) <- lb.list[[i]]
+      k <- j[i]
+      rlist2[[k]] <- rlist3[[i]]
+    }
+  }
+  rlist2 <- rlist2[ !is.na(linkedBins(rlist2)$gene_name) ]
   rlist2
 }
 

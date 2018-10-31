@@ -1687,6 +1687,12 @@ negativeInversion1 <- function(r, build, maxgap=5000){
   r2.rpid <- mcols(r2)$rpid
   sr <- splitReads(r)
   sr <- subsetByOverlaps(sr, bins, maxgap=50)
+  if(length(sr) == 0){
+    sr$rpid <- character()
+    sr$reverse <- logical()
+    splitReads(r) <- sr
+    return(r)
+  }
   sr$rpid <- names(bins)[subjectHits(findOverlaps(sr, bins, maxgap=50))]
   ##
   ##
