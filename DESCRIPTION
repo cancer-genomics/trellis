@@ -103,4 +103,4 @@ LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 RoxygenNote: 6.1.0
-License: Artistic-2.0
+License: GPLv3
