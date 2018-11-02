@@ -767,7 +767,10 @@ fiveTo3List <- function(rlist, build){
     }
   }
   rlist2 <- rlist2[ !is.na(linkedBins(rlist2)$gene_name) ]
-  rlist2
+  rlist3 <- rlist2[ elementNROWS(splitReads(rlist2)) > 0 ]
+  nna <- sapply(splitReads(rlist3), function(x) all(is.na(mcols(x)$reverse)))
+  rlist4 <- rlist3[ !nna ]
+  rlist4
 }
 
 numberSplitReads <- function(rlist){
