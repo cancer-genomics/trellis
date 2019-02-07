@@ -4,7 +4,7 @@
 \alias{readBlat}
 \title{Read output from the command-line blat}
 \usage{
-readBlat(filename, ...)
+readBlat(filename, skip = 5, col_names = FALSE, ...)
 }
 \arguments{
 \item{filename}{character string providing full path to blat output}
