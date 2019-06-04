@@ -746,7 +746,8 @@ linkAmplicons <- function(object, rp, edgeParam=FilterEdgeParam()){
   e <- e[names(e) %in% edgeFilters(e, param=edgeParam)]
   if(length(e)==0) return(object)
   tabe <- table(names(e))
-  keep <- names(tabe)[tabe >= 5]
+  keep <- names(tabe)[tabe >= edgeParam$freq]
+  if (length(keep) == 0) return(object)
   from <-  node1(keep)
   to <- node2(keep)
   existing <- edges(object)[from] ## is 'to' in any of the existing edges
