@@ -16,7 +16,7 @@ vignette: >
 
 # Introduction
 
-The trellis package was developed to identify somatic structural variants in tumor-only analyses of whole genome sequencing data.  The types of somatic structural alterations identified by trellis include deletions, amplifications, intra- and inter-chromosomal rearrangements, inversions, and in-frame fusions.  Trellis distinguishes focal high-copy amplifications from low copy duplications and homozygous deletions from heterozygous deletions.  High copy amplicons are linked using the mate information from read pair analyses, simplifying the interpretation of the likely drivers.  Additional packages required for this vignette are listed below, including the `r Githubpkg("rscharpf/svfilters.hg19")` package that contains various sequence filters for structural variant analyses and the `r Rpackage("svbams")` package that contains subsampled data used to illustrate various aspects of data processing.
+The trellis package was developed to identify somatic structural variants in tumor-only analyses of whole genome sequencing data.  The types of somatic structural alterations identified by trellis include deletions, amplifications, intra- and inter-chromosomal rearrangements, inversions, and in-frame fusions.  High copy amplicons are linked using the mate information from read pair analyses, simplifying the interpretation of the likely drivers.  Additional packages required for this vignette are listed below, including the `r Githubpkg("rscharpf/svfilters.hg19")` package that contains various sequence filters for structural variant analyses and the `r Rpackage("svbams")` package that contains subsampled data used to illustrate various aspects of data processing.
 
 ```{r packages, results="hide", message=F}
 library(Rsamtools)
@@ -48,7 +48,7 @@ This section provides code for extracting all read pairs with aberrant orientati
 
 ## Improperly paired reads
 
-The following code chunk extract all improperly paired reads in a bam file, returning a `GAlignmentPairs` object where the `first` and `last` slots store the alignment of the first read and its mate. The time required to extract these improperly paired reads depends on the size of the bam file. 
+The following code chunk extract all improperly paired reads in a bam file, returning a `GAlignmentPairs` object where the `first` and `last` slots store the alignment of the first read and its mate. The time required to extract these improperly paired reads depends on the size of the bam file.
 
 ```{r improper_pairs}
 extdata <- system.file("extdata", package="svbams")
@@ -93,7 +93,7 @@ set.seed(123)
 bins$log_ratio <- binGCCorrect(bins)
 ```
 
-If one or more normal controls is available, the normalized bin-counts can be further corrected.  Since much of the bin-level technical variation is batch-specific, we advise against the use of historical controls for additional normalization.  Below, we segment the $\log_2$ ratios by circular binary segmentation (CBS). See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object. Note, `segmentBins` assumes a variable called `log_ratio` in the `GRanges` object. The object returned by `segmentBins` is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.
+If one or more normal controls is available, the normalized bin-counts can be further corrected to reduce autocorrelation.  Since much of the bin-level technical variation is batch-specific, we advise against the use of historical controls for additional normalization.  Below, we segment the $\log_2$ ratios by circular binary segmentation (CBS). See `?DNAcopy::segment` for a complete list of parameters available in the `SegmentParam` object. Note, `segmentBins` assumes a variable called `log_ratio` in the `GRanges` object. The object returned by `segmentBins` is a `GRanges` object with segment means of log-normalized coverage in the `seg.mean` column.
 
 ```{r segment}
 g <- segmentBins(bins, param=SegmentParam())
