@@ -34,6 +34,8 @@ library(Rgraphviz)
 library(network)
 library(sna)
 library(kableExtra)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(TxDb.Hsapiens.UCSC.hg19.refGene)
 ```
 
 # Prerequisites
