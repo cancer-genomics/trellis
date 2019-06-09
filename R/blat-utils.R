@@ -46,7 +46,7 @@ readBlat <- function(filename, skip=5, col_names=FALSE, ...){
   ##                     col_types=col_types, ...) %>%
   ##    set_colnames(blat_colnames) %>%
   ##    mutate(Tname=gsub(".fa", "", Tname))
-  ##blat2 <- as.tibble(blat)
+  ##blat2 <- as_tibble(blat)
   blat
 }
 
@@ -165,7 +165,7 @@ annotateBlatRecords <- function(blat, tag.sequences){
   blat2 <- left_join(blat, rid, by="Qname") %>%
     mutate(score=match/Qsize)
   rownames(blat2) <- NULL
-  blat2 <- as.tibble(blat2)
+  blat2 <- as_tibble(blat2)
   blat2
 }
 
@@ -626,7 +626,7 @@ rearrangedReads <- function(linked_bins, blat, maxgap=500){
   blat_gr <- multipleAlignmentRecords2(blat_gr)
   blat2 <- as(blat_gr, "DataFrame")
   blat2 <- blat2[ colnames(blat2) != "X"]
-  blat2 <- as.tibble(blat2) 
+  blat2 <- as_tibble(blat2) 
   drop <- blat2 %>%  filter(blockcount==1) %>%
     group_by(qname) %>%
     summarize(n=n()) %>%
