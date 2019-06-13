@@ -1384,6 +1384,7 @@ finalize_deletions <- function(sv, preprocess, gr_filters,
   bins <- preprocess$bins
   bam.file <- preprocess$bam.file
   sv <- SVFilters(sv, gr_filters, bins, param=param)
+  if (length(sv) == 0) return(sv)
   sv <- groupSVs(sv)
   ## requires bam file
   sv <- allProperReadPairs(sv, param,
