@@ -1189,6 +1189,7 @@ sv_amplicons2 <- function(preprocess, amplicon_filters,
   }
   preprocess$segments <- amplified_segments(preprocess$segments, params)
   ag <- initialize_graph2(preprocess, amplicon_filters, params)
+  if (length(ag) == 0) return(ag)
   ##
   ## Requires bam file -- can not work remotely
   ##
