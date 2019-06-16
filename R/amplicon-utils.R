@@ -347,7 +347,7 @@ AmpliconGraph <- function(ranges=GRanges(),
              germline_cnv=germline_cnv,
              outliers=outliers)
   ## initialize query ranges
-  ampliconQueryRanges(tmp)
+  ampliconQueryRanges(tmp, min.fc = params[["LOW_THR"]])
 }
 
 trimRangesOverlappingCentromere <- function(object, centromeres){
