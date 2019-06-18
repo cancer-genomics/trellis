@@ -311,7 +311,8 @@ thinReadPairQuery <- function(g, zoom.out=1){
 
 .scan_all_readpairs <- function(granges, bam.file, flags){
   g <- reduce(granges)
-  param <- ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"), which=g)
+  param <- ScanBamParam(flag=flags, what=c("flag", "mrnm", "mpos", "mapq"),
+                        which=g)
   ##x <- readGAlignmentsFromBam(bam.file, param=param, use.names=TRUE)
   x <- readGAlignments(bam.file, param=param, use.names=TRUE)
   x <- makeGAlignmentPairs2(x, use.mcols="flag")
@@ -397,12 +398,21 @@ readPairsNearVariant <- function(object, bam.file){
 #' @param bam.file character-vector providing valid complete path to a
 #'   bam file
 #' @param flags length-two integer vector as given by \code{scanBamFlags}
-#' @return A \code{GAlignmentPairs} object 
-#' 
+#' @return A \code{GAlignmentPairs} object
+#'
 #' @export
 get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
   g <- queryRanges(object)
-  get_readpairs2(g, bam.file, flags)
+  if(length(g) == 0) {
+    setflag <- 1
+    g <- GRanges("chr1", IRanges(1, 1))
+  } else setflag <- 0
+  galp <- get_readpairs2(g, bam.file, flags)
+  if(setflag==1){
+    ## make length-zero
+    galp <- galp[0]
+  }
+  galp
 }
 
 #' Extract reads from a bam file
@@ -694,7 +704,7 @@ setMethod("getSequenceOfReads", "Rearrangement",
                    MAX=25L, 
                    build){
             dat <- .getReadSeqsForRear(object, bam.file, params, MAX, build = build)
-            dat2 <- as.tibble(dat)
+            dat2 <- as_tibble(dat)
             dat2
           })
 
@@ -716,6 +726,6 @@ setMethod("getSequenceOfReads", "RearrangementList",
             tags <- do.call(rbind, tag.list)
             readId <- paste(tags$qname, tags$read, sep="_")
             tags <- tags[!duplicated(readId), ]
-            tags2 <- as.tibble(tags)
+            tags2 <- as_tibble(tags)
             tags2
           })

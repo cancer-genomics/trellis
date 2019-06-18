@@ -4,12 +4,14 @@
 \alias{seqJunctionNearTx}
 \title{Evaluates whether sequence junction of a rearrangement is within 5000bp of a transcript}
 \usage{
-seqJunctionNearTx(rlist, build)
+seqJunctionNearTx(rlist, build, maxgap = 5000)
 }
 \arguments{
 \item{rlist}{a \code{RearrangementList}}
 
 \item{build}{genome build}
+
+\item{maxgap}{integer for number of basepairs allowed between a candidate sequence junction and the improperly paired read alignments}
 }
 \value{
 a logical vector of the same length as the \code{rlist} object

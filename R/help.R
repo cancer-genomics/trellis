@@ -32,7 +32,7 @@
 #' @importFrom DNAcopy CNA segment
 #' @importFrom stats setNames predict acf loess median runif setNames kmeans
 #' @importFrom utils read.table data read.delim read.csv
-#' @importFrom tibble as.tibble tibble
+#' @importFrom tibble as_tibble tibble
 #' @importFrom tidyr unite
 #' @importFrom dplyr group_by top_n summarize mutate count n tbl_df filter left_join ungroup bind_rows
 #' @importFrom purrr map_lgl

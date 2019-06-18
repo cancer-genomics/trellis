@@ -1,6 +1,6 @@
 Package: trellis
 Title: Somatic structural variant analysis
-Version: 0.0.52
+Version: 0.0.53
 Author: Rob Scharpf, Daniel Bruhm, Dorothy Hallberg, Victor Velculescu
 Maintainer: Rob Scharpf <rscharpf@jhu.edu>
 Description: Analysis of somatic structural variants from whole genome sequencing.
@@ -83,6 +83,7 @@ Collate:
     'data.R'
     'deletion-utils.R'
     'fasta-utils.R'
+    'functions.R'
     'fusion-utils.R'
     'galignment-utils.R'
     'germlineOutliers.R'
@@ -101,5 +102,5 @@ Collate:
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 License: GPLv3

@@ -1069,7 +1069,8 @@ makeAGraph2 <- function(segs, af, params){
 #' @param amplicon_filters a \code{list} of filters
 #' @param params a list of parameters for the amplicon analysis
 #' @param transcripts a \code{GRanges} object of transcripts
-sv_amplicons <- function(bview, segs, amplicon_filters, params, transcripts){
+sv_amplicons <- function(bview, segs, amplicon_filters,
+                         params, transcripts){
   ag <- initialize_graph(segs, amplicon_filters, params)
   REMOTE <- file.exists(bamPaths(bview))
   if(!REMOTE) stop ("Path to BAM files is invalid")

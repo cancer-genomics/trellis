@@ -96,8 +96,9 @@ test_that("rlist for ovarian clearcell CGOV30T1", {
   extdata <- system.file("extdata", package="trellis")
   rlist <- readRDS(file.path(extdata, "rlist_cgov30t1.rds"))
   ##options(warn=2, error=recover)
-  expect_success(near.coding <- seqJunctionNearTx(rlist=rlist, build="hg19"))
-
+  near.coding <- seqJunctionNearTx(rlist=rlist,
+                                   build="hg19")
+  expect_true(all(near.coding))
   rlist2 <- rlist[ near.coding ]
   if(length(rlist2) == 0){
     msg <- "No rearrangements near coding regions"

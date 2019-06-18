@@ -900,33 +900,40 @@ rearDataFrameList <- function(rlist, build, maxgap=5000){
   }
   igr$region <- regions
   df <- as(igr, "data.frame") %>%
-    as.tibble()
+    as_tibble()
   df2 <- df[, 1:5]
   tagid <- df$tagid
   read <- paste0(df$read, df$strand)
   sr$qname <- sapply(strsplit(sr$qname, "\\."), "[", 1)
   ##is.reverse.strand <- any(sr$reverse)
   red.sr <- reduce(sr)
-  ix <- findOverlaps(red.sr, c(granges(bin1), granges(bin2))) %>%
-    subjectHits
+  if(length(red.sr) == 4){
+    ## Likely double stranded break
+  }
+  ##  ix <- findOverlaps(red.sr, c(granges(bin1), granges(bin2))) %>%
+  ##    subjectHits
+  hits <- findOverlaps(red.sr, c(granges(bin1), granges(bin2)))
+  ix <- queryHits(hits)
   red.sr <- red.sr[ix]
+  names(red.sr) <- c("5p", "3p")[subjectHits(hits)]
   hits <- findOverlaps(sr, red.sr)
+  red.srlist <- split(red.sr, names(red.sr))
   ##
   ## what if reverse is not defined yet?
   ##
   is.rev <- split(sr$reverse[queryHits(hits)],
                   subjectHits(hits)) %>%
     map_lgl(any) %>%
-    set_names(c("5p", "3p"))
+    set_names(names(red.sr))
   if(!is.rev["5p"]){
-    junction_5p <- end(red.sr)[1]
+    junction_5p <- end(red.srlist[["5p"]])[1]
   } else{
-    junction_5p <- start(red.sr)[1]
+    junction_5p <- start(red.srlist[["5p"]])[1]
   }
   if(!is.rev["3p"]){
-    junction_3p <- start(red.sr)[2]  
+    junction_3p <- start(red.srlist[["3p"]])[1]  
   } else {
-    junction_3p <- end(red.sr)[2]
+    junction_3p <- end(red.srlist[["3p"]])[1]
   }
   df2$junction_5p <- sr$junction_5p <- junction_5p
   df2$junction_3p <- sr$junction_3p <- junction_3p
