@@ -202,3 +202,42 @@ test_that("removeSameStateOverlapping2", {
   sv2 <- removeSameStateOverlapping2(sv)
   expect_identical(length(sv2), 80L)
 })
+
+##
+## Steps for confirming improper read pair alignment
+##
+## 1. extract the sequence of all improper read pairs in region near the borders
+##    - for deletions with improperly paired reads (+ calls), borders can be narrowly defined
+##
+##    - for deletions without + calls, look in large region near segment boundary
+##
+## 2. write to fasta
+## 3. blat alignment
+## 4. check scores
+## 5. update improper read pairs assigned to deletions object
+## 6. update boundaries if needed
+.test_that("blat_deletions", {
+  full_bam <-  file.path("dcl01", "scharpf",
+                         "data", "rscharpf",
+                         "OvarianAlignments",
+                         "hg19",
+                         "eland",
+                         "CGOV44T.bam")
+  path <- system.file("extdata", package = "svbams")
+  sv <- readRDS(file.path(path, "sv.rds"))
+}
+
+
+##
+## Steps for evaluated split reads
+##
+## 1. look for mapped-unmapped near boundary
+##
+## 2. write sequences to fasta
+##
+## 3. blat alignment
+##
+## 4. check for split reads
+##
+## 5. revise boundaries if needed (++ call if split reads present?)
+##

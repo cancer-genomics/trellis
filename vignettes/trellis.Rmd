@@ -365,9 +365,9 @@ rdat <- rearrangementData(rlist=rlist,
 rlist <- filterRear(rdat, rparam)
 ```
 
-## Confirmation by BLAT 
+## Confirmation by BLAT
 
-The rearangements identified thus far are required to have a physical separation of at least `rp_separation` with respect to the reference genome, must be supported by at least `min_number_tags_per_cluster` paired reads, at least `prop_modal_rearrangement` of the read pairs must be consistent with the modal rearrangement type, and the size of the read clusters must be at least `min_cluster_size` basepairs. In this section,  we realign all improperly paired reads supporting a candidate rearrangement with BLAT and extract unmapped reads with aligned mate near candidate sequence junctions thatf may correspond to split reads (reads that contain the actual sequence junction).
+The rearangements identified thus far are required to have a physical separation of at least `rp_separation` with respect to the reference genome, must be supported by at least `min_number_tags_per_cluster` paired reads, at least `prop_modal_rearrangement` of the read pairs must be consistent with the modal rearrangement type, and the size of the read clusters must be at least `min_cluster_size` basepairs. In this section,  we realign all improperly paired reads supporting a candidate rearrangement (mapped-mapped) with BLAT and extract unmapped reads with aligned mate near candidate sequence junctions (mapped-unmapped) that may correspond to split reads.  Since split reads contain the actual sequence junction, these reads can usually determine the exact breakpoint within a few basepairs.
 
 ### Mapped-mapped
 
