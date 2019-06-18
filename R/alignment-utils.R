@@ -708,6 +708,21 @@ setMethod("getSequenceOfReads", "Rearrangement",
             dat2
           })
 
+#' @aliases getSequenceOfReads,StructuralVariant-method
+#' @rdname getSequenceOfReads-methods
+setMethod("getSequenceOfReads", "StructuralVariant",
+          function(object,
+                   bam.file,
+                   params=RearrangementParams(),
+                   MAX=25L, 
+                   build){
+            dat <- .getReadSeqsForDeletion(object, bam.file,
+                                           params, MAX,
+                                           build = build)
+            dat2 <- as_tibble(dat)
+            dat2
+          })
+
 #' @aliases getSequenceOfReads,RearrangementList-method
 #' @rdname getSequenceOfReads-methods
 setMethod("getSequenceOfReads", "RearrangementList",
@@ -729,3 +744,35 @@ setMethod("getSequenceOfReads", "RearrangementList",
             tags2 <- as_tibble(tags)
             tags2
           })
+
+.getReadSeqsForDeletion <- function(object,
+                                    bam.file,
+                                    param,
+                                    MAX,
+                                    build){
+  irp <- improper(object)
+  flags <- improperAlignmentFlags()
+  v <- variant(object)
+  w <- round(width(v)/2, 0)
+  starts <- IRanges(start(v), width=1) + w
+  ends <- IRanges(end(v), width=1) + w
+  bins1 <- GRanges(seqnames(v), starts)
+  bins2 <- GRanges(seqnames(v), ends)
+  bins <- c(bins1, bins2)
+  ##lb <- linkedBins(object)
+  ##bins <- c(granges(lb), granges(lb$linked.to))
+  what <- c("qname", "rname", "seq", "flag",
+            "mrnm", "mpos", "mapq")
+  scan.param <- ScanBamParam(flag=flags, what=what, which=bins,
+                             mapqFilter=30)
+  rps <- getImproperAlignmentPairs(bam.file,
+                                   scan.param,
+                                   build=build)
+  rps2 <- filterPairedReads(rps, bins, param)
+  df <- .seqdataframe(rps2, MAX)
+  df$id <- rep(basename(bam.file), nrow(df))
+  ##df$rearrangement.id <- rep(names(linkedBins(object)), nrow(df))
+  number_improper <- sapply(object, function(x) length(improper(x)))
+  df$rearrangement.id <- rep(names(object), number_improper)
+  df
+}
