@@ -185,7 +185,7 @@ initializeImproperIndex3 <- function(sv, param){
 updateImproperIndex <- function(sv, maxgap=2e3){
   left_boundary <- resize(variant(sv), width=2)
   right_boundary <- resize(variant(sv), width=2, fix="end")
-  irp <- improper(sv)
+  irp <- sv@improper
   hitsLeft <- findOverlaps(left_boundary, irp, maxgap=maxgap)
   hitsRight <- findOverlaps(right_boundary, irp, maxgap=maxgap)
 
@@ -1384,6 +1384,7 @@ finalize_deletions <- function(sv, preprocess, gr_filters,
   bins <- preprocess$bins
   bam.file <- preprocess$bam.file
   sv <- SVFilters(sv, gr_filters, bins, param=param)
+  if (length(sv) == 0) return(sv)
   sv <- groupSVs(sv)
   ## requires bam file
   sv <- allProperReadPairs(sv, param,

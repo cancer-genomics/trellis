@@ -347,7 +347,7 @@ AmpliconGraph <- function(ranges=GRanges(),
              germline_cnv=germline_cnv,
              outliers=outliers)
   ## initialize query ranges
-  ampliconQueryRanges(tmp)
+  ampliconQueryRanges(tmp, min.fc = params[["LOW_THR"]])
 }
 
 trimRangesOverlappingCentromere <- function(object, centromeres){
@@ -746,7 +746,8 @@ linkAmplicons <- function(object, rp, edgeParam=FilterEdgeParam()){
   e <- e[names(e) %in% edgeFilters(e, param=edgeParam)]
   if(length(e)==0) return(object)
   tabe <- table(names(e))
-  keep <- names(tabe)[tabe >= 5]
+  keep <- names(tabe)[tabe >= edgeParam$freq]
+  if (length(keep) == 0) return(object)
   from <-  node1(keep)
   to <- node2(keep)
   existing <- edges(object)[from] ## is 'to' in any of the existing edges
@@ -1189,6 +1190,7 @@ sv_amplicons2 <- function(preprocess, amplicon_filters,
   }
   preprocess$segments <- amplified_segments(preprocess$segments, params)
   ag <- initialize_graph2(preprocess, amplicon_filters, params)
+  if (length(ag) == 0) return(ag)
   ##
   ## Requires bam file -- can not work remotely
   ##
