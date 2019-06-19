@@ -185,7 +185,7 @@ initializeImproperIndex3 <- function(sv, param){
 updateImproperIndex <- function(sv, maxgap=2e3){
   left_boundary <- resize(variant(sv), width=2)
   right_boundary <- resize(variant(sv), width=2, fix="end")
-  irp <- improper(sv)
+  irp <- sv@improper
   hitsLeft <- findOverlaps(left_boundary, irp, maxgap=maxgap)
   hitsRight <- findOverlaps(right_boundary, irp, maxgap=maxgap)
 
