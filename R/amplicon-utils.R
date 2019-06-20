@@ -178,12 +178,15 @@ gapBetweenLowCopyRanges <- function(g){
 }
 
 startAmpliconBoundary <- function(ranges, is_gap=TRUE, extend=2e3){
+  ### NOT RUN: is_gap is never specified when this function is called
+  ###          so the value defaults to TRUE
   if(!is_gap){
     candidate_amplicon <- ranges$seg.mean > 0.8 & !is.na(ranges$seg.mean)
     if(any(!candidate_amplicon)){
       start(ranges)[!candidate_amplicon] <- end(ranges)[!candidate_amplicon]
     }
   }
+  ###
   is_small <- width(ranges) < extend
   if(any(is_small)){
     small_amplicons <- ranges[is_small]
@@ -200,12 +203,15 @@ startAmpliconBoundary <- function(ranges, is_gap=TRUE, extend=2e3){
 }
 
 endAmpliconBoundary <- function(ranges, is_gap=FALSE, extend=2e3){
+  ### NOT RUN: is_gap is never specified when this function is called
+  ###          so the value defaults to TRUE
   if(!is_gap){
     candidate_amplicon <- ranges$seg.mean > 0.8 & !is.na(ranges$seg.mean)
     if(any(!candidate_amplicon)){
       start(ranges)[!candidate_amplicon]<- end(ranges)[!candidate_amplicon]
     }
   }
+  ###
   is_small <- width(ranges) < extend
   if(any(is_small)){
     small_amplicons <- ranges[is_small]
