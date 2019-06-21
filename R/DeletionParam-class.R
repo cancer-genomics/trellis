@@ -157,7 +157,7 @@ DeletionParam <- function(min_width=2e3,
       max_proportion_in_filter=max_proportion_in_filter,
       min_segmean_diff=min_segmean_diff,
       bam_seqlevels_style=bam_seqlevels_style,
-      remove_hemizygous=remove_hemizygous
+      remove_hemizygous=remove_hemizygous)
 }
 
 #' @keywords internal
