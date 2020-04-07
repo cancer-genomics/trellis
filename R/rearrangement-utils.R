@@ -1065,7 +1065,8 @@ axis_limit3p <- function(df, basepairs){
 
 #' @export
 axis_limits <- function(df, basepairs){
-  region <- NULL
+
+    region <- NULL
   df1 <- filter(df, region==levels(region)[1])
   df2 <- filter(df, region==levels(region)[2])
   xlim1 <- axis_limit5p(df1, basepairs)
@@ -1401,27 +1402,27 @@ ggRearrangeLegend <- function(){
 #'   }
 #' @export
 ggRearrange <- function(df, ylab="Read pair index",
-                         basepairs=400, num.ticks=5){
-  . <- NULL
-  grobs <- .ggRearrange(df, ylabel=ylab,  basepairs, num.ticks)
-  widths <- c(0.5, 0.5) %>%
-    "/"(sum(.)) %>%
-    unit(., "npc")
-  heights <- c(0.95, 0.05) %>%
-    "/"(sum(.)) %>%
-    unit(., "npc")
-  mat <- matrix(c(1, 2,
-                  3, 3), byrow=TRUE, ncol=2, nrow=2)
-  agrob <- grobs[["5p"]]
-  bgrob <- grobs[["3p"]]
-  legend.grob <- grobs[["legend"]]
-  gobj <- grid.arrange(agrob, bgrob,
-                       legend.grob,
-                       layout_matrix=mat,
-                       widths=widths,
-                       heights=heights)
-  list(arranged.grobs=gobj,
-       grobs=grobs)
+                        basepairs=400, num.ticks=5){
+    . <- NULL
+    grobs <- .ggRearrange(df, ylabel=ylab,  basepairs, num.ticks)
+    widths <- c(0.5, 0.5) %>%
+        "/"(sum(.)) %>%
+        unit(., "npc")
+    heights <- c(0.95, 0.05) %>%
+        "/"(sum(.)) %>%
+        unit(., "npc")
+    mat <- matrix(c(1, 2,
+                    3, 3), byrow=TRUE, ncol=2, nrow=2)
+    agrob <- grobs[["5p"]]
+    bgrob <- grobs[["3p"]]
+    legend.grob <- grobs[["legend"]]
+    gobj <- grid.arrange(agrob, bgrob,
+                         legend.grob,
+                         layout_matrix=mat,
+                         widths=widths,
+                         heights=heights)
+    list(arranged.grobs=gobj,
+         grobs=grobs)
 }
 
 

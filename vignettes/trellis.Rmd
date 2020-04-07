@@ -489,6 +489,7 @@ To visualize the improperly paired reads and the split reads supporting a rearra
 
 ```{r rearDataFrame, message=FALSE, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
 df <- rearDataFrame(rlist3[[1]], build="hg19")
+stop()
 grobs <- ggRearrange(df)
 grobs[["arranged.grobs"]]
 ```
