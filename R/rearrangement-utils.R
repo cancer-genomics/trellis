@@ -912,7 +912,7 @@ rearDataFrameList <- function(rlist, build, maxgap=5000){
   }
   ##  ix <- findOverlaps(red.sr, c(granges(bin1), granges(bin2))) %>%
   ##    subjectHits
-  hits <- findOverlaps(red.sr, c(granges(bin1), granges(bin2)))
+  hits <- findOverlaps(red.sr, c(granges(bin1), granges(bin2)), maxgap=50)
   ix <- queryHits(hits)
   red.sr <- red.sr[ix]
   names(red.sr) <- c("5p", "3p")[subjectHits(hits)]

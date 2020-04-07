@@ -1903,38 +1903,44 @@ validFusions <- function(fusion.list, cds.list, inframe.nostop, ref.frames){
   ref.5p <- ref.5p[ elementNROWS(ref.5p) > 0 ]
   ref.3p <- cds.list[["ref.3p"]][ is.valid ]
   ref.3p <- ref.3p[ elementNROWS(ref.3p) > 0 ]
-  if(!all(names(aa.5p) %in% names(cds.5p))){
-    nm <- names(aa.5p)[! names(aa.5p) %in% names(cds.5p)]
-    tmp <- cds.list[["tum.5p"]][nm]
-    is.valid <- inframe.nostop[[1]]
-    is.valid <- is.valid[[nm]]
-    if(!any(is.valid)){
-      is.valid <- inframe.nostop[[2]]
+
+  if (!all(names(aa.5p) %in% names(cds.5p))) {
+    all_nm <- names(aa.5p)[! names(aa.5p) %in% names(cds.5p)]
+    for (i in 1:length(all_nm)) {
+      nm <- all_nm[i]
+      tmp <- cds.list[["tum.5p"]][nm]
+      is.valid <- inframe.nostop[[1]]
       is.valid <- is.valid[[nm]]
+      if(!any(is.valid)){
+        is.valid <- inframe.nostop[[2]]
+        is.valid <- is.valid[[nm]]
+      }
+      if(!any(is.valid)){
+        is.valid <- inframe.nostop[[3]]
+        is.valid <- is.valid[[nm]]
+      }
+      tmp[[1]] <- tmp[[1]][ is.valid ]
+      cds.5p <- c(cds.5p, tmp)
+
+      tmp <- cds.list[["tum.3p"]][nm]
+      tmp[[1]] <- tmp[[1]][ is.valid ]
+      cds.3p <- c(cds.3p, tmp)
+
+      tmp <- cds.list[["ref.5p"]][ nm ]
+      tmp[[1]] <- tmp[[1]][ is.valid ]
+      ref.5p <- c(ref.5p, tmp)
+
+      tmp <- cds.list[["ref.3p"]][ nm ]
+      tmp[[1]] <- tmp[[1]][ is.valid ]
+      ref.3p <- c(ref.3p, tmp)
     }
-    if(!any(is.valid)){
-      is.valid <- inframe.nostop[[3]]
-      is.valid <- is.valid[[nm]]
-    }
-    tmp[[1]] <- tmp[[1]][ is.valid ]
-    cds.5p <- c(cds.5p, tmp)
+
     cds.5p <- cds.5p[ names(aa.5p) ]
-
-    tmp <- cds.list[["tum.3p"]][nm]
-    tmp[[1]] <- tmp[[1]][ is.valid ]
-    cds.3p <- c(cds.3p, tmp)
     cds.3p <- cds.3p[ names(aa.3p) ]
-
-    tmp <- cds.list[["ref.5p"]][ nm ]
-    tmp[[1]] <- tmp[[1]][ is.valid ]
-    ref.5p <- c(ref.5p, tmp)
     ref.5p <- ref.5p[ names(aa.5p) ]
-
-    tmp <- cds.list[["ref.3p"]][ nm ]
-    tmp[[1]] <- tmp[[1]][ is.valid ]
-    ref.3p <- c(ref.3p, tmp)
     ref.3p <- ref.3p[ names(aa.3p) ]
   }
+
   stopifnot(identical(lengths(cds.5p), lengths(aa.5p)))
   stopifnot(identical(lengths(cds.3p), lengths(aa.3p)))
   stopifnot(identical(lengths(ref.5p), lengths(cds.5p)))

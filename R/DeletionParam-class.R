@@ -50,11 +50,17 @@ NULL
 #'   unassembled regions, and outliers observed in a bin for 2 or more
 #'   normal samples.
 #'
+#' @slot min_segmean_diff length one numeric vector indicating how much
+#'   less the segment mean for a deletion must be relative to the median
+#'   log ratio of bins encompassed in an interval surrounding the
+#'   segment of length equal to 15 times the width of the deleted segment.    
+#'
 #' @slot bam_seqlevels_style character string indicating style of seqnames
 #'
 #' @slot tumor_purity estimated fraction of sequenced DNA that is tumor-derived
 #'
 #' @slot remove_hemizygous whether to remove "hemizygous" calls ('hemizygous+' calls are not removed).
+#'
 #'
 #' @examples
 #' DeletionParam()
@@ -72,6 +78,7 @@ setClass("DeletionParam", representation(homozygous_thr="numeric",
                                          nflanking_homozygous="integer",
                                          maxRatioObservedToExpected="numeric",
                                          max_proportion_in_filter="numeric",
+                                         min_segmean_diff="numeric",
                                          bam_seqlevels_style="character",
                                          remove_hemizygous="logical"))
 
@@ -110,6 +117,10 @@ setClass("DeletionParam", representation(homozygous_thr="numeric",
 #'   maximum proportion of a CNV that can be covered by one of the filters. The
 #'   filters are germline CNV, low mappability, low GC / unassembled regions,
 #'   and outliers observed in a bin for 2 or more normal samples.
+#' @param min_segmean_diff length one numeric vector indicating how much
+#'   less the segment mean for a deletion must be relative to the median
+#'   log ratio of bins encompassed in an interval surrounding the
+#'   segment of length equal to 15 times the width of the deleted segment.
 #' @param bam_seqlevels_style character string indicating style of seqnames
 #' @param build length-1 character vector indicating genome build (must be hg18
 #'   or hg19)
@@ -128,6 +139,7 @@ DeletionParam <- function(min_width=2e3,
                           nflanking_homozygous=5L,
                           maxRatioObservedToExpected=2L,
                           max_proportion_in_filter=0.75,
+                          min_segmean_diff = -0.5,
                           bam_seqlevels_style="UCSC",
                           remove_hemizygous=TRUE){
   new("DeletionParam",
@@ -143,6 +155,7 @@ DeletionParam <- function(min_width=2e3,
       nflanking_homozygous=nflanking_homozygous,
       maxRatioObservedToExpected=maxRatioObservedToExpected,
       max_proportion_in_filter=max_proportion_in_filter,
+      min_segmean_diff=min_segmean_diff,
       bam_seqlevels_style=bam_seqlevels_style,
       remove_hemizygous=remove_hemizygous)
 }
@@ -175,6 +188,10 @@ maximumWidth <- function(object) object@max_width
 #' @export
 maximumProportionInFilter <- function(object) object@max_proportion_in_filter
 
+#' @keywords internal
+#' @rdname DeletionParam-class
+#' @export
+minSegmeanDiff <- function(object) object@min_segmean_diff
 
 #' @keywords internal
 #' @rdname DeletionParam-class

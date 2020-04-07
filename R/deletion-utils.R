@@ -101,12 +101,12 @@ SVFilters <- function(sv, all_filters, bins, zoom.out=1, param){
 #' focal (not a small deletion embedded in a larger deletion), we (i) verify
 #' that the candidate CNV (\code{cnv}) has a mean log ratio less than the mean
 #' log ratio of the neighboring segments by an amount of approx. -0.5
-#' [log2(0.7)] and (ii) assess whether the interval could plausibly be a large
+#' [log2(0.7)] by default and (ii) assess whether the interval could plausibly be a large
 #' hemizygous deletion. Candidate somatic deletions identified by this function
 #' have the following properties: (i) not germline, (ii) unlikely to be large
 #' hemizygous deletions, (iii) the difference in mean of the segment and
-#' neighboring segments is less than -0.5, and (iv) have a width of at least
-#' 2kb.
+#' neighboring segments is less than -0.5 (by default), and (iv) have a width of at least
+#' 2kb (by default).
 #'
 #' @return a named \code{GRanges} object.  The names are given by
 #'   \code{paste0("sv", seq_along(g))} where g is the \code{GRanges}
@@ -125,32 +125,44 @@ germlineFilters <- function(preprocess, germline_filters, param=DeletionParam())
     germline_filters <- genomeFilters(preprocess$genome)
   }
   if(!is.null(germline_filters)){
+    # Creates a vector of TRUE/FALSE the same length as cnv.
+    # The value is TRUE if the cnv is not in a filtered region
+    # as specified by param$max_proportion_in_filter and param@min_width
+    # and FALSE otherwise
     not_germline <- isNotGermline(cnv, germline_filters, param)
   } else {
     ## assume for now that none of the cnvs are germline
     not_germline <- rep(TRUE, length(cnv))
   }
-  ##
-  ## For unit testing, we may not be able to evaluate the context
-  ##
-  evaluate_context <- evaluateContext(cnv, bins)
+  
+  # isLargeHemizygous returns a vector of TRUE/FALSE the same length as cnv.
+  # The value is TRUE if the width of the segment is > maximumWidth(param)
+  # and the call is hemizygous and not homozygous
   is_big <- isLargeHemizygous(cnv, param)
-  if(evaluate_context){
-    egr <- expandGRanges(cnv, 15*width(cnv))
-    fc_context <- granges_copynumber2(egr, bins)
-    fc <- 2^(cnv$seg.mean-fc_context)
-    select <- !is_big & not_germline & fc < 0.7
-  }  else{
-    select <- !is_big & not_germline
-  }
+  
+  # Computing the median log ratio in an interval surrounding each deletion
+  # that encompasses 15 times its width. To ensure that the deletion
+  # is focal, the difference between the segment mean and the context
+  # is computed and stored in diff_from_context. Deletions in which
+  # the difference from the context is not less than minSegmeanDiff(param) 
+  # are later dropped.
+  egr <- expandGRanges(cnv, 15*width(cnv))
+  lrr_context <- granges_copynumber2(egr, bins)
+  diff_from_context <- cnv$seg.mean - lrr_context
+  is_diff <- diff_from_context < minSegmeanDiff(param)
+
+  # Creating a TRUE/FALSE vector where TRUE means that the
+  # deletion is longer than the minimum deletion width as
+  # provided by minimumWidth(param)
+  not_short <- width(cnv) > minimumWidth(dp)
+
+  # Selecting deletions that pass the above 4 filters
+  select <- !is_big & not_germline & is_diff & not_short
   cnv <- cnv[select]
   if(length(cnv) == 0) {
     return(cnv)
   }
-  cnvr <- reduce(cnv)
-  K <- width(cnvr) > 2e3
-  cnvr <- cnvr[K]
-  cnv <- cnv[K]
+  
   names(cnv) <- paste0("sv", seq_along(cnv))
   cnv
 }
@@ -703,6 +715,7 @@ hemizygousBorders <- function(object, param){
 ##}
 
 .reviseEachJunction <- function(sv, bins, improper_rp, param=DeletionParam()){
+  # Refines deletion borders based on improper read pairs
   svs <- reviseDeletionBorders(sv)
   ##
   ## for the duplicated ranges, revert back to the original
@@ -710,16 +723,28 @@ hemizygousBorders <- function(object, param){
   svs[duplicated(svs)] <- variant(sv)[duplicated(svs)]
   variant(sv) <- svs
   copynumber(sv) <- granges_copynumber2(svs, bins)
+
+  # Revise homozygous deletion borders using
+  # the absence of proper read pairs (this likely only works)
+  # with 100% pure samples (e.g. cell lines)
   variant(sv) <- homozygousBorders(sv, svs)
   is.dup <- duplicated(variant(sv))
   if(any(is.dup)){
     sv <- sv[!is.dup]
   }
+
+  # In hemizygous deletions, look for gaps in proper read pairs. If there
+  # is a gap, create a homozygous deletion in the gap and add to the StructuralVariant object.
   sv <- hemizygousBorders(sv, param)
+
+  # Update the improper read pairs supporting deletions 
+  # since deletion boundaries have been updated
   irp <- improperRP(variant(sv), improper_rp, param=param)
   improper(sv) <- irp
   indexImproper(sv) <- updateImproperIndex2(variant(sv), irp, maxgap=500)
   sv <- sv[ overlapsAny(variant(sv), bins) ]
+  
+  # Update deletion calls based on the number of supporting read pairs
   calls(sv) <- rpSupportedDeletions(sv, param, bins)
   sort(sv)
 }
@@ -1339,18 +1364,42 @@ revise <- function(sv, bins, param){
 sv_deletions <- function(preprocess,
                          gr_filters,
                          param=DeletionParam()){
+
   if(missing(gr_filters)){
+    # Returns a GRanges object containing default filtered regions
+    # from the genome build in preprocess$genome
     gr_filters <- genomeFilters(preprocess$genome)
   }
+
+  # Subsetting the segments in preprocess to only include those
+  # with seg.mean less than the hemizygous threshold in param
   segs <- preprocess$segments
   preprocess$segments <- segs[segs$seg.mean < hemizygousThr(param)]
+
+  # Creating an initial StructuralVariant object. Segments in preprocess$segments
+  # with the following criteria are kept:
+  # 1) Less than 0.75 (or the value specified by param@max_proportion_in_filter) of a segment
+  #    overlaps a filtered region
+  # 2) More than 2000bp (or the value specified by param@min_width) of a segment does not 
+  #    overlap a filtered region
+  # 3) The segment is less than 2Mb in length (or the value specified by param@max_width)
+  # 4) The segment is greater than 2kb in length (or the value specified by param@min_width)
+  # 5) The segment mean is less than the median log ratios of surrounding bins by at 
+  #    least -0.5 (or the value specified by param@min_segmean_diff). This ensures that it is focal.
+  # In addition, proper and improper read pairs that are near  each deletion
+  # and stored in the StructuralVariant object
   sv <- deletion_call(preprocess, gr_filters, param)
-  ##sv <- deletion_call(bam.file, improper_rp, pview, gr, gr_filters)
-  sv <- sv[ overlapsAny(variant(sv), preprocess$bins) ]
+ 
+  # Counting the number of improper read pairs supporting deletions. If this
+  # number is greater than param@nflanking_hemizygous then homizygous is
+  # replaced with hemizygous+ and homozygous with homozygous+
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
+
   if(param@remove_hemizygous){
     sv <- removeHemizygous(sv)
   }
+
+  # Extracting improper read pairs with a high MAPQ
   improper_rp <- preprocess$read_pairs[["improper"]]
   ## avoid namespace issues with dplyr
   first <- GenomicAlignments::first
@@ -1358,20 +1407,25 @@ sv_deletions <- function(preprocess,
   mapq <- mcols(first(improper_rp))$mapq > 30 &
                                   mcols(last(improper_rp))$mapq > 30
   improper_rp <- improper_rp[mapq]
+
+
   if(length(variant(sv)) > 0){
+    # Revise deletion boundaries using improper read pairs
+    # and proper read pairs 
     sv <- reviseEachJunction(sv=sv, bins=preprocess$bins,
                              improper_rp=improper_rp,
                              param=param)
-    if(param@remove_hemizygous)
+    if(param@remove_hemizygous) {
       sv <- removeHemizygous(sv)
+    }
   }
+
   if(length(variant(sv)) > 0){
     sv <- revise(sv, bins=preprocess$bins, param=param)
     sv <- finalize_deletions(sv=sv, preprocess,
                              gr_filters=gr_filters,
                              param=param)
   }
-  ## requires bam file
   sv
 }
 
