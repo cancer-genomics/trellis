@@ -225,7 +225,7 @@ test_that("removeSameStateOverlapping2", {
                          "CGOV44T.bam")
   path <- system.file("extdata", package = "svbams")
   sv <- readRDS(file.path(path, "sv.rds"))
-}
+})
 
 
 ##
