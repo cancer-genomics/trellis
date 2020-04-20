@@ -70,6 +70,7 @@ test_that("sv_amplicons", {
   ##
   ## proposed setup.  Call sv_amplicons2 with single argument
   ##
+  skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   expect_identical(pdat$segments, segs)
   ag3 <- sv_amplicons2(pdat)
@@ -104,6 +105,7 @@ test_that("initialize_graph", {
   ag.a4d7744 <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   expect_equivalent(ag, ag.a4d7744)
   ## proposed
+  skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   pdat$segments <- amplified_segments(pdat$segments, params)
   ag2 <- initialize_graph2(pdat, ampliconFilters(pdat$genome),
@@ -119,6 +121,7 @@ test_that("add_amplicons", {
   queryRanges(ag) <- query.ranges
   expected <- ag
   ## proposed
+  skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   path <- system.file("extdata", package="svbams")
   ag <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
@@ -150,6 +153,7 @@ test_that("link_amplicons", {
   ##
   ## proposed
   ##
+  skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   improper_rp2 <- pdat$read_pairs[["improper"]]
   ag2 <- link_amplicons(ag, improper_rp2, params)
@@ -208,6 +212,7 @@ test_that("makeAGraph", {
   ##
   ## Proposed setup
   ##
+  skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   ## generates an error
   segs <- pdat$segments
