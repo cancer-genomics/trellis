@@ -5,7 +5,7 @@ Author: Rob Scharpf, Daniel Bruhm, Dorothy Hallberg, Victor Velculescu
 Maintainer: Rob Scharpf <rscharpf@jhu.edu>
 Description: Analysis of somatic structural variants from whole genome sequencing.
 Depends:
-    R (>= 3.2.0),
+    R (>= 3.6.3),
     GenomicRanges
 Imports:
     methods,
@@ -21,7 +21,7 @@ Imports:
     DNAcopy,
     matrixStats,
     utils,
-    dplyr,
+    dplyr (>= 0.8.5),
     tidyr,
     RBGL,
     magrittr,
