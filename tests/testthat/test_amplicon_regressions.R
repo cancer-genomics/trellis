@@ -121,7 +121,10 @@ test_that("add_amplicons", {
   queryRanges(ag) <- query.ranges
   expected <- ag
   ## proposed
+
   skip("Check cgov44t_preprocess example")  
+
+
   pdat <- cgov44t_preprocess()
   path <- system.file("extdata", package="svbams")
   ag <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
@@ -153,7 +156,10 @@ test_that("link_amplicons", {
   ##
   ## proposed
   ##
+
   skip("Check cgov44t_preprocess example")  
+
+
   pdat <- cgov44t_preprocess()
   improper_rp2 <- pdat$read_pairs[["improper"]]
   ag2 <- link_amplicons(ag, improper_rp2, params)
