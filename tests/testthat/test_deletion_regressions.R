@@ -7,6 +7,7 @@ expect_identical2 <- function(sv1, sv2){
 }
 
 cgov44t_preprocess <- function(){
+    data(bins1kb, package="svfilters.hg19", envir=environment())
   extdata <- system.file("extdata", package="svbams")
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
