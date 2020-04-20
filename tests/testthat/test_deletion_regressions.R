@@ -40,6 +40,7 @@ cgov44t_preprocess <- function(){
 test_that("sv_deletions", {
   library(svfilters.hg19)
   pdat <- cgov44t_preprocess()
+  dp <- DeletionParam(remove_hemizygous=FALSE)
   dels <- sv_deletions(pdat)
   if(FALSE){
     saveRDS(dels, file="sv_deletions.ba3c739.rds")
@@ -52,6 +53,7 @@ test_that("sv_deletions", {
 
 test_that("deletion_call", {
   library(svfilters.hg19)
+  
   pdat <- cgov44t_preprocess()
   result <- deletion_call(pdat)
   if(FALSE){
@@ -63,6 +65,7 @@ test_that("deletion_call", {
 })
 
 test_that("addImproperReadPairs2", {
+  
   pdat <- cgov44t_preprocess()
   improper_rp <- pdat$read_pairs[["improper"]]
   mapq <- mcols(first(improper_rp))$mapq > 30 & mcols(last(improper_rp))$mapq > 30
@@ -88,6 +91,7 @@ test_that("addImproperReadPairs2", {
 })
 
 test_that("rpSupportedDeletions", {
+  
   pdat <- cgov44t_preprocess()
   path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
@@ -120,6 +124,7 @@ test_that("rpSupportedDeletions_fails", {
 
 
 test_that("reviseEachJunction", {
+  
   pdat <- cgov44t_preprocess()
   path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
@@ -141,6 +146,7 @@ test_that("reviseEachJunction", {
 })
 
 test_that("granges_copynumber", {
+  
   pdat <- cgov44t_preprocess()
   path <- system.file("extdata", package="svbams")
   sv <- readRDS(file.path(path, "deletion_call.4adcc78.rds"))
@@ -168,6 +174,7 @@ test_that("granges_copynumber", {
 ## tests after granges_copynumber for a homozygous+ deletion
 test_that("sv_deletions2", {
   library(svfilters.hg19)
+  
   pdat <- cgov44t_preprocess()
   ## the only variant is homozygous+, so these functions are not doing anything
   path <- system.file("extdata", package="svbams")
