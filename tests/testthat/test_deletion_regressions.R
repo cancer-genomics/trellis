@@ -139,7 +139,7 @@ test_that("reviseEachJunction", {
   }
   path <- system.file("extdata", package="svbams")
   g.4adcc78 <- readRDS(file.path(path, "reviseEachJunction.4adcc78.rds"))
-  expect_identical(g.4adcc78, g)
+  expect_equivalent(g.4adcc78, g)
 })
 
 test_that("granges_copynumber", {
@@ -157,7 +157,7 @@ test_that("granges_copynumber", {
 
   ## TODO maxgap should be part of the parameters
   elementMetadata(sv@improper)$names <- names(sv@improper)
-  skip("Need help debugging GAlignments object")
+  ##skip("Need help debugging GAlignments object")
   ## S4vectors no longer allows named GAlignments
   names(sv@improper)  <- NULL
   ##trace(updateImproperIndex, browser)
@@ -198,7 +198,7 @@ test_that("germlineFilters", {
   }
   path <- system.file("extdata", package="svbams")
   cnvs.9492f3f <- readRDS(file.path(path, "germlineFilters.9492f3f.rds"))
-  expect_identical(cnv, cnvs.9492f3f)
+  expect_equivalent(cnv, cnvs.9492f3f)
 })
 
 .test_that <- function(name, expr) NULL
