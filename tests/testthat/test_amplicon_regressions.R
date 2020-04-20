@@ -420,12 +420,12 @@ test_amplicon_vignette <- function(){
   g <- segmentBins(bins, param=SegmentParam())
   ut.segs.subset <- subsetByOverlaps(ut.segs, g)
 
-  dat <- as.tibble(ut.bins) %>%
+  dat <- as_tibble(ut.bins) %>%
     filter(seqnames %in% c("chr5", "chr8")) %>%
     mutate(seqnames=factor(seqnames,
                            levels=c("chr5", "chr8"))) %>%
     filter(!is.na(log_ratio))
-  segs.dat <- as.tibble(ut.segs)
+  segs.dat <- as_tibble(ut.segs)
   ggplot(dat)  +
     geom_point(aes(start/1e6, log_ratio), size = 1, shape=".",
                col="gray") +
@@ -440,12 +440,12 @@ test_amplicon_vignette <- function(){
     xlab("")
 
   ## chr5 is one big segment
-  dat2 <- as.tibble(bins) %>%
+  dat2 <- as_tibble(bins) %>%
     filter(seqnames %in% c("chr5", "chr8")) %>%
     mutate(seqnames=factor(seqnames,
                            levels=c("chr5", "chr8"))) %>%
     filter(!is.na(log_ratio))
-  g.dat <- as.tibble(g) %>%
+  g.dat <- as_tibble(g) %>%
     filter(seqnames %in% c("chr5", "chr8"))
   ggplot(dat2)  +
     geom_point(aes(start/1e6, log_ratio), size = 1, shape=".",

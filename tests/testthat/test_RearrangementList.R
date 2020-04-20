@@ -126,6 +126,6 @@ test_that("rlist for ovarian clearcell CGOV30T1", {
                           inframe.nostop,
                           ref.frames)
   tab <- fusionTable2(fusions) %>%
-    as.tibble %>%
+    as_tibble %>%
     filter(gene.5prime != gene.3prime)
 })
