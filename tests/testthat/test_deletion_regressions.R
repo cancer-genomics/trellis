@@ -156,7 +156,11 @@ test_that("granges_copynumber", {
   expect_equal(copynumber(sv), cn)
 
   ## TODO maxgap should be part of the parameters
+  elementMetadata(sv@improper)$names <- names(sv@improper)
   skip("Need help debugging GAlignments object")
+  ## S4vectors no longer allows named GAlignments
+  names(sv@improper)  <- NULL
+  ##trace(updateImproperIndex, browser)
   index <- updateImproperIndex(sv, maxgap=500)
   if(FALSE){
     saveRDS(index, file="updateImproperIndex.4adcc78.rds")
@@ -165,7 +169,7 @@ test_that("granges_copynumber", {
   }
   path <- system.file("extdata", package="svbams")
   index.4adcc78 <- readRDS(file.path(path, "updateImproperIndex.4adcc78.rds"))
-  expect_identical(index, index.4adcc78)
+  expect_equivalent(index, index.4adcc78)
 })
 
 ## tests after granges_copynumber for a homozygous+ deletion

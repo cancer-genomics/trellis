@@ -207,12 +207,13 @@ updateImproperIndex <- function(sv, maxgap=2e3){
                        names(right_boundary)[queryHits(hitsRight)])
 
   ## concatenate indices for each element of the index list
-  index_all <- setNames(vector("list", length(sv)), names(variant(sv)))
+  index_all <- setNames(vector("list", length(sv)),
+                        names(variant(sv)))
   index_right2 <- index_left2 <- index_all
   i <- match(names(index_left), names(index_all))
   index_left2[i] <- index_left
   i <- match(names(index_right), names(index_all))
-  index_right2[i] <- index_right
+  index_right2[i] <- index_right 
   updated_index_list <- mapply(function(x,y) unique(intersect(x,y)),
                                index_left2, index_right2)
 
@@ -220,9 +221,16 @@ updateImproperIndex <- function(sv, maxgap=2e3){
   ##
   ## Assess whether there are any rearranged read pair clusters
   ## 1. order read pairs by left most alignment
-  irp_id <- lapply(updated_index_list, function(i, irp) names(irp)[i], irp=irp)
+  irp_id <- lapply(updated_index_list, function(i, irp){
+      ##names(irp)[i]
+      elementMetadata(irp)$names[i]
+  }, irp=irp)
   lrp <- leftAlwaysFirst(irp)##, names(irp)
-  lrplist <- lapply(irp_id, function(id, lrp) lrp[names(lrp) %in% id], lrp=lrp)
+  elementMetadata(lrp)$names <- elementMetadata(irp)$names
+  lrplist <- lapply(irp_id, function(id, lrp){
+      nms <- elementMetadata(lrp)$names
+      lrp[nms %in% id]
+  }, lrp=lrp)
   ## 2. cluster the read pairs for each element
   cl_list <- lapply(lrplist, clusterReadPairs)
   ## 3. identify id of cluster with most read pairs
@@ -233,13 +241,16 @@ updateImproperIndex <- function(sv, maxgap=2e3){
                     lrp=lrplist, clid=clid, cl=cl_list)
   ## Update the index a second time to include only those improper
   ## read pairs belonging to the cluster
-  index_irp <- lapply(irp_id2, function(id, irp) match(id, names(irp)), irp=irp)
+  index_irp <- lapply(irp_id2, function(id, irp) {
+      match(id, elementMetadata(irp)$names)
+  }, irp=irp)
   ## the NULLs are now converted to NAs.
   ## Subsetting a vector by NULL returns an empty vector. Convert NAs back to nulls
   na_index <- which(sapply(index_irp, function(x) any(is.na(x))))
   for(j in na_index){
-    index_irp[j] <- list(NULL)
+      index_irp[j] <- list(NULL)
   }
+  index_irp <- index_irp[order(unlist(index_irp))]
   index_irp
 }
 
@@ -1174,20 +1185,26 @@ leftHemizygousHomolog <- function(object, bins, param){
   object2
 }
 
-firstIsLeft <- function(galp) start(first(galp)) <= start(last(galp))
+firstIsLeft <- function(galp) {
+    names(galp) <- NULL
+    start(first(galp)) <= start(last(galp))
+}
 
 leftAlwaysFirst <- function(rp){
-  ##is_r1_left <- start(first(rp)) < start(last(rp))
-  is_r1_left <- firstIsLeft(rp)
-  rp2 <- GAlignmentPairs(first=c(first(rp)[is_r1_left],
-                           last(rp)[!is_r1_left]),
-                         last=c(last(rp)[is_r1_left],
-                           first(rp)[!is_r1_left]),
-                         isProperPair=rep(FALSE, length(rp)))
-  ids <- c(names(first(rp)[is_r1_left]), names(last(rp)[!is_r1_left]))
-  names(rp2) <- ids
-  rp2 <- rp2[order(start(first(rp2)))]
-  as(rp2, "LeftAlignmentPairs")
+    ##is_r1_left <- start(first(rp)) < start(last(rp))
+    is_r1_left <- firstIsLeft(rp)
+    rp2 <- GAlignmentPairs(first=c(first(rp)[is_r1_left],
+                             last(rp)[!is_r1_left]),
+                           last=c(last(rp)[is_r1_left],
+                             first(rp)[!is_r1_left]),
+                           isProperPair=rep(FALSE, length(rp)))
+    nms1 <- elementMetadata(rp)$names[is_r1_left]
+    nms2 <- elementMetadata(rp)$names[!is_r1_left]
+    ##ids <- c(names(first(rp)[is_r1_left]), names(last(rp)[!is_r1_left]))
+    ids <- c(nms1, nms2)
+    names(rp2) <- ids
+    rp2 <- rp2[order(start(first(rp2)))]
+    as(rp2, "LeftAlignmentPairs")
 }
 
 rightHemizygousHomolog <- function(object, bins, param){
