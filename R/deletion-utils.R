@@ -154,7 +154,7 @@ germlineFilters <- function(preprocess, germline_filters, param=DeletionParam())
   # Creating a TRUE/FALSE vector where TRUE means that the
   # deletion is longer than the minimum deletion width as
   # provided by minimumWidth(param)
-  not_short <- width(cnv) > minimumWidth(dp)
+  not_short <- width(cnv) > minimumWidth(param)
 
   # Selecting deletions that pass the above 4 filters
   select <- !is_big & not_germline & is_diff & not_short
