@@ -18,7 +18,7 @@ vignette: >
 
 The trellis package was developed to identify somatic structural variants in tumor-only analyses of whole genome sequencing data.  The types of somatic structural alterations identified by trellis include deletions, amplifications, intra- and inter-chromosomal rearrangements, inversions, and in-frame fusions.  High copy amplicons are linked using the mate information from read pair analyses, simplifying the interpretation of the likely drivers.  Additional packages required for this vignette are listed below, including the `r Githubpkg("rscharpf/svfilters.hg19")` package that contains various sequence filters for structural variant analyses and the `r Rpackage("svbams")` package that contains subsampled data used to illustrate various aspects of data processing.
 
-```{r packages, results="hide", message=F}
+```{r packages, results="hide", message=FALSE}
 library(Rsamtools)
 library(magrittr)
 library(Rsamtools)
@@ -300,6 +300,7 @@ am <- B1@adjMat
 net <- network(am, directed=FALSE)
 chroms <- sapply(strsplit(colnames(am), ":"), "[", 1)
 ar <- ampliconRanges(ag)
+data(transcripts, package="svfilters.hg19")
 hits <- findOverlaps(ar, transcripts, maxgap=5000)
 cancer.con <- split(transcripts$cancer_connection[subjectHits(hits)],
                     queryHits(hits))
@@ -489,7 +490,6 @@ To visualize the improperly paired reads and the split reads supporting a rearra
 
 ```{r rearDataFrame, message=FALSE, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
 df <- rearDataFrame(rlist3[[1]], build="hg19")
-stop()
 grobs <- ggRearrange(df)
 grobs[["arranged.grobs"]]
 ```
