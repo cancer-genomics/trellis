@@ -225,6 +225,7 @@ updateImproperIndex <- function(sv, maxgap=2e3){
       ##names(irp)[i]
       elementMetadata(irp)$names[i]
   }, irp=irp)
+  names(irp) <- NULL
   lrp <- leftAlwaysFirst(irp)##, names(irp)
   elementMetadata(lrp)$names <- elementMetadata(irp)$names
   lrplist <- lapply(irp_id, function(id, lrp){
