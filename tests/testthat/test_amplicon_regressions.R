@@ -29,7 +29,7 @@ cgov44t_preprocess <- function(){
 
   path <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
-  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8", "chr15")
   ##amp.gr <- segs[segs$seg.mean < ampliconParams()$AMP_THR]
   ##proper.amp <- properReadPairs(bamfile,
   ##                              gr=reduce(amp.gr, min.gapwidth=2000))
@@ -42,7 +42,6 @@ cgov44t_preprocess <- function(){
 }
 
 test_that("sv_amplicons", {
-    
   library(Rsamtools)
   library(svfilters.hg19)
   ##
@@ -50,7 +49,7 @@ test_that("sv_amplicons", {
   ##
   cv.extdata <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8", "chr15")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   params <- ampliconParams()
@@ -63,14 +62,12 @@ test_that("sv_amplicons", {
                       amplicon_filters=germline_filters,
                       params=params,
                       transcripts=tx)
-
   path <- system.file("extdata", package="svbams")
   ag.4adcc78 <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   expect_equivalent(ag.4adcc78, ag2)
   ##
   ## proposed setup.  Call sv_amplicons2 with single argument
   ##
-  skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   expect_equivalent(pdat$segments, segs)
   ag3 <- sv_amplicons2(pdat)
@@ -89,7 +86,7 @@ test_that("initialize_graph", {
   ##
   cv.extdata <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8", "chr15")
   path <- system.file("extdata", package="svbams")
   ag <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   extdata <- system.file("extdata", package="svbams")
@@ -105,7 +102,7 @@ test_that("initialize_graph", {
   ag.a4d7744 <- readRDS(file.path(path, "initialize_graph.a4d7744.rds"))
   expect_equivalent(ag, ag.a4d7744)
   ## proposed
-  skip("Check cgov44t_preprocess example")
+  ##skip("Check cgov44t_preprocess example")
   pdat <- cgov44t_preprocess()
   pdat$segments <- amplified_segments(pdat$segments, params)
   ag2 <- initialize_graph2(pdat, ampliconFilters(pdat$genome),
@@ -122,7 +119,7 @@ test_that("add_amplicons", {
   expected <- ag
   ## proposed
 
-  skip("Check cgov44t_preprocess example")  
+  ##skip("Check cgov44t_preprocess example")  
 
 
   pdat <- cgov44t_preprocess()
@@ -132,7 +129,7 @@ test_that("add_amplicons", {
   if(FALSE){
     saveRDS(ag2, file="add_amplicons.a4d7744.rds")
   }
-  expect_identical(ag2, expected)
+  expect_equivalent(ag2, expected)
 })
 
 
@@ -157,7 +154,7 @@ test_that("link_amplicons", {
   ## proposed
   ##
 
-  skip("Check cgov44t_preprocess example")  
+  ##skip("Check cgov44t_preprocess example")  
 
 
   pdat <- cgov44t_preprocess()
@@ -199,7 +196,7 @@ test_that("makeAGraph", {
   ##
   cv.extdata <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8","chr15")
   path <- system.file("extdata", package="svbams")
   ag <- readRDS(file.path(path, "setDrivers.4adcc78.rds"))
   extdata <- system.file("extdata", package="svbams")
@@ -218,7 +215,7 @@ test_that("makeAGraph", {
   ##
   ## Proposed setup
   ##
-  skip("Check cgov44t_preprocess example")  
+  ##skip("Check cgov44t_preprocess example")  
   pdat <- cgov44t_preprocess()
   ## generates an error
   segs <- pdat$segments
@@ -358,7 +355,7 @@ test_that("no germline filter", {
   ##
   cv.extdata <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(cv.extdata, "cgov44t_segments.rds"))
-  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8","chr15")
   extdata <- system.file("extdata", package="svbams")
   bview <- BamViews(bamPaths=file.path(extdata, "cgov44t_revised.bam"))
   params <- ampliconParams()
@@ -410,7 +407,7 @@ test_amplicon_vignette <- function(){
 
   path <- system.file("extdata", package="svbams")
   segs <- readRDS(file.path(path, "cgov44t_segments.rds"))
-  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8")
+  seqlevels(segs, pruning.mode="coarse") <- c("chr5", "chr8","chr15")
   ## unit test (ut) segments
   ut.segs <- segs
 
@@ -432,9 +429,9 @@ test_amplicon_vignette <- function(){
   ut.segs.subset <- subsetByOverlaps(ut.segs, g)
 
   dat <- as_tibble(ut.bins) %>%
-    filter(seqnames %in% c("chr5", "chr8")) %>%
+    filter(seqnames %in% c("chr5", "chr8", "chr15")) %>%
     mutate(seqnames=factor(seqnames,
-                           levels=c("chr5", "chr8"))) %>%
+                           levels=c("chr5", "chr8","chr15"))) %>%
     filter(!is.na(log_ratio))
   segs.dat <- as_tibble(ut.segs)
   ggplot(dat)  +
@@ -452,12 +449,12 @@ test_amplicon_vignette <- function(){
 
   ## chr5 is one big segment
   dat2 <- as_tibble(bins) %>%
-    filter(seqnames %in% c("chr5", "chr8")) %>%
+    filter(seqnames %in% c("chr5", "chr8","chr15")) %>%
     mutate(seqnames=factor(seqnames,
-                           levels=c("chr5", "chr8"))) %>%
+                           levels=c("chr5", "chr8","chr15"))) %>%
     filter(!is.na(log_ratio))
   g.dat <- as_tibble(g) %>%
-    filter(seqnames %in% c("chr5", "chr8"))
+    filter(seqnames %in% c("chr5", "chr8","chr15"))
   ggplot(dat2)  +
     geom_point(aes(start/1e6, log_ratio), size = 1, shape=".",
                col="gray") +
