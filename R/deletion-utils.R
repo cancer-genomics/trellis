@@ -154,7 +154,7 @@ germlineFilters <- function(preprocess, germline_filters, param=DeletionParam())
   # Creating a TRUE/FALSE vector where TRUE means that the
   # deletion is longer than the minimum deletion width as
   # provided by minimumWidth(param)
-  not_short <- width(cnv) > minimumWidth(dp)
+  not_short <- width(cnv) > minimumWidth(param)
 
   # Selecting deletions that pass the above 4 filters
   select <- !is_big & not_germline & is_diff & not_short
@@ -225,6 +225,7 @@ updateImproperIndex <- function(sv, maxgap=2e3){
       ##names(irp)[i]
       elementMetadata(irp)$names[i]
   }, irp=irp)
+  names(irp) <- NULL
   lrp <- leftAlwaysFirst(irp)##, names(irp)
   elementMetadata(lrp)$names <- elementMetadata(irp)$names
   lrplist <- lapply(irp_id, function(id, lrp){

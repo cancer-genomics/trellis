@@ -1,6 +1,7 @@
 context("Spit read checks")
 
 test_that("is_valid_splits", {
+  library(svfilters.hg18)
   extdata <- system.file("extdata", package="svbams")
   rlist <- readRDS(file.path(extdata, "rlist_endometrioid_project.rds"))
   if(FALSE){

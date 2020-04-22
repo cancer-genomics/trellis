@@ -206,7 +206,6 @@ test_that("germlineFilters", {
 test_that("removeSameStateOverlapping2", {
   path <- system.file("extdata", package = "svbams")
   sv <- readRDS(file.path(path, "sv.rds"))
-  skip("Need help debugging GAlignments object")
   sv2 <- removeSameStateOverlapping2(sv)
   expect_identical(length(sv2), 80L)
 })
