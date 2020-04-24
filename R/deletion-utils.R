@@ -1187,8 +1187,11 @@ leftHemizygousHomolog <- function(object, bins, param){
 }
 
 firstIsLeft <- function(galp) {
-    names(galp) <- NULL
-    start(first(galp)) <= start(last(galp))
+    if(is.null(names(galp))) {
+      return(sv)} else{
+        names(galp) <- NULL 
+        start(first(galp)) <= start(last(galp))
+      }
 }
 
 leftAlwaysFirst <- function(rp){
