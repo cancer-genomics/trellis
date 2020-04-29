@@ -114,8 +114,9 @@ setValidity("StructuralVariant", function(object){
   if(sum(elementNROWS(indexImproper(object))) > 0){
     ##i <- as.integer(unlist(indexImproper(object)))
     i <- sapply(indexImproper(object), function(x) {
-      is_null <- is.null(x)
+      is_null <- is.null(x) 
       if(is_null) return(0)
+      if(length(x) == 0) return(0)
       max(x)
     })
     maxi <- max(i)
