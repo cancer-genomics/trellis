@@ -1101,10 +1101,10 @@ findSpanningHemizygousDeletion <- function(hits, homdel, irp, object, bins, para
     seqlevels(g, pruning.mode="coarse") <- seqlevels(homdel)
     seqinfo(g) <- seqinfo(homdel)
     object2 <- addVariant2(v=g,
-                          object=object,
-                          cn=log2(1/50),
-                          cncall="homozygous",
-                          param=param)
+                           object=object,
+                           cn=log2(1/50),
+                           cncall="homozygous",
+                           param=param)
     ##
     ## The homdel is really hemizygous
     ##
@@ -1187,11 +1187,9 @@ leftHemizygousHomolog <- function(object, bins, param){
 }
 
 firstIsLeft <- function(galp) {
-    if(is.null(names(galp))) {
-      return(sv)} else{
-        names(galp) <- NULL 
-        start(first(galp)) <= start(last(galp))
-      }
+    if(!is.null(names(galp)))
+        names(galp) <- NULL
+    start(first(galp)) <= start(last(galp))
 }
 
 leftAlwaysFirst <- function(rp){
