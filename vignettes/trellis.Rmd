@@ -36,6 +36,7 @@ library(sna)
 library(kableExtra)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(TxDb.Hsapiens.UCSC.hg19.refGene)
+
 ```
 
 # Prerequisites
@@ -119,8 +120,8 @@ seqlevels(segs, pruning.mode="coarse") <- seqlevels(bins)
 The data for chromosomes 5, 8, and 15:
 
 ```{r plot, width=10, height=6, message=FALSE, echo=FALSE}
-segs.df <- as.tibble(segs)
-as.tibble(bins) %>%
+segs.df <- as_tibble(segs)
+as_tibble(bins) %>%
   filter(!is.na(log_ratio)) %>%
   ggplot  +
   geom_point(aes(start/1e6, log_ratio), shape = ".", color="gray") +
