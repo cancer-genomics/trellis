@@ -661,6 +661,7 @@ addVariant2 <- function(v, object, cn, cncall, param){
   ids <- paste0("sv", seq_along(cnvs))
   cnvs <- setNames(cnvs, ids)
   cncalls <- as.character(c(cncall, calls(object)))
+  ####get here
   cns <- as.numeric(c(cn, copynumber(object)))
   index_proper <- setNames(c(indexProper(svtmp), indexProper(object)), ids)
   index_improper <- setNames(c(indexImproper(svtmp), indexImproper(object)), ids)
@@ -775,6 +776,7 @@ adjudicateHemizygousOverlap2 <- function(object){
   if(!any(hemi1_or_hemi2)) return(object)
   g <- variant(object)
   if(length(g) < 2) return(object)
+  ####issue returning the seg.mean that's higher when calling duplicated
   is.duplicated <- duplicated(g)
   if(any(is.duplicated)){
     object <- removeDuplicateIntervals(g, object)
@@ -1015,6 +1017,7 @@ removeSameStateOverlapping2 <- function(sv){
   is.homdel <- cncalls == "homozygous"
   sv.homdel <- sv[is.homdel]
   sv.hemdel <- sv[!is.homdel]
+  ####prioritize one sv over other
   sv.hemdel <- adjudicateHemizygousOverlap2(sv.hemdel)
   sv.homdel <- adjudicateHomozygousOverlap2(sv.homdel)
   sv <- combine(sv.hemdel, sv.homdel)
@@ -1233,6 +1236,8 @@ rightHemizygousHomolog <- function(object, bins, param){
       ## object is stable.  object2 is not!
       ##
       homdel <- variant(object)[names(hitlist)[k]]
+      ####
+      
       object2 <- findSpanningHemizygousDeletion(hits=hitlist[[k]],
                                                 homdel=homdel,
                                                 irp=irp,
@@ -1344,6 +1349,7 @@ revise <- function(sv, bins, param){
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins)
   indexImproper(sv) <- updateImproperIndex(sv, maxgap=500)
   calls(sv) <- rpSupportedDeletions(sv, param, bins)
+  ####Here we add a granges object that wasn't present before 
   sv2 <- rightHemizygousHomolog(sv, bins, param)
   sv3 <- leftHemizygousHomolog(sv2, bins, param)
   ##sv3 <- rightHemizygousHomolog(sv2, bins, param)
@@ -1351,6 +1357,7 @@ revise <- function(sv, bins, param){
   message("Refining homozygous boundaries by spanning hemizygous+")
   sv5 <- refineHomozygousBoundaryByHemizygousPlus(sv3)
   sv6 <- callOverlappingHemizygous(sv5)
+  ####where we lose the -8 chr15 segment
   sv7 <- removeSameStateOverlapping2(sv6) 
   sv7
 }
@@ -1440,6 +1447,7 @@ sv_deletions <- function(preprocess,
   }
 
   if(length(variant(sv)) > 0){
+    ####Here we change the numeric seg.mean of Granges sv4 from -8.6549 to 0.925531
     sv <- revise(sv, bins=preprocess$bins, param=param)
     sv <- finalize_deletions(sv=sv, preprocess,
                              gr_filters=gr_filters,
