@@ -323,6 +323,7 @@ updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   ## 1. order read pairs by left most alignment
   irp_id <- lapply(updated_index_list, function(i, irp) names(irp)[i], irp=irp)
   lrp <- leftAlwaysFirst(irp) ##, names(irp)
+  names(lrp) <- names(irp)
   lrplist <- lapply(irp_id, function(id, lrp) lrp[names(lrp) %in% id], lrp=lrp)
   ## 2. cluster the read pairs for each element
   cl_list <- lapply(lrplist, clusterReadPairs)
@@ -727,38 +728,38 @@ hemizygousBorders <- function(object, param){
 ##}
 
 .reviseEachJunction <- function(sv, bins, improper_rp, param=DeletionParam()){
-  # Refines deletion borders based on improper read pairs
-  svs <- reviseDeletionBorders(sv)
-  ##
-  ## for the duplicated ranges, revert back to the original
-  ##
-  svs[duplicated(svs)] <- variant(sv)[duplicated(svs)]
-  variant(sv) <- svs
-  copynumber(sv) <- granges_copynumber2(svs, bins)
+    ## Refines deletion borders based on improper read pairs
+    svs <- reviseDeletionBorders(sv)
+    ##
+    ## for the duplicated ranges, revert back to the original
+    ##
+    svs[duplicated(svs)] <- variant(sv)[duplicated(svs)]
+    variant(sv) <- svs
+    copynumber(sv) <- granges_copynumber2(svs, bins)
 
-  # Revise homozygous deletion borders using
-  # the absence of proper read pairs (this likely only works)
-  # with 100% pure samples (e.g. cell lines)
-  variant(sv) <- homozygousBorders(sv, svs)
-  is.dup <- duplicated(variant(sv))
-  if(any(is.dup)){
-    sv <- sv[!is.dup]
-  }
+    # Revise homozygous deletion borders using
+    # the absence of proper read pairs (this likely only works)
+    # with 100% pure samples (e.g. cell lines)
+    variant(sv) <- homozygousBorders(sv, svs)
+    is.dup <- duplicated(variant(sv))
+    if(any(is.dup)){
+      sv <- sv[!is.dup]
+    }
 
-  # In hemizygous deletions, look for gaps in proper read pairs. If there
-  # is a gap, create a homozygous deletion in the gap and add to the StructuralVariant object.
-  sv <- hemizygousBorders(sv, param)
+    # In hemizygous deletions, look for gaps in proper read pairs. If there
+    # is a gap, create a homozygous deletion in the gap and add to the StructuralVariant object.
+    sv <- hemizygousBorders(sv, param)
 
-  # Update the improper read pairs supporting deletions 
-  # since deletion boundaries have been updated
-  irp <- improperRP(variant(sv), improper_rp, param=param)
-  improper(sv) <- irp
-  indexImproper(sv) <- updateImproperIndex2(variant(sv), irp, maxgap=500)
-  sv <- sv[ overlapsAny(variant(sv), bins) ]
-  
-  # Update deletion calls based on the number of supporting read pairs
-  calls(sv) <- rpSupportedDeletions(sv, param, bins)
-  sort(sv)
+    # Update the improper read pairs supporting deletions 
+    # since deletion boundaries have been updated
+    irp <- improperRP(variant(sv), improper_rp, param=param)
+    improper(sv) <- irp
+    indexImproper(sv) <- updateImproperIndex2(variant(sv), irp, maxgap=500)
+    sv <- sv[ overlapsAny(variant(sv), bins) ]
+
+    # Update deletion calls based on the number of supporting read pairs
+    calls(sv) <- rpSupportedDeletions(sv, param, bins)
+    sort(sv)
 }
 
 removeDuplicateIntervals <- function(g, object){
