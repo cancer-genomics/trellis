@@ -166,8 +166,10 @@ pdata <- preprocessData(bam.file=bamfile,
 The `sv_deletions` function creates an object of class `StructuralVariant` that contains the deletion classification of each segment.  Possible classifications include homozygous deletion (`homozygous`), homozygous deletion supported by improperly paired reads (`homozygous+`), hemizygous deletion (`hemizygous`), and hemizygous deletion supported by improperly paired reads (`hemizygous+`). For identifying somatic deletions without a matched normal, we typically exclude hemizygous deletions not supported by improperly paired reads.  <!-- With this toy dataset, we identify 16 possible homozygous deletions and the calls are both `homozygous` except one which is `homozygous+`.  -->
 
 ```{r sv_deletions}
-temp <- list(pdata=pdata, dp=dp)
-saveRDS(temp, file="../tests/testthat/temp.rds")
+if(FALSE){
+    temp <- list(pdata=pdata, dp=dp)
+    saveRDS(temp, file="../tests/testthat/temp.rds")
+}
 deletions <- sv_deletions(preprocess=pdata, param=dp)
 variant(deletions)
 calls(deletions)

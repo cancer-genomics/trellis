@@ -124,7 +124,7 @@ test_that("step .reviseEachJunction", {
     ##
 })
 
-test_that("step updateImproperIndex2"){
+test_that("step updateImproperIndex2", {
     tmp <- readRDS("temp_updateImproperIndex2_args.rds")
     gr <- tmp$gr
     irp <- tmp$irp
