@@ -62,10 +62,9 @@ test_that("step sv_deletion", {
 })
 
 test_that("step .reviseEachJunction", {
-    tmp  <- readRDS("temp.rds")
-    preprocess <- tmp$pdata
+    preprocess  <- readRDS("tmp_pdata.rds")
+    param <- readRDS("tmp_dp.rds")
     bins <- preprocess$bins
-    param <- tmp$dp    
     rej_args  <- readRDS("temp_reviseEachJunction_args.rds")
     sv <- rej_args$sv
     improper_rp <- rej_args$improper_rp
