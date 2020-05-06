@@ -2,10 +2,8 @@ context("vignette")
 
 ## Create a unit test that will fail
 test_that("vignette deletion", {
-    tmp  <- readRDS("temp.rds")
-    names(tmp)
-    pdata <- tmp$pdata
-    dp <- tmp$dp
+    pdata  <- readRDS("tmp_pdata.rds")
+    dp <- readRDS("tmp_dp.rds")
     deletions <- sv_deletions(preprocess=pdata, param=dp)
     L <- length(variant(deletions))
     expect_identical(L, 4L)
