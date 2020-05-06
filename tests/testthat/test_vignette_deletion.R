@@ -11,9 +11,8 @@ test_that("vignette deletion", {
 
 
 test_that("step sv_deletion", {
-    tmp  <- readRDS("temp.rds")
-    preprocess <- tmp$pdata
-    param <- tmp$dp
+    preprocess  <- readRDS("tmp_pdata.rds")
+    param <- readRDS("tmp_dp.rds")
     gr_filters <- genomeFilters(preprocess$genome)
     segs <- preprocess$segments
     preprocess$segments <- segs[segs$seg.mean < hemizygousThr(param)]
