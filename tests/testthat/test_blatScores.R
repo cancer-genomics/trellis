@@ -83,7 +83,7 @@ test_that("blatScores", {
   tmp$match <- rep(10, length(qnames))
   sblat4 <- rbind(sblat, tmp)
   stags4 <- stags
-  stags4$seqnames=rep("chrX", 10)
+  stags4$seqnames=rep("chrX", 20)
   blat <- annotateBlatRecords(sblat4, stags4)
   s4 <- blatScores(blat, stags4, "SOME_ID")
  expect_true(!any(s4$passQC))
