@@ -84,6 +84,11 @@ test_that("step .reviseEachJunction", {
     ## note, the improper<- assignment method only adds improper read pairs near the candidate deletions
     ## -- this is reasonable
     length(improper(sv2)) < length(improper_rp)
+    ROI <- GRanges("chr15", IRanges(63201001, 63209262),
+                   seg.mean=-8.6549, sample="CGOV44T")
+    seqlevels(ROI) <- seqlevels(variant(sv))
+    seqinfo(ROI) <- seqinfo(variant(sv))
+    names(ROI) <- "sv4"
     irp_near_deletion <- subsetByOverlaps(improper(sv2), ROI, maxgap=1e3)
     expect_identical(length(irp_near_deletion), 55L)
     ##
