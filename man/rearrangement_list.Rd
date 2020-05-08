@@ -5,7 +5,11 @@
 \alias{rearrangement_list}
 \alias{rlist}
 \title{An example RearrangementList object}
-\format{a \code{RearrangementList} object}
+\format{
+a \code{RearrangementList} object
+
+a \code{RearrangementList} object
+}
 \description{
 A \code{RearrangementList} object contains genomic intervals that
 are linked by improper read pairs where both reads were mapped.  In

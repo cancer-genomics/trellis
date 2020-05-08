@@ -25,9 +25,12 @@ name.left(object)
 
 name.right(object)
 
-ExonSubset(name.left = character(),
-  inRearrangement.left = LogicalList(), name.right = character(),
-  inRearrangement.right = LogicalList())
+ExonSubset(
+  name.left = character(),
+  inRearrangement.left = LogicalList(),
+  name.right = character(),
+  inRearrangement.right = LogicalList()
+)
 
 \S4method{name.left}{ExonSubset}(object)
 

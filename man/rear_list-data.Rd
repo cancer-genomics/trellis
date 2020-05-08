@@ -5,7 +5,9 @@
 \alias{rear_list-data}
 \alias{rear_list}
 \title{An example RearrangementList}
-\format{a \code{RearrangementList}}
+\format{
+a \code{RearrangementList}
+}
 \usage{
 data(rear_list)
 }

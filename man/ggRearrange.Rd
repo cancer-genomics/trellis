@@ -4,8 +4,7 @@
 \alias{ggRearrange}
 \title{ggplot wrapper for plotting reads supporting a rearrangement}
 \usage{
-ggRearrange(df, ylab = "Read pair index", basepairs = 400,
-  num.ticks = 5)
+ggRearrange(df, ylab = "Read pair index", basepairs = 400, num.ticks = 5)
 }
 \arguments{
 \item{df}{a \code{data.frame} as created by \code{rearDataFrame}}

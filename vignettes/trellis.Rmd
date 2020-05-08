@@ -18,7 +18,7 @@ vignette: >
 
 The trellis package was developed to identify somatic structural variants in tumor-only analyses of whole genome sequencing data.  The types of somatic structural alterations identified by trellis include deletions, amplifications, intra- and inter-chromosomal rearrangements, inversions, and in-frame fusions.  High copy amplicons are linked using the mate information from read pair analyses, simplifying the interpretation of the likely drivers.  Additional packages required for this vignette are listed below, including the `r Githubpkg("rscharpf/svfilters.hg19")` package that contains various sequence filters for structural variant analyses and the `r Rpackage("svbams")` package that contains subsampled data used to illustrate various aspects of data processing.
 
-```{r packages, results="hide", message=F}
+```{r packages, results="hide", message=FALSE}
 library(Rsamtools)
 library(magrittr)
 library(Rsamtools)
@@ -36,6 +36,7 @@ library(sna)
 library(kableExtra)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(TxDb.Hsapiens.UCSC.hg19.refGene)
+
 ```
 
 # Prerequisites
@@ -119,8 +120,8 @@ seqlevels(segs, pruning.mode="coarse") <- seqlevels(bins)
 The data for chromosomes 5, 8, and 15:
 
 ```{r plot, width=10, height=6, message=FALSE, echo=FALSE}
-segs.df <- as.tibble(segs)
-as.tibble(bins) %>%
+segs.df <- as_tibble(segs)
+as_tibble(bins) %>%
   filter(!is.na(log_ratio)) %>%
   ggplot  +
   geom_point(aes(start/1e6, log_ratio), shape = ".", color="gray") +
@@ -165,6 +166,10 @@ pdata <- preprocessData(bam.file=bamfile,
 The `sv_deletions` function creates an object of class `StructuralVariant` that contains the deletion classification of each segment.  Possible classifications include homozygous deletion (`homozygous`), homozygous deletion supported by improperly paired reads (`homozygous+`), hemizygous deletion (`hemizygous`), and hemizygous deletion supported by improperly paired reads (`hemizygous+`). For identifying somatic deletions without a matched normal, we typically exclude hemizygous deletions not supported by improperly paired reads.  <!-- With this toy dataset, we identify 16 possible homozygous deletions and the calls are both `homozygous` except one which is `homozygous+`.  -->
 
 ```{r sv_deletions}
+if(FALSE){
+    temp <- list(pdata=pdata, dp=dp)
+    saveRDS(temp, file="../tests/testthat/temp.rds")
+}
 deletions <- sv_deletions(preprocess=pdata, param=dp)
 variant(deletions)
 calls(deletions)
@@ -300,6 +305,7 @@ am <- B1@adjMat
 net <- network(am, directed=FALSE)
 chroms <- sapply(strsplit(colnames(am), ":"), "[", 1)
 ar <- ampliconRanges(ag)
+data(transcripts, package="svfilters.hg19")
 hits <- findOverlaps(ar, transcripts, maxgap=5000)
 cancer.con <- split(transcripts$cancer_connection[subjectHits(hits)],
                     queryHits(hits))
@@ -489,7 +495,6 @@ To visualize the improperly paired reads and the split reads supporting a rearra
 
 ```{r rearDataFrame, message=FALSE, fig.cap="Discordant read pairs and split reads supporting a rearrangement.  For the discordant read pairs, the data structure we adopted is a `GAlignmentPairs` object where the 5-prime reads are accessed by the method `first` and the 3-prime reads are accessed by the method `last`."}
 df <- rearDataFrame(rlist3[[1]], build="hg19")
-stop()
 grobs <- ggRearrange(df)
 grobs[["arranged.grobs"]]
 ```

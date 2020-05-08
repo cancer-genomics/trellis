@@ -18,8 +18,7 @@ undo.splits(x)
 
 undo.SD(x)
 
-SegmentParam(alpha = 0.001, undo.splits = "sdundo", undo.SD = 2,
-  verbose = 0)
+SegmentParam(alpha = 0.001, undo.splits = "sdundo", undo.SD = 2, verbose = 0)
 
 \S4method{cbs_alpha}{SegmentParam}(x)
 

@@ -4,8 +4,10 @@
 \name{deletions}
 \alias{deletions}
 \title{A deletions object of class StructuralVariant}
-\format{a \code{StructuralVariant} object containing several
-  deletions.}
+\format{
+a \code{StructuralVariant} object containing several
+  deletions.
+}
 \usage{
 data(deletions)
 }

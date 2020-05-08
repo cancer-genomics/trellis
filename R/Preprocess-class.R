@@ -78,7 +78,7 @@ PreprocessViews2 <- function(object){ ## A BamViews object
 #' @param x a \code{PreprocessViews2} object
 #' @param ... ignored
 #' @param withDimnames ignored
-setMethod("assays", "PreprocessViews2", function(x, ..., withDimnames=FALSE){
+setMethod("assays", "PreprocessViews2", function(x, withDimnames=TRUE, ...){
   result <- matrix(NA, nrow(x), ncol(x))
   for(j in seq_len(ncol(x))){
     result[, j] <- readRDS(paths(x)[j])[indexRanges(x)]

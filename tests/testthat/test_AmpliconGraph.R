@@ -10,7 +10,7 @@ test_that("AmpliconGraph", {
   library(rtracklayer)
   library(graph)
   data(germline_filters, package="svfilters.hg19")
-  data(transcripts, package="svfilters.hg9")
+  data(transcripts, package="svfilters.hg19")
   ##
   ## read in some CNVs
   ##

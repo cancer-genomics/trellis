@@ -32,10 +32,15 @@ minGapWidth(object)
 
 percentModalType(object)
 
-RearrangementParams(rp_separation = 10000,
-  min_number_tags_per_cluster = 5, min_cluster_size = 115L,
-  max_cluster_size = 5000L, min.gapwidth = 1000L,
-  percent_modal_type = 0.9, percent_linking = 0.8)
+RearrangementParams(
+  rp_separation = 10000,
+  min_number_tags_per_cluster = 5,
+  min_cluster_size = 115L,
+  max_cluster_size = 5000L,
+  min.gapwidth = 1000L,
+  percent_modal_type = 0.9,
+  percent_linking = 0.8
+)
 
 \S4method{rpSeparation}{RearrangementParams}(object)
 
@@ -51,10 +56,15 @@ RearrangementParams(rp_separation = 10000,
 
 percentLinking(object)
 
-RearrangementParams(rp_separation = 10000,
-  min_number_tags_per_cluster = 5, min_cluster_size = 115L,
-  max_cluster_size = 5000L, min.gapwidth = 1000L,
-  percent_modal_type = 0.9, percent_linking = 0.8)
+RearrangementParams(
+  rp_separation = 10000,
+  min_number_tags_per_cluster = 5,
+  min_cluster_size = 115L,
+  max_cluster_size = 5000L,
+  min.gapwidth = 1000L,
+  percent_modal_type = 0.9,
+  percent_linking = 0.8
+)
 
 rpSeparation(object)
 
@@ -107,31 +117,6 @@ of reads that must agree with the modal rearrangement type}
 \item{percent_linking}{length-one numeric vector; two linked tag
 clusters must be linked by at least this percentage of reads. See
 details}
-
-\item{rp_separation}{length-one numeric vector indicating minimum
-separation of the first and last read of a pair}
-
-\item{min_number_tags_per_cluster}{length-one numeric vector
-indicating the minimum number of reads in a cluster and the
-minimum number of reads required to link two clusters}
-
-\item{min_cluster_size}{length-one numeric vector; the minimum size
-of a cluster of reads}
-
-\item{max_cluster_size}{length-one numeric vector; the maximum size
-of a cluster of reads}
-
-\item{min.gapwidth}{length-one numeric vector; reads with at most
-min.gapwidth separation between them are considered overlapping.}
-
-\item{percent_modal_type}{length-one numeric vector; the percentage
-of reads that must agree with the modal rearrangement type}
-
-\item{percent_linking}{length-one numeric vector; two linked tag
-clusters must be linked by at least this percentage of reads. See
-details}
-
-\item{object}{a \code{RearrangementParams} object}
 }
 \description{
 Some details about why we look for linked tag clusters.

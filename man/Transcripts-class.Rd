@@ -17,8 +17,13 @@
 \usage{
 identifier(object)
 
-Transcripts(tA = GRangesList(), tB = GRangesList(),
-  tC = GRangesList(), tD = GRangesList(), id = character())
+Transcripts(
+  tA = GRangesList(),
+  tB = GRangesList(),
+  tC = GRangesList(),
+  tD = GRangesList(),
+  id = character()
+)
 
 \S4method{identifier}{Transcripts}(object)
 

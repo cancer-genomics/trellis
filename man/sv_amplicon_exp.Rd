@@ -4,8 +4,14 @@
 \alias{sv_amplicon_exp}
 \title{Identify somatic amplicons and grouped amplicons}
 \usage{
-sv_amplicon_exp(dirs, bviews, grl, amplicon_filters,
-  params = ampliconParams(), transcripts)
+sv_amplicon_exp(
+  dirs,
+  bviews,
+  grl,
+  amplicon_filters,
+  params = ampliconParams(),
+  transcripts
+)
 }
 \arguments{
 \item{dirs}{character-vector of file paths for storing intermediate

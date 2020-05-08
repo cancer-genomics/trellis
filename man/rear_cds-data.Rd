@@ -5,7 +5,9 @@
 \alias{rear_cds-data}
 \alias{rear_cds}
 \title{An example Transcripts object}
-\format{a \code{Transcripts} object}
+\format{
+a \code{Transcripts} object
+}
 \usage{
 data(rear_cds)
 }

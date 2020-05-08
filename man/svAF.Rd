@@ -7,9 +7,19 @@ Given a set of genomic coordinates this function identifies heterozygous positio
 given by \code{normalBam} and retuns the minor allele frequency at these positions in a bam file
 specified by \code{tumorBam}.}
 \usage{
-svAF(normalBam, tumorBam, genome, positions, region, n = 50000,
-  minCovNormal = 20, minCovTumor = 20, minMafNormal = 0.3,
-  minMafTumor = 0, min_base_quality = 0)
+svAF(
+  normalBam,
+  tumorBam,
+  genome,
+  positions,
+  region,
+  n = 50000,
+  minCovNormal = 20,
+  minCovTumor = 20,
+  minMafNormal = 0.3,
+  minMafTumor = 0,
+  min_base_quality = 0
+)
 }
 \arguments{
 \item{normalBam}{The path to a bam file}

@@ -23,9 +23,7 @@
 #' @importClassesFrom GenomicAlignments GAlignmentPairs
 #' @importMethodsFrom GenomicAlignments first last readGAlignments
 #' @import GenomicRanges
-#' @importClassesFrom SummarizedExperiment RangedSummarizedExperiment
-#' @importMethodsFrom SummarizedExperiment SummarizedExperiment assays rowRanges
-#' @importMethodsFrom SummarizedExperiment rowRanges<- colData colData<- assays<-
+#' @import SummarizedExperiment
 #' @importFrom matrixStats rowMedians rowMins
 #' @importFrom graph graphNEL
 #' @importMethodsFrom graph numNodes numEdges nodes addNode addEdge edges edgeNames

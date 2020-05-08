@@ -11,11 +11,17 @@ improperAlignmentFlags()
 
 properAlignmentFlags()
 
-improperAlignmentParams(flag = improperAlignmentFlags(),
-  what = c("flag", "mrnm", "mpos", "mapq", "qname"), ...)
+improperAlignmentParams(
+  flag = improperAlignmentFlags(),
+  what = c("flag", "mrnm", "mpos", "mapq", "qname"),
+  ...
+)
 
-properAlignmentParams(flag = properAlignmentFlags(), what = c("flag",
-  "mrnm", "mpos", "mapq"), ...)
+properAlignmentParams(
+  flag = properAlignmentFlags(),
+  what = c("flag", "mrnm", "mpos", "mapq"),
+  ...
+)
 }
 \arguments{
 \item{flag}{A length-two integer vector as provided by \code{improperAlignmentFlags}}

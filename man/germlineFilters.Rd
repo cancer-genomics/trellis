@@ -31,12 +31,12 @@ artifacts (low mappability and/or GC). To help ensure that the deletion is
 focal (not a small deletion embedded in a larger deletion), we (i) verify
 that the candidate CNV (\code{cnv}) has a mean log ratio less than the mean
 log ratio of the neighboring segments by an amount of approx. -0.5
-[log2(0.7)] and (ii) assess whether the interval could plausibly be a large
+[log2(0.7)] by default and (ii) assess whether the interval could plausibly be a large
 hemizygous deletion. Candidate somatic deletions identified by this function
 have the following properties: (i) not germline, (ii) unlikely to be large
 hemizygous deletions, (iii) the difference in mean of the segment and
-neighboring segments is less than -0.5, and (iv) have a width of at least
-2kb.
+neighboring segments is less than -0.5 (by default), and (iv) have a width of at least
+2kb (by default).
 }
 \seealso{
 \code{\link{preprocessData}}

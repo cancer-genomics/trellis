@@ -7,6 +7,7 @@ expect_identical2 <- function(sv1, sv2){
 }
 
 cgov44t_preprocess <- function(){
+    data(bins1kb, package="svfilters.hg19", envir=environment())
   extdata <- system.file("extdata", package="svbams")
   id <- "cgov44t_revised.bam"
   bamfile <- file.path(extdata, id)
@@ -40,6 +41,7 @@ cgov44t_preprocess <- function(){
 test_that("sv_deletions", {
   library(svfilters.hg19)
   pdat <- cgov44t_preprocess()
+  dp <- DeletionParam(remove_hemizygous=FALSE)
   dels <- sv_deletions(pdat)
   if(FALSE){
     saveRDS(dels, file="sv_deletions.ba3c739.rds")
@@ -137,7 +139,7 @@ test_that("reviseEachJunction", {
   }
   path <- system.file("extdata", package="svbams")
   g.4adcc78 <- readRDS(file.path(path, "reviseEachJunction.4adcc78.rds"))
-  expect_identical(g.4adcc78, g)
+  expect_equivalent(g.4adcc78, g)
 })
 
 test_that("granges_copynumber", {
@@ -154,7 +156,12 @@ test_that("granges_copynumber", {
   expect_equal(copynumber(sv), cn)
 
   ## TODO maxgap should be part of the parameters
-  index <- updateImproperIndex (sv, maxgap=500)
+  elementMetadata(sv@improper)$names <- names(sv@improper)
+  ##skip("Need help debugging GAlignments object")
+  ## S4vectors no longer allows named GAlignments
+  names(sv@improper)  <- NULL
+  ##trace(updateImproperIndex, browser)
+  index <- updateImproperIndex(sv, maxgap=500)
   if(FALSE){
     saveRDS(index, file="updateImproperIndex.4adcc78.rds")
     indexImproper(sv) <- index
@@ -162,7 +169,7 @@ test_that("granges_copynumber", {
   }
   path <- system.file("extdata", package="svbams")
   index.4adcc78 <- readRDS(file.path(path, "updateImproperIndex.4adcc78.rds"))
-  expect_identical(index, index.4adcc78)
+  expect_equivalent(index, index.4adcc78)
 })
 
 ## tests after granges_copynumber for a homozygous+ deletion
@@ -191,7 +198,7 @@ test_that("germlineFilters", {
   }
   path <- system.file("extdata", package="svbams")
   cnvs.9492f3f <- readRDS(file.path(path, "germlineFilters.9492f3f.rds"))
-  expect_identical(cnv, cnvs.9492f3f)
+  expect_equivalent(cnv, cnvs.9492f3f)
 })
 
 .test_that <- function(name, expr) NULL
@@ -225,7 +232,7 @@ test_that("removeSameStateOverlapping2", {
                          "CGOV44T.bam")
   path <- system.file("extdata", package = "svbams")
   sv <- readRDS(file.path(path, "sv.rds"))
-}
+})
 
 
 ##

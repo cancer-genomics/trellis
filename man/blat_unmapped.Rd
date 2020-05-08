@@ -4,7 +4,9 @@
 \name{blat_unmapped}
 \alias{blat_unmapped}
 \title{BLAT alignment of reads that were unmapped by ELAND}
-\format{a \code{data.frame} of blat records}
+\format{
+a \code{data.frame} of blat records
+}
 \description{
 This is a subset of reads that were involved in an unmapped-mapped
 pair.  The mapped reads were near a rearrangement supported by

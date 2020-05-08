@@ -4,8 +4,7 @@
 \alias{getImproperAlignmentPairs}
 \title{Extract all improperly paired reads from a bam file as a GAlignmentPairs object}
 \usage{
-getImproperAlignmentPairs(bam.file, param = improperAlignmentParams(),
-  build)
+getImproperAlignmentPairs(bam.file, param = improperAlignmentParams(), build)
 }
 \arguments{
 \item{bam.file}{complete path to BAM file}

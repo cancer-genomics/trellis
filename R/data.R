@@ -140,7 +140,6 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name rear_cgov7t
-#' @name rear_cgov7t
 #' @usage data(rear_cgov7t)
 #' @aliases rear_cgov7t
 #' @format a \code{RearrangementList} object
