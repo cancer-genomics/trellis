@@ -2,8 +2,14 @@ context("vignette")
 
 ## Create a unit test that will fail
 test_that("vignette deletion", {
-    pdata  <- readRDS("tmp_pdata.rds")
-    dp <- readRDS("tmp_dp.rds")
+    tmp  <- readRDS("temp.rds")
+    names(tmp)
+    pdata <- tmp$pdata
+    pdata
+    extdata <- system.file("extdata", package="svbams")
+    bamfile <- file.path(extdata, "cgov44t_revised.bam")
+    pdata$bam.file <- bamfile
+    dp <- tmp$dp
     deletions <- sv_deletions(preprocess=pdata, param=dp)
     L <- length(variant(deletions))
     expect_identical(L, 4L)
@@ -11,8 +17,9 @@ test_that("vignette deletion", {
 
 
 test_that("step sv_deletion", {
-    preprocess  <- readRDS("tmp_pdata.rds")
-    param <- readRDS("tmp_dp.rds")
+    tmp  <- readRDS("temp.rds")
+    preprocess <- tmp$pdata
+    param <- tmp$dp
     gr_filters <- genomeFilters(preprocess$genome)
     segs <- preprocess$segments
     preprocess$segments <- segs[segs$seg.mean < hemizygousThr(param)]
@@ -62,9 +69,10 @@ test_that("step sv_deletion", {
 })
 
 test_that("step .reviseEachJunction", {
-    preprocess  <- readRDS("tmp_pdata.rds")
-    param <- readRDS("tmp_dp.rds")
+    tmp  <- readRDS("temp.rds")
+    preprocess <- tmp$pdata
     bins <- preprocess$bins
+    param <- tmp$dp   
     rej_args  <- readRDS("temp_reviseEachJunction_args.rds")
     sv <- rej_args$sv
     improper_rp <- rej_args$improper_rp
