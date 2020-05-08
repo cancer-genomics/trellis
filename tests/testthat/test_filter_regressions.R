@@ -59,7 +59,7 @@ test_that("filterRearrangementList", {
                             filters=rf)
   expect_is(rdat, "list")
   rlist3 <- filterRear(rdat, params=rparams)
-  expect_identical(rlist3, expected)
+  expect_equivalent(rlist3, expected)
 })
 
 ## this should be tested in svalignments
