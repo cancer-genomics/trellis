@@ -68,5 +68,5 @@ test_that("modalRearrangement", {
   colData(candidate.list)$percent_rearrangement <- percentRearrangement(candidate.list)
   path <- system.file("extdata", package="svbams")
   rlist.fe9b1f6 <- readRDS(file.path(path, "findCandidates.fe9b1f6.rds"))
-  expect_identical(candidate.list, rlist.fe9b1f6)
+  expect_equivalent(candidate.list, rlist.fe9b1f6)
 })
