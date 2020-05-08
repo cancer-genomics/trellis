@@ -42,11 +42,10 @@ TranscriptsFusion(object, fusions = list())
 
 \S4method{numberFusions}{TranscriptsFusion}(object)
 
-\S4method{[}{TranscriptsFusion,ExonSubset,ANY,ANY}(x, i, j, ...,
-  drop = FALSE)
+\S4method{[}{TranscriptsFusion,ExonSubset,ANY,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
-\item{value}{a \code{GRanges} object}
+\item{value}{character string}
 
 \item{x}{a \code{TranscriptsFusion} object}
 
@@ -57,8 +56,6 @@ TranscriptsFusion(object, fusions = list())
 \item{...}{ignored}
 
 \item{drop}{ignored}
-
-\item{value}{character string}
 }
 \value{
 a \code{ClippedTranscripts} object

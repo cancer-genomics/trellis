@@ -102,5 +102,6 @@ Collate:
 LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
-RoxygenNote: 6.1.1
+Encoding: UTF-8
+RoxygenNote: 7.1.0
 License: GPL-3

@@ -4,8 +4,15 @@
 \alias{filterRearrangementList}
 \title{Applies several filters for somatic rearrangements}
 \usage{
-filterRearrangementList(object, params, amps, del.gr, rear_filter,
-  germline_filters = GRanges(), return_stats = FALSE)
+filterRearrangementList(
+  object,
+  params,
+  amps,
+  del.gr,
+  rear_filter,
+  germline_filters = GRanges(),
+  return_stats = FALSE
+)
 }
 \arguments{
 \item{object}{A \code{RearrangementList}}

@@ -75,8 +75,8 @@ Amplicons and translocations in which the sequences is inverted in
   fusions(rear_cds)
   ## There are for transcripts for gene 'B'.  The accessor txB
   ## returns the CDSs for each of the transcripts as a
-  ## \\code{GRangesList}
+  ## \code{GRangesList}
   txB(rear_cds)
-  ## Similarly, there are accessors \\code{txA}, \\code{txC}, and
-  ## \\code{txD}
+  ## Similarly, there are accessors \code{txA}, \code{txC}, and
+  ## \code{txD}
 }

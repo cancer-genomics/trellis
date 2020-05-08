@@ -4,8 +4,11 @@
 \alias{AmpliconGraph}
 \title{Constructor for AmpliconGraph}
 \usage{
-AmpliconGraph(ranges = GRanges(), filters,
-  params = ampliconParams(border_size = 150000, overhang = 5000))
+AmpliconGraph(
+  ranges = GRanges(),
+  filters,
+  params = ampliconParams(border_size = 150000, overhang = 5000)
+)
 }
 \arguments{
 \item{ranges}{a \code{GRanges} object of the segmented normalized copy number}

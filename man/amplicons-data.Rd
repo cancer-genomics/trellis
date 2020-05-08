@@ -4,7 +4,9 @@
 \name{amplicons-data}
 \alias{amplicons-data}
 \title{An example AmpliconGraph}
-\format{a \code{AmpliconGraph} object.}
+\format{
+a \code{AmpliconGraph} object.
+}
 \usage{
 data(amplicons)
 }

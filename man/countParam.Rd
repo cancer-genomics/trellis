@@ -4,8 +4,10 @@
 \alias{countParam}
 \title{Generate parameters that specify which reads in a bam file to import}
 \usage{
-countParam(gr, flags = scanBamFlag(isUnmappedQuery = FALSE, isDuplicate =
-  FALSE))
+countParam(
+  gr,
+  flags = scanBamFlag(isUnmappedQuery = FALSE, isDuplicate = FALSE)
+)
 }
 \arguments{
 \item{gr}{A \code{GRanges} object}

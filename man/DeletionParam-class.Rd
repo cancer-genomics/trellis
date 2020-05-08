@@ -9,6 +9,7 @@
 \alias{hemizygousThr}
 \alias{maximumWidth}
 \alias{maximumProportionInFilter}
+\alias{minSegmeanDiff}
 \alias{maxRatioObservedToExpected}
 \alias{minimumWidth}
 \alias{minimumGapWidth}
@@ -18,13 +19,23 @@
 \alias{maxRPsHomozygous}
 \title{Parameter class for calling deletions}
 \usage{
-DeletionParam(min_width = 2000, max_width = 2e+06,
-  min_gapwidth = 10000, homozygous_thr = -3, hemizygous_thr = -0.7,
-  tumor_purity = 1, min_RPs_in_hemizygous = 1,
-  max_RPs_in_homozygous = 100, nflanking_hemizygous = 5L,
-  nflanking_homozygous = 5L, maxRatioObservedToExpected = 2L,
-  max_proportion_in_filter = 0.75, bam_seqlevels_style = "UCSC",
-  remove_hemizygous = TRUE)
+DeletionParam(
+  min_width = 2000,
+  max_width = 2e+06,
+  min_gapwidth = 10000,
+  homozygous_thr = -3,
+  hemizygous_thr = -0.7,
+  tumor_purity = 1,
+  min_RPs_in_hemizygous = 1,
+  max_RPs_in_homozygous = 100,
+  nflanking_hemizygous = 5L,
+  nflanking_homozygous = 5L,
+  maxRatioObservedToExpected = 2L,
+  max_proportion_in_filter = 0.75,
+  min_segmean_diff = -0.5,
+  bam_seqlevels_style = "UCSC",
+  remove_hemizygous = TRUE
+)
 
 bamSeqLevelsStyle(object)
 
@@ -35,6 +46,8 @@ hemizygousThr(object)
 maximumWidth(object)
 
 maximumProportionInFilter(object)
+
+minSegmeanDiff(object)
 
 maxRatioObservedToExpected(object)
 
@@ -97,16 +110,17 @@ maximum proportion of a CNV that can be covered by one of the filters. The
 filters are germline CNV, low mappability, low GC / unassembled regions,
 and outliers observed in a bin for 2 or more normal samples.}
 
+\item{min_segmean_diff}{length one numeric vector indicating how much
+less the segment mean for a deletion must be relative to the median
+log ratio of bins encompassed in an interval surrounding the
+segment of length equal to 15 times the width of the deleted segment.}
+
 \item{bam_seqlevels_style}{character string indicating style of seqnames}
 
 \item{object}{a \code{DeletionParam}}
 
 \item{build}{length-1 character vector indicating genome build (must be hg18
 or hg19)}
-
-\item{object}{a \code{DeletionParam}}
-
-\item{object}{a \code{DeletionParam}}
 }
 \value{
 a \code{DeletionParam} object
@@ -163,6 +177,11 @@ the maximum proportion of a CNV that can be covered by one of the
 filters.  The filters are germline CNV, low mappability, low GC /
 unassembled regions, and outliers observed in a bin for 2 or more
 normal samples.}
+
+\item{\code{min_segmean_diff}}{length one numeric vector indicating how much
+less the segment mean for a deletion must be relative to the median
+log ratio of bins encompassed in an interval surrounding the
+segment of length equal to 15 times the width of the deleted segment.}
 
 \item{\code{bam_seqlevels_style}}{character string indicating style of seqnames}
 

@@ -27,8 +27,7 @@
 \alias{seqlevels,RearrangementList-method}
 \title{Constructor for \code{RearrangementList} class}
 \usage{
-RearrangementList(object, modal_rearrangement, percent_rearrangement,
-  colData)
+RearrangementList(object, modal_rearrangement, percent_rearrangement, colData)
 
 \S4method{RearrangementList}{missing}(object, colData)
 
@@ -46,9 +45,14 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement,
 
 \S4method{names}{RearrangementList}(x)
 
-\S4method{overlapsAny}{RearrangementList,GRanges}(query, subject,
-  maxgap = -1L, minoverlap = 0L, type = c("any", "start", "end",
-  "within", "equal"), ...)
+\S4method{overlapsAny}{RearrangementList,GRanges}(
+  query,
+  subject,
+  maxgap = -1L,
+  minoverlap = 0L,
+  type = c("any", "start", "end", "within", "equal"),
+  ...
+)
 
 \S4method{$}{RearrangementList}(x, name) <- value
 
@@ -58,8 +62,7 @@ RearrangementList(object, modal_rearrangement, percent_rearrangement,
 
 \S4method{[[}{RearrangementList,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
-\S4method{[[}{RearrangementList,ANY,ANY,ANY}(x, i, j, ...,
-  drop = FALSE) <- value
+\S4method{[[}{RearrangementList,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE) <- value
 
 \S4method{c}{RearrangementList}(x, ..., recursive = FALSE)
 
@@ -81,7 +84,7 @@ rearrangement type.  Must be the same length as \code{object}.}
 
 \item{x}{a \code{RearrangementList} object}
 
-\item{...}{additional arguments ignored}
+\item{...}{ignored}
 
 \item{query}{a \code{RearrangementList}}
 
@@ -92,8 +95,6 @@ rearrangement type.  Must be the same length as \code{object}.}
 \item{j}{ignored}
 
 \item{drop}{ignored}
-
-\item{...}{ignored}
 }
 \value{
 a \code{RearrangementList} object

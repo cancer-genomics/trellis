@@ -4,7 +4,9 @@
 \name{rear_cgov7t}
 \alias{rear_cgov7t}
 \title{A RearrangementList from ovarian cell line CGOV7T}
-\format{a \code{RearrangementList} object}
+\format{
+a \code{RearrangementList} object
+}
 \usage{
 data(rear_cgov7t)
 }

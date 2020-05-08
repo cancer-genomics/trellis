@@ -4,8 +4,13 @@
 \alias{unmapped_read}
 \title{Extract unmapped reads with a mapped mate from a bam file}
 \usage{
-unmapped_read(bam.file, query, yield_size = 1e+06, maxgap = 500,
-  what = scanBamWhat())
+unmapped_read(
+  bam.file,
+  query,
+  yield_size = 1e+06,
+  maxgap = 500,
+  what = scanBamWhat()
+)
 }
 \arguments{
 \item{bam.file}{character-string providing complete path to BAM file}

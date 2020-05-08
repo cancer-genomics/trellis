@@ -4,11 +4,20 @@
 \alias{ampliconParams}
 \title{Lists germline filters and parameters for filtering amplicons}
 \usage{
-ampliconParams(AMP_THR = log2(2.75), LOW_THR = log2(1.75),
-  border_size = 10000, overhang = 25000, MIN_WIDTH = 2000,
-  MIN_SEGMEAN_DIFF = 0.05, min.gapwidth = 3000, maxgap = 5e+05,
-  frequency = 5, minimum_maxdist = 50, minimum_count = 5,
-  bad_bins = GRanges())
+ampliconParams(
+  AMP_THR = log2(2.75),
+  LOW_THR = log2(1.75),
+  border_size = 10000,
+  overhang = 25000,
+  MIN_WIDTH = 2000,
+  MIN_SEGMEAN_DIFF = 0.05,
+  min.gapwidth = 3000,
+  maxgap = 5e+05,
+  frequency = 5,
+  minimum_maxdist = 50,
+  minimum_count = 5,
+  bad_bins = GRanges()
+)
 }
 \arguments{
 \item{AMP_THR}{numeric threshold for high copy amplicon}

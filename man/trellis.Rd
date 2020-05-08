@@ -3,7 +3,6 @@
 \docType{package}
 \name{trellis}
 \alias{trellis}
-\alias{trellis-package}
 \title{Somatic structural variant analysis}
 \description{
 trellis performs structural variant analyses of sequencing data.

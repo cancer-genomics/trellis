@@ -5,8 +5,7 @@
 \title{Exclude linked tag cluster that overlap with germline CNVs or other
 sequence artifacts}
 \usage{
-filterGermlineRearList(x, dirs, rp = RearrangementParams(),
-  germline_filters)
+filterGermlineRearList(x, dirs, rp = RearrangementParams(), germline_filters)
 }
 \arguments{
 \item{x}{a \code{RearrangementList}}
