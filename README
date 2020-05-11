@@ -1,1 +1,9 @@
 Trellis is a software designed to identify structural variants from whole genome sequenced tumor only BAM files.
+
+
+This branch is the development branch of trellis.
+
+The main focus of the development branch at this time is to add split reads information to every structural varian type.
+
+Target branches will be created from this branch as <initials-newfeature>
+ex. dh-deletion-split-reads
