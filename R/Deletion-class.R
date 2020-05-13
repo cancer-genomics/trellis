@@ -44,6 +44,8 @@ NULL
 #'
 #' @slot length_proper Keeps track of the numer of the total number of
 #'   proper read pairs for quick summaries of this object.
+#'   
+#' @slot split_reads a \code{GRanges} object of the split read alignments
 #'
 #' @examples
 #' StructuralVariant()
@@ -60,7 +62,8 @@ setClass("StructuralVariant",
                         index_improper="list",
                         grouped_variant="factor",
                         length_improper="integer",
-                        length_proper="integer"))
+                        length_proper="integer",
+                        split_reads="GRanges"))
 
 max_proper_read_index <- function(object){
   i <- sapply(indexProper(object), function(x) {
@@ -149,6 +152,7 @@ setMethod("show", "StructuralVariant", function(object){
   cat("    #SVs         :", length(object), "\n")
   cat("    proper RPs   :", sum(elementNROWS(indexProper(object))), "\n")
   cat("    improper RPs :", sum(elementNROWS(indexImproper(object))), "\n")
+  cat("  number of split reads: ", length(splitReads(object))/2, "\n")
   ##cat("    proper RPs   :", object@length_proper, "\n")
   ##cat("    improper RPs :", object@length_improper, "\n")
 })
@@ -417,6 +421,18 @@ setReplaceMethod("variant", "StructuralVariant", function(object, value){
   object@variant <- value
   object
 })
+
+#' @rdname splitReads
+#' @aliases splitReads,Rearrangement-method
+setMethod("splitReads", "Rearrangement", function(object) object@split_reads)
+
+#' @aliases splitReads,Rearrangement,GRanges-method
+#' @rdname splitReads
+setReplaceMethod("splitReads", c("Rearrangement", "GRanges"),
+                 function(object, value){
+                   object@split_reads <- value
+                   object
+                 })
 
 ##--------------------------------------------------
 ##
