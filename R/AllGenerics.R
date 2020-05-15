@@ -389,7 +389,7 @@ setGeneric("percentRearrangement<-",
 #'
 #' @rdname splitReads
 #'
-#' @param object a \code{Rearrangement} object
+#' @param object a \code{Rearrangement} object or \code{StructuralVariant} object
 #'
 #' @export
 setGeneric("splitReads",

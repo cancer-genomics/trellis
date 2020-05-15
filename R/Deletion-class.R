@@ -423,12 +423,12 @@ setReplaceMethod("variant", "StructuralVariant", function(object, value){
 })
 
 #' @rdname splitReads
-#' @aliases splitReads,Rearrangement-method
-setMethod("splitReads", "Rearrangement", function(object) object@split_reads)
+#' @aliases splitReads,StructuralVariant-method
+setMethod("splitReads", "StructuralVariant", function(object) object@split_reads)
 
-#' @aliases splitReads,Rearrangement,GRanges-method
+#' @aliases splitReads,StructuralVariant,GRanges-method
 #' @rdname splitReads
-setReplaceMethod("splitReads", c("Rearrangement", "GRanges"),
+setReplaceMethod("splitReads", c("StructuralVariant", "GRanges"),
                  function(object, value){
                    object@split_reads <- value
                    object
