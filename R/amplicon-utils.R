@@ -150,6 +150,7 @@ overlapsGermline <- function(object, germline, overhang=5e3){
 }
 
 standardizeGRangesMetadata <- function(granges){
+ browser()
   if(length(granges) == 0) return(granges)
   mns <- granges$seg.mean
   is_amplicon <- granges$is_amplicon

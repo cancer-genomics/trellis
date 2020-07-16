@@ -133,7 +133,7 @@ segmentBins <- function(bins, param=SegmentParam(), ...){
     chrbins <- bins_grl[[i]]
     chrbins <- keepSeqlevels(chrbins, as.character(unique(seqnames(chrbins))))
     if(length(chrbins) < 2) next()
-    results[[i]] <- .segmentBins(chrbins, param=param)
+    results[[i]] <- .segmentBins(chrbins, param=param, ...)
   }
   results <- results[ !sapply(results, is.null) ]
   g <- unlist(GRangesList(results))
