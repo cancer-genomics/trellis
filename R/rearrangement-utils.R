@@ -489,12 +489,12 @@ typeGAPairs <- function(gpairs){
 #' Determine the type of rearrangement supported by each improper read pair
 #'
 #' @details
-#' 
+#'
 #' Rearrangements are typed by the following criteria for read 1 (R1)
 #'   and read 2 (R2):
-#' 
+#'
 #' \enumerate{
-#' 
+#'
 #'   \item strand of R1 and R2
 #'   \item orientation of R1 and R2 (e.g., R1 < R2)
 #'   \item whether R1 and R2 are on different chromosomes
@@ -519,7 +519,7 @@ typeGAPairs <- function(gpairs){
 #'         1  2  3     4 5 6    7 8 9
 #'   +5' ------------|--------|-------------
 #'   -3' ------------|--------|-------------
-#' 
+#'
 #'  Tumor
 #'         1  2  3     4 5 6    4 5 6   7 8 9
 #'   +5' ------------|--------X-------|---------
@@ -531,22 +531,22 @@ typeGAPairs <- function(gpairs){
 #'   downstream:
 #'
 #' \preformatted{
-#'  Tumor 
+#'  Tumor
 #'         1  2  3     4 5 6    7 8 9   4 5 6
 #'   +5' ------------|--------|-------X---------
 #'   -3' ------------|--------|-------X---------
 #'
 #'  or further upstream:
-#' 
-#'  Tumor 
+#'
+#'  Tumor
 #'         4  5  6     1 2 3    4 5 6   7 8 9
 #'   +5' ------------X--------|-------|---------
 #'   -3' ------------X--------|-------|---------
 #'
 #' }
-#' 
+#'
 #'   In each case, the rearrangement junctions given by 'X' would be
-#'   identified by R1+ > R2 - and R1- < R2+.  
+#'   identified by R1+ > R2 - and R1- < R2+.
 #'
 #' \strong{Inter-chromosomal translocations:} For translocations,
 #'   positional orientation is determined by chromosome number and not
@@ -557,17 +557,17 @@ typeGAPairs <- function(gpairs){
 #'
 #' \preformatted{
 #' Reference   (-- chr1, == chr2)
-#'   
+#'
 #'      chr1  1 2 3   4 5 6   chr2  20 21 22   23  24  25
 #' 5' + ------------|------   ===============|==============
 #' 3' - ------------|------   ===============|==============
-#' 
+#'
 #' Tumor
-#' 
-#'       chr1  1 2 3   23 24 25 
-#' 5' + ------------|========== 
+#'
+#'       chr1  1 2 3   23 24 25
+#' 5' + ------------|==========
 #' 3' - ------------|==========
-#' 
+#'
 #' }
 #'
 #' Read orientations R1+ < R2- and R1- > R2+ are consistent with the
@@ -576,7 +576,7 @@ typeGAPairs <- function(gpairs){
 #'   observe
 #'
 #' \preformatted{
-#' 
+#'
 #' Tumor
 #'      chr2  20 21 22   4 5 6
 #' 5' + ==============|--------
@@ -594,18 +594,18 @@ typeGAPairs <- function(gpairs){
 #'
 #' \strong{Inversions:}
 #'
-#' An intrachromosomal inversion: 
+#' An intrachromosomal inversion:
 #'
 #' \preformatted{
-#' 
+#'
 #' Reference:  (-- positive strand,  == negative strand)
-#' 
+#'
 #'       1 2 3   4 5 6     7 8 9
 #' 5'+  ------>|-------->|------->
 #' 3'-  <======|<========|<=======
 #'
 #' Tumor (inversion)
-#' 
+#'
 #'       1 2 3   6 5 4    7 8 9
 #' 5'+  ------>X=======>X------->
 #' 3'-  <======X<-------X<=======
@@ -623,10 +623,10 @@ typeGAPairs <- function(gpairs){
 #' @note Type \code{amp1,amp3} would never be identified because the
 #'   junction does not involve an aberrant separation between read
 #'   pairs.
-#' 
+#'
 #' @return a \code{data.frame} with colnames 'type' and 'percent'
 #' @export
-#' @param object a \code{Rearrangement} 
+#' @param object a \code{Rearrangement}
 rearrangementType <- function(object){
   imp <- improper(object)
   rtypes <- typeGAPairs(imp)
@@ -644,13 +644,13 @@ rearrangementType <- function(object){
 #' Illumina HiSeq.
 #'
 #' @details
-#' 
+#'
 #' All reads from improper read pairs  where mates are separated by
 #' at least 10kb and both reads in pair are mapped are read from the
 #' \code{AlignmentViews} object.  A cluster of reads (all involved in
 #' improper pairs) is defined as follows:
 #' \enumerate{
-#' 
+#'
 #'   \item genomic intervals demarcating improper read clusters are
 #'   gotten by applying reduce to a GRanges representation of all
 #'   improper reads
@@ -661,7 +661,7 @@ rearrangementType <- function(object){
 #'   \item each cluster must contain at least 5 reads
 #'
 #' }
-#' 
+#'
 #' Non-overlapping clusters that are linked by multiple improper read
 #' pairs are suggestive of a rearrangement.  Linked tag clusters are
 #' identified by the function \code{seqJunctionsInferredByPairedTags}.
@@ -807,7 +807,7 @@ typeRead <- function(gap){
 #'   rlist <- readRDS(rfile)
 #'   r <- rlist[[1]]
 #'   r2 <- fiveTo3Prime(r, "hg19")
-#'   rearDataFrame(r2[[1]], "hg19") 
+#'   rearDataFrame(r2[[1]], "hg19")
 #' @export
 rearDataFrame <- function(r, build, maxgap=5000){
   lb <- linkedBins(r)
@@ -931,7 +931,7 @@ rearDataFrameList <- function(rlist, build, maxgap=5000){
     junction_5p <- start(red.srlist[["5p"]])[1]
   }
   if(!is.rev["3p"]){
-    junction_3p <- start(red.srlist[["3p"]])[1]  
+    junction_3p <- start(red.srlist[["3p"]])[1]
   } else {
     junction_3p <- end(red.srlist[["3p"]])[1]
   }
@@ -959,7 +959,7 @@ rearDataFrameList <- function(rlist, build, maxgap=5000){
   df3$region <- factor(regions2, levels=bins$gene_name)
   df3$tagid <- as.numeric(df3$tagid)
   ##
-  ## if transcript is on reverse strand, we need to multiply the coordinates by a negative number 
+  ## if transcript is on reverse strand, we need to multiply the coordinates by a negative number
   ##
   ##
   if(FALSE){
@@ -1152,7 +1152,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
     theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
           axis.text.y=element_blank(),
           plot.title=element_text(size=5)) +
-    guides(color=FALSE, fill=FALSE) +
+    guides(color="none", fill="none") +
     geom_vline(xintercept=df$junction_5p[1], linetype="dashed") +
     ggtitle(paste0(df1$region[1], " (", df1$seqnames[1], ")"))
   if(df1$reverse[1]){
@@ -1179,7 +1179,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
           legend.position="bottom",
           legend.direction="horizontal",
           plot.title=element_text(size=5)) +
-    guides(color=FALSE, fill=FALSE) +
+    guides(color="none", fill="none") +
     geom_vline(xintercept=df$junction_3p[1], linetype="dashed") +
     ylab("") +
     ggtitle(paste0(df2$region[1], " (", df2$seqnames[1], ")"))
@@ -1250,7 +1250,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
   ##
   ##  match sequences to the dna coordinates based on the lenths
   ##
-  sizes1 <- lengths(position.list1) 
+  sizes1 <- lengths(position.list1)
   sizes2 <- lengths(base.list1)
   sizes3 <- lengths(base.list2)
   if(all(sizes1 == sizes2)){
@@ -1298,7 +1298,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
     theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
           axis.text.y=element_blank(),
           plot.title=element_text(size=5)) +
-    guides(color=FALSE, fill=FALSE) +
+    guides(color="none", fill="none") +
     geom_vline(xintercept=df$junction_5p[1], linetype="dashed") +
     ggtitle(paste0(df1$region[1], " (", df1$seqnames[1], ")"))
   if(df1$reverse[1]){
@@ -1325,7 +1325,7 @@ axis_labels3p <- function(df, xlim2, num.ticks){
           legend.position="bottom",
           legend.direction="horizontal",
           plot.title=element_text(size=5)) +
-    guides(color=FALSE, fill=FALSE) +
+    guides(color="none", fill="none") +
     geom_vline(xintercept=df$junction_3p[1], linetype="dashed") +
     ylab("") +
     ggtitle(paste0(df2$region[1], " (", df2$seqnames[1], ")"))
