@@ -153,16 +153,22 @@ standardizeGRangesMetadata <- function(granges){
   if(length(granges) == 0) return(granges)
   mns <- granges$seg.mean
   is_amplicon <- granges$is_amplicon
-  granges <- reduce(granges)
-  granges$seg.mean <- mns
-  granges$is_amplicon <- is_amplicon
-  names(granges) <- ampliconNames(granges)
-
-  granges$hgnc <- as.character(NA)
-  granges$driver <- as.character(NA)
-  granges$biol_sign <- as.character(NA)
-  granges$groups <- as.factor(NA)
-  granges
+  if(FALSE){
+      x <- tibble(mean=granges$seg.mean,
+                  is_amplicon=granges$is_amplicon)
+      ggplot(x, aes(factor(is_amplicon), mean)) +
+          geom_jitter(aes(color=is_amplicon), width=0.05)
+  }
+  granges2 <- reduce(granges, with.revmap=TRUE)
+  granges2$seg.mean <- mns
+  granges2$is_amplicon <- is_amplicon
+  names(granges2) <- ampliconNames(granges2)
+  
+  granges2$hgnc <- as.character(NA)
+  granges2$driver <- as.character(NA)
+  granges2$biol_sign <- as.character(NA)
+  granges2$groups <- as.factor(NA)
+  granges2
 }
 
 isNotAmplicon <- function(object) !isAmplicon(object)

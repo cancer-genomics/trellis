@@ -136,6 +136,8 @@ of improper read pairs for quick summaries of this object.}
 
 \item{\code{length_proper}}{Keeps track of the numer of the total number of
 proper read pairs for quick summaries of this object.}
+
+\item{\code{split_reads}}{a \code{GRanges} object of the split read alignments}
 }}
 
 \examples{

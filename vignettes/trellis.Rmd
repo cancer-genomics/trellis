@@ -1,7 +1,7 @@
 ---
 title: "Structural variant analysis for whole genome sequencing with trellis"
-author: 
-- Robert Scharpf
+author:
+- Robert B. Scharpf
 - Dorothy Hallberg
 - Daniel Bruhm
 - Victor Velculescu
@@ -11,7 +11,7 @@ output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{Structural variant analysis for whole genome sequencing with trellis}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}  
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
@@ -36,7 +36,6 @@ library(sna)
 library(kableExtra)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(TxDb.Hsapiens.UCSC.hg19.refGene)
-
 ```
 
 # Prerequisites
@@ -289,10 +288,10 @@ plot_amplicons <- function (ag, colors){
     nodenames <- setNames(nodes(g1), nodes(g1))
     text_col <- setNames(rep("black", length(nodes(g1))), nodes(g1))
     text_col[color_nodes %in% dark_colors] <- "gray90"
-    nodeRenderInfo(g1) <- list(label = nodenames, fill = color_nodes, 
+    nodeRenderInfo(g1) <- list(label = nodenames, fill = color_nodes,
         textCol = text_col)
     nodeAttrs <- list(fillcolor = color_nodes)
-    attrs <- list(node = list(shape = "rectangle", fixedsize = FALSE), 
+    attrs <- list(node = list(shape = "rectangle", fixedsize = FALSE),
         graph = list(rankdir = "LR"))
     graph_object <- layoutGraph(g1, attrs = attrs, nodeAttrs = nodeAttrs)
     graph_object
@@ -321,7 +320,7 @@ B <- ggnet2(net, color="chrom",
             ##legend.size=1)  +
   guides(size=FALSE, shape=FALSE,
          color=guide_legend(title="",
-                            override.aes=list(size=5))) 
+                            override.aes=list(size=5)))
 print(B)
 ```
 
@@ -436,7 +435,7 @@ mapped_unmapped.fa <- file.path(dir, "mapped-unmapped.fa")
 writeUnmappedToFasta(unmapped, mapped_unmapped.fa)
 ```
 
-The object `unmapped` is a `GRanges` object of 87 reads that were not mapped by ELAND to the reference genome and that have a mate mapped to one of the intervals in `query`. Again, we use a system call in the following unevaluated code chunk to realign the unmapped reads: 
+The object `unmapped` is a `GRanges` object of 87 reads that were not mapped by ELAND to the reference genome and that have a mate mapped to one of the intervals in `query`. Again, we use a system call in the following unevaluated code chunk to realign the unmapped reads:
 
 ```{r blat-unmapped, eval=FALSE}
 outfile <- tempfile()
@@ -538,7 +537,7 @@ cds.list <- fuseCDS_Rlist(rlist4, coding_jxns)
 cds.list
 ```
 
-For each fusion, we translate the CDS in each of the three possible reading frames and partition the amino acid sequence of the fusion protein into the sequences derived from the 5-prime and 3-prime transcripts.  By partioning the amino acid sequence of the fusion into its 5-prime and 3-prime parts, we can compare the 5-prime partition to the amino acid sequence of the 5-prime reference protein and the 3-prime partition to the amino acid sequence of the 3-prime reference protein. The function `translateCDS` translates the CDS in the 3 possible reading frames. 
+For each fusion, we translate the CDS in each of the three possible reading frames and partition the amino acid sequence of the fusion protein into the sequences derived from the 5-prime and 3-prime transcripts.  By partioning the amino acid sequence of the fusion into its 5-prime and 3-prime parts, we can compare the 5-prime partition to the amino acid sequence of the 5-prime reference protein and the 3-prime partition to the amino acid sequence of the 3-prime reference protein. The function `translateCDS` translates the CDS in the 3 possible reading frames.
 
 ```{r translate}
 proteins <- translateCDS(cds.list)
@@ -565,7 +564,7 @@ partition.fusion <- partitionAASequence(proteins)
 partition.fusion
 ```
 
-For a fusion to be in-frame, we require that the amino acid sequence derived from the 5- and 3-prime transcripts to be subsequences of the full amino acid sequence of the reference genome that was translated in the same frame.  In addition, we require that there be no premature stop codons.  The following code accomplishes these two tasks, with the `ref.frames` object below containing the full amino acid sequence of the transcripts associated with IKAROS and ERBB4.  
+For a fusion to be in-frame, we require that the amino acid sequence derived from the 5- and 3-prime transcripts to be subsequences of the full amino acid sequence of the reference genome that was translated in the same frame.  In addition, we require that there be no premature stop codons.  The following code accomplishes these two tasks, with the `ref.frames` object below containing the full amino acid sequence of the transcripts associated with IKAROS and ERBB4.
 
 ```{r inframe_and_nostops}
 nostop.list <- noPrematureStop(partition.fusion)
