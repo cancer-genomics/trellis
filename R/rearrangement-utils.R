@@ -1151,7 +1151,8 @@ axis_labels3p <- function(df, xlim2, num.ticks){
     xlab("") +
     theme(axis.text.x=element_text(size=7, angle=45, hjust=1),
           axis.text.y=element_blank(),
-          plot.title=element_text(size=5)) +
+          plot.title=element_text(size=5),
+          panel.background=element_blank()) +
     guides(color="none", fill="none") +
     geom_vline(xintercept=df$junction_5p[1], linetype="dashed") +
     ggtitle(paste0(df1$region[1], " (", df1$seqnames[1], ")"))
@@ -1205,7 +1206,9 @@ axis_labels3p <- function(df, xlim2, num.ticks){
   bgrob <- ggplotGrob(b)
   ##legend.grob <- gg.objs[[2]]
   bgrob$widths <- agrob$widths
-  list(`5p`=agrob,
+  list(a=a,
+       b=b,
+      `5p`=agrob,
        `3p`=bgrob,
        legend=legend.grob)
 }
@@ -1451,6 +1454,8 @@ ggRearrangeSequences <- function(df, ylab="Read pair index",
 }
 
 strands <- function(r){
+    ##first <- GenomicAlignments::first
+    ##last <- GenomicAlignments::last
   gap <- improper(r)
   paste0(cstrand(first(gap)), cstrand(last(gap)))
 }

@@ -3,7 +3,7 @@ NULL
 
 #' Find total width of a \code{GRanges} object
 #'
-#' Adds the width of the intervals in a \code{GRanges} object. 
+#' Adds the width of the intervals in a \code{GRanges} object.
 #'
 #' @examples
 #' gr <- GRanges(c("chr1", "chr2"), IRanges(c(11, 11), c(1000, 1000)))
@@ -85,10 +85,10 @@ makeGAlignmentPairs2 <- function(x, use.names=FALSE,
 #'   and \code{\link{improperAlignmentParams}} for a wrapper of this
 #'   function that generates a \code{ScanBamParam} object using these
 #'   flags.
-#' 
+#'
 #' @examples
 #' require(Rsamtools)
-#' 
+#'
 #' flags <- scanBamFlag(isDuplicate=FALSE,
 #'                      isPaired=TRUE,
 #'                      isUnmappedQuery=FALSE,
@@ -111,7 +111,7 @@ improperAlignmentFlags <- function(){
 #' @rdname alignment-flags
 #' @export
 #' @examples
-#'  
+#'
 #' flags <- scanBamFlag(isDuplicate=FALSE,
 #'                      isPaired=TRUE,
 #'                      isUnmappedQuery=FALSE,
@@ -158,7 +158,7 @@ improperAlignmentParams <- function(flag=improperAlignmentFlags(),
 
 #' @export
 #' @rdname alignment-flags
-#' @examples 
+#' @examples
 #' flags <- properAlignmentFlags()
 #' print(flags)
 #' params <- ScanBamParam(flag = flags, what=c("flag", "mrnm", "mpos", "mapq"))
@@ -219,7 +219,7 @@ getImproperAlignmentPairs <- function(bam.file,
 #' @param build the reference genome buld that reads were aligned to.  Currently
 #' supported builds include "hg19" and "hg18".
 #'
-#' @examples 
+#' @examples
 #' library(svbams)
 #' path <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(path, "cgov10t.bam")
@@ -241,12 +241,12 @@ getProperAlignmentPairs <- function(bam.file,
 }
 
 # Parse improper read pairs from a bam file
-# 
+#
 # Parses improper read pairs from a bam file and saves the result as
 # a serialized R object.  The file paths to the improper read pairs
 # are given by accessors defined from the \code{AlignmentViews2}
 # class.
-# 
+#
 # @examples
 #   library(Rsamtools)
 #   require(TestBams)
@@ -259,7 +259,7 @@ getProperAlignmentPairs <- function(bam.file,
 #     writeImproperAlignments2(aviews)
 #     gps <- readRDS(file.path(dp["alignments/0improper"], rdsId(aviews)[1]))
 #   }
-# 
+#
 # @rdname AlignmentViews2
 # @export
 # @param bam.file complete path to BAM file
@@ -416,8 +416,8 @@ get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
 }
 
 #' Extract reads from a bam file
-#' 
-#' Parses a BAM file for read pairs near intervals specified by a \code{GRanges} object and 
+#'
+#' Parses a BAM file for read pairs near intervals specified by a \code{GRanges} object and
 #' returns the read pairs in a \code{GAlignmentPairs} object.
 #' @param g A \code{GRanges} object
 #' @param bam.file A character vector of the path to a bam file
@@ -442,9 +442,9 @@ get_readpairs <- function(object, bam.file, flags=scanBamFlag()){
 #' queryRange.  To allow fuzzy matching of alignments to the
 #' queryRanges, the queryRanges are expanded by 2kb in each direction.
 #'
-#' 
+#'
 #' @export
-#' 
+#'
 #' @param object An object for which \code{queryRanges} method is defined
 #' @param bam.file The complete file path to a bam file.
 get_improper_readpairs <- function(object, bam.file){
@@ -492,13 +492,13 @@ get_improper_readpairs2 <- function(g, bam.file){
 }
 
 #' Convert GAlignmentPairs to GRanges while maintaining read pair information
-#' 
+#'
 #' Melts \code{GAlignmentPairs} objects to \code{GRanges} objects.
 #'
 #' @param ga a \code{GAlignments} object
 #' @param is.improper a length-one logical vector.  \code{TRUE} if the reads are improperly paired, \code{FALSE} otherwise.
 #' @param use.mcols logical for whether to keep the metadata columns of the \code{GAlignment} objects
-#' 
+#'
 #' @examples
 #' library(svbams)
 #' path <- system.file("extdata", package="svbams")
@@ -534,7 +534,7 @@ ga2gr <- function(ga, is.improper=FALSE, use.mcols=FALSE){
 #' of the first read (R1) in the pair.
 #'
 #' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs}
-#' @return a \code{GRanges} object 
+#' @return a \code{GRanges} object
 #' @examples
 #'   library(svbams)
 #'   library(TxDb.Hsapiens.UCSC.hg19.refGene)
@@ -573,15 +573,15 @@ sortByRead1 <- function(gr){
 #'
 #' This function provides a simple interface to
 #' subsample a \code{GRanges} object of properly paired
-#' reads to reduce overplotting. 
+#' reads to reduce overplotting.
 #'
 #' @param gr a \code{GRanges} object instantiated from a \code{GAlignmentPairs} object
 #' @param thin integer indicating how much to thin the properly paired reads.
-#' @details Setting the parameter \code{thin} to 10 (default) will 
-#' return a \code{GRanges} object with 1/10 the original number of 
+#' @details Setting the parameter \code{thin} to 10 (default) will
+#' return a \code{GRanges} object with 1/10 the original number of
 #' properly paired reads in \code{gr}.
-#' @return A \code{GRanges} object  
-#' @examples 
+#' @return A \code{GRanges} object
+#' @examples
 #' library(svbams)
 #' path <- system.file("extdata", package="svbams")
 #' bam.file <- file.path(path, "cgov10t.bam")
@@ -625,7 +625,7 @@ thinProperPairs <- function(gr, thin=10){
 #'
 #' Evaluates to TRUE if
 #' @param gpairs a \code{GAlignmentPairs} object
-#' @param distance the minimum distance in base pairs between two reads in 
+#' @param distance the minimum distance in base pairs between two reads in
 #' order to call them aberrantly separated
 #' @return logical vector of the same length as \code{gpairs}
 #' @export
@@ -668,7 +668,7 @@ filterPairedReads <- function(gpairs, bins, params){
   what <- c("qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq")
   scan.param <- ScanBamParam(flag=flags, what=what, which=bins, mapqFilter=30)
   rps <- getImproperAlignmentPairs(bam.file,
-                                   scan.param, 
+                                   scan.param,
                                    build = build)
   rps2 <- filterPairedReads(rps, bins, param)
   df <- .seqdataframe(rps2, MAX)
@@ -701,7 +701,7 @@ setMethod("getSequenceOfReads", "Rearrangement",
           function(object,
                    bam.file,
                    params=RearrangementParams(),
-                   MAX=25L, 
+                   MAX=25L,
                    build){
             dat <- .getReadSeqsForRear(object, bam.file, params, MAX, build = build)
             dat2 <- as_tibble(dat)
@@ -714,7 +714,7 @@ setMethod("getSequenceOfReads", "StructuralVariant",
           function(object,
                    bam.file,
                    params=RearrangementParams(),
-                   MAX=25L, 
+                   MAX=25L,
                    build){
             dat <- .getReadSeqsForDeletion(object, bam.file,
                                            params, MAX,
@@ -729,13 +729,13 @@ setMethod("getSequenceOfReads", "RearrangementList",
           function(object,
                    bam.file,
                    params=RearrangementParams(),
-                   MAX=25L, 
+                   MAX=25L,
                    build){
             tag.list <- vector("list", length(object))
             for(j in seq_along(object)){
               r <- object[[j]]
               tag.list[[j]] <- .getReadSeqsForRear(r, bam.file,
-                                                   params, MAX=MAX, 
+                                                   params, MAX=MAX,
                                                    build = build)
             }
             tags <- do.call(rbind, tag.list)
