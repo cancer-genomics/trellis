@@ -1,1 +1,3 @@
 Trellis is a software designed to identify structural variants from whole genome sequenced tumor only BAM files.
+
+Trellis V2 is modified to work on whole genome sequenced tumor only CRAM files. 
