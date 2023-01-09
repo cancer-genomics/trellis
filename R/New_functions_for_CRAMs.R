@@ -33,3 +33,46 @@ add.info <- function(data){
   data
 }
 
+
+
+#' Data frame to GAlignment conversion 
+#' this function prepares for conversion of GAlignment to GAlignmentPairs
+#' makeGAlignmentPairs looks for: qname, rname, rnext, pos, pnext, flags
+#' @param dt a \code{GRanges} object
+#'
+#' @details this function converts data frame into GAlignment object. This step is used
+#' before converting GAlignment to GAlignmentPairs.
+#'
+#'
+#' @examples
+#'   bed <- data.table::fread(here("cgov44t_comparison", "eland", "cgov44t_revised.bed"))
+#'   colnames(bed) <- c("chr", "start", "end", "id", "score", "strand", "flag", "cigar", "mrnm", "mpos")
+#'   ga <- dt2ga2(bed)
+#'
+#' @export
+dt2ga2 <- function(dt){
+  chrom.info <- as.data.frame(seqinfo(Hsapiens))[1:23,]
+  chrom <- levels(Rle(factor(dt$chr)))
+  seq.info <- chrom.info[chrom, 1]
+  seqlen <- setNames(seq.info, chrom)
+  
+  # if seq is present in data frame 
+  if ("seq" %in% colnames(dt)){
+    seq = as.character(dt$seq)
+  }
+  else {seq = NA}
+  
+  ga <- GAlignments(seqnames = Rle(factor(dt$chr)), 
+                     pos = as.integer(dt$start+1), 
+                     cigar = as.character(dt$cigar), 
+                     strand = GenomicRanges::strand(dt$strand), 
+                     names = as.character(dt$id), 
+                    seqlengths = seqlen, 
+                     flag = as.integer(dt$flag), 
+                     mrnm = as.factor(dt$mrnm),
+                     mpos = as.integer(dt$mpos),
+                     mapq = as.numeric(dt$score), 
+                    seq = seq, 
+                    qname = as.character(dt$id))
+  ga
+} # +1 in the starting position since bed files are 
