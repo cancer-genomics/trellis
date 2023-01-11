@@ -398,3 +398,194 @@ sv_deletions_bedops2 <- function(preprocess, gr_filters, param=DeletionParam(), 
   }
   sv
 }
+
+
+
+## Amplification 
+
+# Define functions for sv_amplicons2_bedops
+get_readpairs2_bedops <- function(g=queryRanges(ag), bed_file){
+  #g <- queryRanges(ag.bedops)
+  ga <- subsetByOverlaps(bed_file, g)
+  galp <- makeGAlignmentPairs(ga, use.names=TRUE, use.mcols=TRUE, strandMode=1)
+  validR1 <- overlapsAny(GenomicAlignments::first(galp), g)
+  validR2 <- overlapsAny(GenomicAlignments::last(galp), g)
+  proper_rp <- galp[validR1 & validR2]
+  proper_rp
+}
+
+add_amplicons_bedops <- function(ag, bed_file, params){
+  proper_rp <- get_readpairs2_bedops(g=queryRanges(ag), bed_file)
+  ag <- addFocalDupsFlankingAmplicon(ag, proper_rp, params)
+  queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
+  ag
+}
+
+
+sv_amplicons2_bedops <- function(preprocess, amplicon_filters, params=ampliconParams(), bed_file=amp.ga){
+  if(missing(amplicon_filters)){
+    amplicon_filters <- ampliconFilters(preprocess$genome)
+  }
+  preprocess$segments <- amplified_segments(preprocess$segments, params)
+  ag <- initialize_graph2(preprocess, amplicon_filters, params)
+  if (length(ag) == 0) return(ag)
+  
+  ag <- add_amplicons_bedops(ag, bed_file, params)
+  
+  improper_rp <- preprocess$read_pairs[["improper"]]
+  ag <- link_amplicons(ag, improper_rp, params)
+  tx <- loadTx(preprocess$genome)
+  ag <- annotate_amplicons(ag, tx)
+  ag
+}
+
+
+#sv_amplicons2_bedops first half
+
+# output amplicon query
+sv_amp_makeQuery <- function(preprocess, amplicon_filters, params=ampliconParams()){
+  if(missing(amplicon_filters)){
+    amplicon_filters <- ampliconFilters(preprocess$genome)
+  }
+  preprocess$segments <- amplified_segments(preprocess$segments, params)
+  ag <- initialize_graph2(preprocess, amplicon_filters, params)
+  if (length(ag) == 0) return(ag)
+  
+  g=queryRanges(ag)
+  g
+}
+
+
+#sv_amplicons2_bedops second half
+
+# Define functions for sv_amplicons2_bedops
+get_readpairs2_bedops2 <- function(g=queryRanges(ag), bed_file){
+  #g <- queryRanges(ag.bedops)
+  #ga <- subsetByOverlaps(bed_file, g)
+  galp <- makeGAlignmentPairs(bed_file, use.names=TRUE, use.mcols=TRUE, strandMode=1)
+  validR1 <- overlapsAny(GenomicAlignments::first(galp), g)
+  validR2 <- overlapsAny(GenomicAlignments::last(galp), g)
+  proper_rp <- galp[validR1 & validR2]
+  proper_rp
+}
+
+add_amplicons_bedops2 <- function(ag, bed_file, params){
+  proper_rp <- get_readpairs2_bedops2(g=queryRanges(ag), bed_file)
+  ag <- addFocalDupsFlankingAmplicon(ag, proper_rp, params)
+  queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
+  ag
+}
+
+
+sv_amplicons2_bedops2 <- function(preprocess, amplicon_filters, params=ampliconParams(), bed_file){
+  if(missing(amplicon_filters)){
+    amplicon_filters <- ampliconFilters(preprocess$genome)
+  }
+  preprocess$segments <- amplified_segments(preprocess$segments, params)
+  ag <- initialize_graph2(preprocess, amplicon_filters, params)
+  if (length(ag) == 0) return(ag)
+  
+  ag <- add_amplicons_bedops2(ag, bed_file, params)
+  
+  improper_rp <- preprocess$read_pairs[["improper"]]
+  ag <- link_amplicons(ag, improper_rp, params)
+  tx <- loadTx(preprocess$genome)
+  ag <- annotate_amplicons(ag, tx)
+  ag
+}
+
+
+
+
+#Rearrangement
+#BLAT mapped-mapped
+
+# for mapped-mapped, BLAT realignment
+# define functions to convert GAlignment to tibble for first and last reads
+ga2tibble_first <- function(first, len){
+  first.tib <- as_tibble(first)
+  rname <- as.character(seqnames(first))
+  read <- rep("R1", len)
+  id <- rep(paste0(sample, ".bam"), len)
+  rearrangement.id <- names(first)
+  first.tib <- first.tib %>% dplyr::select(-rpid) %>% mutate(rname, read, id, rearrangement.id)
+  first.tib
+}
+
+ga2tibble_last <- function(last, len){
+  last.tib <- as_tibble(last)
+  rname <- as.character(seqnames(last))
+  read <- rep("R2", len)
+  id <- rep(paste0(sample, ".bam"), len)
+  rearrangement.id <- names(last)
+  last.tib <- last.tib %>% dplyr::select(-rpid) %>% mutate(rname, read, id, rearrangement.id)
+  last.tib
+}
+
+getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample=sample){
+  # initialize an empty tibble
+  #colnames(tags)
+  tags_colnames <- c("seqnames", "strand", "cigar", "qwidth", "start", "end", "width", "njunc", "qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq", "read", "id", "rearrangement.id")
+  tags_bedops <- as_tibble(matrix(nrow = 0, ncol = length(tags_colnames)), .name_repair = ~ tags_colnames)
+  
+  for (i in 1:length(rlist.bedops)) {
+    imp <- improper(rlist.bedops[[i]])
+    len <- length(imp)
+    
+    if (len > MAX) {
+      rown <- sample(1:len, MAX)
+      imp_sub <- imp[rown, ]
+      first <- GenomicAlignments::first(imp_sub)
+      last <- GenomicAlignments::last(imp_sub)
+      len <- MAX
+    }
+    else {
+      first <- GenomicAlignments::first(imp)
+      last <- GenomicAlignments::last(imp)
+    }
+    
+    # compile tibble
+    first_tib <- ga2tibble_first(first, len)
+    last_tib <- ga2tibble_last(last, len)
+    tib <- rbind(first_tib, last_tib)
+    
+    # append to tags tibble 
+    tags_bedops <- rbind(tags_bedops, tib)
+  }
+  tags_bedops
+}
+
+
+
+#BLAT mapped-unmapped
+
+# function to import R1 and R2 as granges object
+import_mum_bedops <- function(path, sample=sample, file){
+  mum.df <- data.table::fread(paste0(path, "/", sample, "_", file))
+  colnames(mum.df) <- c("chr", "start", "end", "snms", "strand", "seq")
+  # replace all strand values with *
+  mum.df$strand <- rep("*", dim(mum.df)[1])
+  # convert data.table to GRanges
+  # bed file start at +1 compared to non-bed file -- use starts.in.df.are.0based = TRUE to be the same as vignette
+  mum.gr <- GenomicRanges::makeGRangesFromDataFrame(mum.df, starts.in.df.are.0based = TRUE, keep.extra.columns = TRUE)
+  names(mum.gr) <- mum.df$snms
+  mum.gr
+}
+
+unmapped_read_bedops <- function(query.bedops, maxgap=500, path, sample=sample){
+  # import R1 and R2 as granges object
+  mumR1.name <- "mum_R1.bed"
+  mumR2.name <- "mum_R2.bed"
+  mumR1.gr <- import_mum_bedops(path, sample = sample, file = mumR1.name)
+  mumR2.gr <- import_mum_bedops(path, sample = sample, file = mumR2.name)
+  
+  mate_gr <- subsetByOverlaps(mumR1.gr, query.bedops+maxgap)
+  mate_gr$read <- rep("R1", length(mate_gr))
+  mate_gr2 <- subsetByOverlaps(mumR2.gr, query.bedops+maxgap)
+  mate_gr2$read <- rep("R2", length(mate_gr2))
+  unmapped.bedops <- c(mate_gr, mate_gr2)
+  unmapped.bedops
+}
+
+
+
