@@ -66,6 +66,7 @@ Collate:
     'DeletionList-class.R'
     'DeletionParam-class.R'
     'ExonSubset-class.R'
+    'Functions_for_CRAM.R'
     'GRanges-utils.R'
     'Preprocess-class.R'
     'RearrangementList-class.R'
@@ -103,5 +104,5 @@ LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 Encoding: UTF-8
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
 License: GPL-3
