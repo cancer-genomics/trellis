@@ -84,6 +84,7 @@ Collate:
     'deletion-utils.R'
     'fasta-utils.R'
     'functions.R'
+    'functions_for_CRAM.R'
     'fusion-utils.R'
     'galignment-utils.R'
     'germlineOutliers.R'
@@ -103,5 +104,5 @@ LazyData: true
 VignetteBuilder: knitr
 biocViews: Sequencing, HighThroughputSequencing, CopyNumberVariants
 Encoding: UTF-8
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
 License: GPL-3
