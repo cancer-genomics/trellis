@@ -54,13 +54,13 @@ dt2ga2 <- function(dt){
                     qname = as.character(dt$id))
   ga
 } # +1 in the starting position since bed files are 
-#' @examples
+
+
 
 
 
 
 ## Functions for Deletion
-
 
 #' Proper read pairs near variant (properReadPairs for CRAM)
 #'
