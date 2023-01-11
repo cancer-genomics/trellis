@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_for_CRAM.R
 \name{add.info}
 \alias{add.info}
-\title{Add seqinfo to dataframe}
+\title{Add seqinfo to dataframe (for CRAM)}
 \usage{
 add.info(data)
 }
@@ -13,5 +13,5 @@ add.info(data)
 data with added seqinfo
 }
 \description{
-Add seqinfo to dataframe
+Add seqinfo to dataframe (for CRAM)
 }

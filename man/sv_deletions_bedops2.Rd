@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_for_CRAM.R
 \name{sv_deletions_bedops2}
 \alias{sv_deletions_bedops2}
-\title{Second half of sv_deletions}
+\title{Second part of sv_deletions_bedops}
 \usage{
 sv_deletions_bedops2(preprocess, gr_filters, param = DeletionParam(), object)
 }
@@ -19,5 +19,5 @@ sv_deletions_bedops2(preprocess, gr_filters, param = DeletionParam(), object)
 A set of candidate structural variants.
 }
 \description{
-Second half of sv_deletions
+Second part of sv_deletions_bedops
 }

@@ -1,4 +1,4 @@
-#' Add seqinfo to dataframe 
+#' Add seqinfo to dataframe (for CRAM)
 #'
 #' @param data 
 #'
@@ -18,11 +18,11 @@ add.info <- function(data){
 
 
 
-#' Convert dataframe to GAlignment 
+#' Convert dataframe to GAlignment (for CRAM)
 #'
 #' @param dt 
 #'
-#' @return
+#' @return GAlignment object that is ready to be paired with GAlignmentPairs
 #' @export
 dt2ga2 <- function(dt){
   # sort file by chromosome in alpha-numeric order
@@ -62,7 +62,7 @@ dt2ga2 <- function(dt){
 ## Functions for Deletion
 
 
-#' properReadPairs
+#' Proper read pairs near variant (properReadPairs for CRAM)
 #'
 #' @param prp4del.ga 
 #' @param del.gr 
@@ -87,9 +87,11 @@ properReadPairs_bedops <- function(prp4del.ga, del.gr, dp){
 
 # break-up of properReadPairs_bedops
 # first part
-#' A broken-up version of properReadPairs_bedops that can be used in linux system. This
-#' is the first part where we extract a set of GRanges that are near deletion regions. 
-#' The second half of the properReadPairs_bedops function is properReadPairs_bedops2
+#' First part of properReadPairs_bedops 
+#' 
+#' This is the first part of the broken-up version of properReadPairs_bedops that can 
+#' be used in linux system. This is the first part where we extract a set of GRanges 
+#' that are near deletion regions. The second half of the properReadPairs_bedops function is properReadPairs_bedops2
 #'
 #' @param del.gr 
 #' @param dp 
@@ -107,8 +109,9 @@ prp_makeRthinned <- function(del.gr, dp){
 
 
 # second part: after bedmap in shell file, import GAlignment
-#' Second half of the broken up properReadPairs_bedops function after we used bedmap 
-#' of a bed file and the GRanges from prp_makeRthinned.
+#' Second part of properReadPairs_bedops 
+#' 
+#' Used after we used bedmap of a bed file and the GRanges from prp_makeRthinned 
 #'
 #' @param ga 
 #'
@@ -165,7 +168,7 @@ finalize_deletions_bedops <- function(sv, preprocess, gr_filters,
 }
 
 
-#' Define new functions for sv_deletions_bedops
+#' Define new functions for sv_deletions (for CRAM)
 #'
 #' @param preprocess 
 #' @param gr_filters 
@@ -247,7 +250,7 @@ finalize_deletions_bedops1 <- function(sv, preprocess, gr_filters,
   query
 }
 
-#' First half of sv_deletion
+#' First part of sv_deletions_bedops
 #'
 #' @param preprocess 
 #' @param gr_filters 
@@ -345,7 +348,7 @@ finalize_deletions_bedops2 <- function(sv, preprocess, gr_filters,
 }
 
 
-#' Second half of sv_deletions
+#' Second part of sv_deletions_bedops
 #'
 #' @param preprocess 
 #' @param gr_filters 
@@ -422,6 +425,15 @@ add_amplicons_bedops <- function(ag, bed_file, params){
 }
 
 
+#' sv_amplicons2 for CRAM
+#'
+#' @param preprocess 
+#' @param amplicon_filters 
+#' @param params 
+#' @param bed_file 
+#'
+#' @return A set of amplicons
+#' @export
 sv_amplicons2_bedops <- function(preprocess, amplicon_filters, params=ampliconParams(), bed_file=amp.ga){
   if(missing(amplicon_filters)){
     amplicon_filters <- ampliconFilters(preprocess$genome)
@@ -443,6 +455,14 @@ sv_amplicons2_bedops <- function(preprocess, amplicon_filters, params=ampliconPa
 #sv_amplicons2_bedops first half
 
 # output amplicon query
+#' First part of sv_amplicons2_bedops
+#'
+#' @param preprocess 
+#' @param amplicon_filters 
+#' @param params 
+#'
+#' @return A set of GRanges near amplicons
+#' @export
 sv_amp_makeQuery <- function(preprocess, amplicon_filters, params=ampliconParams()){
   if(missing(amplicon_filters)){
     amplicon_filters <- ampliconFilters(preprocess$genome)
@@ -457,7 +477,6 @@ sv_amp_makeQuery <- function(preprocess, amplicon_filters, params=ampliconParams
 
 
 #sv_amplicons2_bedops second half
-
 # Define functions for sv_amplicons2_bedops
 get_readpairs2_bedops2 <- function(g=queryRanges(ag), bed_file){
   #g <- queryRanges(ag.bedops)
@@ -477,6 +496,15 @@ add_amplicons_bedops2 <- function(ag, bed_file, params){
 }
 
 
+#' Second part of sv_amplicons2_bedops
+#'
+#' @param preprocess 
+#' @param amplicon_filters 
+#' @param params 
+#' @param bed_file 
+#'
+#' @return A set of amplicons
+#' @export
 sv_amplicons2_bedops2 <- function(preprocess, amplicon_filters, params=ampliconParams(), bed_file){
   if(missing(amplicon_filters)){
     amplicon_filters <- ampliconFilters(preprocess$genome)
@@ -522,6 +550,14 @@ ga2tibble_last <- function(last, len){
   last.tib
 }
 
+#' getSequenceOfReads for CRAM
+#'
+#' @param rlist.bedops 
+#' @param MAX 
+#' @param sample 
+#'
+#' @return Tagged sequences from BLAT
+#' @export
 getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample=sample){
   # initialize an empty tibble
   #colnames(tags)
@@ -572,6 +608,15 @@ import_mum_bedops <- function(path, sample=sample, file){
   mum.gr
 }
 
+#' unmapped_read for CRAM
+#'
+#' @param query.bedops 
+#' @param maxgap 
+#' @param path 
+#' @param sample 
+#'
+#' @return Unmapped reads for BLAT
+#' @export
 unmapped_read_bedops <- function(query.bedops, maxgap=500, path, sample=sample){
   # import R1 and R2 as granges object
   mumR1.name <- "mum_R1.bed"

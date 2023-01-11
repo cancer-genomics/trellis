@@ -2,8 +2,7 @@
 % Please edit documentation in R/functions_for_CRAM.R
 \name{properReadPairs_bedops2}
 \alias{properReadPairs_bedops2}
-\title{Second half of the broken up properReadPairs_bedops function after we used bedmap 
-of a bed file and the GRanges from prp_makeRthinned.}
+\title{Second part of properReadPairs_bedops}
 \usage{
 properReadPairs_bedops2(ga)
 }
@@ -14,6 +13,5 @@ properReadPairs_bedops2(ga)
 A set of proper read pairs near deletion region
 }
 \description{
-Second half of the broken up properReadPairs_bedops function after we used bedmap 
-of a bed file and the GRanges from prp_makeRthinned.
+Used after we used bedmap of a bed file and the GRanges from prp_makeRthinned
 }

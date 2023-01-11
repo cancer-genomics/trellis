@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_for_CRAM.R
 \name{sv_del_makeQuery}
 \alias{sv_del_makeQuery}
-\title{First half of sv_deletion}
+\title{First part of sv_deletions_bedops}
 \usage{
 sv_del_makeQuery(preprocess, gr_filters, param = DeletionParam())
 }
@@ -17,5 +17,5 @@ sv_del_makeQuery(preprocess, gr_filters, param = DeletionParam())
 A GRanges object that can be used for bedmap in command-line programs
 }
 \description{
-First half of sv_deletion
+First part of sv_deletions_bedops
 }

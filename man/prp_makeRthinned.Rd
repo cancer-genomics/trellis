@@ -2,9 +2,7 @@
 % Please edit documentation in R/functions_for_CRAM.R
 \name{prp_makeRthinned}
 \alias{prp_makeRthinned}
-\title{A broken-up version of properReadPairs_bedops that can be used in linux system. This
-is the first part where we extract a set of GRanges that are near deletion regions. 
-The second half of the properReadPairs_bedops function is properReadPairs_bedops2}
+\title{First part of properReadPairs_bedops}
 \usage{
 prp_makeRthinned(del.gr, dp)
 }
@@ -17,7 +15,7 @@ prp_makeRthinned(del.gr, dp)
 GRanges that are near deletion regions
 }
 \description{
-A broken-up version of properReadPairs_bedops that can be used in linux system. This
-is the first part where we extract a set of GRanges that are near deletion regions. 
-The second half of the properReadPairs_bedops function is properReadPairs_bedops2
+This is the first part of the broken-up version of properReadPairs_bedops that can 
+be used in linux system. This is the first part where we extract a set of GRanges 
+that are near deletion regions. The second half of the properReadPairs_bedops function is properReadPairs_bedops2
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_for_CRAM.R
 \name{sv_deletions_bedops}
 \alias{sv_deletions_bedops}
-\title{Define new functions for sv_deletions_bedops}
+\title{Define new functions for sv_deletions (for CRAM)}
 \usage{
 sv_deletions_bedops(preprocess, gr_filters, param = DeletionParam(), object)
 }
@@ -19,5 +19,5 @@ sv_deletions_bedops(preprocess, gr_filters, param = DeletionParam(), object)
 A set of candidate structural variants
 }
 \description{
-Define new functions for sv_deletions_bedops
+Define new functions for sv_deletions (for CRAM)
 }
