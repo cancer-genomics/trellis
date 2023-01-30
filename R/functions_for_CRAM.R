@@ -530,21 +530,21 @@ sv_amplicons2_bedops2 <- function(preprocess, amplicon_filters, params=ampliconP
 
 # for mapped-mapped, BLAT realignment
 # define functions to convert GAlignment to tibble for first and last reads
-ga2tibble_first <- function(first, len){
+ga2tibble_first <- function(first, lenn){
   first.tib <- as_tibble(first)
   rname <- as.character(seqnames(first))
-  read <- rep("R1", len)
-  id <- rep(paste0(sample, ".bam"), len)
+  read <- rep("R1", lenn)
+  id <- rep(paste0(sample, ".bam"), lenn)
   rearrangement.id <- names(first)
   first.tib <- first.tib %>% dplyr::select(-rpid) %>% mutate(rname, read, id, rearrangement.id)
   first.tib
 }
 
-ga2tibble_last <- function(last, len){
+ga2tibble_last <- function(last, lenn){
   last.tib <- as_tibble(last)
   rname <- as.character(seqnames(last))
-  read <- rep("R2", len)
-  id <- rep(paste0(sample, ".bam"), len)
+  read <- rep("R2", lenn)
+  id <- rep(paste0(sample, ".bam"), lenn)
   rearrangement.id <- names(last)
   last.tib <- last.tib %>% dplyr::select(-rpid) %>% mutate(rname, read, id, rearrangement.id)
   last.tib
@@ -559,38 +559,37 @@ ga2tibble_last <- function(last, len){
 #' @return Tagged sequences from BLAT
 #' @export
 getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample=sample){
-  # initialize an empty tibble
-  #colnames(tags)
+  ## initialize an empty tibble
+  ##colnames(tags)
   tags_colnames <- c("seqnames", "strand", "cigar", "qwidth", "start", "end", "width", "njunc", "qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq", "read", "id", "rearrangement.id")
   tags_bedops <- as_tibble(matrix(nrow = 0, ncol = length(tags_colnames)), .name_repair = ~ tags_colnames)
   
   for (i in 1:length(rlist.bedops)) {
     imp <- improper(rlist.bedops[[i]])
-    len <- length(imp)
+    lenn <- length(imp)
     
-    if (len > MAX) {
-      rown <- sample(1:len, MAX)
+    if (lenn > MAX) {
+      rown <- sample(1:lenn, MAX)
       imp_sub <- imp[rown, ]
       first <- GenomicAlignments::first(imp_sub)
       last <- GenomicAlignments::last(imp_sub)
-      len <- MAX
+      lenn <- MAX
     }
     else {
       first <- GenomicAlignments::first(imp)
       last <- GenomicAlignments::last(imp)
     }
     
-    # compile tibble
-    first_tib <- ga2tibble_first(first, len)
-    last_tib <- ga2tibble_last(last, len)
+    ## compile tibble
+    first_tib <- ga2tibble_first(first, lenn)
+    last_tib <- ga2tibble_last(last, lenn)
     tib <- rbind(first_tib, last_tib)
     
-    # append to tags tibble 
+    ## append to tags tibble 
     tags_bedops <- rbind(tags_bedops, tib)
   }
   tags_bedops
 }
-
 
 
 #BLAT mapped-unmapped
