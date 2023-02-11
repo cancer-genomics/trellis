@@ -4,7 +4,7 @@
 \alias{unmapped_read_bedops}
 \title{unmapped_read for CRAM}
 \usage{
-unmapped_read_bedops(query.bedops, maxgap = 500, path, sample = sample)
+unmapped_read_bedops(query.bedops, maxgap = 500, path, sample_name = sample)
 }
 \arguments{
 \item{query.bedops}{}

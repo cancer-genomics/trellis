@@ -4,7 +4,7 @@
 \alias{getSequenceOfReads_bedops}
 \title{getSequenceOfReads for CRAM}
 \usage{
-getSequenceOfReads_bedops(rlist.bedops, MAX = 25, sample = sample)
+getSequenceOfReads_bedops(rlist.bedops, MAX = 25, sample_name = sample)
 }
 \arguments{
 \item{rlist.bedops}{}
