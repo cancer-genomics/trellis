@@ -30,7 +30,6 @@
 \alias{graph,AmpliconGraph-method}
 \alias{graph,AmpliconGraph-class}
 \alias{driver,AmpliconGraph-method}
-\alias{edges,AmpliconGraph,ANY-method}
 \alias{edges,AmpliconGraph-method}
 \alias{graph<-,AmpliconGraph-method}
 \alias{graph,AmpliconGraph,ANY-method}
@@ -100,7 +99,7 @@ ampliconNames(amplicons)
 
 \S4method{driver}{AmpliconGraph}(object)
 
-\S4method{edges}{AmpliconGraph,ANY}(object, which, ...)
+\S4method{edges}{AmpliconGraph}(object, which, ...)
 
 \S4method{graph}{AmpliconGraph}(object) <- value
 
