@@ -227,10 +227,9 @@ updateImproperIndex <- function(sv, maxgap=2e3){
   }, irp=irp)
   names(irp) <- NULL
   lrp <- leftAlwaysFirst(irp)##, names(irp)
-  elementMetadata(lrp)$names <- elementMetadata(irp)$names
+  #elementMetadata(lrp)$names <- elementMetadata(irp)$names
   lrplist <- lapply(irp_id, function(id, lrp){
-      nms <- elementMetadata(lrp)$names
-      lrp[nms %in% id]
+      lrp[elementMetadata(lrp)$names %in% id]
   }, lrp=lrp)
   ## 2. cluster the read pairs for each element
   cl_list <- lapply(lrplist, clusterReadPairs)
@@ -238,7 +237,7 @@ updateImproperIndex <- function(sv, maxgap=2e3){
   clid <- lapply(cl_list, function(cl) names(which.max(table(cl))))
   ## 4. extract the names of the improper read pairs that correspond
   ## to the above cluster
-  irp_id2 <- mapply(function(lrp, clid, cl) names(lrp)[cl==clid],
+  irp_id2 <- mapply(function(lrp, clid, cl) elementMetadata(lrp)$names[cl==clid],
                     lrp=lrplist, clid=clid, cl=cl_list)
   ## Update the index a second time to include only those improper
   ## read pairs belonging to the cluster
@@ -251,7 +250,7 @@ updateImproperIndex <- function(sv, maxgap=2e3){
   for(j in na_index){
       index_irp[j] <- list(NULL)
   }
-  index_irp <- index_irp[order(unlist(index_irp))]
+#  index_irp <- index_irp[order(unlist(index_irp))] # commenting this to avoid error
   index_irp
 }
 
@@ -321,21 +320,21 @@ updateImproperIndex2 <- function(gr, irp, maxgap=2e3){
   ##
   ## Assess whether there are any rearranged read pair clusters
   ## 1. order read pairs by left most alignment
-  irp_id <- lapply(updated_index_list, function(i, irp) names(irp)[i], irp=irp)
+  irp_id <- lapply(updated_index_list, function(i, irp) elementMetadata(irp)$names[i], irp=irp)
   lrp <- leftAlwaysFirst(irp) ##, names(irp)
-  names(lrp) <- names(irp)
-  lrplist <- lapply(irp_id, function(id, lrp) lrp[names(lrp) %in% id], lrp=lrp)
+  #names(lrp) <- names(irp)
+  lrplist <- lapply(irp_id, function(id, lrp) lrp[elementMetadata(lrp)$names %in% id], lrp=lrp)
   ## 2. cluster the read pairs for each element
   cl_list <- lapply(lrplist, clusterReadPairs)
   ## 3. identify id of cluster with most read pairs
   clid <- lapply(cl_list, function(cl) names(which.max(table(cl))))
   ## 4. extract the names of the improper read pairs that correspond
   ## to the above cluster
-  irp_id2 <- mapply(function(lrp, clid, cl) names(lrp)[cl==clid],
+  irp_id2 <- mapply(function(lrp, clid, cl) elementMetadata(lrp)$names[cl==clid],
                     lrp=lrplist, clid=clid, cl=cl_list)
   ## Update the index a second time to include only those improper
   ## read pairs belonging to the cluster
-  index_irp <- lapply(irp_id2, function(id, irp) match(id, names(irp)), irp=irp)
+  index_irp <- lapply(irp_id2, function(id, irp) match(id, elementMetadata(irp)$names), irp=irp)
   ## the NULLs are now converted to NAs.
   ## Subsetting a vector by NULL returns an empty vector. Convert NAs back to nulls
   na_index <- which(sapply(index_irp, function(x) any(is.na(x))))
@@ -378,8 +377,9 @@ improperRP <- function(gr, irp, param=DeletionParam()){
   hits <- findOverlaps(gr, irp, maxgap=minimumGapWidth(param))
   irp <- irp[unique(subjectHits(hits))]
   if(length(irp) > 0){
-    names(irp) <- paste0("i", seq_along(irp))
+    elementMetadata(irp)$names <- paste0("i", seq_along(irp))
   }
+  names(irp) <- NULL
   irp  
 }
 
@@ -1208,7 +1208,7 @@ leftAlwaysFirst <- function(rp){
     nms2 <- elementMetadata(rp)$names[!is_r1_left]
     ##ids <- c(names(first(rp)[is_r1_left]), names(last(rp)[!is_r1_left]))
     ids <- c(nms1, nms2)
-    names(rp2) <- ids
+    elementMetadata(rp2)$names <- ids
     rp2 <- rp2[order(start(first(rp2)))]
     as(rp2, "LeftAlignmentPairs")
 }
