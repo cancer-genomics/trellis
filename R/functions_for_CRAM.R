@@ -530,7 +530,7 @@ sv_amplicons2_bedops2 <- function(preprocess, amplicon_filters, params=ampliconP
 
 # for mapped-mapped, BLAT realignment
 # define functions to convert GAlignment to tibble for first and last reads
-ga2tibble_first <- function(first, lenn, sample_name=sample){
+ga2tibble_first <- function(first, lenn, sample_name){
   first.tib <- as_tibble(first)
   rname <- as.character(seqnames(first))
   read <- rep("R1", lenn)
@@ -540,7 +540,7 @@ ga2tibble_first <- function(first, lenn, sample_name=sample){
   first.tib
 }
 
-ga2tibble_last <- function(last, lenn, sample_name=sample){
+ga2tibble_last <- function(last, lenn, sample_name){
   last.tib <- as_tibble(last)
   rname <- as.character(seqnames(last))
   read <- rep("R2", lenn)
@@ -558,7 +558,7 @@ ga2tibble_last <- function(last, lenn, sample_name=sample){
 #'
 #' @return Tagged sequences from BLAT
 #' @export
-getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample_name=sample){
+getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample_name){
   ## initialize an empty tibble
   ##colnames(tags)
   tags_colnames <- c("seqnames", "strand", "cigar", "qwidth", "start", "end", "width", "njunc", "qname", "rname", "seq", "flag", "mrnm", "mpos", "mapq", "read", "id", "rearrangement.id")
@@ -581,8 +581,8 @@ getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample_name=sample){
     }
     
     ## compile tibble
-    first_tib <- ga2tibble_first(first, lenn, sample_name=sample)
-    last_tib <- ga2tibble_last(last, lenn, sample_name=sample)
+    first_tib <- ga2tibble_first(first, lenn, sample_name=sample_name)
+    last_tib <- ga2tibble_last(last, lenn, sample_name=sample_name)
     tib <- rbind(first_tib, last_tib)
     
     ## append to tags tibble 
@@ -594,7 +594,7 @@ getSequenceOfReads_bedops <- function(rlist.bedops, MAX=25, sample_name=sample){
 #BLAT mapped-unmapped
 
 # function to import R1 and R2 as granges object
-import_mum_bedops <- function(path, sample_name=sample, file){
+import_mum_bedops <- function(path, sample_name, file){
   mum.df <- data.table::fread(paste0(path, "/", sample_name, "_", file))
   if (nrow(mum.df)>0) {
     colnames(mum.df) <- c("chr", "start", "end", "snms", "strand", "seq")
@@ -620,12 +620,12 @@ import_mum_bedops <- function(path, sample_name=sample, file){
 #'
 #' @return Unmapped reads for BLAT
 #' @export
-unmapped_read_bedops <- function(query.bedops, maxgap=500, path, sample_name=sample){
+unmapped_read_bedops <- function(query.bedops, maxgap=500, path, sample_name){
   ## import R1 and R2 as granges object
   mumR1.name <- "mum_R1.bed"
   mumR2.name <- "mum_R2.bed"
-  mumR1.gr <- import_mum_bedops(path, sample_name = sample, file = mumR1.name)
-  mumR2.gr <- import_mum_bedops(path, sample_name = sample, file = mumR2.name)
+  mumR1.gr <- import_mum_bedops(path, sample_name = sample_name, file = mumR1.name)
+  mumR2.gr <- import_mum_bedops(path, sample_name = sample_name, file = mumR2.name)
   
   mate_gr <- subsetByOverlaps(mumR1.gr, query.bedops+maxgap)
   mate_gr$read <- rep("R1", length(mate_gr))
