@@ -468,7 +468,8 @@ flankingRanges <- function(object, shift=2){
   index2 <- index - shift  
   index2 <- index2[index2 > 0]
   index3 <- index + shift
-  is_right_flank <- index3 < length(rgs)
+  is_right_flank <- (index3 < length(rgs)) & (as.character(seqnames(rgs[index3])) == as.character(seqnames(rgs[index])))
+  # This just fixes the issue at the right flank. Couldn't this happen at the left flank as well? 
   if(any(!is_right_flank)){
     ## REFACTOR.  No right flank exists.  If we exclude, linkedDuplicatedRanges will fail
     ## assign the amplicon index
