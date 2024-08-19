@@ -2,6 +2,7 @@
 % Please edit documentation in R/help.R
 \docType{package}
 \name{trellis}
+\alias{trellis-package}
 \alias{trellis}
 \title{Somatic structural variant analysis}
 \description{

@@ -736,12 +736,12 @@ setGeneric("getSequenceOfReads", function(object, bam.file,
 
 setGeneric("rename", function(x, ...) standardGeneric("rename"))
 
-#' Accessor for the combination of strands involved in a rearrangement
-#'
-#' @rdname Rearrangement-class
-#' @aliases type
-#' @export
-setGeneric("type", function(object) standardGeneric("type"))
+## #' Accessor for the combination of strands involved in a rearrangement
+## #'
+## #' @rdname Rearrangement-class
+## #' @aliases type
+## #' @export
+##setGeneric("type", function(object) standardGeneric("type"))
 setGeneric("last<-", function(x, value) standardGeneric("last<-"))
 setGeneric("numberLinkingRP", function(object) standardGeneric("numberLinkingRP"))
 

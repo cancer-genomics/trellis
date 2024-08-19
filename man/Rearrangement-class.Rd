@@ -4,7 +4,6 @@
 \docType{class}
 \name{partitioning}
 \alias{partitioning}
-\alias{type}
 \alias{Rearrangement-class}
 \alias{Rearrangement}
 \alias{partitioning,Rearrangement-method}
@@ -13,11 +12,9 @@
 \alias{[,Rearrangement,ANY,ANY,ANY-method}
 \alias{type,Rearrangement-method}
 \alias{type,RearrangementList-method}
-\title{Accessor for the combination of strands involved in a rearrangement}
+\title{A class for storing rearrangement data}
 \usage{
 partitioning(object)
-
-type(object)
 
 \S4method{partitioning}{Rearrangement}(object)
 
@@ -27,9 +24,9 @@ type(object)
 
 \S4method{[}{Rearrangement,ANY,ANY,ANY}(x, i, j, ..., drop = FALSE)
 
-\S4method{type}{Rearrangement}(object)
+\S4method{type}{Rearrangement}(x)
 
-\S4method{type}{RearrangementList}(object)
+\S4method{type}{RearrangementList}(x)
 }
 \arguments{
 \item{x}{a \code{Rearrangement} object}

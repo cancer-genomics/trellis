@@ -1539,15 +1539,15 @@ list_orientations <- function(r1, r2){
 
 #' @aliases type,Rearrangement-method
 #' @rdname Rearrangement-class
-setMethod("type", "Rearrangement", function(object){
-  .type_rear(object)
+setMethod("type", "Rearrangement", function(x){
+  .type_rear(x)
 })
 
 #' @rdname Rearrangement-class
 #' @aliases type,RearrangementList-method
-setMethod("type", "RearrangementList", function(object){
-  x <- sapply(object, type)
-  x
+setMethod("type", "RearrangementList", function(x){
+  x2 <- sapply(x, type)
+  x2
 })
 
 #' Ad-hoc assessment of the complexity of a rearrangement using the strand of the supporting read pairs
