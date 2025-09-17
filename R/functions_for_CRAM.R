@@ -485,12 +485,14 @@ get_readpairs2_bedops2 <- function(g=queryRanges(ag), bed_file){
   validR1 <- overlapsAny(GenomicAlignments::first(galp), g)
   validR2 <- overlapsAny(GenomicAlignments::last(galp), g)
   proper_rp <- galp[validR1 & validR2]
+  rm(galp);gc()
   proper_rp
 }
 
 add_amplicons_bedops2 <- function(ag, bed_file, params){
   proper_rp <- get_readpairs2_bedops2(g=queryRanges(ag), bed_file)
   ag <- addFocalDupsFlankingAmplicon(ag, proper_rp, params)
+  rm(proper_rp);gc()
   queryRanges(ag) <- focalAmpliconDupRanges(ag, params)
   ag
 }
@@ -519,6 +521,8 @@ sv_amplicons2_bedops2 <- function(preprocess, amplicon_filters, params=ampliconP
   ag <- link_amplicons(ag, improper_rp, params)
   tx <- loadTx(preprocess$genome)
   ag <- annotate_amplicons(ag, tx)
+  
+  rm(improper_rp, tx); gc()
   ag
 }
 
