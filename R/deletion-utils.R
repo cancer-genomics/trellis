@@ -1594,7 +1594,7 @@ thinReadPairs <- function(object, max.out=25e3){
 }
 
 meltReadPairs <- function(rps){
-  is.improper <- names(rps) != ""
+  is.improper <- elementMetadata(rps)$names != ""
   names(rps) <- NULL
   df <- data.frame(seqnames=as.character(seqnames(rps)),
                   start.first=start(first(rps)), end.first=end(first(rps)),
