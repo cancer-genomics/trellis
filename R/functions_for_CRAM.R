@@ -266,6 +266,9 @@ sv_del_makeQuery <- function(preprocess, gr_filters, param=DeletionParam()){
   
   segs2 <- preprocess$segments
   preprocess$segments <- segs2[segs2$seg.mean < hemizygousThr(param)]
+
+  rm(segs2);gc()
+
   sv <- deletion_call(preprocess, gr_filters, param)
   calls(sv) <- rpSupportedDeletions(sv, param=param, bins=preprocess$bins)
   
@@ -291,6 +294,10 @@ sv_del_makeQuery <- function(preprocess, gr_filters, param=DeletionParam()){
       sv <- removeHemizygous(sv)
     }
   }
+
+  rm(improper_rp)
+  rm(mapq)
+  gc()
   
   # stop here since finalize_deletions() requires bam file
   
