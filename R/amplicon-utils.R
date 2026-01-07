@@ -424,6 +424,9 @@ joinNearGRanges <- function(object, params){
   thr <- params[["MIN_SEGMEAN_DIFF"]]
   MIN_WIDTH <- params[["MIN_WIDTH"]]
   min.gapwidth <- params[["min.gapwidth"]]
+  AMP_THR <- params[["AMP_THR"]]
+  germline_priority <- c("fully_germline", "part_germline", "no_germline")
+  
   k <- which(!is.na(object$seg.mean) & width(object) > MIN_WIDTH)
   if(length(k) == 0) return(object)
   g <- object[k]
@@ -442,11 +445,17 @@ joinNearGRanges <- function(object, params){
     j <- indexlist[[i]]
     if(length(j)==1) next()
     ng <- reduce(g[j], min.gapwidth=min.gapwidth)
-    ##
-    ## TODO: combining the metadata.  Here, we're just taking the first row
-    ##
-    mc <- mcols(g)[j[1], , drop=FALSE]
-    mc$seg.mean <- sum(width(g[j])*g$seg.mean[j])/sum(width(g[j]))
+    weighted_seg.mean <- sum(width(g[j])*g$seg.mean[j])/sum(width(g[j]))
+    j_is_amplicon <- mcols(g)[j, , drop=FALSE]$is_amplicon
+    j_overlaps_germline <- mcols(g)[j, , drop=FALSE]$overlaps_germline
+    
+    
+    mc <- mcols(g)[j[1], , drop = FALSE]
+    mc$seg.mean <- weighted_seg.mean
+    mc$is_amplicon <- ifelse(any(j_is_amplicon) &
+                               weighted_seg.mean > AMP_THR, T, F)
+    mc$overlaps_germline <- germline_priority[match(TRUE, germline_priority %in% j_overlaps_germline)]
+    
     mcols(ng) <- mc
     glist[[i]] <- ng
   }
@@ -1132,13 +1141,10 @@ amplified_segments <- function(segments, params){
 }
 
 initialize_graph2 <- function(preprocess, filters, params){
-  ag <- makeAGraph2(preprocess$segments, filters, params)
-  merged <- joinNearGRanges(ranges(ag), params)
+  merged <- joinNearGRanges(preprocess$segments, params)
   names(merged) <- ampliconNames(merged)
-  ## the names of the nodes no longer correspond to the range names
-  ## stopifnot(nodes(ag) %in% names(tmp)), and so
-  ## setAmpliconGroups fails
-  ranges(ag) <- merged
+  
+  ag <- makeAGraph2(merged, filters, params)
   ag
 }
 
