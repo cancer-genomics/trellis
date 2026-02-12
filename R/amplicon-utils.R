@@ -950,19 +950,29 @@ setGenes <- function(object, transcripts){
 }
 
 ## Two levels of significance for genes:
-##    - clinical significance (synonymous with driver)
+##    - Cancer gene:
+##          - On OncoKB list of Cancer genes (12/18/2025)
+##          - Identified in any of the following publications: 
+##            PMID: 23539594, 24132290, 24390350, 29056346, 29625053, 32015527
 ##
-##    - biologically significant: perhaps biologically significant but unkown
-##      clinical significance. This set of all clinically significant
-##      genes is a subset
+##    - Clinically significant: Identified in the OncoKB list of clinically actionable genes
+##          - Therapeutic sensitivity: Levels 1, 2, 3a, 3b, and 4 (Level 1 is highest)
+##          - Therapeutic resistance: Levels R1 and R2 (Level R1 is highest)
+##          - Diagnostic evidence: Levels Dx1, Dx2, and Dx3 (Level Dx1 is highest)
+##          - Prognostic evidence: Levels Px1, Px2, and Px3 (Level Px1 is highest)
+##                      https://www.oncokb.org/actionable-genes#sections=Tx,Dx,Px
+##                      downloaded on 01/12/2026
 driver_genes <- function(tx, clin_sign=FALSE){
   if(clin_sign){
-    return(tx$gene_name[tx$cancer_connection])
+    clin_sign_index <- which(!is.na(tx$clinically_significant))
+    return(tx$gene_name[clin_sign_index])
   }
-  tx$gene_name [ tx$biol_sign ]
+  tx$gene_name [ tx$cancer_gene ]
 }
 
-getDrivers <- function(object, transcripts, clin_sign=TRUE){
+
+
+getDrivers <- function(object, transcripts, clin_sign=FALSE){
   known_drivers <- unique(driver_genes(transcripts, clin_sign=clin_sign))
   genes <- object$hgnc
   gene_list <- split(genes, object$groups)
