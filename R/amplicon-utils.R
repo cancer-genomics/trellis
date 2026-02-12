@@ -160,7 +160,7 @@ standardizeGRangesMetadata <- function(granges){
 
   granges$hgnc <- as.character(NA)
   granges$driver <- as.character(NA)
-  granges$biol_sign <- as.character(NA)
+  granges$cancer_gene <- as.character(NA)
   granges$groups <- as.factor(NA)
   granges
 }
@@ -286,7 +286,7 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
   g$is_amplicon <- FALSE
   g$hgnc <- as.character(NA)
   g$driver <- as.character(NA)
-  g$biol_sign <- as.character(NA)
+  g$cancer_gene <- as.character(NA)
   g$groups <- as.factor(NA)
   g
 }
@@ -380,7 +380,7 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
     trimmed$is_amplicon <- rgs$is_amplicon[j]
     trimmed$hgnc <- rgs$hgnc
     trimmed$driver <- rgs$driver
-    trimmed$biol_sign <- rgs$biol_sign
+    trimmed$cancer_gene <- rgs$cancer_gene
     trimmed$groups <- rgs$groups
     trimmed$overlaps_germline <- rgs$overlaps_germline
     ## drop regions that were gaps to begin with
@@ -994,13 +994,13 @@ getDrivers <- function(object, transcripts, clin_sign=FALSE){
     if(clin_sign){
       object$driver[object$groups == driver_group] <- drv[i]
     } else {
-      object$biol_sign[ object$groups == driver_group ] <- drv[i]
+      object$cancer_gene[ object$groups == driver_group ] <- drv[i]
     }
   }
   if(clin_sign){
     object$driver <- as.character(object$driver)
   } else {
-    object$biol_sign <- as.character(object$biol_sign)
+    object$cancer_gene <- as.character(object$cancer_gene)
   }
   object
 }

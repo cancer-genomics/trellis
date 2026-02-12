@@ -747,8 +747,8 @@ overlappingTranscripts <- function(r, build, maxgap=5000){
     noncoding$tx_id <- ""
     noncoding$tx_name <- ""
     noncoding$gene_name <- paste0("noncoding", seq_len(sum(no.overlap)))
-    noncoding$cancer_connection <- FALSE
-    noncoding$biol_sign <- FALSE
+    noncoding$clinically_significant <- FALSE
+    noncoding$cancer_gene <- FALSE
     tx <- c(tx, noncoding)
   }
   hits <- findOverlaps(g, tx, maxgap=maxgap)
