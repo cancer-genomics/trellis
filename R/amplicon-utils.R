@@ -157,9 +157,9 @@ standardizeGRangesMetadata <- function(granges){
   granges$seg.mean <- mns
   granges$is_amplicon <- is_amplicon
   names(granges) <- ampliconNames(granges)
-
+  
   granges$hgnc <- as.character(NA)
-  granges$driver <- as.character(NA)
+  granges$clinically_significant <- as.character(NA)
   granges$cancer_gene <- as.character(NA)
   granges$groups <- as.factor(NA)
   granges
@@ -285,7 +285,7 @@ setMethod("combine", signature(x="GRanges", y="GRanges"),
   g$seg.mean <- NA
   g$is_amplicon <- FALSE
   g$hgnc <- as.character(NA)
-  g$driver <- as.character(NA)
+  g$clinically_significant <- as.character(NA)
   g$cancer_gene <- as.character(NA)
   g$groups <- as.factor(NA)
   g
@@ -379,7 +379,7 @@ trimRangesOverlappingCentromere <- function(object, centromeres){
     trimmed$seg.mean <- rgs$seg.mean[j]
     trimmed$is_amplicon <- rgs$is_amplicon[j]
     trimmed$hgnc <- rgs$hgnc
-    trimmed$driver <- rgs$driver
+    trimmed$clinically_significant <- rgs$clinically_significant
     trimmed$cancer_gene <- rgs$cancer_gene
     trimmed$groups <- rgs$groups
     trimmed$overlaps_germline <- rgs$overlaps_germline
@@ -642,8 +642,8 @@ edgeStats <- function(edges, param){
   hits2 <- findOverlaps(last(e2), bad_bins[[1]], select="first")
   if(any(hits1 == hits2, na.rm=TRUE)){
     stop("variable flag not defined")
-##    id <- names(e2)[flag]
-##    stats$bad_bin[id] <- TRUE
+    ##    id <- names(e2)[flag]
+    ##    stats$bad_bin[id] <- TRUE
   }
   stats
 }
@@ -771,7 +771,7 @@ linkAmplicons <- function(object, rp, edgeParam=FilterEdgeParam()){
                         to=to, existing=existing)
   if(!all(edge_exists)){
     graph(object) <- addEdge(node1(keep[!edge_exists]),
-                         node2(keep[!edge_exists]), graph(object))
+                             node2(keep[!edge_exists]), graph(object))
   }
   object
 }
@@ -992,13 +992,13 @@ getDrivers <- function(object, transcripts, clin_sign=FALSE){
   for(i in seq_along(drv)){
     driver_group <- names(drv)[i]
     if(clin_sign){
-      object$driver[object$groups == driver_group] <- drv[i]
+      object$clinically_significant[object$groups == driver_group] <- drv[i]
     } else {
       object$cancer_gene[ object$groups == driver_group ] <- drv[i]
     }
   }
   if(clin_sign){
-    object$driver <- as.character(object$driver)
+    object$clinically_significant <- as.character(object$clinically_significant)
   } else {
     object$cancer_gene <- as.character(object$cancer_gene)
   }
@@ -1323,7 +1323,7 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
   tx <- tx[cnts > 1, ]
   is_overlap <- is_overlap[ cnts > 1, ]
   cnts <- cnts[ cnts > 1 ]
-
+  
   ids <- apply(is_overlap, 1, function(is_amplicon, id) {
     paste(id[is_amplicon], collapse=",")
   }, id=gsub(".bam", "", colnames(is_overlap)))
@@ -1359,7 +1359,7 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
 #' @export
 recurrentDrivers <- function(grl, transcripts, split=", "){
   driver_list <- sapply(grl, function(g){
-    dr <- as.character(g$driver)
+    dr <- as.character(g$cancer_genes)
     if(length(dr) == 0) return(NULL)
     dr <- dr[!is.na(dr)]
     dr <- unlist(strsplit(dr, split))
