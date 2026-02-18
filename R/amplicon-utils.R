@@ -932,7 +932,7 @@ setAmpliconGroups <- function(object){
 
 getGenes <- function(object, transcripts){
   .hgnc <- setNames(rep(NA, length(object)), names(object))
-  hits <- findOverlaps(transcripts, object, type="within")
+  hits <- findOverlaps(transcripts, object, type="any", minoverlap = 100)
   ##genes <- hgnc(transcripts)[queryHits(hits)]
   genes <- transcripts$gene_name[queryHits(hits)]
   amp <- names(object)[subjectHits(hits)]
