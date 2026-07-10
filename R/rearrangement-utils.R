@@ -1707,10 +1707,15 @@ negativeInversion1 <- function(r, build, maxgap=5000){
   ## approx. half of the r1-- will be bin[1], the other have bin[2]
   ## here, we do i.
   r1.is.bin1 <- r1.rpid == names(bins)[1]
-  mcols(r2)$reverse <- mcols(r1)$reverse <- FALSE
+  ## Length-aware init (logical(length(x)) == all FALSE) so a rearrangement
+  ## with zero improper pairs (length-0 r1/r2) or zero split reads does not
+  ## error with "1 elements in value to replace 0 elements". Identical to the
+  ## previous scalar FALSE when the objects are non-empty.
+  mcols(r1)$reverse <- logical(length(r1))
+  mcols(r2)$reverse <- logical(length(r2))
   mcols(r1)$reverse[r1.is.bin1] <- TRUE
   mcols(r2)$reverse[!r1.is.bin1] <- TRUE
-  sr$reverse <- FALSE
+  sr$reverse <- logical(length(sr))
   sr$reverse[sr$rpid==names(bins)[1]] <- TRUE
   first(ga) <- r1
   last(ga) <- r2
@@ -1755,10 +1760,14 @@ positiveInversion1 <- function(r, build, maxgap=5000){
   ## approx. half of the r1-- will be bin[1], the other have bin[2]
   ## here, we do i.
   r2.is.bin2 <- r2.rpid == names(bins)[2]
-  mcols(r2)$reverse <- mcols(r1)$reverse <- FALSE
+  ## Length-aware init (see negativeInversion1): guards a rearrangement with
+  ## zero improper pairs (length-0 r1/r2) — the CGOV141T_1 crash site —
+  ## "1 elements in value to replace 0 elements". Identical when non-empty.
+  mcols(r1)$reverse <- logical(length(r1))
+  mcols(r2)$reverse <- logical(length(r2))
   mcols(r1)$reverse[!r2.is.bin2] <- TRUE
   mcols(r2)$reverse[r2.is.bin2] <- TRUE
-  sr$reverse <- FALSE
+  sr$reverse <- logical(length(sr))
   sr$reverse[sr$rpid==names(bins)[2]] <- TRUE
   first(ga) <- r1
   last(ga) <- r2

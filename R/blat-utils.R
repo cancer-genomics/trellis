@@ -38,8 +38,16 @@ readBlat <- function(filename, skip=5, col_names=FALSE, ...){
 ##  nms <- paste0(as.character(blat[1, ]), as.character(blat[2, ]))
 ##  nms <- gsub(" ", "", nms)
 ##  ##nms[22:23] <- c("seq1", "seq2")
-  blat <- read.delim(filename, skip=5, stringsAsFactors=FALSE,
-                     header=FALSE, sep="\t")
+  ## A BLAT run that finds zero alignments still writes the 5-line psLayout
+  ## header, so read.delim(skip=5) has no data rows and errors with
+  ## "no lines available in input". Treat that as an empty result (zero
+  ## alignments) so callers hit their existing length-0 early returns.
+  blat <- tryCatch(
+    read.delim(filename, skip=5, stringsAsFactors=FALSE,
+               header=FALSE, sep="\t"),
+    error=function(e)
+      as.data.frame(matrix(character(0), nrow=0, ncol=length(blat_colnames)),
+                    stringsAsFactors=FALSE))
   colnames(blat) <- blat_colnames
   ##  colnames(blat) <- nms
   ##  blat <- read_table(filename, skip=skip, col_names=col_names,
@@ -47,7 +55,16 @@ readBlat <- function(filename, skip=5, col_names=FALSE, ...){
   ##    set_colnames(blat_colnames) %>%
   ##    mutate(Tname=gsub(".fa", "", Tname))
   ##blat2 <- as_tibble(blat)
-  blat
+  ## Drop malformed records whose target coordinates are missing (NA) or
+  ## reversed (Tend < Tstart). These cannot form valid genomic intervals and
+  ## otherwise crash IRanges() downstream (blatGRanges, blat_to_granges) with
+  ## "'start' or 'end' cannot contain NAs" or "each range must have an end
+  ## that is greater or equal to its start minus one". Well-formed PSL rows
+  ## always satisfy Tend >= Tstart, so passing samples are unaffected.
+  blat$Tstart <- suppressWarnings(as.integer(blat$Tstart))
+  blat$Tend   <- suppressWarnings(as.integer(blat$Tend))
+  keep <- !is.na(blat$Tstart) & !is.na(blat$Tend) & blat$Tend >= blat$Tstart
+  blat[keep, , drop=FALSE]
 }
 
 blatGRanges <- function(blat, sl=paste0("chr", c(1:22, "X", "Y", "M"))){
@@ -329,6 +346,16 @@ blatScores <- function(blat, tags, id, min.tags=5, prop.pass=0.8){
   rid <- number_alignments <- p_overlap_genome <- number_tags <- NULL
   Tend <- Tstart <- Tsize <- tag_length <- is_size_near100 <- NULL
   is_90 <- n.matches <- n.genome.matches <- is_pass <- proportion_pass <- ngats <- NULL
+  ## No BLAT alignments (e.g. an empty mapped-mapped .psl): nothing to score.
+  ## Return an empty scores table with the expected columns so the caller's
+  ## passQC filter yields zero passing rearrangements rather than erroring on
+  ## a zero-row assignment below.
+  if(nrow(blat) == 0){
+    return(tibble::tibble(rid=factor(character(0)),
+                          number_tags=integer(0),
+                          p_overlap_genome=numeric(0),
+                          passQC=logical(0)))
+  }
   tags <- tags %>%
     unite("Qname", c("qname", "read"))
   filter <- dplyr::filter
