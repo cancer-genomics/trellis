@@ -160,8 +160,10 @@ annotateBlatRecords <- function(blat, tag.sequences){
   ##table(blat$Qname %in% tagnames)
   qname_in_tgs <- blat$Qname %in% tagnames
   if(!all(qname_in_tgs)){
-    stop("Qnames in blat records not in tag names. One of the objects must be outdated.")
-    blat <- blat[blat$Qname %in% tagnames, ]
+    warning("Qnames in blat records not in tag names — dropping ",
+            sum(!qname_in_tgs), " unmatched record(s). ",
+            "BLAT PSL may have been built from a different rlist version.")
+    blat <- blat[qname_in_tgs, , drop=FALSE]
   }
   blat$id <- sampleids[blat$Qname]
   blat$genome.chr <- genome.chr[blat$Qname]
@@ -494,6 +496,7 @@ numberAlignmentRecords <- function(blat.gr){
                 match=bmatch,
                 strand=strands)
   gr <- reduce(g2, with.revmap=TRUE)
+  if (length(gr) == 0) return(GRanges())
   revmap <- mcols(gr)$revmap
   tmp <- relist(g2$qStarts[unlist(revmap)], revmap)
   qstarts <- sapply(tmp, min)
