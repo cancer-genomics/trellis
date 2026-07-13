@@ -124,6 +124,14 @@ genomeAndBlatOverlap <- function(blat){
 #' @export
 annotateBlatRecords <- function(blat, tag.sequences){
   Qname <- NULL
+  ## A mapped-mapped BLAT run that finds zero alignments yields a 0-row blat
+  ## (readBlat returns an empty data.frame). Guard it: the split() below uses
+  ## 1:nrow(blat), which is c(1, 0) when nrow == 0 (length 2) and crashes
+  ## split() with "group length is 0 but data length > 0". Return the empty
+  ## records unchanged; blatScores() already short-circuits on nrow == 0, so the
+  ## caller gets zero passing rearrangements. (CGOV161T: empty tumor mapped-mapped
+  ## PSL.)
+  if (nrow(blat) == 0L) return(blat)
   qname2 <- paste0(tag.sequences$qname, "_", tag.sequences$read)
   query.sequences <- setNames(tag.sequences$seq, qname2)
   query.sequences <- query.sequences[names(query.sequences) %in% blat$Qname]
