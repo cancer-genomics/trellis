@@ -962,12 +962,44 @@ setGenes <- function(object, transcripts){
 ##          - Prognostic evidence: Levels Px1, Px2, and Px3 (Level Px1 is highest)
 ##                      https://www.oncokb.org/actionable-genes#sections=Tx,Dx,Px
 ##                      downloaded on 01/12/2026
+##
+## driver_genes() must tolerate two annotation schemas on 'tx' (a transcripts
+## GRanges, e.g. from svfilters.<ucsc_build>):
+##
+##   - current schema (intended OncoKB-derived columns, not yet produced by any
+##     released svfilters.* data package): 'cancer_gene', 'clinically_significant'
+##   - historical schema (what every released svfilters.hg18/hg19 'transcripts'
+##     object actually ships today): 'biol_sign', 'cancer_connection'
+##
+## An empty result is never a valid outcome of a schema mismatch -- if neither
+## schema resolves, fail loudly instead of silently returning character(0).
+## (theme 8 / trellis 1.0.9: see card EXT-01 in cancer-genomics/2025.ovarian.subtypes)
+##
 driver_genes <- function(tx, clin_sign=FALSE){
+  cols <- colnames(mcols(tx))
   if(clin_sign){
-    clin_sign_index <- which(!is.na(tx$clinically_significant))
-    return(tx$gene_name[clin_sign_index])
+    if("clinically_significant" %in% cols){
+      clin_sign_index <- which(!is.na(tx$clinically_significant))
+      return(tx$gene_name[clin_sign_index])
+    }
+    if("cancer_connection" %in% cols){
+      return(tx$gene_name[tx$cancer_connection])
+    }
+    stop("driver_genes(clin_sign=TRUE): could not resolve a recognized schema on 'tx'.\n",
+         "  Columns found:    ", paste(cols, collapse=", "), "\n",
+         "  Columns expected: 'clinically_significant' (current schema) or ",
+         "'cancer_connection' (historical schema).")
   }
-  tx$gene_name [ tx$cancer_gene ]
+  if("cancer_gene" %in% cols){
+    return(tx$gene_name[tx$cancer_gene])
+  }
+  if("biol_sign" %in% cols){
+    return(tx$gene_name[tx$biol_sign])
+  }
+  stop("driver_genes(): could not resolve a recognized schema on 'tx'.\n",
+       "  Columns found:    ", paste(cols, collapse=", "), "\n",
+       "  Columns expected: 'cancer_gene' (current schema) or ",
+       "'biol_sign' (historical schema).")
 }
 
 
@@ -1359,7 +1391,24 @@ recurrentAmplicons <- function(tx, grl, maxgap=5e3){
 #' @export
 recurrentDrivers <- function(grl, transcripts, split=", "){
   driver_list <- sapply(grl, function(g){
-    dr <- as.character(g$cancer_genes)
+    ## Same class of defect as driver_genes() (card EXT-01): the amplicon/
+    ## deletion GRanges 'g' is annotated by setDrivers()/getDrivers() /
+    ## standardizeGRangesMetadata(), all of which write the column 'cancer_gene'
+    ## (singular) -- never the plural 'cancer_genes' this used to read. Accept
+    ## the current column name and the historical pre-2016 name ('driver'),
+    ## and fail loudly rather than silently returning an empty driver list if
+    ## neither is present.
+    cols <- colnames(mcols(g))
+    if("cancer_gene" %in% cols){
+      dr <- as.character(g$cancer_gene)
+    } else if("driver" %in% cols){
+      dr <- as.character(g$driver)
+    } else {
+      stop("recurrentDrivers(): could not resolve a recognized driver-gene column on 'grl'.\n",
+           "  Columns found:    ", paste(cols, collapse=", "), "\n",
+           "  Columns expected: 'cancer_gene' (current schema, set by ",
+           "setDrivers()/getDrivers()) or 'driver' (historical schema).")
+    }
     if(length(dr) == 0) return(NULL)
     dr <- dr[!is.na(dr)]
     dr <- unlist(strsplit(dr, split))
