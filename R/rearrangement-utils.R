@@ -729,6 +729,24 @@ type_each <- function(rlist){
   rlist
 }
 
+## Placeholder transcript records for regions that overlap no transcript.
+## They get exactly the metadata columns, and types, of `transcripts` --
+## whichever cancer-gene schema the svfilters version carries -- so that
+## c(tx, noncoding) cannot fail on mismatched columns. Logical columns are
+## FALSE, everything else NA, except tx_name ("") and gene_name
+## ("noncoding1", ...).
+noncodingRanges <- function(g, transcripts){
+  noncoding <- granges(g)
+  n <- length(noncoding)
+  mc <- lapply(as.list(mcols(transcripts)), function(x) {
+    if (is.logical(x)) rep(FALSE, n) else x[rep(NA_integer_, n)]
+  })
+  mc$tx_name <- rep("", n)
+  mc$gene_name <- paste0("noncoding", seq_len(n))
+  mcols(noncoding) <- DataFrame(mc, check.names = FALSE)
+  noncoding
+}
+
 overlappingTranscripts <- function(r, build, maxgap=5000){
   if(missing(build)){
     build <- genome(improper(r))[[1]]
@@ -743,12 +761,7 @@ overlappingTranscripts <- function(r, build, maxgap=5000){
   if(!all(overlapsAny(g, transcripts, maxgap=maxgap))){
     ## one or both regions do not overlap a transcript
     no.overlap <- !overlapsAny(g, transcripts, maxgap=maxgap)
-    noncoding <- g[no.overlap]
-    noncoding$tx_id <- ""
-    noncoding$tx_name <- ""
-    noncoding$gene_name <- paste0("noncoding", seq_len(sum(no.overlap)))
-    noncoding$clinically_significant <- FALSE
-    noncoding$cancer_gene <- FALSE
+    noncoding <- noncodingRanges(g[no.overlap], transcripts)
     tx <- c(tx, noncoding)
   }
   hits <- findOverlaps(g, tx, maxgap=maxgap)
