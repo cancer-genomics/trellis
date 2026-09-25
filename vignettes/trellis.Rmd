@@ -306,6 +306,9 @@ net <- network(am, directed=FALSE)
 chroms <- sapply(strsplit(colnames(am), ":"), "[", 1)
 ar <- ampliconRanges(ag)
 data(transcripts, package="svfilters.hg19")
+## cancer_connection is the 2016 literature-based driver list. transcripts also
+## carries cancer_gene and clinically_significant (OncoKB-derived, snapshot
+## 2026-01; see ?svfilters.hg19::transcripts), which driver_genes() prefers.
 hits <- findOverlaps(ar, transcripts, maxgap=5000)
 cancer.con <- split(transcripts$cancer_connection[subjectHits(hits)],
                     queryHits(hits))
