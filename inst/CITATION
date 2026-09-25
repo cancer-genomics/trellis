@@ -1,0 +1,34 @@
+bibentry(
+  bibtype = "Article",
+  header = "To cite trellis in publications, please cite:",
+  title = paste("Integrated Genomic, Epigenomic, and Expression Analyses of",
+                "Ovarian Cancer Cell Lines"),
+  author = c(person("Eniko", "Papp"), person("Dorothy", "Hallberg"),
+             person("Gottfried E.", "Konecny"), person("Daniel C.", "Bruhm"),
+             person("Vilmos", "Adleff"), person("Micha\u00ebl", "No\u00eb"),
+             person("Ioannis", "Kagiampakis"), person("Doreen", "Palsgrove"),
+             person("Dylan", "Conklin"), person("Yasuto", "Kinose"),
+             person("James R.", "White"), person("Michael F.", "Press"),
+             person("Ronny", "Drapkin"), person("Hariharan", "Easwaran"),
+             person("Stephen B.", "Baylin"), person("Dennis", "Slamon"),
+             person("Victor E.", "Velculescu"), person("Robert B.", "Scharpf")),
+  journal = "Cell Reports",
+  year = "2018",
+  volume = "25",
+  number = "9",
+  pages = "2617--2633",
+  doi = "10.1016/j.celrep.2018.10.096",
+  note = "PMID: 30485824"
+)
+
+bibentry(
+  bibtype = "Manual",
+  header = "The package itself:",
+  title = "trellis: Analysis of somatic structural variants from whole genome sequencing",
+  author = c(person("Rob", "Scharpf"), person("Daniel", "Bruhm"),
+             person("Dorothy", "Hallberg"), person("Shashikant", "Koul"),
+             person("Nicholas", "Vulpescu"), person("Victor", "Velculescu")),
+  year = "2026",
+  note = paste("R package version", meta$Version),
+  url = "https://github.com/cancer-genomics/trellis"
+)
