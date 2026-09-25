@@ -951,8 +951,9 @@ setGenes <- function(object, transcripts){
 
 ## Two levels of significance for genes:
 ##    - Cancer gene:
-##          - On OncoKB list of Cancer genes (12/18/2025)
-##          - Identified in any of the following publications: 
+##          - On the OncoKB cancer gene list (ONCOGENE/TSG genes and their
+##            aliases; snapshot 2026-01-06), or
+##          - Identified in any of the following publications:
 ##            PMID: 23539594, 24132290, 24390350, 29056346, 29625053, 32015527
 ##
 ##    - Clinically significant: Identified in the OncoKB list of clinically actionable genes
@@ -961,15 +962,22 @@ setGenes <- function(object, transcripts){
 ##          - Diagnostic evidence: Levels Dx1, Dx2, and Dx3 (Level Dx1 is highest)
 ##          - Prognostic evidence: Levels Px1, Px2, and Px3 (Level Px1 is highest)
 ##                      https://www.oncokb.org/actionable-genes#sections=Tx,Dx,Px
-##                      downloaded on 01/12/2026
+##                      snapshot 2026-01-12
+##
+##    Both are computed by the private CancerGenes package when svfilters is
+##    built, and shipped on svfilters.hg19 (>= 0.0.27) / svfilters.hg18
+##    (>= 0.0.20) 'transcripts'. See ?svfilters.hg19::transcripts for the
+##    OncoKB attribution, and metadata(transcripts)$oncokb for the snapshot.
 ##
 ## driver_genes() must tolerate two annotation schemas on 'tx' (a transcripts
 ## GRanges, e.g. from svfilters.<ucsc_build>):
 ##
-##   - current schema (intended OncoKB-derived columns, not yet produced by any
-##     released svfilters.* data package): 'cancer_gene', 'clinically_significant'
-##   - historical schema (what every released svfilters.hg18/hg19 'transcripts'
-##     object actually ships today): 'biol_sign', 'cancer_connection'
+##   - current schema (OncoKB-derived columns, shipped by svfilters.hg19 >= 0.0.27
+##     and svfilters.hg18 >= 0.0.20, and briefly by svfilters.hg19 0.0.24-0.0.25):
+##     'cancer_gene', 'clinically_significant'
+##   - historical schema (2016 literature-based list; still carried alongside
+##     the current schema, and the only schema in earlier releases):
+##     'biol_sign', 'cancer_connection'
 ##
 ## An empty result is never a valid outcome of a schema mismatch -- if neither
 ## schema resolves, fail loudly instead of silently returning character(0).
