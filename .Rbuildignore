@@ -6,3 +6,4 @@ contributing.md
 data-raw$
 TODO.org
 ^\.git$
+^project\.yml$

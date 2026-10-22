@@ -1,0 +1,34 @@
+# Tier P: code, no data of its own. Vocabulary and required-field profile:
+# ../sop.fair-data/vocab.yml.
+#
+# Written 2026-10-22 at P0 of the trellis2 rewrite plan
+# (cancer-genomics/trellis2, docs/refactor_plan.md). This package is frozen at
+# tag pre-refactor-baseline (d18b70e) and is the reference implementation
+# until trellis2 reaches parity (P13). Bundled data under data/ and inst/extdata
+# are small example objects; filters and test BAMs live in svfilters.* / svbams.
+tier: P
+id: trellis
+venue: github
+title: "trellis -- somatic structural variant analysis from whole-genome sequencing"
+status: active
+reviewed: 2026-10-22
+pi: Rob Scharpf
+
+people:
+  - {name: Rob Scharpf, jhed: rscharp1, role: pi, contact: rscharpf@jhu.edu}
+
+human_subjects: false
+phi_tier: none
+containment: not-required
+retention: keep
+
+locality: shared-remote
+backup:
+  - {mode: remote-git}
+  - {mode: dropbox-sync}
+
+license: {code: GPL-3.0, note: "License field in DESCRIPTION"}
+
+# Reciprocal edge in trellis2/project.yml (uses-methods-from: trellis).
+related:
+  - {relation: provides-methods-for, id: trellis2}
